@@ -1,0 +1,118 @@
+/* The only dark surface in the app (spec 8.5, VISUAL_AUDIT section 8). */
+
+.card {
+  position: absolute;
+  right: var(--inset-hud);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+  width: min(360px, calc(100vw - 32px));
+  background: var(--chip-darker);
+  border-radius: var(--radius-card);
+  padding: 14px 12px 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  z-index: 25;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.close {
+  position: absolute;
+  right: 4px;
+  top: -2px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.well {
+  position: relative;
+  height: 104px;
+  background: var(--well-black);
+  border-radius: var(--radius-well);
+  overflow: hidden;
+}
+
+.chart {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.wellEmpty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0 24px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.rows {
+  position: relative;
+  margin-top: 12px;
+  transition: height var(--tween-reorder) var(--ease-out);
+  overflow: hidden;
+}
+
+.row {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform var(--tween-reorder) var(--ease-out);
+  will-change: transform;
+}
+
+.receptorPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  min-height: 34px;
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.occupancyValue {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+  min-width: 34px;
+}
+
+.rows :global(.dotMatrix),
+.row > span:last-child {
+  margin-left: auto;
+}
+
+.footnote {
+  margin: 8px 4px 0;
+  font-size: 10px;
+  line-height: 1.45;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.35);
+}

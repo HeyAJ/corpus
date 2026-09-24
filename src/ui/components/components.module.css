@@ -1,0 +1,233 @@
+/* Shared primitives for the HUD. Measured from docs/VISUAL_AUDIT.md sections 4-6. */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  min-height: 32px;
+  background: var(--chip-bg);
+  border-radius: var(--radius-chip);
+  font-size: var(--size-chip);
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.chipLabel {
+  color: var(--ink-dim);
+  font-weight: var(--weight-bold);
+}
+
+.chipUnit {
+  color: var(--ink-faint);
+  font-weight: var(--weight-bold);
+  font-size: 0.85em;
+}
+
+.chipSeparator {
+  color: #9a9a9a;
+  padding: 0 2px;
+}
+
+/* The chip's bottom-edge fill indicator, visible on the stomach volume chip. */
+.chipFill {
+  position: relative;
+  overflow: hidden;
+}
+
+.chipFill::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: var(--fill, 0%);
+  background: linear-gradient(90deg, #d8a86a, #c8433a);
+  border-radius: 0 3px 3px 0;
+  transition: width 400ms var(--ease-out);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  min-height: 34px;
+  border-radius: var(--radius-pill);
+  font-size: var(--size-chip);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.organPill {
+  background: var(--organ-active);
+  color: var(--ink-inverse);
+}
+
+.strip {
+  position: relative;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+}
+
+.darkStrip {
+  background: var(--chip-dark);
+  border-radius: var(--radius-chip);
+  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.darkStripBadge {
+  color: #fff;
+  font-weight: var(--weight-bold);
+  font-size: 14px;
+  min-width: 14px;
+  text-align: center;
+}
+
+/* --- pH scale (spec 8.2) ------------------------------------------------ */
+
+.phChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  background: var(--chip-bg);
+  border-radius: var(--radius-chip);
+  font-size: var(--size-chip);
+  font-weight: var(--weight-bold);
+}
+
+.phTrack {
+  position: relative;
+  width: 110px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, #d93025 0%, #e8722a 28%, #efa93b 55%, #c9d14a 80%, #8fbf5a 100%);
+}
+
+.phHandle {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  margin-left: -6px;
+  border-radius: 50%;
+  background: #2a2a2a;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: left 400ms var(--ease-out);
+}
+
+/* --- condition tags (spec 4.8) ----------------------------------------- */
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radius-pill);
+  font-size: var(--size-tag);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.015em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tagCritical {
+  background: var(--severity-critical-bg);
+  color: var(--severity-critical-ink);
+}
+
+.tagWarn {
+  background: var(--severity-warn-bg);
+  color: var(--severity-warn-ink);
+}
+
+.tagWatch {
+  background: var(--severity-watch-bg);
+  color: var(--severity-watch-ink);
+}
+
+/* Colour is never the only signal (spec 10.6): each tier also carries a glyph. */
+.tagGlyph {
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+/* --- dot-matrix occupancy bar (spec 8.5) -------------------------------- */
+
+.dotMatrix {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  grid-auto-rows: 3px;
+  gap: 2px;
+  width: 140px;
+}
+
+.dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #5a5a5a;
+}
+
+.dotOn {
+  background: #ffffff;
+}
+
+/* --- sparkline ---------------------------------------------------------- */
+
+.sparkline {
+  display: block;
+}
+
+/* --- provenance affordance ---------------------------------------------- */
+
+.provenanceButton {
+  padding: 0 4px;
+  color: var(--ink-faint);
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 4px;
+}
+
+.provenanceButton:hover {
+  color: var(--ink-dim);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ------------------------------------------------------------- dose curve */
+
+.doseCurveFigure {
+  margin: 0;
+  line-height: 0;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* -------------------------------------------------------------- sparkline */
+
+.sparkline {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: middle;
+  opacity: 0.75;
+}

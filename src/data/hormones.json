@@ -1,0 +1,153 @@
+{
+  "version": 1,
+  "about": "Endogenous hormones. Each carries a baseline plasma level with a reference range, a secretory drive expressed as a function of state the engine already computes, a clearance half-life, and an effect vector onto the shared effect bus in src/sim/core/effects.ts. A hormone is not a drug: it has no dose, no route and no volume of distribution here. What it has is a feedback loop, and the loop is the point.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021. Unit XIV, Endocrinology and Reproduction.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "WILLIAMS14": {
+      "label": "Melmed S, Auchus RJ, Goldfine AB, Koenig RJ, Rosen CJ (eds). Williams Textbook of Endocrinology, 14th ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/williams-textbook-of-endocrinology/melmed/978-0-323-55596-8"
+    },
+    "ENGINEERING": {
+      "label": "Engineering default chosen for this simulation. Not a physiological measurement; see docs/MODEL_LIMITATIONS.md.",
+      "url": "docs/MODEL_LIMITATIONS.md"
+    }
+  },
+  "hormones": [
+    {
+      "id": "cortisol",
+      "label": "Cortisol",
+      "gland": "adrenal cortex",
+      "unit": "ug/dL",
+      "baseline": 12,
+      "refLow": 5,
+      "refHigh": 25,
+      "halfLife_min": 80,
+      "ec50": 20,
+      "hill": 1.4,
+      "circadianAmplitude": 0.55,
+      "circadianPeakHour": 8,
+      "drivers": [{ "signal": "stressAxis", "gain": 2.4 }],
+      "effects": [
+        { "target": "metabolic.hepaticGlucoseOutput", "gain": 0.5, "note": "Gluconeogenesis from amino acids; the reason a stressed body runs hyperglycaemic." },
+        { "target": "metabolic.proteinCatabolism", "gain": 0.6, "note": "Skeletal muscle breakdown supplying gluconeogenic substrate." },
+        { "target": "immune.inflammation", "gain": -0.8, "note": "Broad suppression of inflammatory signalling; the basis of every glucocorticoid drug." },
+        { "target": "cardio.systemicResistance", "gain": 0.2, "note": "Permissive effect: catecholamines act poorly on a cortisol-deficient vasculature." }
+      ],
+      "source": "GH14",
+      "confidence": "measured",
+      "note": "Morning peak, evening trough. The circadian term is what makes an 08:00 level and a 23:00 level different numbers for the same healthy body, which is the single most misread fact about a cortisol result."
+    },
+    {
+      "id": "aldosterone",
+      "label": "Aldosterone",
+      "gland": "adrenal cortex",
+      "unit": "ng/dL",
+      "baseline": 10,
+      "refLow": 3,
+      "refHigh": 30,
+      "halfLife_min": 20,
+      "ec50": 15,
+      "hill": 1.2,
+      "drivers": [
+        { "signal": "reninDrive", "gain": 1.8 },
+        { "signal": "serumPotassium", "gain": 1.2 }
+      ],
+      "effects": [
+        { "target": "renal.sodiumReabsorption", "gain": 0.85, "note": "Principal cells of the collecting duct: ENaC insertion and Na/K-ATPase upregulation." },
+        { "target": "renal.potassiumExcretion", "gain": 0.75, "note": "The same exchange, seen from the other side. It is why an aldosterone antagonist causes hyperkalaemia." },
+        { "target": "renal.waterReabsorption", "gain": 0.35, "note": "Water follows the reabsorbed sodium osmotically." }
+      ],
+      "source": "GH14",
+      "confidence": "measured",
+      "note": "Driven by renin and, independently, by serum potassium. The potassium limb matters: it is a direct adrenal effect that does not need the renin-angiotensin system at all."
+    },
+    {
+      "id": "adh",
+      "label": "Vasopressin (ADH)",
+      "gland": "posterior pituitary",
+      "unit": "pg/mL",
+      "baseline": 2.5,
+      "refLow": 1,
+      "refHigh": 13,
+      "halfLife_min": 18,
+      "ec50": 6,
+      "hill": 1.6,
+      "drivers": [
+        { "signal": "plasmaOsmolality", "gain": 3.0 },
+        { "signal": "hypovolaemia", "gain": 2.2 }
+      ],
+      "effects": [
+        { "target": "renal.waterReabsorption", "gain": 0.9, "note": "Aquaporin-2 insertion in the collecting duct." },
+        { "target": "cardio.systemicResistance", "gain": 0.45, "note": "V1A-mediated vasoconstriction, which only becomes significant at the concentrations severe hypovolaemia produces." }
+      ],
+      "source": "GH14",
+      "confidence": "measured",
+      "note": "Two drivers with very different sensitivities. Osmolality moves it over a 1% change; volume has to fall about 10% before it contributes at all — and then it dominates. That asymmetry is why a hypovolaemic patient will retain water at the cost of becoming hyponatraemic."
+    },
+    {
+      "id": "thyroxine",
+      "label": "Free T4",
+      "gland": "thyroid",
+      "unit": "ng/dL",
+      "baseline": 1.3,
+      "refLow": 0.8,
+      "refHigh": 1.8,
+      "halfLife_min": 9600,
+      "ec50": 1.5,
+      "hill": 2.0,
+      "drivers": [{ "signal": "tshDrive", "gain": 1.0 }],
+      "effects": [
+        { "target": "metabolic.basalRate", "gain": 0.7, "note": "Sets basal metabolic rate across essentially every tissue." },
+        { "target": "thermal.heatProduction", "gain": 0.5, "note": "Obligatory thermogenesis; the reason hypothyroid patients are cold." },
+        { "target": "cardio.heartRate", "gain": 0.4, "note": "Increased beta-adrenoceptor density in the myocardium, so thyroid state changes how the heart answers catecholamines." },
+        { "target": "cardio.contractility", "gain": 0.3, "note": "Same mechanism." }
+      ],
+      "source": "WILLIAMS14",
+      "confidence": "measured",
+      "note": "A seven-day half-life, modelled as 9600 min. Nothing else in this simulation moves that slowly, and the consequence is worth seeing: change thyroid state and the body takes simulated weeks to answer."
+    },
+    {
+      "id": "glucagon",
+      "label": "Glucagon",
+      "gland": "pancreatic alpha cell",
+      "unit": "pg/mL",
+      "baseline": 70,
+      "refLow": 50,
+      "refHigh": 150,
+      "halfLife_min": 6,
+      "ec50": 120,
+      "hill": 1.5,
+      "drivers": [{ "signal": "hypoglycaemia", "gain": 3.0 }],
+      "effects": [
+        { "target": "metabolic.glycogenolysis", "gain": 0.9, "note": "Hepatic glycogen phosphorylase activation: the fast defence against hypoglycaemia." },
+        { "target": "metabolic.hepaticGlucoseOutput", "gain": 0.8, "note": "Gluconeogenesis and glycogenolysis together." },
+        { "target": "metabolic.ketogenesis", "gain": 0.6, "note": "Unopposed by insulin, this is what produces ketoacidosis." }
+      ],
+      "source": "GH14",
+      "confidence": "measured",
+      "note": "The existing Bergman minimal model in systems/metabolic.ts already carries a glucagon DRIVE term. This entry gives that drive a concentration, a clearance and an effect vector, so the counter-regulation becomes a hormone rather than a coefficient."
+    },
+    {
+      "id": "epo",
+      "label": "Erythropoietin",
+      "gland": "kidney",
+      "unit": "mIU/mL",
+      "baseline": 12,
+      "refLow": 4,
+      "refHigh": 25,
+      "halfLife_min": 420,
+      "ec50": 30,
+      "hill": 1.0,
+      "drivers": [{ "signal": "hypoxia", "gain": 4.0 }],
+      "effects": [
+        { "target": "renal.erythropoiesis", "gain": 1.0, "note": "Marrow erythroid progenitor survival. Acts over days, so within one session it is a readout rather than a lever." }
+      ],
+      "source": "GH14",
+      "confidence": "measured",
+      "note": "Included because it makes renal failure and chronic hypoxia legible as endocrine problems, not just filtration ones. Its effect on haematocrit is far slower than any session, and the model says so rather than pretending otherwise."
+    }
+  ]
+}

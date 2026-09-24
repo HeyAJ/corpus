@@ -1,0 +1,170 @@
+/*
+ * PHYSIOLOGY PANEL.
+ *
+ * Styled as a control surface, not as a readout. Every other panel in this interface
+ * reports what the body is doing; this one is where you tell it what to do, and the
+ * distinction has to be visible at a glance or the numbers here will be mistaken for
+ * measurements. Hence sliders rather than chips, left-aligned prose under each control,
+ * and none of the tabular density the lab panel uses.
+ */
+
+.panel {
+  position: absolute;
+  top: var(--inset-hud);
+  right: var(--inset-hud);
+  width: min(400px, calc(100vw - 2 * var(--inset-hud)));
+  max-height: calc(100vh - 2 * var(--inset-hud) - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+  z-index: 30;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+}
+
+.sub {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.value {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mid);
+}
+
+/* What the body has actually reached, when it lags what was asked for. The gap between
+   the two IS the physiology, so it gets its own colour rather than being hidden. */
+.actual {
+  color: var(--organ-active);
+  font-weight: 600;
+}
+
+/* Pain is the one row that is a genuine computation rather than a setting. */
+.felt {
+  color: var(--organ-active);
+  font-weight: 600;
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--organ-active);
+  cursor: pointer;
+}
+
+.hint {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+.buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.small {
+  flex: 1;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: var(--radius-chip, 8px);
+  cursor: pointer;
+}
+
+.small:hover {
+  background: var(--chip-bg-strong);
+}
+
+.toggle {
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: var(--radius-chip, 8px);
+  cursor: pointer;
+  text-align: left;
+}
+
+.toggleOn {
+  background: var(--organ-active);
+  color: var(--ink-inverse);
+}
+
+/* Something the body is carrying that you did not set and cannot set: a debt, a volume
+   already lost. Distinct from both the controls and the readouts. */
+.debt {
+  margin: 0;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  background: var(--chip-bg-strong);
+  border-radius: 6px;
+}

@@ -1,0 +1,201 @@
+/*
+ * SESSION TIMELINE.
+ *
+ * Collapsed it is one strip of ticks, roughly the height of a chip, because most of
+ * the time nothing has happened and that should cost nothing. Opened it becomes a
+ * small chart plus the written record.
+ */
+
+.wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  background: var(--sheet-bg);
+  border-radius: var(--radius-well);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+  /*
+   * Sized here rather than with auto margins. An `margin: 0 auto` on a stretched flex
+   * item does not centre a full-width box — it makes the box shrink to its content and
+   * then centres that, which collapsed this to the width of the word "Timeline".
+   */
+  width: min(560px, calc(100% - 2 * var(--inset-hud)));
+  transition: background var(--tween-state) var(--ease-out);
+}
+
+.wrapOpen {
+  background: rgba(240, 240, 240, 0.97);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  color: var(--ink-mid);
+  align-self: flex-start;
+}
+
+.toggleLabel {
+  font-size: 12px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.toggleCount {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--chip-bg-strong);
+  color: var(--ink-dim);
+}
+
+/* ------------------------------------------------------------------ track */
+
+.track {
+  position: relative;
+  height: 14px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.wrapOpen .track {
+  height: 58px;
+}
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * A tick, not a dot. The vertical line reads as "an instant" and a dot reads as
+ * "a thing", and these are instants.
+ */
+.mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 1px;
+}
+
+.markDrug {
+  background: var(--accent-magenta);
+}
+.markFood {
+  background: var(--accent-amber);
+}
+.markProcedure {
+  background: var(--accent-cool);
+}
+.markState {
+  background: var(--ink-faint);
+}
+
+/* ----------------------------------------------------------------- legend */
+
+.legend {
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.legendMap::before,
+.legendHr::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  margin-right: 4px;
+  vertical-align: middle;
+  border-radius: 1px;
+}
+
+.legendMap::before {
+  background: var(--organ-active);
+}
+
+.legendHr::before {
+  background: var(--accent-cool);
+}
+
+.legendSpan {
+  margin-left: auto;
+}
+
+/* ------------------------------------------------------------------- list */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 128px;
+  overflow-y: auto;
+  font-size: 12px;
+}
+
+.list li {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 2px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.listTime {
+  flex: 0 0 62px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.listLabel {
+  color: var(--ink);
+}
+
+.listDetail {
+  color: var(--ink-dim);
+}
+
+.tone_info {
+  color: var(--ink);
+}
+
+.tone_warn .listLabel {
+  color: var(--severity-warn-ink);
+  font-weight: var(--weight-bold);
+}
+
+.tone_critical .listLabel {
+  color: var(--severity-critical-bg);
+  font-weight: var(--weight-bold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .wrap {
+    max-width: none;
+    margin: 0 var(--inset-hud);
+  }
+}

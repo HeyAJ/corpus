@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "about": "Constants for the pathology subsystem in src/sim/systems/pathology.ts: pain, systemic inflammation, continuous haemorrhage and vertigo. Same rule as every other data file here - no number in src/sim/ that is not in a data file with a citation. Two things are worth knowing before reading it. FIRST, most of what this subsystem does is DERIVED AT RUNTIME from the numbers below together with constants that already live in physiology.json, rather than being written down as a finished gain. A cold pressor test raises heart rate by about ten beats a minute; what fraction of THIS model's baseline that is depends on this model's baseline, so the ten is stored and the fraction is computed. That is ADR-022's rule - anything the model can compute, the model computes - and it is what keeps a gain from silently drifting out of agreement with the baseline it was fitted against. SECOND, haemorrhage appears here only in the documentation. The bleed itself has no constants at all: it is a rate the user sets, subtracted from circulating volume through the same addVolume path the instantaneous HAEMORRHAGE intent already uses, and everything that follows - baroreflex, transcapillary refill, lactate - is already modelled elsewhere. A constant with no consumer would be worse than no constant.",
+  "notForClinicalUse": "CORPUS is a simulator. Nothing in this file is dosing, triage or diagnostic guidance.",
+
+  "sources": {
+    "VICTOR1987": {
+      "label": "Victor RG, Leimbach WN Jr, Seals DR, Wallin BG, Mark AL. Effects of the cold pressor test on muscle sympathetic nerve activity in humans. Hypertension. 1987;9(5):429-436.",
+      "url": "https://doi.org/10.1161/01.HYP.9.5.429"
+    },
+    "BORGBJERG1996": {
+      "label": "Borgbjerg FM, Nielsen K, Franks J. Experimental pain stimulates respiration and attenuates morphine-induced respiratory depression: a controlled study in human volunteers. Pain. 1996;64(1):123-128.",
+      "url": "https://doi.org/10.1016/0304-3959(95)00088-7"
+    },
+    "BONE1992": {
+      "label": "Bone RC, Balk RA, Cerra FB, et al. Definitions for sepsis and organ failure and guidelines for the use of innovative therapies in sepsis. ACCP/SCCM Consensus Conference. Chest. 1992;101(6):1644-1655.",
+      "url": "https://doi.org/10.1378/chest.101.6.1644"
+    },
+    "MACKOWIAK1998": {
+      "label": "Mackowiak PA. Concepts of fever. Arch Intern Med. 1998;158(17):1870-1881. Reviews DuBois's observation that fever above about 41 C is vanishingly rare because fever is a REGULATED rise, and that higher temperatures mean thermoregulation has failed rather than that the fever is worse.",
+      "url": "https://doi.org/10.1001/archinte.158.17.1870"
+    },
+    "DESBOROUGH2000": {
+      "label": "Desborough JP. The stress response to trauma and surgery. Br J Anaesth. 2000;85(1):109-117.",
+      "url": "https://doi.org/10.1093/bja/85.1.109"
+    },
+    "PARRILLO1993": {
+      "label": "Parrillo JE. Pathogenetic mechanisms of septic shock. N Engl J Med. 1993;328(20):1471-1477.",
+      "url": "https://doi.org/10.1056/NEJM199305203282008"
+    },
+    "FLECK1985": {
+      "label": "Fleck A, Raines G, Hawker F, Trotter J, Wallace PI, Ledingham IM, Calman KC. Increased vascular permeability: a major cause of hypoalbuminaemia in disease and injury. Lancet. 1985;1(8432):781-784.",
+      "url": "https://doi.org/10.1016/S0140-6736(85)91447-3"
+    },
+    "KOCH2014": {
+      "label": "Koch KL. Gastric dysrhythmias: a potential objective measure of nausea. Exp Brain Res. 2014;232(8):2553-2561.",
+      "url": "https://doi.org/10.1007/s00221-014-3966-1"
+    },
+    "ATLS10": {
+      "label": "American College of Surgeons Committee on Trauma. Advanced Trauma Life Support (ATLS) Student Course Manual, 10th ed. Chicago: ACS, 2018. Chapter 3, Shock - the four-class haemorrhage table.",
+      "url": "https://www.facs.org/quality-programs/trauma/education/advanced-trauma-life-support/"
+    },
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "ENGINEERING": {
+      "label": "Engineering default chosen for this simulation. Not a physiological measurement; see docs/MODEL_LIMITATIONS.md and docs/PATHOLOGY.md.",
+      "url": "docs/PATHOLOGY.md"
+    }
+  },
+
+  "constants": {
+    "pain.heartRateRise_bpm": {
+      "value": 10,
+      "unit": "bpm",
+      "source": "VICTOR1987",
+      "sourceUrl": "https://doi.org/10.1161/01.HYP.9.5.429",
+      "confidence": "measured",
+      "note": "Approximate group-mean rise in heart rate during the cold pressor test, the standard quantified experimental pain stimulus in human physiology. Stored in beats per minute rather than as a fraction so the fraction can be computed against this model's own baseline heart rate; see ADR-022. Applied at pain = 1, which therefore means 'as noxious as a healthy volunteer will tolerate for two minutes', NOT 'the worst pain a human can feel'. docs/PATHOLOGY.md says so in plainer words."
+    },
+    "pain.meanPressureRise_mmHg": {
+      "value": 20,
+      "unit": "mmHg",
+      "source": "VICTOR1987",
+      "sourceUrl": "https://doi.org/10.1161/01.HYP.9.5.429",
+      "confidence": "measured",
+      "note": "Approximate group-mean rise in mean arterial pressure during the same test, driven by a roughly two- to three-fold rise in muscle sympathetic nerve activity. Converted to a systemic-resistance modifier at runtime through MAP = CO x SVR against the model's own baroreflex set point, because a pressure cannot be pushed onto the bus directly - only the resistance that produces it can, and the baroreflex is then free to buffer the result the way it does in a real subject."
+    },
+    "pain.minuteVentilationRise_fraction": {
+      "value": 0.2,
+      "unit": "fraction",
+      "source": "BORGBJERG1996",
+      "sourceUrl": "https://doi.org/10.1016/0304-3959(95)00088-7",
+      "confidence": "derived",
+      "note": "Derived as a conservative reading of the increase in minute ventilation that experimental pain produced in that study's volunteers. The paper is cited here rather than a textbook line about pain stimulating respiration because it measured BOTH limbs of the thing this subsystem exists to show: pain raises ventilation, and it does so on top of - and partly against - morphine's depression of it. Applied to resp.drive, never to resp.rate; see ADR-021 for what happens when a ventilatory effect is put downstream of the chemoreflex."
+    },
+
+    "inflammation.feverCeiling_C": {
+      "value": 41.1,
+      "unit": "C",
+      "source": "MACKOWIAK1998",
+      "sourceUrl": "https://doi.org/10.1001/archinte.158.17.1870",
+      "confidence": "measured",
+      "note": "The top of the febrile range. Fever is a regulated rise and the hypothalamus does not defend a temperature above roughly this one; readings past it are hyperthermia - thermoregulatory failure, heat stroke, malignant hyperthermia - which is a different mechanism and is not modelled here at all. This is the temperature that inflammation = 1 maps to, so the whole 0..1 inflammation axis is anchored to a real, bounded clinical range rather than to an arbitrary scale."
+    },
+    "inflammation.majorInjuryFever_C": {
+      "value": 1.0,
+      "unit": "C",
+      "source": "DESBOROUGH2000",
+      "sourceUrl": "https://doi.org/10.1093/bja/85.1.109",
+      "confidence": "derived",
+      "note": "How much core temperature rises after major tissue injury with no infection whatsoever - the ordinary non-infective pyrexia of the first day or two after major surgery, driven by IL-6 and the rest of the acute-phase response in proportion to the magnitude of the injury. Read from the pyrexia the source describes as part of that response; one degree is the usual size of it. It is what calibrates nociception's drive onto the inflammation axis. Note that 37 + 1.0 lands exactly on the SIRS temperature criterion below, from a completely independent source - which is not a coincidence and is the reason SIRS criteria are so unhelpful after an operation."
+    },
+    "inflammation.onsetTau_min": {
+      "value": 60,
+      "unit": "min",
+      "source": "DESBOROUGH2000",
+      "sourceUrl": "https://doi.org/10.1093/bja/85.1.109",
+      "confidence": "derived",
+      "note": "First-order time constant for the rise of the inflammatory axis. Derived from the onset limb the source describes: IL-6 is detectable within 30-60 minutes of tissue injury and peaks at 4-6 hours. A 60 minute time constant reaches only about 63 % of target in the first hour and still takes several hours to arrive, which is the shape that description implies. This is a SLOW subsystem, and a user who applies a stimulus and watches for a minute will correctly see nothing."
+    },
+    "inflammation.resolutionTau_min": {
+      "value": 240,
+      "unit": "min",
+      "source": "DESBOROUGH2000",
+      "sourceUrl": "https://doi.org/10.1093/bja/85.1.109",
+      "confidence": "derived",
+      "note": "Time constant for the fall. Deliberately four times the onset constant, because the acute-phase response resolves over a day or two having risen over hours - it is not symmetrical, and a single time constant for both directions would make an injury look like it had never happened within an hour of the stimulus being removed."
+    },
+    "inflammation.systemicResistanceFall_fraction": {
+      "value": 0.5,
+      "unit": "fraction",
+      "source": "PARRILLO1993",
+      "sourceUrl": "https://doi.org/10.1056/NEJM199305203282008",
+      "confidence": "derived",
+      "note": "Systemic vascular resistance at inflammation = 1, as a fall from baseline. The hyperdynamic profile the source describes - high cardiac output against a low systemic resistance - is the defining haemodynamic signature of distributive shock, and a halving of resistance is the size of it. At the SIRS threshold this is only about a 12 % fall, which is the modest vasodilation of a simple fever rather than shock, and that gradation is the point of expressing it against the inflammation axis instead of as an event."
+    },
+    "inflammation.capillaryPermeabilityRise_fraction": {
+      "value": 1.5,
+      "unit": "fraction",
+      "source": "FLECK1985",
+      "sourceUrl": "https://doi.org/10.1016/S0140-6736(85)91447-3",
+      "confidence": "derived",
+      "note": "Capillary leak at inflammation = 1. The source measured the transcapillary escape rate of albumin rising roughly two- to three-fold in septic and injured patients, which is where the hypoalbuminaemia of critical illness comes from; +1.5 is a 2.5-fold rise. READ THE CODE COMMENT BEFORE TRUSTING THIS: vascular.permeability is a declared effect target that nothing in this engine currently reads, so this number is on the bus and is doing nothing. It is here rather than absent because the alternative was to approximate capillary leak onto a target that means something else, which effects.ts argues at length is worse."
+    },
+
+    "sirs.temperature_C": {
+      "value": 38.0,
+      "unit": "C",
+      "source": "BONE1992",
+      "sourceUrl": "https://doi.org/10.1378/chest.101.6.1644",
+      "confidence": "measured",
+      "note": "The temperature limb of the ACCP/SCCM systemic inflammatory response syndrome criteria (the definition also admits T < 36 C, which this model cannot produce because inflammation here only ever adds heat). Used to locate the point on the 0..1 inflammation axis at which the model should be meeting the SIRS definition, and the other SIRS constants are then anchored to that same point."
+    },
+    "sirs.heartRate_bpm": {
+      "value": 90,
+      "unit": "bpm",
+      "source": "BONE1992",
+      "sourceUrl": "https://doi.org/10.1378/chest.101.6.1644",
+      "confidence": "measured",
+      "note": "The heart rate limb of the same criteria. This is what DERIVES the inflammatory tachycardia rather than a separately invented gain: at the inflammatory load that produces a temperature of 38 C, the model should also be at 90 beats a minute, because SIRS is defined by the conjunction of those findings. As a cross-check, Liebermeister's old rule of about 8-10 beats per degree of fever predicts roughly the same slope from an entirely different direction."
+    },
+    "sirs.paco2_mmHg": {
+      "value": 32,
+      "unit": "mmHg",
+      "source": "BONE1992",
+      "sourceUrl": "https://doi.org/10.1378/chest.101.6.1644",
+      "confidence": "measured",
+      "note": "The other half of the respiratory limb: the criteria are satisfied by a respiratory rate above 20 OR a PaCO2 below 32 mmHg. The PaCO2 figure is what this model derives its inflammatory respiratory drive from, because a drive term controls arterial CO2 directly and controls respiratory rate only through the chemoreflex that then argues with it. Deriving the gain from the rate instead would be fitting against the model's own buffering rather than against the literature; see ADR-020, ADR-021."
+    },
+    "sirs.respiratoryRate_per_min": {
+      "value": 20,
+      "unit": "breaths/min",
+      "source": "BONE1992",
+      "sourceUrl": "https://doi.org/10.1378/chest.101.6.1644",
+      "confidence": "measured",
+      "note": "The rate half of the respiratory limb. NOT CONSUMED BY THE ENGINE, deliberately - it is a calibration landmark that tests/sim/pathology.test.ts asserts the model's behaviour against, in the manner of ADR-020 (tests assert against the literature, not against the engine). The criteria are an OR, so a model that produces the hypocapnia without quite producing the rate still satisfies the definition, and recording the rate here is what makes that statement checkable rather than a claim."
+    },
+
+    "vertigo.gastricMotilityFall_fraction": {
+      "value": 0.5,
+      "unit": "fraction",
+      "source": "KOCH2014",
+      "sourceUrl": "https://doi.org/10.1007/s00221-014-3966-1",
+      "confidence": "derived",
+      "note": "Fall in gastric motility at vertigo = 1. The source describes vestibular and visually induced nausea replacing the normal 3 cycle-per-minute gastric slow wave with tachygastria and abolishing antral contractility. This model carries a single motility scalar where the source describes a change of RHYTHM as well as of amplitude, so a halving is the most that scalar can honestly be made to say; it is the gastric stasis of motion sickness, not the dysrhythmia."
+    },
+    "vertigo.heartRateChange_fraction": {
+      "value": null,
+      "unit": "fraction",
+      "source": "ENGINEERING",
+      "sourceUrl": "docs/PATHOLOGY.md",
+      "confidence": "assumed",
+      "note": "DELIBERATELY NULL, and the engine checks for the null and writes nothing to cardio.heartRate rather than substituting a plausible number. The autonomic response to vestibular provocation is biphasic - heart rate rises during the provocation and then falls, sometimes abruptly, in the vasovagal reaction at the point of emesis - so no single fractional gain represents it, and a chosen sign would be wrong for half of the time course. A null with a reason beats a plausible guess. If this is ever filled in it needs a source that states the phase as well as the magnitude."
+    },
+
+    "haemorrhage.classIII_fractionLost": {
+      "value": 0.3,
+      "unit": "fraction",
+      "source": "ATLS10",
+      "sourceUrl": "https://www.facs.org/quality-programs/trauma/education/advanced-trauma-life-support/",
+      "confidence": "measured",
+      "note": "Loss of 30 % of blood volume: the ATLS class II/III boundary, and the point at which blood pressure classically begins to fall rather than being held up by the reflex. NOT CONSUMED BY THE ENGINE - the bleed deliberately has no constants, because it is a subtraction of volume and everything downstream of it is already modelled. It is here as the landmark tests/sim/pathology.test.ts checks the bled body against, and as the anchor for the table in docs/PATHOLOGY.md."
+    },
+    "haemorrhage.classIV_fractionLost": {
+      "value": 0.4,
+      "unit": "fraction",
+      "source": "ATLS10",
+      "sourceUrl": "https://www.facs.org/quality-programs/trauma/education/advanced-trauma-life-support/",
+      "confidence": "measured",
+      "note": "Loss of more than 40 % of blood volume: ATLS class IV, immediately life-threatening, and the point past which this model has nothing useful left to say. There is no coagulopathy here, no acidosis-hypothermia spiral, no myocardial ischaemia and no cell death; the interstitium has already hit its own floor in fluids.ts. The bleed is still allowed to continue past this point, because a real bleed does - but docs/PATHOLOGY.md says plainly that the numbers past here should not be read."
+    }
+  }
+}

@@ -1,0 +1,405 @@
+{
+  "version": 1,
+  "about": "Constants for the two behaviour subsystems: what the body is DOING (src/sim/systems/activity.ts - exertion, oxygen debt, sleep) and what it FEELS (src/sim/systems/affect.ts - fright, stress, low mood). Same rule as every other data file in this directory: no number reaches the engine without a source. Shape follows src/data/hormones.json - a source table at the top, and every constant naming an entry in it - with the per-entry `sourceUrl`, `unit` and `confidence` that src/data/types.ts requires of a Sourced value. Kept out of physiology.json deliberately: these are not properties of a resting body, they are the coefficients of two things a body DOES, and mixing them in would make 'the constants of a human at rest' stop meaning that.",
+  "citationPolicy": "Journal references resolve through a PubMed query rather than a DOI. A DOI typed from memory is an invented identifier, and inventing identifiers is the same failure as inventing numbers - it just fails silently instead of loudly. A query that finds exactly one paper is checkable; a wrong DOI resolves to somebody else's work or to nothing at all. Textbooks cite the publisher.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021. Ch. 85 (Sports Physiology) and Unit VII.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "WEST10": {
+      "label": "West JB, Luks AM. West's Respiratory Physiology: The Essentials, 10th ed. Wolters Kluwer, 2016. Ch. 10 (Respiratory System Under Stress).",
+      "url": "https://shop.lww.com/West-s-Respiratory-Physiology/p/9781496339447"
+    },
+    "ACSM11": {
+      "label": "American College of Sports Medicine. ACSM's Guidelines for Exercise Testing and Prescription, 11th ed. Wolters Kluwer, 2021. Ch. 6 (General Principles of Exercise Prescription).",
+      "url": "https://www.acsm.org/education-resources/books/guidelines-exercise-testing-prescription"
+    },
+    "AINSWORTH2011": {
+      "label": "Ainsworth BE, Haskell WL, Herrmann SD, et al. 2011 Compendium of Physical Activities: a second update of codes and MET values. Med Sci Sports Exerc 2011;43(8):1575-1581.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Ainsworth+2011+Compendium+of+Physical+Activities+second+update+MET+values"
+    },
+    "TANAKA2001": {
+      "label": "Tanaka H, Monahan KD, Seals DR. Age-predicted maximal heart rate revisited. J Am Coll Cardiol 2001;37(1):153-156.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Tanaka+Monahan+Seals+age-predicted+maximal+heart+rate+revisited"
+    },
+    "POOLE2012": {
+      "label": "Poole DC, Jones AM. Oxygen uptake kinetics. Compr Physiol 2012;2(2):933-996.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Poole+Jones+oxygen+uptake+kinetics+Comprehensive+Physiology+2012"
+    },
+    "GAESSER1984": {
+      "label": "Gaesser GA, Brooks GA. Metabolic bases of excess post-exercise oxygen consumption: a review. Med Sci Sports Exerc 1984;16(1):29-43.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Gaesser+Brooks+metabolic+bases+of+excess+post-exercise+oxygen+consumption"
+    },
+    "ROWELL1990": {
+      "label": "Rowell LB, O'Leary DS. Reflex control of the circulation during exercise: chemoreflexes and mechanoreflexes. J Appl Physiol 1990;69(2):407-418.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Rowell+O%27Leary+reflex+control+of+the+circulation+during+exercise+chemoreflexes+mechanoreflexes"
+    },
+    "WAHREN1971": {
+      "label": "Wahren J, Felig P, Ahlborg G, Jorfeldt L. Glucose metabolism during leg exercise in man. J Clin Invest 1971;50(12):2715-2725.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Wahren+Felig+Ahlborg+Jorfeldt+glucose+metabolism+during+leg+exercise+in+man"
+    },
+    "CARSKADON2017": {
+      "label": "Carskadon MA, Dement WC. Normal Human Sleep: An Overview. In: Kryger M, Roth T, Dement WC (eds), Principles and Practice of Sleep Medicine, 6th ed. Elsevier, 2017:15-24.",
+      "url": "https://www.elsevier.com/books/principles-and-practice-of-sleep-medicine/kryger/978-0-323-24288-2"
+    },
+    "WHITE1985": {
+      "label": "White DP, Weil JV, Zwillich CW. Metabolic rate and breathing during sleep. J Appl Physiol 1985;59(2):384-391.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=White+Weil+Zwillich+metabolic+rate+and+breathing+during+sleep"
+    },
+    "DOUGLAS1982": {
+      "label": "Douglas NJ, White DP, Weil JV, Pickett CK, Zwillich CW. Hypercapnic ventilatory response in sleeping adults. Am Rev Respir Dis 1982;126(5):758-762. Companion paper: Douglas NJ, White DP, Pickett CK, Weil JV, Zwillich CW. Respiration during sleep in normal man. Thorax 1982;37(11):840-844.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Douglas+White+Weil+hypercapnic+ventilatory+response+in+sleeping+adults"
+    },
+    "SOMERS1993": {
+      "label": "Somers VK, Dyken ME, Mark AL, Abboud FM. Sympathetic-nerve activity during sleep in normal subjects. N Engl J Med 1993;328(5):303-307.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Somers+Dyken+Mark+Abboud+sympathetic+nerve+activity+during+sleep+in+normal+subjects"
+    },
+    "CLUTTER1980": {
+      "label": "Clutter WE, Bier DM, Shah SD, Cryer PE. Epinephrine plasma metabolic clearance rates and physiologic thresholds for metabolic and hemodynamic actions in man. J Clin Invest 1980;66(1):94-101.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Clutter+Bier+Shah+Cryer+epinephrine+plasma+metabolic+clearance+rates+physiologic+thresholds"
+    },
+    "TAYLOR1986": {
+      "label": "Taylor CB, Sheikh J, Agras WS, et al. Ambulatory heart rate changes in patients with panic attacks. Am J Psychiatry 1986;143(4):478-482.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Taylor+Sheikh+Agras+ambulatory+heart+rate+changes+in+patients+with+panic+attacks"
+    },
+    "WILHELM2001": {
+      "label": "Wilhelm FH, Trabert W, Roth WT. Physiologic instability in panic disorder and generalized anxiety disorder. Biol Psychiatry 2001;49(7):596-605.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Wilhelm+Trabert+Roth+physiologic+instability+in+panic+disorder+and+generalized+anxiety+disorder"
+    },
+    "KAMARCK2003": {
+      "label": "Kamarck TW, Lovallo WR. Cardiovascular reactivity to psychological challenge: conceptual and measurement considerations. Psychosom Med 2003;65(1):9-21.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Kamarck+Lovallo+cardiovascular+reactivity+to+psychological+challenge+conceptual+measurement"
+    },
+    "KEMP2010": {
+      "label": "Kemp AH, Quintana DS, Gray MA, Felmingham KL, Brown K, Gatt JM. Impact of depression and antidepressant treatment on heart rate variability: a review and meta-analysis. Biol Psychiatry 2010;67(11):1067-1074.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Kemp+Quintana+Gray+impact+of+depression+and+antidepressant+treatment+on+heart+rate+variability+meta-analysis"
+    },
+    "BENCA1992": {
+      "label": "Benca RM, Obermeyer WH, Thisted RA, Gillin JC. Sleep and psychiatric disorders: a meta-analysis. Arch Gen Psychiatry 1992;49(8):651-668.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Benca+Obermeyer+Thisted+Gillin+sleep+and+psychiatric+disorders+a+meta-analysis"
+    },
+    "PARIANTE2008": {
+      "label": "Pariante CM, Lightman SL. The HPA axis in major depression: classical theories and new developments. Trends Neurosci 2008;31(9):464-468.",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/?term=Pariante+Lightman+the+HPA+axis+in+major+depression+classical+theories+new+developments"
+    },
+    "ENGINEERING": {
+      "label": "Engineering default chosen for this simulation. Not a physiological measurement; see docs/BEHAVIOUR.md and docs/MODEL_LIMITATIONS.md.",
+      "url": "https://github.com/"
+    },
+    "URSINO1998": {
+      "label": "Ursino M. Interaction between carotid baroregulation and the pulsating heart: a mathematical model. Am J Physiol 1998;275(5):H1733-H1747.",
+      "url": "https://doi.org/10.1152/ajpheart.1998.275.5.H1733"
+    },
+    "SUNAGAWA2017": {
+      "label": "Sunagawa K. Guyton's venous return curves should be taught at medical schools (complete English translation of the Japanese version). J Physiol Sci 2017;67(4):447-458.",
+      "url": "https://doi.org/10.1007/s12576-017-0533-0"
+    }
+  },
+  "constants": {
+    "exercise.maximalAerobicMets": {
+      "value": 10,
+      "unit": "METs",
+      "source": "ACSM11",
+      "sourceUrl": "https://www.acsm.org/education-resources/books/guidelines-exercise-testing-prescription",
+      "confidence": "derived",
+      "note": "What `exertion = 1` MEANS. One MET is resting oxygen uptake, 3.5 mL/kg/min; VO2max for a healthy, untrained 35-year-old man is about 35 mL/kg/min, which is 10 METs. The compendium's own entries agree: running at 12 km/h is 11.8 METs and running at 8 km/h is 8.3, so a 10-MET ceiling is 'running, but not for long'. The state comment calls exertion 1 'maximal sustainable'; every cited relationship downstream of this - heart rate, ventilation, stroke volume - is anchored to VO2max, so that is what 1 is taken to be. A real person holds 0.6-0.8 of it for an hour and 1.0 for a few minutes."
+    },
+    "exercise.vo2TimeConstant_s": {
+      "value": 35,
+      "unit": "s",
+      "source": "POOLE2012",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Poole+Jones+oxygen+uptake+kinetics+Comprehensive+Physiology+2012",
+      "confidence": "measured",
+      "note": "Phase-II (primary) oxygen-uptake time constant for moderate exercise in healthy untrained adults, 25-45 s. This is the whole reason an oxygen debt exists: the demand steps, the delivery does not, and the area between the two curves is the deficit."
+    },
+    "exercise.epocHalfTime_s": {
+      "value": 45,
+      "unit": "s",
+      "source": "GAESSER1984",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Gaesser+Brooks+metabolic+bases+of+excess+post-exercise+oxygen+consumption",
+      "confidence": "derived",
+      "note": "Half-time of the FAST component of excess post-exercise oxygen consumption, reported across studies as 30-60 s; the midpoint is taken. The slow component (tens of minutes, driven by temperature, catecholamines and substrate cycling) is NOT modelled - see docs/BEHAVIOUR.md. Consequence: recovery here is a little tidier than a real one."
+    },
+    "exercise.maxHeartRateIntercept_bpm": {
+      "value": 208,
+      "unit": "bpm",
+      "source": "TANAKA2001",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Tanaka+Monahan+Seals+age-predicted+maximal+heart+rate+revisited",
+      "confidence": "measured",
+      "note": "HRmax = 208 - 0.7 x age, from a meta-analysis of 351 studies plus a laboratory cohort. Deliberately NOT the folk formula 220 - age, which Tanaka's paper exists to correct: 220 - age underestimates maximal heart rate in older adults by up to 10 bpm and overestimates it in the young."
+    },
+    "exercise.maxHeartRateAgeSlope_bpm_per_year": {
+      "value": 0.7,
+      "unit": "bpm per year",
+      "source": "TANAKA2001",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Tanaka+Monahan+Seals+age-predicted+maximal+heart+rate+revisited",
+      "confidence": "measured",
+      "note": "The age slope of the same regression. Read together with the intercept, and independent of sex and of training status."
+    },
+    "exercise.strokeVolumeRise": {
+      "value": 0.47,
+      "unit": "fraction",
+      "source": "GH14",
+      "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+      "confidence": "derived",
+      "note": "Derived from Guyton & Hall Ch. 85: stroke volume in an untrained young man rises from about 75 mL at rest to about 110 mL at maximal exercise. 110/75 - 1 = 0.47. Applied as a contractility modifier rather than as a stroke volume, because stroke volume in this engine is an OUTPUT of the elastance model and writing it would be writing over the model."
+    },
+    "exercise.strokeVolumePlateauFraction": {
+      "value": 0.45,
+      "unit": "fraction of VO2max",
+      "source": "GH14",
+      "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+      "confidence": "derived",
+      "note": "Stroke volume reaches its maximum at roughly 40-50% of VO2max and is flat above that; everything further comes from heart rate. Midpoint of the cited range. This is why the first half of an exercise ramp looks quite different from the second half."
+    },
+    "exercise.systemicResistanceFall": {
+      "value": 0.71,
+      "unit": "fraction",
+      "source": "GH14",
+      "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+      "confidence": "derived",
+      "note": "Derived from two cited numbers rather than measured directly. Guyton & Hall Ch. 85: cardiac output in an untrained young man rises from 5.5 to about 23 L/min at maximal exercise (x4.2) while mean arterial pressure rises only about 20% (x1.2). Resistance is pressure over flow, so it ends at 1.2/4.2 = 0.29 of its resting value: a fall of 0.71. The mechanism is skeletal-muscle vasodilation - muscle blood flow goes from about 1 to about 20 L/min."
+    },
+    "exercise.hepaticGlucoseOutputRise": {
+      "value": 3.0,
+      "unit": "multiple of basal",
+      "source": "WAHREN1971",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Wahren+Felig+Ahlborg+Jorfeldt+glucose+metabolism+during+leg+exercise+in+man",
+      "confidence": "derived",
+      "note": "Splanchnic glucose output rises roughly three- to fivefold during sustained leg exercise, tracking the leg's uptake closely enough that arterial glucose barely moves. The low end of the cited range is used because this model has no exercise duration term and the higher multiples belong to prolonged work."
+    },
+    "exercise.glucoseUptakeRise": {
+      "value": 4.0,
+      "unit": "multiple of basal",
+      "source": "WAHREN1971",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Wahren+Felig+Ahlborg+Jorfeldt+glucose+metabolism+during+leg+exercise+in+man",
+      "confidence": "derived",
+      "note": "Leg glucose uptake rises manyfold during exercise; a fourfold whole-body figure is the conservative end. Written onto `metabolic.glucoseUptake`, which in the Bergman minimal model multiplies the INSULIN-dependent limb only - so at basal insulin it contributes almost nothing and the contraction-mediated, insulin-independent limb has no path at all. That gap is real and is named in docs/BEHAVIOUR.md."
+    },
+    "exercise.baroreflexResetting": {
+      "value": null,
+      "unit": "mmHg of setpoint shift per unit exertion",
+      "source": "ROWELL1990",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Rowell+O%27Leary+reflex+control+of+the+circulation+during+exercise+chemoreflexes+mechanoreflexes",
+      "confidence": "measured",
+      "note": "DELIBERATELY NULL, AND THE ENGINE MUST NOT READ IT. Central command and the exercise pressor reflex reset the arterial baroreflex to a higher operating pressure, which is why heart rate and arterial pressure rise TOGETHER during exercise instead of the reflex cancelling one with the other. There is no effect-bus target for the baroreflex setpoint, so this subsystem cannot do it, and the un-reset baroreflex costs the model some of its exercise tachycardia. Kept here as a named, sourced hole rather than as silence."
+    },
+    "sleep.deepeningTimeConstant_s": {
+      "value": 900,
+      "unit": "s",
+      "source": "CARSKADON2017",
+      "sourceUrl": "https://www.elsevier.com/books/principles-and-practice-of-sleep-medicine/kryger/978-0-323-24288-2",
+      "confidence": "derived",
+      "note": "Slow-wave sleep (N3) first appears 20-30 minutes after sleep onset in a normal adult, having passed through N1 and N2. A first-order approach with a 15-minute time constant reaches 0.63 at 15 min and 0.86 at 30 min, which puts 'deep' where the cited latency puts it. It is a CONTINUOUS depth rather than discrete stages, and it does not cycle: the 90-minute NREM/REM alternation is not modelled."
+    },
+    "sleep.metabolicRateFall": {
+      "value": 0.1,
+      "unit": "fraction",
+      "source": "WHITE1985",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=White+Weil+Zwillich+metabolic+rate+and+breathing+during+sleep",
+      "confidence": "measured",
+      "note": "Oxygen consumption and CO2 production both fall about 10% from wakefulness to NREM sleep. Measured together with the ventilation fall in the same subjects, which is what makes the pair usable as a cross-check: ventilation must end up lower because metabolism is lower, not because the model was told to breathe less."
+    },
+    "sleep.ventilatoryDriveFall": {
+      "value": 0.5,
+      "unit": "fraction",
+      "source": "DOUGLAS1982",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Douglas+White+Weil+hypercapnic+ventilatory+response+in+sleeping+adults",
+      "confidence": "measured",
+      "note": "The slope of the hypercapnic ventilatory response falls by about half in NREM sleep (roughly 2.4 to 1.2 L/min/mmHg). Applied to `resp.drive`, which multiplies the chemoreflex limb as well as the baseline, so ONE modifier blunts the CO2 response AND withdraws the wakefulness drive. The resulting arterial PCO2 rise is then emergent, not prescribed, and the companion Thorax paper says it should be 2-4 mmHg - which is how docs/BEHAVIOUR.md checks this number rather than assuming it."
+    },
+    "sleep.heartRateFall": {
+      "value": 0.09,
+      "unit": "fraction",
+      "source": "SOMERS1993",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Somers+Dyken+Mark+Abboud+sympathetic+nerve+activity+during+sleep+in+normal+subjects",
+      "confidence": "derived",
+      "note": "Muscle sympathetic nerve activity falls progressively from stage 2 to stage 4 NREM, and heart rate falls with it - reported as a fall of roughly 8-10% from quiet wakefulness. Midpoint taken. REM is the exception in the source (bursts of sympathetic activity above waking levels) and is not modelled here."
+    },
+    "sleep.systemicResistanceFall": {
+      "value": 0.08,
+      "unit": "fraction",
+      "source": "SOMERS1993",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Somers+Dyken+Mark+Abboud+sympathetic+nerve+activity+during+sleep+in+normal+subjects",
+      "confidence": "derived",
+      "note": "The vasoconstrictor half of the same sympathetic withdrawal. Sized so that this and the heart-rate fall together produce the measured nocturnal pressure dip rather than being fitted to it separately: see sleep.nocturnalPressureDip."
+    },
+    "sleep.nocturnalPressureDip": {
+      "value": 0.13,
+      "unit": "fraction of daytime mean arterial pressure",
+      "source": "SOMERS1993",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Somers+Dyken+Mark+Abboud+sympathetic+nerve+activity+during+sleep+in+normal+subjects",
+      "confidence": "derived",
+      "note": "NOT READ BY THE ENGINE - this is a target the test measures against. A normal 'dipper' loses 10-20% of daytime mean arterial pressure overnight; the midpoint is taken. The pressure fall in this model is an OUTPUT of the heart-rate and resistance modifiers above, so asserting it is a real check on them and not a restatement."
+    },
+    "sleep.arousalFromFright": {
+      "value": 1.0,
+      "unit": "fraction of depth lost per unit fright",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Engineering default, not a measurement. A full-intensity fright takes sleep depth to zero; a half one halves the depth the sleeper can reach. Something had to be written down for 'a bang wakes you up', and there is no clean number for it because the experiment is an arousal threshold in decibels, not a fraction. The SHAPE is the claim - arousal is graded, not a switch - and the coefficient is an admission."
+    },
+    "fright.decayHalfLife_s": {
+      "value": 120,
+      "unit": "s",
+      "source": "CLUTTER1980",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Clutter+Bier+Shah+Cryer+epinephrine+plasma+metabolic+clearance+rates+physiologic+thresholds",
+      "confidence": "measured",
+      "note": "This is NOT a guess about how long fear lasts. It is the measured plasma half-life of adrenaline, about 2 minutes, and adrenaline is what carries the haemodynamics of fright. The feeling may outlast the molecule; the tachycardia does not. Cited by the same paper that gives the thresholds below."
+    },
+    "fright.heartRateRise_bpm": {
+      "value": 30,
+      "unit": "bpm",
+      "source": "TAYLOR1986",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Taylor+Sheikh+Agras+ambulatory+heart+rate+changes+in+patients+with+panic+attacks",
+      "confidence": "derived",
+      "note": "Ambulatory recording during spontaneous panic attacks showed heart-rate rises of roughly 25-40 bpm over the preceding baseline. Taken at the low end, because `fright = 1` is a startle rather than a full panic attack, and because the model's baroreflex will oppose part of it."
+    },
+    "fright.contractilityRise": {
+      "value": 0.3,
+      "unit": "fraction",
+      "source": "CLUTTER1980",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Clutter+Bier+Shah+Cryer+epinephrine+plasma+metabolic+clearance+rates+physiologic+thresholds",
+      "confidence": "derived",
+      "note": "Beta-1 inotropy at the plasma adrenaline concentrations fright produces. Clutter gives the physiologic thresholds: systolic pressure and heart rate begin to move at 50-100 pg/mL, several times basal, which an acute fright comfortably exceeds. The size is scaled to the systolic rise those concentrations produce rather than measured as contractility, which is not measurable in an intact human."
+    },
+    "fright.systemicResistanceRise": {
+      "value": 0.15,
+      "unit": "fraction",
+      "source": "CLUTTER1980",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Clutter+Bier+Shah+Cryer+epinephrine+plasma+metabolic+clearance+rates+physiologic+thresholds",
+      "confidence": "derived",
+      "note": "Small and positive, which is the net of two opposite things: direct sympathetic alpha-1 constriction in skin and splanchnic beds, against beta-2 dilation in muscle which is what makes infused adrenaline at physiological concentrations LOWER diastolic pressure. Fright has the nerve traffic as well as the hormone, so the net is constriction - but only just."
+    },
+    "fright.respiratoryRateRise": {
+      "value": 0.35,
+      "unit": "fraction",
+      "source": "WILHELM2001",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Wilhelm+Trabert+Roth+physiologic+instability+in+panic+disorder+and+generalized+anxiety+disorder",
+      "confidence": "derived",
+      "note": "Respiratory rate rises and breathing becomes irregular in acute anxiety. Written onto `resp.rate`, which is DOWNSTREAM of the chemoreflex and therefore the correct target for a change of PATTERN - see the warning at the top of src/sim/core/effects.ts. Paired with the tidal-volume fall below so that the pattern changes and minute ventilation, on its own, does not."
+    },
+    "fright.tidalVolumeFall": {
+      "value": 0.2,
+      "unit": "fraction",
+      "source": "WILHELM2001",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Wilhelm+Trabert+Roth+physiologic+instability+in+panic+disorder+and+generalized+anxiety+disorder",
+      "confidence": "derived",
+      "note": "The other half of 'fast and shallow'. The clinically important consequence is that dead-space fraction rises, so a frightened person moves more air and clears less CO2 per litre of it than the minute ventilation suggests."
+    },
+    "fright.ventilatoryDriveRise": {
+      "value": 0.25,
+      "unit": "fraction",
+      "source": "WILHELM2001",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Wilhelm+Trabert+Roth+physiologic+instability+in+panic+disorder+and+generalized+anxiety+disorder",
+      "confidence": "derived",
+      "note": "The genuine hyperventilation, separate from the pattern change, sized so arterial PCO2 falls a few mmHg. Acute anxiety and panic drive PCO2 down towards 30 mmHg, and the hypocapnia is the mechanism behind the paraesthesiae and carpopedal spasm - the frightening symptoms of being frightened."
+    },
+    "fright.gutMotilityFall": {
+      "value": 0.35,
+      "unit": "fraction",
+      "source": "GH14",
+      "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+      "confidence": "derived",
+      "note": "Sympathetic discharge inhibits gastrointestinal motility and gastric emptying. Size is a reading of the textbook description rather than a measured figure, so it is derived and not measured. It matters here for a non-obvious reason: it slows the absorption of any oral drug the body is carrying, which is a real interaction between being frightened and being medicated."
+    },
+    "fright.hepaticGlucoseOutputRise": {
+      "value": 0.6,
+      "unit": "fraction",
+      "source": "CLUTTER1980",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Clutter+Bier+Shah+Cryer+epinephrine+plasma+metabolic+clearance+rates+physiologic+thresholds",
+      "confidence": "derived",
+      "note": "Adrenaline raises plasma glucose by stimulating glycogenolysis and gluconeogenesis; Clutter puts the threshold for the glycaemic action at 150-200 pg/mL, higher than the threshold for tachycardia. Sized so that being frightened raises glucose noticeably but less than it raises heart rate, which is the observed ordering."
+    },
+    "fright.stressAxisDrive": {
+      "value": 0.5,
+      "unit": "fraction of full HPA drive",
+      "source": "GH14",
+      "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+      "confidence": "derived",
+      "note": "A startle recruits the hypothalamic-pituitary-adrenal axis as well as the sympathoadrenal one, but the two run on completely different clocks: adrenaline in seconds, cortisol over tens of minutes. Half drive, because a two-minute fright is a brief stimulus to an axis whose own time constant is ten minutes and which will therefore barely notice it - which is the correct behaviour, not a weakness."
+    },
+    "stress.heartRateRise": {
+      "value": 0.17,
+      "unit": "fraction",
+      "source": "KAMARCK2003",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Kamarck+Lovallo+cardiovascular+reactivity+to+psychological+challenge+conceptual+measurement",
+      "confidence": "derived",
+      "note": "Laboratory psychological challenge (mental arithmetic, Stroop, speech tasks) typically raises heart rate 10-15 bpm. 12 bpm on a 72 bpm baseline is 0.17. Sustained rather than transient, which is what separates this from fright."
+    },
+    "stress.systemicResistanceRise": {
+      "value": 0.12,
+      "unit": "fraction",
+      "source": "KAMARCK2003",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Kamarck+Lovallo+cardiovascular+reactivity+to+psychological+challenge+conceptual+measurement",
+      "confidence": "derived",
+      "note": "The same literature reports systolic rises of 15-20 mmHg. A vasoconstrictor task (cold pressor) and a beta-adrenergic task (mental arithmetic) do it by different routes; this is the vasoconstrictor share, sized to land the pressure rise in that band once the heart-rate term is also present."
+    },
+    "stress.hpaDrive": {
+      "value": 1.0,
+      "unit": "fraction of full HPA drive",
+      "source": "PARIANTE2008",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Pariante+Lightman+the+HPA+axis+in+major+depression+classical+theories+new+developments",
+      "confidence": "assumed",
+      "note": "DEFINITIONAL rather than measured: `stress = 1` is defined as full psychological drive on the HPA axis, so the coefficient is 1 by construction. The physiology lives downstream, in the cortisol model in src/sim/systems/endocrine.ts, which already carries its own sourced gain, half-life and circadian term. Duplicating any of that here would give the simulation two cortisols."
+    },
+    "depression.restingHeartRateRise_bpm": {
+      "value": 5,
+      "unit": "bpm",
+      "source": "KEMP2010",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Kemp+Quintana+Gray+impact+of+depression+and+antidepressant+treatment+on+heart+rate+variability+meta-analysis",
+      "confidence": "derived",
+      "note": "Depression is associated with a modestly higher resting heart rate alongside the reduced variability the meta-analysis is actually about. Small, sustained, and the only cardiovascular sign of depression this engine can currently show - see depression.heartRateVariabilityFall."
+    },
+    "depression.heartRateVariabilityFall": {
+      "value": null,
+      "unit": "fraction of RR modulation amplitude",
+      "source": "KEMP2010",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Kemp+Quintana+Gray+impact+of+depression+and+antidepressant+treatment+on+heart+rate+variability+meta-analysis",
+      "confidence": "measured",
+      "note": "DELIBERATELY NULL, AND THE ENGINE MUST NOT READ IT. The best-replicated physiological finding in depression is reduced heart rate variability, and this engine's only variability is respiratory sinus arrhythmia, whose amplitude is the fixed constant `ecg.rsaFraction` read directly inside systems/cardio.ts. There is no effect-bus target for it, so the single most citable sign of depression is the one thing this subsystem cannot show. Recorded as a hole with a name rather than left unsaid."
+    },
+    "depression.exertionToleranceFall": {
+      "value": 0.3,
+      "unit": "fraction",
+      "source": "BENCA1992",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Benca+Obermeyer+Thisted+Gillin+sleep+and+psychiatric+disorders+a+meta-analysis",
+      "confidence": "assumed",
+      "note": "Psychomotor retardation and fatigue are diagnostic criteria for major depression, and reduced physical activity is among the most consistent objective findings. A 30% reduction in the effort actually delivered for a given attempt is an ENGINEERING reading of that, not a measurement - nobody publishes 'exertion tolerance' as a fraction. The shape is the claim: a depressed body attempting the same thing does less of it."
+    },
+    "depression.slowWaveSleepFall": {
+      "value": 0.25,
+      "unit": "fraction of maximum sleep depth",
+      "source": "BENCA1992",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Benca+Obermeyer+Thisted+Gillin+sleep+and+psychiatric+disorders+a+meta-analysis",
+      "confidence": "derived",
+      "note": "The meta-analysis's most robust sleep findings in depression are reduced slow-wave sleep, shortened REM latency and more awakenings. Only the first has any meaning in a model with one continuous depth and no REM, so it is applied as a ceiling on how deep this body can get. The REM abnormalities - which are the more specific finding - cannot be represented at all here."
+    },
+    "depression.appetiteFall": {
+      "value": 0.3,
+      "unit": "fraction",
+      "source": "BENCA1992",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Benca+Obermeyer+Thisted+Gillin+sleep+and+psychiatric+disorders+a+meta-analysis",
+      "confidence": "assumed",
+      "note": "Appetite loss is a melancholic-subtype criterion; the atypical subtype has the OPPOSITE sign, and a single scalar `depression` cannot represent both. One direction was chosen, the commoner one in the classical description, and the choice is an admission rather than a finding. Written onto `gi.appetite`, which nothing currently reads."
+    },
+    "depression.hpaDrive": {
+      "value": 0.35,
+      "unit": "fraction of full HPA drive",
+      "source": "PARIANTE2008",
+      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Pariante+Lightman+the+HPA+axis+in+major+depression+classical+theories+new+developments",
+      "confidence": "derived",
+      "note": "Roughly half of patients with major depression show HPA overactivity - raised cortisol, blunted dexamethasone suppression, adrenal hypertrophy - and roughly half do not. A single coefficient applied to every simulated body is therefore a population average standing in for a bimodal fact, which is the standard hazard of averaging. 0.35 is a modest, sustained drive: enough to lift cortisol within its reference range rather than into Cushing's."
+    },
+    "exercise.venousReturnRise": {
+      "value": 0.28,
+      "unit": "fraction",
+      "source": "URSINO1998",
+      "sourceUrl": "https://doi.org/10.1152/ajpheart.1998.275.5.H1733",
+      "confidence": "derived",
+      "note": "THE PRELOAD SIDE OF EXERCISE, AND WHY IT IS NOT A NEW NUMBER. Cardiac output cannot quadruple on a fixed venous unstressed volume: the circulation is closed, so more flow into the heart requires more of the venous reservoir's blood to become 'stressed' (pressure-bearing) rather than sitting unstressed. Guyton's venous-return-curve work (textbook home: GH14, the cardiac-output/venous-return chapter in Unit IV) is where this is taught - sympathetic venoconstriction converts unstressed to stressed volume and raises mean systemic filling pressure without any change in total blood volume. Sunagawa 2017 (SUNAGAWA2017, a checked, DOI-resolving translation of the same teaching) states it for exercise specifically: 'In exercise, activation of sympathetic nerve increases stressed volume resulting in marked increase in mean circulatory filling pressure' (section on Fig. 4), which is the mechanism this constant supplies. THE NUMBER ITSELF IS NOT NEW: this engine already trusts a figure for exactly this quantity - `baroreflex.gainVenousTone_mL` = 700 mL, 'unstressed venous volume recruited at full sympathetic drive' (URSINO1998, same model family Ursino 1998 as the rest of the baroreflex) - and reuses it rather than inventing a second one. 700 mL against this engine's own `cardio.venous.unstressedVolume_mL` (2520 mL) is 0.278, rounded to 0.28. WHY IT IS WRITTEN HERE INSTEAD OF LEFT TO THE BAROREFLEX, WHICH ALREADY READS `baroreflex.gainVenousTone_mL`: because `exercise.baroreflexResetting` is a declared null a few entries above this one - the arterial baroreflex in this model is NOT reset to a higher operating pressure during exercise, so as exercise raises mean arterial pressure the baroreflex afferent senses MORE pressure and, if anything, WITHDRAWS sympathetic tone rather than supplying it. A real exercising body gets its venoconstriction from central command and the exercise pressor reflex, which this model does not have a baroreflex-shaped path for. `cardio.venousTone` on the effect bus is that path, sized to the SAME full-sympathetic-drive magnitude the model already trusts, triggered by exertion directly rather than by an arterial pressure the model cannot reset. NAMED APPROXIMATIONS. (1) This conflates two distinct drives - central-command venoconstriction and baroreflex venoconstriction - by giving them the same cited magnitude; nobody has published a separate number for the central-command component alone. (2) It does not model the skeletal-muscle pump, which is a real and separately significant contributor to venous return during rhythmic (not isometric) exercise and is entirely absent from this two-element circuit - so venous return here is under-supplied relative to a real running body and over-supplied relative to a real cycling-with-legs-still body, and both are worth naming rather than averaging away. See docs/BEHAVIOUR.md."
+    }
+  }
+}

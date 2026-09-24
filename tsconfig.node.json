@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "composite": true,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "baseUrl": ".",
+    "paths": {
+      "@sim/*": ["src/sim/*"],
+      "@data/*": ["src/data/*"]
+    }
+  },
+  "include": ["vite.config.ts", "vitest.config.ts", "tools", "src/data/pharma-types.ts", "src/data/types.ts", "src/bridge/types.ts", "src/render/organs/placeholder.ts"]
+}

@@ -1,0 +1,268 @@
+{
+  "version": 2,
+  "units": "metres",
+  "note": "Half-extents and positions are real adult dimensions (Guyton & Hall 14e; Standring, Gray's Anatomy 42e), with the body's origin at roughly the L3 vertebral level. The group offsets on top of them are the EXPLODED STACK (spec 6.1): a deliberate design choice, not anatomy, kept in data so it can be animated.",
+  "groupLayout": {
+    "cranial": { "offset": [0, 0.06, 0] },
+    "thoracic": { "offset": [0, 0.0, 0] },
+    "abdominal": { "offset": [0, -0.025, 0] },
+    "pelvic": { "offset": [0, -0.045, 0] }
+  },
+  "organs": [
+    {
+      "id": "brain",
+      "displayName": "Brain",
+      "group": "cranial",
+      "panel": "neuro",
+      "selectedColor": "#7E5AB3",
+      "placeholder": { "kind": "brainShell" },
+      "position": [0, 0.42, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 1350,
+      "volumeSource": "Adult mean brain volume ~1350 mL; Guyton & Hall 14e.",
+      "labelBias": [0, 0]
+    },
+    {
+      "id": "heart",
+      "displayName": "Heart",
+      "group": "thoracic",
+      "panel": "cardiac",
+      "selectedColor": "#B0232A",
+      "placeholder": { "kind": "heartShell" },
+      "position": [-0.016, 0.168, 0.016],
+      "layoutOffset": [0, 0, 0],
+      "rotation": [0.1, 0.0, 0.3],
+      "volume_mL": 500,
+      "volumeSource": "Whole-heart tissue and chamber volume, adult; Guyton & Hall 14e ch.9. Roughly 12 cm long by 9 cm wide.",
+      "labelBias": [0, 0]
+    },
+    {
+      "id": "lung_l",
+      "displayName": "Left Lung",
+      "group": "thoracic",
+      "panel": "respiratory",
+      "selectedColor": "#5B3A8C",
+      "placeholder": { "kind": "lobedLung", "side": -1 },
+      "position": [-0.068, 0.205, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 2600,
+      "volumeSource": "Unilateral lung volume at FRC, left (smaller, cardiac notch); West 10e. About 25 cm tall.",
+      "labelBias": [-0.7, 0]
+    },
+    {
+      "id": "lung_r",
+      "displayName": "Right Lung",
+      "group": "thoracic",
+      "panel": "respiratory",
+      "selectedColor": "#5B3A8C",
+      "placeholder": { "kind": "lobedLung", "side": 1 },
+      "position": [0.072, 0.21, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 3000,
+      "volumeSource": "Unilateral lung volume at FRC, right; West 10e.",
+      "labelBias": [0.7, 0]
+    },
+    {
+      "id": "trachea",
+      "displayName": "Trachea",
+      "group": "thoracic",
+      "panel": "respiratory",
+      "selectedColor": "#C8555A",
+      "placeholder": {
+        "kind": "tube",
+        "path": [[0, 0.352, 0], [0, 0.32, 0.002], [0, 0.285, 0.004], [0, 0.252, 0.004]],
+        "radius": 0.0105
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 30,
+      "volumeSource": "Tracheal contribution to anatomical dead space; West 10e. About 11 cm long, 2 cm bore."
+    },
+    {
+      "id": "oesophagus",
+      "displayName": "Oesophagus",
+      "group": "thoracic",
+      "panel": "gi",
+      "selectedColor": "#C8433A",
+      "placeholder": {
+        "kind": "tube",
+        "path": [[0.004, 0.352, -0.02], [0.006, 0.29, -0.021], [0.008, 0.22, -0.019], [0.012, 0.15, -0.012], [0.018, 0.095, -0.002]],
+        "radius": 0.0095
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 40,
+      "volumeSource": "Adult oesophagus, about 25 cm from cricoid to cardia; Guyton & Hall 14e ch.64."
+    },
+    {
+      "id": "liver",
+      "displayName": "Liver",
+      "group": "abdominal",
+      "panel": "hepatic",
+      "selectedColor": "#8E3A2A",
+      "placeholder": {
+        "kind": "ellipsoid",
+        "radii": [0.098, 0.058, 0.055],
+        "detail": 5,
+        "noise": 0.09
+      },
+      "position": [0.032, 0.062, 0.006],
+      "layoutOffset": [0, 0, 0],
+      "rotation": [0.0, 0.16, -0.12],
+      "volume_mL": 1500,
+      "volumeSource": "Adult liver volume ~1.5 L, about 20 cm across; Guyton & Hall 14e ch.71.",
+      "labelBias": [0.6, 0]
+    },
+    {
+      "id": "stomach",
+      "displayName": "Stomach",
+      "group": "abdominal",
+      "panel": "gastric",
+      "selectedColor": "#C8433A",
+      "placeholder": {
+        "kind": "lathe",
+        "profile": [
+          [0.0, -0.082], [0.022, -0.078], [0.04, -0.06], [0.05, -0.032],
+          [0.053, 0.0], [0.05, 0.026], [0.042, 0.047], [0.028, 0.062],
+          [0.014, 0.071], [0.0, 0.075]
+        ],
+        "segments": 34,
+        "noise": 0.06
+      },
+      "position": [-0.05, 0.055, -0.004],
+      "layoutOffset": [0, 0, 0],
+      "rotation": [0, 0, -0.38],
+      "volume_mL": 1000,
+      "volumeSource": "Adult gastric capacity ~1 L at comfortable distension, about 25 cm long; Guyton & Hall 14e ch.64.",
+      "labelBias": [-0.6, 0]
+    },
+    {
+      "id": "pancreas",
+      "displayName": "Pancreas",
+      "group": "abdominal",
+      "panel": "generic",
+      "selectedColor": "#C99A4A",
+      "placeholder": {
+        "kind": "capsuleChain",
+        "points": [[-0.07, 0.03, -0.028], [-0.03, 0.024, -0.03], [0.012, 0.016, -0.028], [0.042, 0.006, -0.022]],
+        "radius": 0.015
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 90,
+      "volumeSource": "Adult pancreas ~15 cm head to tail, volume 72-110 mL; Guyton & Hall 14e ch.65."
+    },
+    {
+      "id": "spleen",
+      "displayName": "Spleen",
+      "group": "abdominal",
+      "panel": "generic",
+      "selectedColor": "#7A2B44",
+      "placeholder": { "kind": "ellipsoid", "radii": [0.03, 0.047, 0.026], "detail": 5, "noise": 0.05 },
+      "position": [-0.093, 0.055, -0.03],
+      "layoutOffset": [0, 0, 0],
+      "rotation": [0, 0.3, -0.22],
+      "volume_mL": 180,
+      "volumeSource": "Adult spleen ~12 x 7 x 4 cm, volume 150-200 mL; Guyton & Hall 14e ch.33."
+    },
+    {
+      "id": "kidney_l",
+      "displayName": "Left Kidney",
+      "group": "abdominal",
+      "panel": "renal",
+      "selectedColor": "#8E4A6E",
+      "placeholder": { "kind": "ellipsoid", "radii": [0.026, 0.055, 0.02], "detail": 5, "noise": 0.05 },
+      "position": [-0.062, 0.012, -0.05],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 150,
+      "volumeSource": "Adult kidney ~11 x 6 x 3 cm, volume 130-170 mL each; Guyton & Hall 14e ch.26.",
+      "labelBias": [-0.8, 0]
+    },
+    {
+      "id": "kidney_r",
+      "displayName": "Right Kidney",
+      "group": "abdominal",
+      "panel": "renal",
+      "selectedColor": "#8E4A6E",
+      "placeholder": { "kind": "ellipsoid", "radii": [0.026, 0.055, 0.02], "detail": 5, "noise": 0.05 },
+      "position": [0.062, 0.0, -0.05],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 150,
+      "volumeSource": "Adult kidney ~11 x 6 x 3 cm, volume 130-170 mL each; Guyton & Hall 14e ch.26.",
+      "labelBias": [0.8, 0]
+    },
+    {
+      "id": "intestine_small",
+      "displayName": "Small Intestine",
+      "group": "abdominal",
+      "panel": "gi",
+      "selectedColor": "#D0625A",
+      "placeholder": {
+        "kind": "capsuleChain",
+        "points": [
+          [0.022, 0.012, 0.01], [0.006, -0.012, 0.026], [-0.04, -0.022, 0.02],
+          [-0.056, -0.052, 0.008], [-0.018, -0.07, 0.022], [0.03, -0.06, 0.018],
+          [0.054, -0.03, 0.002], [0.026, -0.012, -0.016], [-0.016, -0.028, -0.018],
+          [-0.044, -0.062, -0.01], [-0.008, -0.086, 0.004], [0.036, -0.08, 0.012],
+          [0.042, -0.104, 0.0], [0.0, -0.114, 0.006]
+        ],
+        "radius": 0.016,
+        "tube": 1
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 500,
+      "volumeSource": "Small bowel, ~6 m long, coiled into the central abdomen; Guyton & Hall 14e ch.64."
+    },
+    {
+      "id": "intestine_large",
+      "displayName": "Large Intestine",
+      "group": "abdominal",
+      "panel": "gi",
+      "selectedColor": "#8E2020",
+      "placeholder": {
+        "kind": "capsuleChain",
+        "points": [
+          [0.076, -0.122, -0.012], [0.08, -0.07, -0.014], [0.078, -0.018, -0.014],
+          [0.028, 0.0, -0.018], [-0.028, -0.002, -0.018], [-0.078, -0.018, -0.016],
+          [-0.08, -0.07, -0.014], [-0.07, -0.12, -0.008], [-0.034, -0.14, -0.006],
+          [0.0, -0.146, -0.008], [0.006, -0.17, -0.01]
+        ],
+        "radius": 0.021,
+        "tube": 1
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 900,
+      "volumeSource": "Colon, ~1.5 m long, framing the small bowel; Guyton & Hall 14e ch.64.",
+      "labelBias": [0, 0.5]
+    },
+    {
+      "id": "bladder",
+      "displayName": "Bladder",
+      "group": "pelvic",
+      "panel": "bladder",
+      "selectedColor": "#C9A227",
+      "placeholder": { "kind": "ellipsoid", "radii": [0.038, 0.033, 0.033], "detail": 5, "noise": 0.03 },
+      "position": [0, -0.188, 0.004],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 500,
+      "volumeSource": "Adult bladder capacity 400-600 mL; Guyton & Hall 14e ch.26.",
+      "labelBias": [0, -0.7]
+    }
+  ],
+  "giCentrelines": [
+    { "segment": "mouth", "points": [[0, 0.385, 0.008], [0.002, 0.368, 0.0]] },
+    { "segment": "oesophagus", "points": [[0.004, 0.352, -0.02], [0.006, 0.29, -0.021], [0.008, 0.22, -0.019], [0.012, 0.15, -0.012], [0.018, 0.095, -0.002]] },
+    { "segment": "stomach", "points": [[0.018, 0.095, -0.002], [-0.03, 0.098, 0.0], [-0.056, 0.07, 0.002], [-0.07, 0.036, 0.0], [-0.056, 0.008, -0.006], [-0.03, 0.0, -0.01]] },
+    { "segment": "duodenum", "points": [[-0.03, 0.0, -0.01], [-0.002, 0.008, -0.02], [0.028, 0.006, -0.024], [0.04, -0.014, -0.018]] },
+    { "segment": "jejunum", "points": [[0.04, -0.014, -0.018], [0.006, -0.012, 0.026], [-0.04, -0.022, 0.02], [-0.056, -0.052, 0.008], [-0.018, -0.07, 0.022], [0.03, -0.06, 0.018]] },
+    { "segment": "ileum", "points": [[0.03, -0.06, 0.018], [0.054, -0.03, 0.002], [0.026, -0.012, -0.016], [-0.016, -0.028, -0.018], [-0.044, -0.062, -0.01], [-0.008, -0.086, 0.004], [0.036, -0.08, 0.012], [0.042, -0.104, 0.0], [0.062, -0.12, -0.006]] },
+    { "segment": "caecum", "points": [[0.062, -0.12, -0.006], [0.076, -0.122, -0.012]] },
+    { "segment": "colon_ascending", "points": [[0.076, -0.122, -0.012], [0.08, -0.07, -0.014], [0.078, -0.018, -0.014]] },
+    { "segment": "colon_transverse", "points": [[0.078, -0.018, -0.014], [0.028, 0.0, -0.018], [-0.028, -0.002, -0.018], [-0.078, -0.018, -0.016]] },
+    { "segment": "colon_descending", "points": [[-0.078, -0.018, -0.016], [-0.08, -0.07, -0.014], [-0.07, -0.12, -0.008]] },
+    { "segment": "colon_sigmoid", "points": [[-0.07, -0.12, -0.008], [-0.034, -0.14, -0.006], [0.0, -0.146, -0.008]] },
+    { "segment": "rectum", "points": [[0.0, -0.146, -0.008], [0.006, -0.17, -0.01], [0.004, -0.196, -0.012]] }
+  ]
+}

@@ -1,0 +1,172 @@
+{
+  "generatedBy": "tools/placeholder-organs.ts",
+  "note": "Bounding spheres and centroids of the procedural placeholders. A real mesh from Phase 7 must match these within a few millimetres, or the camera focus animation and the sim-driven pulse scaling will be framed on the wrong point.",
+  "totalTriangles": 27092,
+  "organs": [
+    {
+      "id": "intestine_small",
+      "triangles": 4704,
+      "budget": 15000,
+      "boundingRadius_m": 0.0857,
+      "worldCentre_m": [
+        -0.003,
+        -0.0788,
+        0.0031
+      ]
+    },
+    {
+      "id": "intestine_large",
+      "triangles": 3696,
+      "budget": 10000,
+      "boundingRadius_m": 0.11994,
+      "worldCentre_m": [
+        0.0008,
+        -0.1015,
+        -0.0125
+      ]
+    },
+    {
+      "id": "brain",
+      "triangles": 2420,
+      "budget": 20000,
+      "boundingRadius_m": 0.08359,
+      "worldCentre_m": [
+        -0.001,
+        0.4866,
+        0.0006
+      ]
+    },
+    {
+      "id": "heart",
+      "triangles": 2420,
+      "budget": 15000,
+      "boundingRadius_m": 0.04884,
+      "worldCentre_m": [
+        -0.016,
+        0.1883,
+        0.0152
+      ]
+    },
+    {
+      "id": "lung_l",
+      "triangles": 2420,
+      "budget": 12000,
+      "boundingRadius_m": 0.09524,
+      "worldCentre_m": [
+        -0.0674,
+        0.1729,
+        0.0005
+      ]
+    },
+    {
+      "id": "lung_r",
+      "triangles": 2420,
+      "budget": 12000,
+      "boundingRadius_m": 0.09552,
+      "worldCentre_m": [
+        0.072,
+        0.1775,
+        0
+      ]
+    },
+    {
+      "id": "oesophagus",
+      "triangles": 1920,
+      "budget": 6000,
+      "boundingRadius_m": 0.1309,
+      "worldCentre_m": [
+        0.011,
+        0.2227,
+        -0.0116
+      ]
+    },
+    {
+      "id": "trachea",
+      "triangles": 1536,
+      "budget": 6000,
+      "boundingRadius_m": 0.05184,
+      "worldCentre_m": [
+        0,
+        0.3023,
+        0.0021
+      ]
+    },
+    {
+      "id": "pancreas",
+      "triangles": 1344,
+      "budget": 6000,
+      "boundingRadius_m": 0.06186,
+      "worldCentre_m": [
+        -0.0129,
+        -0.0068,
+        -0.0265
+      ]
+    },
+    {
+      "id": "liver",
+      "triangles": 720,
+      "budget": 10000,
+      "boundingRadius_m": 0.09585,
+      "worldCentre_m": [
+        0.0327,
+        0.0378,
+        0.0082
+      ]
+    },
+    {
+      "id": "spleen",
+      "triangles": 720,
+      "budget": 6000,
+      "boundingRadius_m": 0.047,
+      "worldCentre_m": [
+        -0.0928,
+        0.0303,
+        -0.0296
+      ]
+    },
+    {
+      "id": "kidney_l",
+      "triangles": 720,
+      "budget": 6000,
+      "boundingRadius_m": 0.05537,
+      "worldCentre_m": [
+        -0.0619,
+        -0.0126,
+        -0.0498
+      ]
+    },
+    {
+      "id": "kidney_r",
+      "triangles": 720,
+      "budget": 6000,
+      "boundingRadius_m": 0.05537,
+      "worldCentre_m": [
+        0.0621,
+        -0.0246,
+        -0.0498
+      ]
+    },
+    {
+      "id": "bladder",
+      "triangles": 720,
+      "budget": 6000,
+      "boundingRadius_m": 0.03726,
+      "worldCentre_m": [
+        0.0001,
+        -0.2329,
+        0.0044
+      ]
+    },
+    {
+      "id": "stomach",
+      "triangles": 612,
+      "budget": 8000,
+      "boundingRadius_m": 0.0824,
+      "worldCentre_m": [
+        -0.0499,
+        0.0276,
+        -0.0024
+      ]
+    }
+  ]
+}

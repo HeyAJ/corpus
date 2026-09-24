@@ -1,0 +1,329 @@
+/* Bottom sheet, snap points at 45 % and 90 % (spec 8.3). */
+
+.sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 45%;
+  display: flex;
+  flex-direction: column;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.1);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  transition: height var(--tween-state) var(--ease-out);
+  z-index: 30;
+}
+
+.sheetFull {
+  height: 90%;
+}
+
+.grabber {
+  width: 40px;
+  height: 4px;
+  margin: 10px auto 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 6px 20px 10px;
+}
+
+.tab,
+.tabActive {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 2px 0;
+}
+
+.tab {
+  color: var(--ink-faint);
+}
+
+.tabActive {
+  color: var(--ink);
+}
+
+.close {
+  margin-left: auto;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-faint);
+  padding: 0 4px;
+}
+
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.groupHeader {
+  margin: 14px 4px 8px;
+  font-size: 17px;
+  font-weight: 700;
+  color: #b0b0b0;
+  letter-spacing: 0.01em;
+}
+
+.rowGroup {
+  margin-bottom: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 54px;
+}
+
+.drugPill {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 16px;
+  min-height: 40px;
+  border-radius: var(--radius-pill);
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* Route buttons are right-anchored so the rightmost column always lines up,
+   whether a drug offers one route or three (VISUAL_AUDIT section 7). */
+.routes {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.routeButton {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 7px 13px;
+  border-radius: var(--radius-chip);
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--ink);
+  font-weight: 700;
+  transition: background 120ms ease;
+}
+
+.routeButton:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.11);
+}
+
+.routeButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.routeButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.routeName {
+  font-size: 14px;
+}
+
+.routeDose {
+  font-size: 11px;
+  color: var(--ink-dim);
+}
+
+.stopButton {
+  padding: 8px 16px;
+  border-radius: var(--radius-chip);
+  background: var(--severity-warn-bg);
+  color: var(--severity-warn-ink);
+  font-weight: 700;
+}
+
+.foodMacros {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+
+.details {
+  padding: 4px 6px 14px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.notes {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-mid);
+  font-weight: 500;
+}
+
+.targets {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.targets th {
+  text-align: left;
+  font-weight: 700;
+  color: var(--ink-faint);
+  padding: 2px 6px 2px 0;
+}
+
+.targets td {
+  padding: 2px 6px 2px 0;
+  font-weight: 700;
+  color: var(--ink-mid);
+}
+
+.sources {
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.sources summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.sources ul {
+  margin: 6px 0 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+.emptyNote {
+  margin: 8px 4px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-mid);
+  font-weight: 500;
+  max-width: 46ch;
+}
+
+.footnote {
+  margin: 0;
+  padding: 8px 20px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* ------------------------------------------------------------ dose section */
+
+.doseSection {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.doseHeading {
+  margin: 0 0 4px;
+  font-size: var(--size-tag);
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+}
+
+.doseIntro {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+/* --------------------------------------------------------- depot readout */
+
+.depotList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.depotItem {
+  font-variant-numeric: tabular-nums;
+}
+
+.depotWaiting {
+  color: var(--severity-warn-ink);
+}
+
+/* ------------------------------------------------------------------ search */
+
+/*
+ * At nineteen drugs a list was fine. At eighty-nine it is not, and the search is
+ * the difference between a drawer you scroll and a drawer you use.
+ */
+.search {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search input {
+  width: min(320px, 40vw);
+  padding: 6px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.72);
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.search input::placeholder {
+  color: var(--ink-faint);
+}
+
+.searchCount {
+  font-size: 11px;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------- controlled notice */
+
+.scheduleNote {
+  margin: 0 0 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--severity-warn-ink);
+  background: var(--severity-warn-bg);
+  border-radius: var(--radius-chip);
+}

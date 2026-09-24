@@ -1,0 +1,240 @@
+/*
+ * ENDOCRINE PANEL.
+ *
+ * A reading instrument, not a dashboard. Each row is a value against its own
+ * reference band, and the band is drawn on a fixed scale so it never moves —
+ * an axis that rescales every tick is an axis that cannot be read.
+ */
+
+.panel {
+  position: absolute;
+  top: var(--inset-hud);
+  right: var(--inset-hud);
+  width: min(400px, calc(100vw - 2 * var(--inset-hud)));
+  max-height: calc(100vh - 2 * var(--inset-hud) - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--size-tag);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.clock {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+  padding: 1px 7px;
+  background: var(--chip-bg-strong);
+  border-radius: var(--radius-pill);
+}
+
+.close {
+  margin-left: auto;
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.summary {
+  margin: 0;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.empty {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.empty code {
+  font-size: 11px;
+  background: var(--chip-bg);
+  padding: 0 4px;
+  border-radius: 4px;
+}
+
+/* -------------------------------------------------------------------- list */
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/*
+ * A grid, not a flex row. With flex, a long hormone name ("Vasopressin (ADH)")
+ * pushed the state badge onto its own line and the row lost its alignment with
+ * every other row. The grid gives each part a column, so a long name truncates
+ * instead of reflowing the row.
+ */
+.rowHead {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto auto auto;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.gland {
+  font-size: 10px;
+  color: var(--ink-faint);
+  text-transform: lowercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.unit {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--ink-faint);
+}
+
+.badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.normal {
+  background: rgba(127, 214, 238, 0.3);
+  color: #29616f;
+}
+
+.low,
+.high {
+  background: var(--severity-warn-bg);
+  color: var(--severity-warn-ink);
+}
+
+.veryLow,
+.veryHigh {
+  background: var(--severity-critical-bg);
+  color: var(--severity-critical-ink);
+  font-weight: var(--weight-bold);
+}
+
+/* --------------------------------------------------------------------- bar */
+
+/*
+ * Fixed scale: zero to twice the top of the reference range. The band therefore
+ * always sits in the middle half of the track and a value can visibly run off the
+ * end, which is exactly what "very high" should look like.
+ */
+.bar {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(127, 214, 238, 0.45);
+}
+
+.needle {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: left var(--tween-state) var(--ease-out);
+}
+
+.needle.low,
+.needle.high {
+  background: var(--severity-warn-ink);
+}
+
+.needle.veryLow,
+.needle.veryHigh {
+  background: var(--severity-critical-bg);
+}
+
+.rowFoot {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.footnote {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+.footnote code {
+  background: var(--chip-bg);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .needle {
+    transition: none;
+  }
+}

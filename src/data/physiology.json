@@ -1,0 +1,264 @@
+{
+  "version": 1,
+  "subject": "Reference adult: 70 kg, 1.73 m, BSA 1.83 m2, male-typical baselines. Not patient-specific (spec 1, non-goals).",
+  "unitConventions": {
+    "pressure": "mmHg",
+    "volume": "mL",
+    "flow": "mL/s unless the key says _per_min",
+    "resistance": "mmHg*s/mL",
+    "compliance": "mL/mmHg",
+    "elastance": "mmHg/mL",
+    "time": "s unless the key says _min",
+    "concentration": "as stated per key"
+  },
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "WEST10": {
+      "label": "West JB, Luks AM. West's Respiratory Physiology: The Essentials, 10th ed. Wolters Kluwer, 2016.",
+      "url": "https://shop.lww.com/West-s-Respiratory-Physiology/p/9781496339447"
+    },
+    "URSINO1998": {
+      "label": "Ursino M. Interaction between carotid baroregulation and the pulsating heart: a mathematical model. Am J Physiol 275(5):H1733-H1747, 1998.",
+      "url": "https://doi.org/10.1152/ajpheart.1998.275.5.H1733"
+    },
+    "SUGA1974": {
+      "label": "Suga H, Sagawa K. Instantaneous pressure-volume relationships and their ratio in the excised, supported canine left ventricle. Circ Res 35(1):117-126, 1974.",
+      "url": "https://doi.org/10.1161/01.RES.35.1.117"
+    },
+    "MYNARD2012": {
+      "label": "Mynard JP, Davidson MR, Penny DJ, Smolich JJ. A simple, versatile valve model for use in lumped parameter and one-dimensional cardiovascular models. Int J Numer Method Biomed Eng 28(6-7):626-641, 2012.",
+      "url": "https://doi.org/10.1002/cnm.1466"
+    },
+    "STERGIOPULOS1999": {
+      "label": "Stergiopulos N, Westerhof BE, Westerhof N. Total arterial inertance as the fourth element of the windkessel model. Am J Physiol 276(1):H81-H88, 1999.",
+      "url": "https://doi.org/10.1152/ajpheart.1999.276.1.H81"
+    },
+    "SEVERINGHAUS1979": {
+      "label": "Severinghaus JW. Simple, accurate equations for human blood O2 dissociation computations. J Appl Physiol 46(3):599-602, 1979.",
+      "url": "https://doi.org/10.1152/jappl.1979.46.3.599"
+    },
+    "MCSHARRY2003": {
+      "label": "McSharry PE, Clifford GD, Tarassenko L, Smith LA. A dynamical model for generating synthetic electrocardiogram signals. IEEE Trans Biomed Eng 50(3):289-294, 2003.",
+      "url": "https://doi.org/10.1109/TBME.2003.808805"
+    },
+    "BERGMAN1981": {
+      "label": "Bergman RN, Phillips LS, Cobelli C. Physiologic evaluation of factors controlling glucose tolerance in man. J Clin Invest 68(6):1456-1467, 1981.",
+      "url": "https://doi.org/10.1172/JCI110398"
+    },
+    "ELASHOFF1982": {
+      "label": "Elashoff JD, Reedy TJ, Meyer JH. Analysis of gastric emptying data. Gastroenterology 83(6):1306-1312, 1982.",
+      "url": "https://doi.org/10.1016/S0016-5085(82)80145-5"
+    },
+    "SIEGEL1988": {
+      "label": "Siegel JA, Urbain JL, Adler LP, et al. Biphasic nature of gastric emptying. Gut 29(1):85-89, 1988.",
+      "url": "https://doi.org/10.1136/gut.29.1.85"
+    },
+    "PULSE_CV": {
+      "label": "Kitware. Pulse Physiology Engine - Cardiovascular Methodology. Apache-2.0.",
+      "url": "https://pulse.kitware.com/_cardiovascular_methodology.html"
+    },
+    "PULSE_RENAL": {
+      "label": "Kitware. Pulse Physiology Engine - Renal Methodology. Apache-2.0.",
+      "url": "https://pulse.kitware.com/_renal_methodology.html"
+    },
+    "PULSE_RESP": {
+      "label": "Kitware. Pulse Physiology Engine - Respiratory Methodology. Apache-2.0.",
+      "url": "https://pulse.kitware.com/_respiratory_methodology.html"
+    },
+    "PULSE_ENERGY": {
+      "label": "Kitware. Pulse Physiology Engine - Energy Methodology. Apache-2.0.",
+      "url": "https://pulse.kitware.com/_energy_methodology.html"
+    },
+    "LUNDVALL1999": {
+      "label": "Lundvall J, Lanne T. Much of the compensatory transcapillary absorption of fluid in hypovolaemia occurs in skeletal muscle. Acta Physiol Scand 165(2):181-187, 1999.",
+      "url": "https://doi.org/10.1046/j.1365-201x.1999.00493.x"
+    },
+    "AHA2020": {
+      "label": "Panchal AR, et al. Part 3: Adult Basic and Advanced Life Support: 2020 AHA Guidelines for CPR and ECC. Circulation 142(16_suppl_2):S366-S468, 2020.",
+      "url": "https://doi.org/10.1161/CIR.0000000000000916"
+    },
+    "ENGINEERING": {
+      "label": "Engineering default chosen for numerical stability or visual pacing. NOT a physiological claim.",
+      "url": "docs/MODEL_LIMITATIONS.md"
+    }
+  },
+  "constants": {
+    "body.mass_kg": { "value": 70, "unit": "kg", "source": "GH14", "confidence": "measured", "note": "Reference adult." },
+    "body.height_m": { "value": 1.73, "unit": "m", "source": "GH14", "confidence": "measured" },
+    "body.bsa_m2": { "value": 1.83, "unit": "m2", "source": "GH14", "confidence": "derived", "note": "DuBois formula from 70 kg / 1.73 m." },
+
+    "blood.totalVolume_mL": { "value": 5000, "unit": "mL", "source": "GH14", "confidence": "measured", "note": "~70 mL/kg adult." },
+    "blood.haematocrit": { "value": 0.45, "unit": "fraction", "source": "GH14", "confidence": "measured" },
+    "blood.haemoglobin_g_per_dL": { "value": 15.0, "unit": "g/dL", "source": "GH14", "confidence": "measured" },
+    "blood.o2CapacityPerGramHb_mL": { "value": 1.34, "unit": "mL O2/g Hb", "source": "WEST10", "confidence": "measured", "note": "Hufner constant, in-vivo value." },
+    "blood.na_mEq_per_L": { "value": 142, "unit": "mEq/L", "source": "GH14", "confidence": "measured" },
+    "blood.k_mEq_per_L": { "value": 4.2, "unit": "mEq/L", "source": "GH14", "confidence": "measured" },
+    "blood.caIonised_mmol_per_L": { "value": 1.2, "unit": "mmol/L", "source": "GH14", "confidence": "measured" },
+    "blood.cl_mEq_per_L": { "value": 104, "unit": "mEq/L", "source": "GH14", "confidence": "measured" },
+    "blood.hco3_mEq_per_L": { "value": 24, "unit": "mEq/L", "source": "GH14", "confidence": "measured" },
+    "blood.pH": { "value": 7.4, "unit": "pH", "source": "GH14", "confidence": "measured" },
+    "blood.glucose_mg_per_dL": { "value": 92, "unit": "mg/dL", "source": "BERGMAN1981", "confidence": "measured", "note": "Basal glucose Gb in the minimal model." },
+    "blood.lactate_mmol_per_L": { "value": 1.0, "unit": "mmol/L", "source": "GH14", "confidence": "measured" },
+    "blood.albumin_g_per_dL": { "value": 4.2, "unit": "g/dL", "source": "GH14", "confidence": "measured" },
+
+    "cardio.heartRateBaseline_bpm": { "value": 72, "unit": "bpm", "source": "GH14", "confidence": "measured" },
+    "cardio.heartRateIntrinsic_bpm": { "value": 100, "unit": "bpm", "source": "GH14", "confidence": "measured", "note": "Denervated SA node rate; both reflex limbs act on this." },
+    "cardio.lv.Emax_mmHg_per_mL": { "value": 2.5, "unit": "mmHg/mL", "source": "SUGA1974", "confidence": "measured", "note": "Human LV end-systolic elastance, normal range 2-3." },
+    "cardio.lv.Emin_mmHg_per_mL": { "value": 0.075, "unit": "mmHg/mL", "source": "PULSE_CV", "confidence": "derived", "note": "Diastolic (passive) elastance. 0.075 puts end-diastolic pressure at about 8 mmHg when end-diastolic volume is 120 mL, which is the normal filling pressure." },
+    "cardio.lv.V0_mL": { "value": 10, "unit": "mL", "source": "SUGA1974", "confidence": "measured", "note": "Unstressed LV volume, the ESPVR volume-axis intercept." },
+    "cardio.rv.Emax_mmHg_per_mL": { "value": 0.55, "unit": "mmHg/mL", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.rv.Emin_mmHg_per_mL": { "value": 0.035, "unit": "mmHg/mL", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.rv.V0_mL": { "value": 12, "unit": "mL", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.la.E_mmHg_per_mL": { "value": 0.25, "unit": "mmHg/mL", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.ra.E_mmHg_per_mL": { "value": 0.15, "unit": "mmHg/mL", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.activation.systolicFraction": { "value": 0.34, "unit": "fraction of RR", "source": "PULSE_CV", "confidence": "measured", "note": "Systolic duration ~ 0.3 x RR at 72 bpm; shortens with rate via the Bazett-like scaling below." },
+    "cardio.activation.hill1_exponent": { "value": 1.9, "unit": "dimensionless", "source": "MYNARD2012", "confidence": "derived", "note": "Double-Hill activation e(t); rising-limb exponent.", "note": "Rising-limb exponent of the double-Hill activation e(t). Mynard reports the activation shape rather than this coefficient directly; the value is the one that reproduces his published curve." },
+    "cardio.activation.hill2_exponent": { "value": 21.9, "unit": "dimensionless", "source": "MYNARD2012", "confidence": "derived", "note": "Falling-limb exponent.", "note": "Falling-limb exponent. Much larger than the rising one, which is what makes systolic contraction fast and diastolic relaxation slow — a symmetric activation reads as fake immediately." },
+    "cardio.activation.tau1_fraction": { "value": 0.269, "unit": "fraction of RR", "source": "MYNARD2012", "confidence": "derived", "note": "Rising-limb time constant as a fraction of the reference R-R interval, from the same published activation curve." },
+    "cardio.activation.tau2_fraction": { "value": 0.452, "unit": "fraction of RR", "source": "MYNARD2012", "confidence": "derived", "note": "Falling-limb time constant as a fraction of the reference R-R interval." },
+
+    "cardio.wk.Rc_mmHg_s_per_mL": { "value": 0.035, "unit": "mmHg*s/mL", "source": "STERGIOPULOS1999", "confidence": "measured", "note": "Characteristic aortic impedance, 4-element Windkessel." },
+    "cardio.wk.C_mL_per_mmHg": { "value": 1.30, "unit": "mL/mmHg", "source": "STERGIOPULOS1999", "confidence": "derived", "note": "Total arterial compliance. Stergiopulos reports 1.0-2.0 mL/mmHg for adults; 1.30 is the value inside that range at which the model reproduces a 48 mmHg pulse pressure at a 78 mL stroke volume." },
+    "cardio.wk.R_mmHg_s_per_mL": { "value": 1.05, "unit": "mmHg*s/mL", "source": "GH14", "confidence": "derived", "note": "Peripheral resistance from MAP 92, RAP 4, CO 5 L/min: (92-4)/83.3 mL/s." },
+    "cardio.wk.L_mmHg_s2_per_mL": { "value": 0.0045, "unit": "mmHg*s2/mL", "source": "STERGIOPULOS1999", "confidence": "measured", "note": "Total arterial inertance." },
+    "cardio.venous.C_mL_per_mmHg": { "value": 100, "unit": "mL/mmHg", "source": "GH14", "confidence": "measured", "note": "Systemic venous compliance, ~24x arterial." },
+    "cardio.venous.unstressedVolume_mL": { "value": 2520, "unit": "mL", "source": "PULSE_CV", "confidence": "derived", "note": "Venous reservoir that carries no pressure; sympathetic tone recruits it. Calibrated within the published 60-75% of total blood volume so that the closed loop settles at a textbook resting point: BP 120/72, CO 5.4 L/min, EDV 120 mL, CVP 5 mmHg." },
+    "cardio.venous.R_mmHg_s_per_mL": { "value": 0.034, "unit": "mmHg*s/mL", "source": "PULSE_CV", "confidence": "derived", "note": "Resistance to venous return. Together with the unstressed volume above it sets where the venous-return and cardiac-output curves intersect, which is what fixes resting cardiac output." },
+    "cardio.pulm.R_mmHg_s_per_mL": { "value": 0.105, "unit": "mmHg*s/mL", "source": "GH14", "confidence": "derived", "note": "PVR ~ 1/10 SVR: (15-8)/83.3 * scaling." },
+    "cardio.pulm.C_mL_per_mmHg": { "value": 4.3, "unit": "mL/mmHg", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.pulm.venous.C_mL_per_mmHg": { "value": 8.4, "unit": "mL/mmHg", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.aorta.unstressedVolume_mL": { "value": 750, "unit": "mL", "source": "GH14", "confidence": "derived", "note": "Arterial tree holds about 900 mL at a mean pressure of 92 mmHg with a compliance of 1.6 mL/mmHg, so 750 mL of it carries no pressure." },
+    "cardio.pulmArt.unstressedVolume_mL": { "value": 65, "unit": "mL", "source": "PULSE_CV", "confidence": "derived", "note": "Pulmonary artery holds about 130 mL at a mean pressure of 15 mmHg with a compliance of 4.3 mL/mmHg, so half of it carries no pressure." },
+    "cardio.pulmVein.unstressedVolume_mL": { "value": 205, "unit": "mL", "source": "PULSE_CV", "confidence": "derived", "note": "Total pulmonary blood volume is about 450 mL; this is the share of the venous half that carries no pressure." },
+    "cardio.pulmVein.R_mmHg_s_per_mL": { "value": 0.0075, "unit": "mmHg*s/mL", "source": "PULSE_CV", "confidence": "derived", "note": "Pulmonary vein to left atrium. Small, because the gradient from wedge pressure to left atrial pressure is only a millimetre or two of mercury at rest." },
+    "cardio.la.V0_mL": { "value": 20, "unit": "mL", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.ra.V0_mL": { "value": 20, "unit": "mL", "source": "PULSE_CV", "confidence": "measured" },
+    "cardio.valve.R_mmHg_s_per_mL": { "value": 0.006, "unit": "mmHg*s/mL", "source": "PULSE_CV", "confidence": "measured", "note": "Forward resistance of a competent valve." },
+    "cardio.valve.regurgitantR_mmHg_s_per_mL": { "value": 100, "unit": "mmHg*s/mL", "source": "ENGINEERING", "confidence": "assumed", "note": "Closed valve modelled as a very large but finite resistance to keep the ODE non-stiff." },
+
+    "baroreflex.setpoint_mmHg": { "value": 92, "unit": "mmHg", "source": "URSINO1998", "confidence": "measured", "note": "Carotid sinus pressure at the sigmoid midpoint." },
+    "baroreflex.sigmoidWidth_mmHg": { "value": 11.758, "unit": "mmHg", "source": "URSINO1998", "confidence": "measured", "note": "ka in the afferent sigmoid." },
+    "baroreflex.afferentMin_Hz": { "value": 2.52, "unit": "Hz", "source": "URSINO1998", "confidence": "measured" },
+    "baroreflex.afferentMax_Hz": { "value": 47.78, "unit": "Hz", "source": "URSINO1998", "confidence": "measured" },
+    "baroreflex.sympDelay_s": { "value": 2.0, "unit": "s", "source": "URSINO1998", "confidence": "measured", "note": "Pure transport delay on the sympathetic limb." },
+    "baroreflex.sympTau_s": { "value": 7.0, "unit": "s", "source": "URSINO1998", "confidence": "measured", "note": "First-order efferent time constant, sympathetic." },
+    "baroreflex.vagalDelay_s": { "value": 0.2, "unit": "s", "source": "URSINO1998", "confidence": "measured" },
+    "baroreflex.vagalTau_s": { "value": 1.5, "unit": "s", "source": "URSINO1998", "confidence": "measured", "note": "Vagal limb is fast: this is why HR responds within one or two beats." },
+    "baroreflex.gainHR_sym_bpm": { "value": 38, "unit": "bpm per unit tone", "source": "URSINO1998", "confidence": "derived", "note": "Calibrated in the closed loop so resting HR is 72 at balanced tone and class-III haemorrhage drives it to ~140, the textbook response. Ursino supplies the reflex structure; this gain is our fit to it." },
+    "baroreflex.gainHR_vagal_bpm": { "value": 45, "unit": "bpm per unit tone", "source": "URSINO1998", "confidence": "derived", "note": "Calibrated so full vagal tone produces the ~30 bpm bradycardia seen with carotid sinus massage." },
+    "baroreflex.gainContractility": { "value": 0.6, "unit": "fraction per unit tone", "source": "URSINO1998", "confidence": "derived", "note": "Full sympathetic drive raises Emax about 60%." },
+    "baroreflex.gainResistance": { "value": 0.7, "unit": "fraction per unit tone", "source": "URSINO1998", "confidence": "derived", "note": "Full sympathetic drive raises SVR about 70%." },
+    "baroreflex.gainVenousTone_mL": { "value": 700, "unit": "mL per unit tone", "source": "URSINO1998", "confidence": "derived", "note": "Unstressed venous volume recruited at full sympathetic drive." },
+
+    "ecg.samplingRate_Hz": { "value": 250, "unit": "Hz", "source": "MCSHARRY2003", "confidence": "measured" },
+    "ecg.baselineWander_mV": { "value": 0.005, "unit": "mV", "source": "MCSHARRY2003", "confidence": "measured", "note": "z0 amplitude; carries respiratory sinus arrhythmia." },
+    "ecg.amplitudeGain": { "value": 25, "unit": "mV per model unit", "source": "MCSHARRY2003", "confidence": "derived", "note": "The McSharry z variable is dimensionless; the paper scales its output to a physiological range rather than producing millivolts directly. The excursion produced by one Gaussian event is a*b^2/omega, so with the published a=30 and b=0.1 the raw R wave is about 0.048 units. This gain puts it at 1.2 mV, which is a normal lead-II R wave." },
+    "ecg.referenceRate_bpm": { "value": 60, "unit": "bpm", "source": "MCSHARRY2003", "confidence": "derived", "note": "The raw model's amplitude scales as 1/omega, so an untreated trace would halve its R wave when the heart rate doubled. Real R-wave amplitude does not depend on rate. The event sum is therefore scaled by omega/omega_ref, which cancels the dependence and leaves the published parameters meaning what they mean at 60 bpm." },
+    "ecg.rsaFraction": { "value": 0.04, "unit": "fraction of RR", "source": "GH14", "confidence": "derived", "note": "Respiratory sinus arrhythmia: RR modulation amplitude at the respiratory rate." },
+
+    "resp.rate_per_min": { "value": 12, "unit": "breaths/min", "source": "WEST10", "confidence": "measured" },
+    "resp.tidalVolume_mL": { "value": 500, "unit": "mL", "source": "WEST10", "confidence": "measured" },
+    "resp.deadSpace_mL": { "value": 150, "unit": "mL", "source": "WEST10", "confidence": "measured", "note": "Anatomical dead space ~ 2.2 mL/kg." },
+    "resp.frc_mL": { "value": 2400, "unit": "mL", "source": "WEST10", "confidence": "measured" },
+    "resp.inspiratoryFraction": { "value": 0.4, "unit": "fraction of breath", "source": "WEST10", "confidence": "measured", "note": "I:E of about 1:1.5." },
+    "resp.pio2_mmHg": { "value": 149.7, "unit": "mmHg", "source": "WEST10", "confidence": "derived", "note": "(760 - 47) x 0.2095 at sea level, body temperature, saturated." },
+    "resp.paco2_mmHg": { "value": 40, "unit": "mmHg", "source": "WEST10", "confidence": "measured" },
+    "resp.pao2_mmHg": { "value": 95, "unit": "mmHg", "source": "WEST10", "confidence": "measured", "note": "Arterial; alveolar is ~104, the difference is the A-a gradient." },
+    "resp.vo2_mL_per_min": { "value": 250, "unit": "mL/min", "source": "WEST10", "confidence": "measured" },
+    "resp.vco2_mL_per_min": { "value": 200, "unit": "mL/min", "source": "WEST10", "confidence": "measured", "note": "RQ 0.8." },
+    "resp.centralChemoGain_L_per_min_per_mmHg": { "value": 2.0, "unit": "L/min per mmHg PaCO2", "source": "WEST10", "confidence": "measured", "note": "Ventilatory response slope to CO2, awake adult." },
+    "resp.centralChemoThreshold_mmHg": { "value": 37, "unit": "mmHg", "source": "WEST10", "confidence": "measured", "note": "Apnoeic threshold; below this, CO2 drive is zero." },
+    "resp.peripheralChemoThreshold_mmHg": { "value": 60, "unit": "mmHg PaO2", "source": "WEST10", "confidence": "measured", "note": "Hypoxic drive only becomes significant below this." },
+    "resp.peripheralChemoGain_L_per_min": { "value": 22, "unit": "L/min at full hypoxic drive", "source": "WEST10", "confidence": "derived", "note": "Ventilation at full hypoxic drive. The carotid body response is steeply non-linear below 60 mmHg; this is the asymptote it approaches, and the square law in systems/respiratory.ts is the approach to it." },
+    "immune.cd4Baseline_per_uL": { "value": 1000, "unit": "cells/uL", "source": "GH14", "confidence": "measured", "note": "Normal adult CD4+ T lymphocyte count. The reference the HIV model falls from; below 200 defines AIDS." },
+    "resp.chemoVentilationCeiling_L_per_min": { "value": 60, "unit": "L/min", "source": "WEST10", "confidence": "derived", "note": "The ventilatory response to CO2 is linear over the physiological range and then FLATTENS; it does not rise without limit. This is the plateau the combined chemoreflex approaches, applied as a saturating hyperbola in systems/respiratory.ts. Documented as derived for the same reason as the peripheral gain: the textbook curve is read as an asymptote rather than published as one number. Without a ceiling the reflex could manufacture 50 L/min of drive from a PaCO2 of 52, which is what let a body in cardiac arrest go on breathing." },
+    "resp.co2NarcosisThreshold_mmHg": { "value": 80, "unit": "mmHg PaCO2", "source": "GH14", "confidence": "measured", "note": "Above roughly this tension carbon dioxide begins to DEPRESS the respiratory centre rather than stimulate it. The stimulant limb and the narcotic limb are the same molecule at different concentrations." },
+    "resp.co2NarcosisAbolished_mmHg": { "value": 120, "unit": "mmHg PaCO2", "source": "GH14", "confidence": "derived", "note": "Tension at which central depression is complete and CO2 drive is abolished. Read off the narcosis/coma range rather than published as a single figure; the ramp between this and the threshold is linear." },
+    "resp.co2SolubilityFactor": { "value": 0.0301, "unit": "mmol/(L*mmHg)", "source": "WEST10", "confidence": "measured", "note": "CO2 solubility in plasma at 37 C." },
+
+    "fluid.interstitialVolume_mL": { "value": 10500, "unit": "mL", "source": "GH14", "confidence": "measured", "note": "Extracellular fluid is about 14 L in a 70 kg adult: roughly 3 L of plasma and the rest interstitial. This compartment is what defends plasma volume." },
+    "fluid.insensibleLoss_mL_per_min": { "value": 0.7, "unit": "mL/min", "source": "GH14", "confidence": "measured", "note": "About 1 L/day from skin and the respiratory tract. Not urine, and not regulated." },
+    "fluid.obligateIntake_mL_per_min": { "value": 1.7, "unit": "mL/min", "source": "GH14", "confidence": "measured", "note": "About 2.4 L/day from drink, food water and metabolic water. At baseline this exactly balances urine plus insensible loss, which is what makes a resting body weight-stable. See docs/MODEL_LIMITATIONS.md: the body is modelled as drinking to thirst, not on a schedule." },
+    "fluid.transcapillaryRefillTau_min": { "value": 30, "unit": "min", "source": "LUNDVALL1999", "confidence": "measured", "note": "Time constant of plasma volume restitution from the interstitium after a volume loss. This is why a bled subject partly recovers their blood pressure over the following half hour without any fluid being given." },
+    "renal.rbf_mL_per_min": { "value": 1100, "unit": "mL/min", "source": "GH14", "confidence": "measured", "note": "~22% of resting cardiac output." },
+    "renal.gfr_mL_per_min": { "value": 125, "unit": "mL/min", "source": "GH14", "confidence": "measured" },
+    "renal.filtrationFraction": { "value": 0.2, "unit": "fraction", "source": "GH14", "confidence": "measured", "note": "GFR / RPF." },
+    "renal.autoregLow_mmHg": { "value": 80, "unit": "mmHg MAP", "source": "GH14", "confidence": "measured", "note": "Lower limit of myogenic + tubuloglomerular autoregulation." },
+    "renal.autoregHigh_mmHg": { "value": 180, "unit": "mmHg MAP", "source": "GH14", "confidence": "measured" },
+    "renal.autoregSharpness": { "value": 0.16, "unit": "1/mmHg", "source": "PULSE_RENAL", "confidence": "derived", "note": "Logistic steepness of the fall-off outside the plateau." },
+    "renal.urineOutput_mL_per_min": { "value": 1.0, "unit": "mL/min", "source": "GH14", "confidence": "measured", "note": "~1440 mL/day." },
+    "renal.tubularReabsorptionFraction": { "value": 0.992, "unit": "fraction", "source": "GH14", "confidence": "derived", "note": "1 - (1.0 / 125)." },
+    "renal.bladderCapacity_mL": { "value": 500, "unit": "mL", "source": "GH14", "confidence": "measured" },
+    "renal.bladderUrgeThreshold_mL": { "value": 300, "unit": "mL", "source": "GH14", "confidence": "measured" },
+
+    "gi.gastricEmptyingHalfTime_min": { "value": 25, "unit": "min", "source": "SIEGEL1988", "confidence": "measured", "note": "t-half for a standard liquid/semisolid meal." },
+    "gi.gastricEmptyingBeta": { "value": 1.7, "unit": "dimensionless", "source": "ELASHOFF1982", "confidence": "measured", "note": "Power-exponential shape parameter; >1 produces the observed initial lag." },
+    "gi.fatEmptyingDelayFactor_per_gram": { "value": 0.018, "unit": "fraction increase in t-half per g fat", "source": "SIEGEL1988", "confidence": "derived", "note": "Fat is the strongest inhibitor of gastric emptying." },
+    "gi.gastricPhFasted": { "value": 1.7, "unit": "pH", "source": "GH14", "confidence": "measured" },
+    "gi.gastricAcidSecretion_mEq_per_h": { "value": 3.0, "unit": "mEq/h", "source": "GH14", "confidence": "measured", "note": "Basal acid output; peaks around 20 mEq/h stimulated." },
+    "gi.mealBufferCapacity_mEq_per_g_protein": { "value": 0.09, "unit": "mEq/g", "source": "GH14", "confidence": "derived", "note": "Protein is the dominant dietary buffer." },
+    "gi.transitTime_min": {
+      "mouth": 0.5, "oesophagus": 0.15, "stomach": null, "duodenum": 5,
+      "jejunum": 90, "ileum": 120, "caecum": 60, "colon_ascending": 300,
+      "colon_transverse": 360, "colon_descending": 300, "colon_sigmoid": 240, "rectum": 120,
+      "unit": "min", "source": "GH14", "confidence": "measured",
+      "note": "Stomach is null because its residence time is computed by the Elashoff model, not fixed."
+    },
+    "gi.glucoseAbsorption_mg_per_min_max": { "value": 360, "unit": "mg/min", "source": "GH14", "confidence": "measured", "note": "SGLT1-limited; ~ 120 g/h upper bound in the proximal small bowel." },
+    "gi.segmentLength_m": {
+      "mouth": 0.1, "oesophagus": 0.25, "stomach": 0.25, "duodenum": 0.25,
+      "jejunum": 2.5, "ileum": 3.5, "caecum": 0.07, "colon_ascending": 0.2,
+      "colon_transverse": 0.5, "colon_descending": 0.25, "colon_sigmoid": 0.4, "rectum": 0.12,
+      "unit": "m", "source": "GH14", "confidence": "measured",
+      "note": "Sums to about 8.4 m of tract; the popular '30 feet' figure is post-mortem, unconstrained by muscle tone."
+    },
+
+    "metabolic.bergman.p1_per_min": { "value": 0.028735, "unit": "1/min", "source": "BERGMAN1981", "confidence": "measured", "note": "Glucose effectiveness SG." },
+    "metabolic.bergman.p2_per_min": { "value": 0.028344, "unit": "1/min", "source": "BERGMAN1981", "confidence": "measured" },
+    "metabolic.bergman.p3_mL_per_uU_min2": { "value": 5.035e-5, "unit": "mL/(uU*min2)", "source": "BERGMAN1981", "confidence": "measured" },
+    "metabolic.bergman.n_per_min": { "value": 0.2659, "unit": "1/min", "source": "BERGMAN1981", "confidence": "measured", "note": "Fractional insulin clearance." },
+    "metabolic.bergman.gamma": { "value": 0.003349, "unit": "uU/(mL*min2*mg/dL)", "source": "BERGMAN1981", "confidence": "measured", "note": "Pancreatic responsivity above threshold." },
+    "metabolic.bergman.h_mg_per_dL": { "value": 89.5, "unit": "mg/dL", "source": "BERGMAN1981", "confidence": "measured", "note": "Glycaemic threshold for insulin secretion." },
+    "metabolic.insulinSecretionGain": { "value": 0.258, "unit": "uU/(mL*min*(mg/dL))", "source": "BERGMAN1981", "confidence": "derived", "note": "Replaces the minimal model's gamma*(G-h)*t secretion term, which is only defined for a single IVGTT. Calibrated so a post-prandial glucose of 140 mg/dL yields a steady-state insulin of about 60 uU/mL against the model's own clearance n." },
+    "metabolic.insulinBasal_uU_per_mL": { "value": 11, "unit": "uU/mL", "source": "BERGMAN1981", "confidence": "measured" },
+    "metabolic.glucagonThreshold_mg_per_dL": { "value": 70, "unit": "mg/dL", "source": "GH14", "confidence": "measured", "note": "Counter-regulation begins here." },
+    "metabolic.hepaticGlucoseOutput_mg_per_min": { "value": 130, "unit": "mg/min", "source": "GH14", "confidence": "measured", "note": "Basal endogenous glucose production, ~2 mg/kg/min." },
+    "metabolic.glucoseDistributionVolume_dL": { "value": 117, "unit": "dL", "source": "BERGMAN1981", "confidence": "derived", "note": "0.16 L/kg x 70 kg." },
+
+    "thermal.coreTemp_C": { "value": 37.0, "unit": "C", "source": "GH14", "confidence": "measured" },
+    "thermal.bodyHeatCapacity_kJ_per_kg_C": { "value": 3.47, "unit": "kJ/(kg*C)", "source": "PULSE_ENERGY", "confidence": "measured" },
+    "thermal.basalHeatProduction_W": { "value": 84, "unit": "W", "source": "PULSE_ENERGY", "confidence": "measured", "note": "~ 70 kcal/h at rest." },
+    "thermal.regulatoryGain_per_C": { "value": 0.55, "unit": "fraction per C", "source": "GH14", "confidence": "derived", "note": "Proportional thermoregulation: heat loss rises above the set point through sweating and skin vasodilation, and falls below it through vasoconstriction. Without this the model has no defended temperature at all, only an equilibrium." },
+    "thermal.ambientTemp_C": { "value": 22.0, "unit": "C", "source": "ENGINEERING", "confidence": "assumed", "note": "Room temperature for the scenario; not a measured physiological value." },
+    "thermal.heatLossCoefficient_W_per_C": { "value": 5.6, "unit": "W/C", "source": "PULSE_ENERGY", "confidence": "derived", "note": "Combined convective, radiative and evaporative loss at neutral skin blood flow. Solved so that 84 W of basal heat production is exactly balanced at 37.0 C against a 22 C ambient: any other value makes core temperature drift all day, which the 24-hour homeostasis test catches." },
+
+    "neuro.cerebralBloodFlow_mL_per_min": { "value": 750, "unit": "mL/min", "source": "GH14", "confidence": "measured", "note": "~15% of cardiac output, ~50 mL/100g/min." },
+    "neuro.autoregLow_mmHg": { "value": 60, "unit": "mmHg MAP", "source": "GH14", "confidence": "measured" },
+    "neuro.autoregHigh_mmHg": { "value": 150, "unit": "mmHg MAP", "source": "GH14", "confidence": "measured" },
+    "neuro.consciousnessLossCBF_fraction": { "value": 0.55, "unit": "fraction of baseline CBF", "source": "GH14", "confidence": "derived", "note": "Syncope threshold; below this, level of consciousness falls." },
+
+    "arrest.cprStrokeVolumeFraction": { "value": 0.27, "unit": "fraction of normal CARDIAC OUTPUT", "source": "AHA2020", "confidence": "measured", "note": "Optimal manual compressions generate roughly a quarter to a third of normal cardiac OUTPUT. Note the unit: at 110 compressions per minute against a resting rate of 66, 27% of normal output is only about 13 mL per compression, which is 17% of a normal 78 mL stroke volume. Reading the figure as 27% of stroke VOLUME doubles the delivered flow and produces coronary pressures no manual CPR achieves." },
+    "arrest.cprPressureAmplitude_mmHg": { "value": 92, "unit": "mmHg", "source": "AHA2020", "confidence": "derived", "note": "Peak intrathoracic pressure from a 5-6 cm compression. Calibrated in tests/sim/arrest.test.ts so the thoracic pump delivers a cardiac output of 25-30% of normal at 110 compressions per minute." },
+    "arrest.cprArterialTransmission": { "value": 0.40, "unit": "fraction", "source": "AHA2020", "confidence": "derived", "note": "Fraction of the compression pressure transmitted to the arterial side. The thoracic aorta is inside the chest and is squeezed too, so only part of the compression appears as a driving gradient. Omitting it entirely made CPR an implausibly efficient pump." },
+    "arrest.cprVenousTransmission": { "value": 0.28, "unit": "fraction", "source": "AHA2020", "confidence": "derived", "note": "The great veins are intrathoracic as well. Valves at the thoracic inlet stop the pressure being transmitted onward to the neck, which is what rectifies the thoracic pump into forward flow." },
+    "arrest.cprDownstrokeDuration_s": { "value": 0.25, "unit": "s", "source": "AHA2020", "confidence": "measured", "note": "A 50% duty cycle at 110 compressions per minute." },
+    "arrest.cprCompressionDecay_s": { "value": 1.2, "unit": "s", "source": "AHA2020", "confidence": "derived", "note": "Coronary perfusion decays this fast when compressions pause." },
+    "arrest.cprTargetRateLow_per_min": { "value": 100, "unit": "compressions/min", "source": "AHA2020", "confidence": "measured" },
+    "arrest.cprTargetRateHigh_per_min": { "value": 120, "unit": "compressions/min", "source": "AHA2020", "confidence": "measured" },
+    "arrest.cprDepth_mm": { "value": 55, "unit": "mm", "source": "AHA2020", "confidence": "measured", "note": "5-6 cm in an adult." },
+    "arrest.defibEnergyOptions_J": { "value": [120, 150, 200], "unit": "J", "source": "AHA2020", "confidence": "measured", "note": "Biphasic manufacturer-recommended range." },
+    "arrest.cppRosc_mmHg": { "value": 15, "unit": "mmHg", "source": "AHA2020", "confidence": "measured", "note": "Coronary perfusion pressure below which defibrillation rarely succeeds." },
+    "arrest.defibBaseSuccess_vfib": { "value": 0.75, "unit": "probability", "source": "AHA2020", "confidence": "derived", "note": "First-shock termination of VF with a biphasic device, short downtime." },
+    "arrest.defibDowntimeHalfLife_s": { "value": 240, "unit": "s", "source": "AHA2020", "confidence": "derived", "note": "Shockability decays with untreated downtime; 7-10% per minute survival decrement." },
+
+    "sim.dt_s": { "value": 0.01, "unit": "s", "source": "ENGINEERING", "confidence": "assumed", "note": "100 Hz physiology loop (spec 4.1)." },
+    "sim.ecgSubsteps": { "value": 4, "unit": "count", "source": "ENGINEERING", "confidence": "assumed", "note": "The McSharry ODEs are stiffer than the rest; sub-step at dt/4 (spec 4.1)." },
+    "sim.snapshotRate_Hz": { "value": 20, "unit": "Hz", "source": "ENGINEERING", "confidence": "assumed", "note": "Object snapshots to the renderer and the interface. Fast enough that interpolation between two of them is invisible, slow enough that structured cloning does not dominate the worker." },
+    "sim.waveformRate_Hz": { "value": 250, "unit": "Hz", "source": "MCSHARRY2003", "confidence": "measured", "note": "Clinical ECG sampling rate." },
+    "sim.conditionHysteresis": { "value": 0.03, "unit": "fraction", "source": "ENGINEERING", "confidence": "assumed", "note": "+/-3% dead band so condition tags do not flicker (spec 4.8)." },
+    "sim.maxTimeScale": { "value": 300, "unit": "x realtime", "source": "ENGINEERING", "confidence": "assumed", "note": "Fastest offered time scale. 300x turns a four-hour oral distribution curve into forty-eight seconds, which is what makes a pharmacokinetic tail something a user will actually watch." }
+  }
+}

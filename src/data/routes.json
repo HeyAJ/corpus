@@ -1,0 +1,198 @@
+{
+  "version": 1,
+  "about": "Routes of administration. Each route describes HOW a dose reaches the central compartment, not how much of it to give. Absorption rate constants are expressed as a multiple of the drug's own measured intramuscular ka rather than as absolute values, because a route changes the barrier, not the molecule: a lipophilic drug is fast by every extravascular route and a hydrophilic one is slow by every extravascular route, and only the ratio between routes is a property of the route itself. Where a specific drug's label publishes its own figures, those override this table and are emitted per drug in drugs.json.",
+  "sources": {
+    "GG14": {
+      "label": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023. Chapter 2, 'Pharmacokinetics: The Dynamics of Drug Absorption, Distribution, Metabolism and Elimination'.",
+      "url": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191"
+    },
+    "RANG10": {
+      "label": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023. Chapter 10, 'Absorption and distribution of drugs'.",
+      "url": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5"
+    },
+    "AHA2020": {
+      "label": "Panchal AR, et al. Part 3: Adult Basic and Advanced Life Support: 2020 American Heart Association Guidelines for CPR and Emergency Cardiovascular Care. Circulation 142(16_suppl_2):S366-S468, 2020.",
+      "url": "https://doi.org/10.1161/CIR.0000000000000916"
+    },
+    "NARCAN_SPL": {
+      "label": "FDA Structured Product Label - NARCAN (naloxone hydrochloride) nasal spray, section 12.3.",
+      "url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=narcan%20nasal%20spray"
+    },
+    "DURAGESIC_SPL": {
+      "label": "FDA Structured Product Label - DURAGESIC (fentanyl transdermal system), section 12.3.",
+      "url": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=duragesic"
+    },
+    "DEBOER1982": {
+      "label": "de Boer AG, Moolenaar F, de Leede LGJ, Breimer DD. Rectal drug administration: clinical pharmacokinetic considerations. Clin Pharmacokinet 7(4):285-311, 1982.",
+      "url": "https://doi.org/10.2165/00003088-198207040-00002"
+    },
+    "ENGINEERING": {
+      "label": "Engineering default chosen for this simulation. Not a physiological or pharmacological measurement; see docs/MODEL_LIMITATIONS.md.",
+      "url": "docs/MODEL_LIMITATIONS.md"
+    },
+    "SIMONS2001": {
+      "label": "Simons FE, Gu X, Simons KJ. Epinephrine absorption in adults: intramuscular versus subcutaneous injection. J Allergy Clin Immunol 108(5):871-873, 2001.",
+      "url": "https://doi.org/10.1067/mai.2001.119409"
+    }
+  },
+  "routes": {
+    "IV_PUSH": {
+      "label": "Intravenous push",
+      "short": "IV",
+      "kind": "intravascular",
+      "requiresIvAccess": true,
+      "kaScale": null,
+      "bioavailability": 1.0,
+      "lagMin": 0,
+      "bypassesFirstPass": true,
+      "source": "GG14",
+      "confidence": "measured",
+      "note": "The reference case. All of the dose is in the central compartment at t=0, by definition, because the central compartment is the plasma."
+    },
+    "IV_DRIP": {
+      "label": "Intravenous infusion",
+      "short": "Drip",
+      "kind": "intravascular",
+      "requiresIvAccess": true,
+      "kaScale": null,
+      "bioavailability": 1.0,
+      "lagMin": 0,
+      "bypassesFirstPass": true,
+      "source": "GG14",
+      "confidence": "measured",
+      "note": "Zero-order input at dose/duration until stopped. Cancellable at any time, which is the entire clinical argument for infusing a short-acting drug rather than pushing it."
+    },
+    "INTRAOSSEOUS": {
+      "label": "Intraosseous",
+      "short": "IO",
+      "kind": "intravascular",
+      "requiresIvAccess": false,
+      "kaScale": null,
+      "bioavailability": 1.0,
+      "lagMin": 0.25,
+      "bypassesFirstPass": true,
+      "source": "AHA2020",
+      "confidence": "derived",
+      "note": "Modelled as intravenous with a 15-second transit delay. The marrow cavity is a non-collapsible vein: ACLS treats intraosseous access as an acceptable substitute when intravenous access cannot be obtained, and this route exists in the simulation for the same reason it exists in an arrest - it is the one that still works when the peripheries have shut down. It deliberately does NOT require the IV-access procedure, because placing the needle is the administration act; the transit delay is an engineering value, not a measured one."
+    },
+    "IM": {
+      "label": "Intramuscular",
+      "short": "IM",
+      "kind": "depot",
+      "requiresIvAccess": false,
+      "kaScale": 1.0,
+      "bioavailability": 1.0,
+      "lagMin": 0,
+      "bypassesFirstPass": true,
+      "source": "GG14",
+      "confidence": "measured",
+      "note": "The reference extravascular route, so its kaScale is 1.0 by construction and every other depot route is expressed relative to it. Skeletal muscle is well perfused, so absorption is limited by the drug rather than by the tissue, and essentially all of an injected dose eventually reaches the circulation - hence a bioavailability of 1. What an intramuscular injection costs is TIME, not dose."
+    },
+    "SUBCUTANEOUS": {
+      "label": "Subcutaneous",
+      "short": "SC",
+      "kind": "depot",
+      "requiresIvAccess": false,
+      "kaScale": 0.8,
+      "bioavailability": 1.0,
+      "lagMin": 0,
+      "bypassesFirstPass": true,
+      "source": "GG14",
+      "confidence": "assumed",
+      "note": "Modestly slower than intramuscular. Subcutaneous fat carries a fraction of the blood flow of skeletal muscle, so absorption from it is slower and far more dependent on perfusion. The factor of 0.8 is an ENGINEERING DEFAULT for the generic case, not a measured ratio. AN EARLIER VERSION SET IT TO 0.25, calibrated on Simons' measured four-fold difference for adrenaline, and that was a mistake: adrenaline is slow subcutaneously partly because it constricts the vessels around its own depot, which is a property of adrenaline and not of the route. That measurement now lives where it belongs, as a per-drug override on adrenaline in tools/ingest/route_presets.ts. Bioavailability is 1 for the same reason as intramuscular: the dose is already inside the body and none of it meets the liver on the way in. What changes is how long it takes to get there."
+    },
+    "INTRANASAL": {
+      "label": "Intranasal",
+      "short": "IN",
+      "kind": "depot",
+      "requiresIvAccess": false,
+      "kaScale": 1.2,
+      "bioavailability": 0.45,
+      "lagMin": 0,
+      "bypassesFirstPass": true,
+      "source": "NARCAN_SPL",
+      "confidence": "derived",
+      "note": "The nasal mucosa is thin, richly perfused and drains to the systemic circulation, so the liver is bypassed entirely. THE ADVANTAGE IS NOT SPEED. Naloxone's nasal spray label puts the median time to peak at about 30 minutes against roughly 15 for the intramuscular route, so the generic rate here is only slightly faster than intramuscular; what a nasal spray buys is that a bystander can give it without a needle. Drugs with a published figure for a real spray override this per drug. The 45% bioavailability is the generic default."
+    },
+    "SUBLINGUAL": {
+      "label": "Sublingual",
+      "short": "SL",
+      "kind": "depot",
+      "requiresIvAccess": false,
+      "kaScale": 1.5,
+      "bioavailability": 0.5,
+      "lagMin": 0,
+      "bypassesFirstPass": true,
+      "source": "RANG10",
+      "confidence": "assumed",
+      "note": "Absorbed across the sublingual mucosa into veins draining to the superior vena cava, so the whole dose escapes first-pass metabolism - the reason glyceryl trinitrate is given this way and is useless swallowed. THE ROUTE IS NOT INTRINSICALLY FAST. Glyceryl trinitrate acts in two minutes because it is tiny and lipophilic; a sublingual fentanyl tablet peaks at thirty to sixty, because the tablet has to dissolve first. The generic 1.5 is an engineering default for a dissolved drug, and formulations with a published time to peak override it."
+    },
+    "RECTAL": {
+      "label": "Rectal",
+      "short": "PR",
+      "kind": "depot",
+      "requiresIvAccess": false,
+      "kaScale": 0.6,
+      "bioavailability": 0.6,
+      "lagMin": 2,
+      "bypassesFirstPass": false,
+      "firstPassFraction": 0.5,
+      "source": "DEBOER1982",
+      "confidence": "derived",
+      "note": "The interesting route, anatomically. The inferior and middle rectal veins drain to the systemic circulation, the superior rectal vein drains to the portal vein - so roughly half a rectal dose bypasses the liver and half does not, and the effective first-pass loss is about half the oral one. Absorption is slower and more variable than any other mucosal route because it depends on where the dose ends up and on what else is there."
+    },
+    "TRANSDERMAL": {
+      "label": "Transdermal",
+      "short": "TD",
+      "kind": "depot",
+      "requiresIvAccess": false,
+      "kaScale": 0.004,
+      "bioavailability": 0.9,
+      "lagMin": 720,
+      "bypassesFirstPass": true,
+      "source": "DURAGESIC_SPL",
+      "confidence": "derived",
+      "note": "The stratum corneum is a rate-limiting membrane, and a patch is a depot that releases over days rather than minutes. Anchored to the fentanyl transdermal label: serum concentrations rise for 12 to 24 hours after application and a depot persists in the skin after removal. That last property is the point of simulating this route - you cannot take a transdermal dose back, and the overdose it causes outlives the decision that caused it."
+    },
+    "INHALED": {
+      "label": "Inhaled",
+      "short": "INH",
+      "kind": "pulmonary",
+      "requiresIvAccess": false,
+      "kaScale": null,
+      "bioavailability": null,
+      "lagMin": 0,
+      "bypassesFirstPass": true,
+      "source": "GG14",
+      "confidence": "measured",
+      "note": "Metered-dose delivery. The alveolar surface is enormous and one cell thick, so the fraction that reaches it is absorbed essentially instantly; the pulmonary bioavailability factor is doing all the work and it is the drug's own measured value."
+    },
+    "NEBULISED": {
+      "label": "Nebulised",
+      "short": "NEB",
+      "kind": "pulmonary",
+      "requiresIvAccess": false,
+      "kaScale": null,
+      "bioavailability": null,
+      "lagMin": 0,
+      "durationMin": 10,
+      "bypassesFirstPass": true,
+      "source": "GG14",
+      "confidence": "derived",
+      "note": "The same pulmonary absorption as a metered dose, delivered continuously over the run time of the nebuliser rather than in one breath. Modelled as a zero-order pulmonary infusion over ten minutes, which is what changes clinically: a nebuliser can be left running, and a distressed patient who cannot coordinate an inhaler can still receive it."
+    },
+    "ORAL": {
+      "label": "Oral",
+      "short": "PO",
+      "kind": "gut",
+      "requiresIvAccess": false,
+      "kaScale": null,
+      "bioavailability": null,
+      "lagMin": 0,
+      "bypassesFirstPass": false,
+      "source": "GG14",
+      "confidence": "measured",
+      "note": "Not a depot at all. The dose is swallowed as a digesta payload and is subject to the whole gastrointestinal model - gastric emptying, site-specific absorption, and the fat content of anything already in the stomach - before first-pass extraction removes a share of what is absorbed."
+    }
+  }
+}

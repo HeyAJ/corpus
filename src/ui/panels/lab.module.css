@@ -1,0 +1,191 @@
+/*
+ * LABORATORY PANEL.
+ *
+ * Laid out as a results screen: dense, tabular, monospaced figures, reference range
+ * always adjacent to the value. Density is the point — the question this panel
+ * answers is "what changed", and that needs everything visible at once.
+ */
+
+.panel {
+  position: absolute;
+  top: var(--inset-hud);
+  right: var(--inset-hud);
+  width: min(440px, calc(100vw - 2 * var(--inset-hud)));
+  max-height: calc(100vh - 2 * var(--inset-hud) - 40px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--size-tag);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.count {
+  font-size: 11px;
+  color: var(--ink-dim);
+  padding: 1px 7px;
+  background: var(--chip-bg-strong);
+  border-radius: var(--radius-pill);
+}
+
+.close {
+  margin-left: auto;
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.scroll {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.table tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.rowLabel {
+  text-align: left;
+  font-weight: 400;
+  color: var(--ink-mid);
+  padding: 3px 0;
+  white-space: nowrap;
+}
+
+.derived {
+  color: var(--ink-faint);
+  font-size: 10px;
+}
+
+.rowValue {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+  padding: 3px 4px 3px 8px;
+}
+
+.rowUnit {
+  font-size: 10px;
+  color: var(--ink-faint);
+  padding-right: 6px;
+  white-space: nowrap;
+}
+
+.rowTrend {
+  width: 40px;
+  line-height: 0;
+}
+
+.rowRef {
+  text-align: right;
+  font-size: 10px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+
+.rowFlag {
+  font-size: 10px;
+  white-space: nowrap;
+  text-align: right;
+  min-width: 68px;
+}
+
+/* -------------------------------------------------------------------- bands */
+
+.normal .rowFlag {
+  color: var(--ink-faint);
+}
+
+.abnormal .rowValue,
+.abnormal .rowFlag {
+  color: var(--severity-warn-ink);
+  font-weight: var(--weight-bold);
+}
+
+.critical .rowValue,
+.critical .rowFlag {
+  color: var(--severity-critical-ink);
+  font-weight: var(--weight-bold);
+}
+
+.critical {
+  background: var(--severity-critical-bg);
+}
+
+.critical .rowLabel,
+.critical .rowUnit,
+.critical .rowRef {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.unknown .rowValue {
+  color: var(--ink-faint);
+}
+
+.sectionSource {
+  margin: 2px 0 0;
+  font-size: 9px;
+  line-height: 1.4;
+  color: var(--ink-faint);
+}
+
+.footnote {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}

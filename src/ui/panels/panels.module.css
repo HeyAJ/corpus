@@ -1,0 +1,141 @@
+/* HUD metric cluster: top-left, vertical stack, left-aligned (spec 8.3). */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.heartGlyph {
+  color: #e9868a;
+  font-size: 0.9em;
+  margin-right: 2px;
+}
+
+.rhythm {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+
+.bandValue {
+  text-transform: capitalize;
+}
+
+.detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  max-width: 240px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  padding: 2px 2px 0;
+}
+
+.noteText {
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--ink-faint);
+  max-width: 230px;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--chip-bg);
+  color: var(--ink-dim);
+  font-size: 11px;
+}
+
+.badgeWarn {
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--severity-warn-bg);
+  color: var(--severity-warn-ink);
+  font-size: 11px;
+}
+
+/* --- condition tags, top-right, most severe first ----------------------- */
+
+.conditions {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 22px);
+  right: var(--inset-hud);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+  max-width: 46vw;
+}
+
+/* --- GI transit list ---------------------------------------------------- */
+
+.transitList {
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 240px;
+}
+
+.transitList li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'label segment'
+    'bar   volume';
+  gap: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  background: var(--chip-bg);
+  border-radius: var(--radius-chip);
+  padding: 6px 10px;
+}
+
+.transitEmpty {
+  display: block !important;
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.transitLabel {
+  grid-area: label;
+  color: var(--ink);
+}
+
+.transitSegment {
+  grid-area: segment;
+  text-align: right;
+  color: var(--ink-faint);
+  text-transform: capitalize;
+}
+
+.transitBar {
+  grid-area: bar;
+  display: block;
+  width: 110px;
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.transitBar > span {
+  display: block;
+  height: 100%;
+  background: var(--organ-active);
+  border-radius: var(--radius-pill);
+  transition: width 300ms linear;
+}
+
+.transitVolume {
+  grid-area: volume;
+  text-align: right;
+}

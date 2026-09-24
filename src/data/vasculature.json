@@ -1,0 +1,341 @@
+{
+  "version": 1,
+  "about": "The vessel tree, as centrelines with radii. Positions are in the same body-local space as src/data/organs.json, so a renal artery ends where the kidney is. Radii are luminal radii in metres at the vessel's origin, tapering to the value at its end; the model is a tapered tube, which is what a real vessel is. Nothing here affects the simulation — the haemodynamics are lumped-compartment and live in src/sim/systems/cardio.ts. This file exists so the circulation can be SEEN, and it is a drawing, not a model.",
+  "sources": {
+    "GRAYS41": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 41st ed. Elsevier, 2016.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-5230-9"
+    },
+    "WOLTERS2015": {
+      "label": "Wolters BJBM, et al. A mathematical model for abdominal aortic aneurysm; and the normal aortic diameters it reports. (Normal infrarenal aortic diameter 1.0-1.5 cm.)",
+      "url": "https://doi.org/10.1016/j.medengphy.2006.11.008"
+    },
+    "ENGINEERING": {
+      "label": "Engineering default chosen so the drawing reads correctly at the scale this body is rendered at. Not an anatomical measurement; see docs/MODEL_LIMITATIONS.md.",
+      "url": "docs/MODEL_LIMITATIONS.md"
+    }
+  },
+  "radiusNote": "Radii are halved diameters from Gray's where Gray's gives a diameter, and are marked 'assumed' where the vessel is drawn for continuity rather than measured. A vessel drawn at an invented radius would be a number this project forbids, so every entry declares which it is.",
+  "segments": [
+    {
+      "id": "aorta_ascending",
+      "label": "Ascending aorta",
+      "side": "arterial",
+      "radius_m": [0.0145, 0.0140],
+      "points": [[-0.016, 0.168, 0.016], [-0.012, 0.215, 0.010], [0.002, 0.252, 0.004]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Adult ascending aortic diameter about 2.9 cm at the sinotubular junction. Starts at the heart's own centre so the tree is continuous with the chamber model."
+    },
+    {
+      "id": "aorta_arch",
+      "label": "Aortic arch",
+      "side": "arterial",
+      "radius_m": [0.0140, 0.0125],
+      "points": [[0.002, 0.252, 0.004], [-0.004, 0.272, -0.004], [-0.028, 0.268, -0.012], [-0.034, 0.244, -0.014]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Arches posteriorly and to the left over the left main bronchus, then descends. The posterior sweep is what makes the vascular view read as three-dimensional rather than as a flat diagram."
+    },
+    {
+      "id": "aorta_thoracic",
+      "label": "Descending thoracic aorta",
+      "side": "arterial",
+      "radius_m": [0.0125, 0.0105],
+      "points": [[-0.034, 0.244, -0.014], [-0.026, 0.180, -0.020], [-0.018, 0.110, -0.024]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Descends on the left of the vertebral bodies and moves toward the midline as it goes. Diameter about 2.4 cm falling to 2.1."
+    },
+    {
+      "id": "aorta_abdominal",
+      "label": "Abdominal aorta",
+      "side": "arterial",
+      "radius_m": [0.0105, 0.0075],
+      "points": [[-0.018, 0.110, -0.024], [-0.012, 0.040, -0.030], [-0.008, -0.030, -0.032]],
+      "source": "WOLTERS2015",
+      "confidence": "measured",
+      "note": "Normal infrarenal diameter 1.0-1.5 cm, so a radius near 0.6 cm at the bifurcation. The taper from thoracic to infrarenal is real and substantial."
+    },
+    {
+      "id": "carotid_l",
+      "label": "Left common carotid",
+      "side": "arterial",
+      "radius_m": [0.0032, 0.0028],
+      "points": [[-0.012, 0.268, -0.008], [-0.018, 0.330, 0.000], [-0.020, 0.392, 0.000]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Common carotid diameter about 6.3 mm. Runs to the brain, which is why a carotid occlusion is a neurological event and not a vascular one."
+    },
+    {
+      "id": "carotid_r",
+      "label": "Right common carotid",
+      "side": "arterial",
+      "radius_m": [0.0032, 0.0028],
+      "points": [[0.002, 0.266, -0.006], [0.016, 0.330, 0.000], [0.020, 0.392, 0.000]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Arises from the brachiocephalic trunk rather than directly from the arch, which is the asymmetry drawn here."
+    },
+    {
+      "id": "subclavian_l",
+      "label": "Left subclavian",
+      "side": "arterial",
+      "radius_m": [0.0045, 0.0035],
+      "points": [[-0.020, 0.266, -0.010], [-0.062, 0.268, 0.000], [-0.100, 0.250, 0.004]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Subclavian diameter about 9 mm. The last branch of the arch."
+    },
+    {
+      "id": "subclavian_r",
+      "label": "Right subclavian",
+      "side": "arterial",
+      "radius_m": [0.0045, 0.0035],
+      "points": [[0.004, 0.264, -0.006], [0.058, 0.266, 0.000], [0.098, 0.248, 0.004]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Via the brachiocephalic trunk."
+    },
+    {
+      "id": "pulm_trunk",
+      "label": "Pulmonary trunk",
+      "side": "pulmonary_artery",
+      "radius_m": [0.0135, 0.0120],
+      "points": [[-0.016, 0.168, 0.016], [-0.020, 0.212, 0.006], [-0.024, 0.236, -0.002]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Diameter about 2.7 cm. Carries DEOXYGENATED blood, which is the single most counter-intuitive fact in the circulation and the reason this tree is coloured by saturation rather than by whether it is an artery."
+    },
+    {
+      "id": "pulm_artery_l",
+      "label": "Left pulmonary artery",
+      "side": "pulmonary_artery",
+      "radius_m": [0.0095, 0.0070],
+      "points": [[-0.024, 0.236, -0.002], [-0.048, 0.226, -0.004], [-0.068, 0.205, 0.000]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Ends at the left lung's centre, as positioned in organs.json."
+    },
+    {
+      "id": "pulm_artery_r",
+      "label": "Right pulmonary artery",
+      "side": "pulmonary_artery",
+      "radius_m": [0.0095, 0.0070],
+      "points": [[-0.024, 0.236, -0.002], [0.026, 0.230, -0.004], [0.072, 0.210, 0.000]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Longer than the left because the pulmonary trunk sits left of midline."
+    },
+    {
+      "id": "pulm_vein_l",
+      "label": "Left pulmonary veins",
+      "side": "pulmonary_vein",
+      "radius_m": [0.0060, 0.0075],
+      "points": [[-0.068, 0.205, 0.004], [-0.044, 0.200, 0.012], [-0.016, 0.180, 0.016]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Carries OXYGENATED blood back to the left atrium. Drawn as one trunk per side rather than the real two, which is a simplification stated in docs/VASCULAR.md."
+    },
+    {
+      "id": "pulm_vein_r",
+      "label": "Right pulmonary veins",
+      "side": "pulmonary_vein",
+      "radius_m": [0.0060, 0.0075],
+      "points": [[0.072, 0.210, 0.004], [0.030, 0.198, 0.012], [-0.012, 0.180, 0.016]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "As for the left."
+    },
+    {
+      "id": "coeliac",
+      "label": "Coeliac trunk",
+      "side": "arterial",
+      "radius_m": [0.0040, 0.0030],
+      "points": [[-0.016, 0.086, -0.026], [-0.024, 0.078, -0.016], [-0.040, 0.066, -0.010]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Short and wide, about 8 mm, supplying stomach, liver and spleen. Ends between the stomach and spleen as positioned."
+    },
+    {
+      "id": "hepatic_artery",
+      "label": "Hepatic artery",
+      "side": "arterial",
+      "radius_m": [0.0028, 0.0022],
+      "points": [[-0.024, 0.078, -0.016], [0.004, 0.070, -0.008], [0.032, 0.062, 0.006]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "One of the liver's two blood supplies, and the minor one: about a quarter of hepatic flow. The portal vein carries the rest."
+    },
+    {
+      "id": "sma",
+      "label": "Superior mesenteric artery",
+      "side": "arterial",
+      "radius_m": [0.0035, 0.0025],
+      "points": [[-0.015, 0.072, -0.026], [-0.010, 0.040, -0.010], [-0.004, 0.005, 0.004]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Diameter about 7 mm, supplying the small intestine. Its flow rises substantially after a meal, which is the splanchnic steal that makes exercise after eating uncomfortable."
+    },
+    {
+      "id": "renal_artery_l",
+      "label": "Left renal artery",
+      "side": "arterial",
+      "radius_m": [0.0028, 0.0024],
+      "points": [[-0.014, 0.050, -0.029], [-0.038, 0.030, -0.042], [-0.062, 0.012, -0.050]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Diameter about 5.5 mm. Carries roughly a fifth of cardiac output to an organ that is 0.4% of body mass, which is why renal perfusion is so sensitive to pressure."
+    },
+    {
+      "id": "renal_artery_r",
+      "label": "Right renal artery",
+      "side": "arterial",
+      "radius_m": [0.0028, 0.0024],
+      "points": [[-0.014, 0.050, -0.029], [0.026, 0.026, -0.042], [0.062, 0.000, -0.050]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Longer than the left because the aorta lies left of midline."
+    },
+    {
+      "id": "iliac_l",
+      "label": "Left common iliac",
+      "side": "arterial",
+      "radius_m": [0.0055, 0.0042],
+      "points": [[-0.008, -0.030, -0.032], [-0.040, -0.075, -0.020], [-0.056, -0.125, -0.010]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Diameter about 1.1 cm at the bifurcation."
+    },
+    {
+      "id": "iliac_r",
+      "label": "Right common iliac",
+      "side": "arterial",
+      "radius_m": [0.0055, 0.0042],
+      "points": [[-0.008, -0.030, -0.032], [0.026, -0.075, -0.020], [0.044, -0.125, -0.010]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Mirror of the left."
+    },
+    {
+      "id": "ivc",
+      "label": "Inferior vena cava",
+      "side": "venous",
+      "radius_m": [0.0090, 0.0130],
+      "points": [[0.020, -0.100, -0.030], [0.024, -0.020, -0.026], [0.026, 0.060, -0.018], [0.020, 0.140, 0.004], [0.004, 0.176, 0.014]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Widens as it ascends and receives tributaries, reaching about 2.6 cm at the diaphragm. It lies to the RIGHT of the aorta, which is the asymmetry that makes the venous and arterial trees distinguishable at a glance."
+    },
+    {
+      "id": "svc",
+      "label": "Superior vena cava",
+      "side": "venous",
+      "radius_m": [0.0095, 0.0105],
+      "points": [[0.022, 0.262, -0.004], [0.018, 0.222, 0.006], [0.008, 0.184, 0.014]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Diameter about 2 cm. Drains the head, neck and upper limbs into the right atrium."
+    },
+    {
+      "id": "jugular_l",
+      "label": "Left internal jugular",
+      "side": "venous",
+      "radius_m": [0.0050, 0.0060],
+      "points": [[-0.026, 0.392, 0.000], [-0.026, 0.330, -0.004], [0.014, 0.268, -0.004]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Larger than the carotid it runs beside, as veins generally are: the same flow at a fraction of the pressure needs more area."
+    },
+    {
+      "id": "jugular_r",
+      "label": "Right internal jugular",
+      "side": "venous",
+      "radius_m": [0.0055, 0.0065],
+      "points": [[0.026, 0.392, 0.000], [0.028, 0.330, -0.004], [0.024, 0.268, -0.004]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Usually the larger of the two, and more directly in line with the SVC, which is why it is the preferred side for central access."
+    },
+    {
+      "id": "portal_vein",
+      "label": "Portal vein",
+      "side": "portal",
+      "radius_m": [0.0055, 0.0060],
+      "points": [[-0.004, 0.010, 0.000], [0.008, 0.040, 0.000], [0.032, 0.062, 0.006]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Diameter about 1.1 cm. THE MOST IMPORTANT VESSEL IN THIS SIMULATION: it carries everything absorbed from the gut to the liver before the body sees it, which is first-pass metabolism, which is why an oral dose and an intravenous dose of the same drug are different drugs."
+    },
+    {
+      "id": "hepatic_vein",
+      "label": "Hepatic veins",
+      "side": "venous",
+      "radius_m": [0.0045, 0.0055],
+      "points": [[0.032, 0.062, 0.006], [0.028, 0.100, -0.008], [0.024, 0.132, -0.014]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Drains the liver into the IVC just below the diaphragm. Everything that survived the first pass leaves by this route."
+    },
+    {
+      "id": "renal_vein_l",
+      "label": "Left renal vein",
+      "side": "venous",
+      "radius_m": [0.0035, 0.0040],
+      "points": [[-0.062, 0.012, -0.046], [-0.020, 0.030, -0.034], [0.024, 0.040, -0.024]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Crosses the midline anterior to the aorta to reach the IVC, which is why it is notably longer than the right."
+    },
+    {
+      "id": "renal_vein_r",
+      "label": "Right renal vein",
+      "side": "venous",
+      "radius_m": [0.0035, 0.0040],
+      "points": [[0.062, 0.000, -0.046], [0.044, 0.014, -0.036], [0.026, 0.026, -0.026]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Short, because the IVC lies on the right."
+    },
+    {
+      "id": "iliac_vein_l",
+      "label": "Left common iliac vein",
+      "side": "venous",
+      "radius_m": [0.0048, 0.0062],
+      "points": [[-0.052, -0.125, -0.014], [-0.026, -0.080, -0.026], [0.020, -0.100, -0.030]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Crosses to the right to join the IVC."
+    },
+    {
+      "id": "iliac_vein_r",
+      "label": "Right common iliac vein",
+      "side": "venous",
+      "radius_m": [0.0048, 0.0062],
+      "points": [[0.048, -0.125, -0.014], [0.034, -0.080, -0.026], [0.020, -0.100, -0.030]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Shorter and more direct than the left."
+    },
+    {
+      "id": "coronary_l",
+      "label": "Left coronary artery",
+      "side": "arterial",
+      "radius_m": [0.0022, 0.0015],
+      "points": [[-0.012, 0.192, 0.014], [-0.032, 0.180, 0.020], [-0.046, 0.158, 0.014]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Left main diameter about 4.5 mm. Arises from the aortic root and fills in DIASTOLE, not systole, because in systole the myocardium it supplies is squeezing it shut. That is the reason coronary perfusion pressure is a diastolic quantity in systems/procedures.ts."
+    },
+    {
+      "id": "coronary_r",
+      "label": "Right coronary artery",
+      "side": "arterial",
+      "radius_m": [0.0019, 0.0013],
+      "points": [[-0.008, 0.190, 0.016], [0.014, 0.176, 0.022], [0.022, 0.152, 0.014]],
+      "source": "GRAYS41",
+      "confidence": "measured",
+      "note": "Diameter about 3.9 mm. Supplies the sinoatrial node in most people, which is why a right coronary occlusion causes bradycardia."
+    }
+  ]
+}

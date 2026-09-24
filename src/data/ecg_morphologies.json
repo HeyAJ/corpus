@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "model": "McSharry-Clifford dynamical ECG model (IEEE TBME 50(3):289-294, 2003).",
+  "modelUrl": "https://doi.org/10.1109/TBME.2003.808805",
+  "lead": "II",
+  "units": { "theta": "rad", "a": "dimensionless (z-amplitude gain)", "b": "rad (Gaussian width)" },
+  "note": "theta/a/b for the baseline 60 bpm lead-II morphology are taken verbatim from Table I of McSharry et al. Derived morphologies state what they change and why.",
+  "morphologies": {
+    "nsr": {
+      "label": "Normal sinus rhythm",
+      "source": "MCSHARRY2003",
+      "events": [
+        { "id": "P", "theta": -1.0471975512, "a": 1.2, "b": 0.25 },
+        { "id": "Q", "theta": -0.2617993878, "a": -5.0, "b": 0.1 },
+        { "id": "R", "theta": 0.0, "a": 30.0, "b": 0.1 },
+        { "id": "S", "theta": 0.2617993878, "a": -7.5, "b": 0.1 },
+        { "id": "T", "theta": 1.5707963268, "a": 0.75, "b": 0.4 }
+      ]
+    },
+    "afib": {
+      "label": "Atrial fibrillation",
+      "source": "MCSHARRY2003",
+      "derivedFrom": "nsr",
+      "change": "P event deleted (no organised atrial depolarisation). R-R interval is randomised in cardio.ts, not here.",
+      "events": [
+        { "id": "Q", "theta": -0.2617993878, "a": -5.0, "b": 0.1 },
+        { "id": "R", "theta": 0.0, "a": 30.0, "b": 0.1 },
+        { "id": "S", "theta": 0.2617993878, "a": -7.5, "b": 0.1 },
+        { "id": "T", "theta": 1.5707963268, "a": 0.75, "b": 0.4 }
+      ]
+    },
+    "vt": {
+      "label": "Monomorphic ventricular tachycardia",
+      "source": "MCSHARRY2003",
+      "derivedFrom": "nsr",
+      "change": "No P. QRS widened (b 0.1 -> 0.30) and made monophasic with a large discordant T, reproducing the wide-complex monomorphic morphology. Widths give a QRS duration of roughly 160 ms at 180 bpm, matching the clinical definition of a wide complex. NOTE ON AMPLITUDES: the excursion an event produces is proportional to a*b^2, so widening b without rescaling a makes the complex taller as well as wider. Keeping the published a values with a tripled b gave a 10 mV VT complex, eight times a normal R wave. These a values are set so the wide complex is about 1.5x the height of a normal R, which is what a monomorphic VT looks like.",
+      "events": [
+        { "id": "Q", "theta": -0.6283185307, "a": -0.9, "b": 0.3 },
+        { "id": "R", "theta": 0.0, "a": 5.0, "b": 0.3 },
+        { "id": "S", "theta": 0.6283185307, "a": -1.6, "b": 0.34 },
+        { "id": "T", "theta": 1.8849555922, "a": -0.9, "b": 0.5 }
+      ]
+    },
+    "pea": {
+      "label": "Pulseless electrical activity",
+      "source": "MCSHARRY2003",
+      "derivedFrom": "nsr",
+      "change": "Electrically identical to a sinus or idioventricular complex; the defining feature is that mechanical gain is zero in cardio.ts. Complexes are broadened slightly to read as agonal.",
+      "events": [
+        { "id": "P", "theta": -1.0471975512, "a": 0.15, "b": 0.3 },
+        { "id": "Q", "theta": -0.3490658504, "a": -1.2, "b": 0.16 },
+        { "id": "R", "theta": 0.0, "a": 7.0, "b": 0.18 },
+        { "id": "S", "theta": 0.3490658504, "a": -1.5, "b": 0.2 },
+        { "id": "T", "theta": 1.5707963268, "a": 0.2, "b": 0.45 }
+      ]
+    },
+    "asystole": {
+      "label": "Asystole",
+      "source": "MCSHARRY2003",
+      "derivedFrom": "nsr",
+      "change": "No events at all. The trace becomes z0 baseline wander only, which is exactly what an asystolic strip looks like: not a perfectly flat line, but a slow drift.",
+      "events": []
+    }
+  },
+  "vfib": {
+    "label": "Ventricular fibrillation",
+    "model": "Band-limited noise, NOT the McSharry limit cycle.",
+    "source": "CLAYTON1995",
+    "sourceRef": {
+      "label": "Clayton RH, Murray A, Campbell RWF. Frequency analysis of ventricular fibrillation. Eur Heart J 16(8):1112-1118, 1995.",
+      "url": "https://doi.org/10.1093/oxfordjournals.eurheartj.a061055"
+    },
+    "dominantFrequencyLow_Hz": 4.0,
+    "dominantFrequencyHigh_Hz": 7.0,
+    "amplitude_mV": 0.45,
+    "amplitudeDecayHalfLife_s": 300,
+    "note": "VF amplitude falls with downtime; coarse VF becomes fine VF over several minutes. Half-life is our fit to the clinical observation that VF degenerates to asystole in 10-15 minutes untreated."
+  },
+  "eeg": {
+    "label": "EEG band model",
+    "model": "Sum of five band-limited oscillators whose relative power is set by consciousness and sedative receptor occupancy.",
+    "source": "NIEDERMEYER",
+    "sourceRef": {
+      "label": "Schomer DL, Lopes da Silva FH (eds). Niedermeyer's Electroencephalography, 7th ed. Oxford University Press, 2017.",
+      "url": "https://global.oup.com/academic/product/niedermeyers-electroencephalography-9780190228484"
+    },
+    "bands": [
+      { "id": "delta", "low_Hz": 0.5, "high_Hz": 4, "centre_Hz": 2.0 },
+      { "id": "theta", "low_Hz": 4, "high_Hz": 8, "centre_Hz": 6.0 },
+      { "id": "alpha", "low_Hz": 8, "high_Hz": 13, "centre_Hz": 10.0 },
+      { "id": "beta", "low_Hz": 13, "high_Hz": 30, "centre_Hz": 20.0 },
+      { "id": "gamma", "low_Hz": 30, "high_Hz": 80, "centre_Hz": 40.0 }
+    ]
+  }
+}

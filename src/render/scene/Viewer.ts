@@ -1,0 +1,394 @@
+import * as THREE from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+
+import { OrganSet, type OrganState } from '../organs/OrganSet';
+import { OrbitRig } from '../camera/OrbitRig';
+import { createDitherPass } from '../postfx/DitherPass';
+import { GiBolus } from '../organs/GiBolus';
+import { VascularSystem } from '../vascular/VascularSystem';
+import type { OrganId } from '../../data/types';
+import type { SimSnapshot } from '../../bridge/types';
+
+/**
+ * LAYER B — the renderer.
+ *
+ * Reads snapshots. Never writes sim state. React never touches this canvas.
+ *
+ * INTERPOLATION (spec 3): snapshots arrive at 20 Hz and the renderer runs at 60+.
+ * Every animated quantity is therefore interpolated between the last two snapshots
+ * using the wall-clock time since the newer one. Without this you get 20 fps
+ * visuals on a 60 fps render loop, and it looks exactly as bad as it sounds.
+ *
+ * POST CHAIN ORDER (spec 6.6):
+ *   Scene -> UnrealBloom -> ACES + warm grade -> ORDERED DITHER -> vignette -> output
+ * The dither is the last thing before output and runs at native device resolution.
+ */
+
+export type BackgroundMode = 'idle' | 'active' | 'arrest';
+
+const BACKGROUNDS: Record<BackgroundMode, number> = {
+  idle: 0xf0f0f0,
+  active: 0xf6f4e4,
+  arrest: 0xfbf3d0,
+};
+
+export interface ViewerCallbacks {
+  onHover?: (id: OrganId | null) => void;
+  onSelect?: (id: OrganId | null) => void;
+  /** Screen-space label anchors, recomputed each frame (spec 6.4). */
+  onLabels?: (labels: { id: OrganId; x: number; y: number; visible: boolean }[]) => void;
+}
+
+interface SnapshotPair {
+  previous: SimSnapshot | null;
+  current: SimSnapshot | null;
+  receivedAt: number;
+  intervalMs: number;
+}
+
+export class Viewer {
+  readonly scene = new THREE.Scene();
+  readonly rig: OrbitRig;
+  readonly organs = new OrganSet();
+  readonly renderer: THREE.WebGLRenderer;
+
+  private composer: EffectComposer;
+  private bloom: UnrealBloomPass;
+  private dither: ReturnType<typeof createDitherPass>;
+  private raycaster = new THREE.Raycaster();
+  private pointer = new THREE.Vector2();
+  private pointerInside = false;
+  private bolus: GiBolus;
+  private vascular: VascularSystem;
+
+  private snapshots: SnapshotPair = { previous: null, current: null, receivedAt: 0, intervalMs: 50 };
+  private lastFrameTime = 0;
+  private running = false;
+  private rafId = 0;
+
+  private hovered: OrganId | null = null;
+  private selected: OrganId | null = null;
+  private callbacks: ViewerCallbacks = {};
+  private backgroundMode: BackgroundMode = 'idle';
+  private backgroundColor = new THREE.Color(BACKGROUNDS.idle);
+  private targetBackground = new THREE.Color(BACKGROUNDS.idle);
+
+  private labelBuffer: { id: OrganId; x: number; y: number; visible: boolean }[] = [];
+  private projected = new THREE.Vector3();
+
+  /** Set from the store; freezes organ motion but leaves numbers live (spec 10.6). */
+  reducedMotion = false;
+
+  frameTimes: number[] = [];
+
+  constructor(canvas: HTMLCanvasElement) {
+    this.renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: false,
+      powerPreference: 'high-performance',
+    });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setSize(canvas.clientWidth || 1, canvas.clientHeight || 1, false);
+    // Tone mapping happens in the dither/grade pass, not here: the dither must be
+    // applied after tone mapping or the pattern stops being uniform across the
+    // tonal range.
+    this.renderer.toneMapping = THREE.NoToneMapping;
+    this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+
+    this.scene.background = this.backgroundColor;
+    this.scene.add(this.organs.root);
+
+    this.bolus = new GiBolus();
+    this.scene.add(this.bolus.root);
+
+    // Vessels in bucket 1 and flow particles in bucket 2, so the order-independence
+    // guarantee is untouched: both land in buckets that already exist.
+    this.vascular = new VascularSystem();
+    this.scene.add(this.vascular.root);
+
+    const aspect = (canvas.clientWidth || 1) / (canvas.clientHeight || 1);
+    this.rig = new OrbitRig(aspect, 21);
+
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(new RenderPass(this.scene, this.rig.camera));
+
+    // THRESHOLD IS THE WHOLE TRICK HERE, and it is easy to get wrong.
+    //
+    // Bloom runs on the LINEAR scene buffer, where the cream background is already
+    // 0.86. A threshold below that blooms the background itself and the entire
+    // frame turns into white haze. The threshold must sit ABOVE the background so
+    // that only pixels the additive rim has pushed past it bloom — which is exactly
+    // the reference's behaviour: a halo around the organ outlines and nowhere else.
+    this.bloom = new UnrealBloomPass(
+      new THREE.Vector2(canvas.clientWidth || 1, canvas.clientHeight || 1),
+      0.30, // strength
+      0.35, // radius
+      0.95, // threshold — above the 0.86 linear background, below background + rim
+    );
+    this.composer.addPass(this.bloom);
+
+    // LAST PASS. The dither/grade pass does its own tone map and its own
+    // linear-to-display conversion, and it is deliberately the final pass so the
+    // grid lands on the composited image at native device resolution.
+    //
+    // There is NO OutputPass after it. OutputPass would apply a second sRGB
+    // encode on top of ours, and the result is a washed-out image that looks like
+    // the absorption material is broken when in fact the colour pipeline is.
+    this.dither = createDitherPass({ dotSize: 3.0, strength: 0.12, vignette: 0.1 });
+    this.composer.addPass(this.dither);
+
+    this.resize();
+  }
+
+  setCallbacks(cb: ViewerCallbacks): void {
+    this.callbacks = cb;
+  }
+
+  /* --------------------------------------------------------------- input */
+
+  handlePointerMove(x: number, y: number, dragging: boolean, dx: number, dy: number): void {
+    this.pointer.set(x, y);
+    this.pointerInside = true;
+    if (dragging) this.rig.orbit(-dx, -dy);
+  }
+
+  handlePointerLeave(): void {
+    this.pointerInside = false;
+    this.setHover(null);
+  }
+
+  handleWheel(delta: number): void {
+    this.rig.dolly(delta);
+  }
+
+  handlePinch(scale: number): void {
+    this.rig.dolly(-(scale - 1) * 6);
+  }
+
+  handleTap(x: number, y: number): void {
+    this.pointer.set(x, y);
+    const hit = this.pick();
+    this.select(hit);
+  }
+
+  select(id: OrganId | null): void {
+    if (this.selected === id) return;
+    this.selected = id;
+    this.organs.clearStates(id ?? undefined);
+    if (id) {
+      const h = this.organs.organs.get(id);
+      this.organs.setState(id, 'selected');
+      if (h) this.rig.focus(h.centroid, h.boundingRadius);
+    } else {
+      this.rig.reset();
+    }
+    this.callbacks.onSelect?.(id);
+  }
+
+  private setHover(id: OrganId | null): void {
+    if (this.hovered === id) return;
+    if (this.hovered && this.hovered !== this.selected) this.organs.setState(this.hovered, 'dormant');
+    this.hovered = id;
+    if (id && id !== this.selected) this.organs.setState(id, 'hovered');
+    this.callbacks.onHover?.(id);
+  }
+
+  private pick(): OrganId | null {
+    this.raycaster.setFromCamera(this.pointer, this.rig.camera);
+    const hits = this.raycaster.intersectObjects(this.organs.pickTargets, false);
+    if (hits.length === 0) return null;
+    // Nearest hit wins. Because the absorption meshes are DoubleSide, a ray through
+    // a hollow shell hits both walls; taking the first is the front wall, which is
+    // what the user is pointing at.
+    return (hits[0].object.userData.organId as OrganId) ?? null;
+  }
+
+  /* ------------------------------------------------------------ snapshots */
+
+  /** Show or hide the vascular overlay. Wired to the blood-drop tool button. */
+  setVascularVisible(on: boolean): void {
+    this.vascular.setVisible(on);
+  }
+
+  /** Triangles the vascular overlay adds, for the performance report. */
+  get vascularTriangles(): number {
+    return this.vascular.triangleCount;
+  }
+
+  pushSnapshot(s: SimSnapshot): void {
+    const now = performance.now();
+    this.vascular.pushSnapshot(s);
+    if (this.snapshots.current) {
+      this.snapshots.intervalMs = Math.max(8, Math.min(200, now - this.snapshots.receivedAt));
+    }
+    this.snapshots.previous = this.snapshots.current;
+    this.snapshots.current = s;
+    this.snapshots.receivedAt = now;
+  }
+
+  /** Interpolation factor for the current frame, 0..1 with a small extrapolation cap. */
+  private alpha(now: number): number {
+    const { receivedAt, intervalMs } = this.snapshots;
+    return Math.max(0, Math.min(1.25, (now - receivedAt) / intervalMs));
+  }
+
+  private lerpSnapshot(pick: (s: SimSnapshot) => number, now: number): number {
+    const { previous, current } = this.snapshots;
+    if (!current) return 0;
+    if (!previous) return pick(current);
+    const a = Math.min(1, this.alpha(now));
+    const p = pick(previous);
+    const c = pick(current);
+    return p + (c - p) * a;
+  }
+
+  setBackgroundMode(mode: BackgroundMode): void {
+    if (this.backgroundMode === mode) return;
+    this.backgroundMode = mode;
+    this.targetBackground.setHex(BACKGROUNDS[mode]);
+  }
+
+  /* ---------------------------------------------------------------- loop */
+
+  start(): void {
+    if (this.running) return;
+    this.running = true;
+    this.lastFrameTime = performance.now();
+    const loop = () => {
+      if (!this.running) return;
+      this.rafId = requestAnimationFrame(loop);
+      this.frame();
+    };
+    this.rafId = requestAnimationFrame(loop);
+  }
+
+  stop(): void {
+    this.running = false;
+    cancelAnimationFrame(this.rafId);
+  }
+
+  private frame(): void {
+    const now = performance.now();
+    const dtMs = now - this.lastFrameTime;
+    this.lastFrameTime = now;
+
+    this.frameTimes.push(dtMs);
+    if (this.frameTimes.length > 240) this.frameTimes.shift();
+
+    this.backgroundColor.lerp(this.targetBackground, Math.min(1, dtMs / 400));
+
+    if (this.pointerInside && !this.selected) {
+      this.setHover(this.pick());
+    }
+
+    this.organs.update(dtMs);
+    this.vascular.update(dtMs / 1000);
+    this.rig.update(dtMs);
+    this.applySnapshotToScene(now);
+    this.organs.sortSolidBucket(this.rig.camera);
+    this.emitLabels();
+
+    this.composer.render();
+  }
+
+  /**
+   * Everything animated in the body is driven from the snapshot. No CSS, no GSAP,
+   * no keyframes anywhere near a physiological quantity (spec 6.7).
+   */
+  private applySnapshotToScene(now: number): void {
+    const s = this.snapshots.current;
+    if (!s) return;
+
+    if (this.reducedMotion) {
+      this.organs.setScale('heart', 1);
+      this.organs.setScale('lung_l', 1);
+      this.organs.setScale('lung_r', 1);
+    } else {
+      // HEART. Scale follows chamber volume, so systolic contraction is fast and
+      // diastolic filling is slow — which is what makes it look alive. A symmetric
+      // sine reads as fake immediately.
+      const lv = this.lerpSnapshot((x) => x.cardio.lvVolume_mL, now);
+      const rv = this.lerpSnapshot((x) => x.cardio.rvVolume_mL, now);
+      const chamberVolume = lv + rv;
+      // Volume scales as the cube of a linear dimension.
+      const REFERENCE_CHAMBER_ML = 246;
+      const linear = Math.cbrt(Math.max(0.15, chamberVolume / REFERENCE_CHAMBER_ML));
+      this.organs.setScale('heart', 0.88 + 0.12 * linear * 1.0 + 0.06 * (linear - 1));
+
+      // LUNGS. Scale on the respiratory tidal waveform.
+      const inflation = this.lerpSnapshot((x) => x.resp.inflation, now);
+      const lungScale = 1 + 0.055 * Math.max(0, Math.min(1.4, inflation));
+      this.organs.setScale('lung_l', lungScale);
+      this.organs.setScale('lung_r', lungScale);
+    }
+
+    // STOMACH and BLADDER fluid levels.
+    this.organs.setFluidLevel('stomach', this.lerpSnapshot((x) => x.gi.gastricFillFraction, now));
+    this.organs.setFluidLevel('bladder', this.lerpSnapshot((x) => x.renal.bladderFillFraction, now));
+
+    // GI transit.
+    this.bolus.update(s, this.reducedMotion ? 0 : s.gi.peristalsisPhase);
+  }
+
+  private emitLabels(): void {
+    if (!this.callbacks.onLabels) return;
+    this.labelBuffer.length = 0;
+    const width = this.renderer.domElement.clientWidth;
+    const height = this.renderer.domElement.clientHeight;
+
+    for (const h of this.organs.organs.values()) {
+      if (h.state === 'dormant') continue;
+      this.projected.copy(h.centroid).project(this.rig.camera);
+      const bias = h.def.labelBias ?? [0, 0];
+      const x = (this.projected.x * 0.5 + 0.5) * width + bias[0] * 40;
+      const y = (-this.projected.y * 0.5 + 0.5) * height + bias[1] * 40;
+      this.labelBuffer.push({
+        id: h.id,
+        x,
+        y,
+        visible: this.projected.z < 1 && x > 0 && x < width && y > 0 && y < height,
+      });
+    }
+    this.callbacks.onLabels(this.labelBuffer);
+  }
+
+  resize(): void {
+    const canvas = this.renderer.domElement;
+    const width = canvas.clientWidth || 1;
+    const height = canvas.clientHeight || 1;
+    const dpr = Math.min(window.devicePixelRatio, 2);
+
+    this.renderer.setPixelRatio(dpr);
+    this.renderer.setSize(width, height, false);
+    this.composer.setPixelRatio(dpr);
+    this.composer.setSize(width, height);
+    this.bloom.setSize(width * dpr, height * dpr);
+    this.rig.setAspect(width / height);
+
+    // The dither samples gl_FragCoord, which is in render-target pixels, so the
+    // resolution uniform must be the DEVICE size, not the CSS size.
+    (this.dither.uniforms.uResolution.value as THREE.Vector2).set(width * dpr, height * dpr);
+  }
+
+  /** 95th-percentile frame time over the last ~4 s, for the perf readout. */
+  frameTimeP95(): number {
+    if (this.frameTimes.length < 10) return 0;
+    const sorted = [...this.frameTimes].sort((a, b) => a - b);
+    return sorted[Math.floor(sorted.length * 0.95)];
+  }
+
+  setOrganState(id: OrganId, state: OrganState): void {
+    this.organs.setState(id, state);
+  }
+
+  dispose(): void {
+    this.stop();
+    this.organs.dispose();
+    this.bolus.dispose();
+    this.composer.dispose();
+    this.renderer.dispose();
+  }
+}

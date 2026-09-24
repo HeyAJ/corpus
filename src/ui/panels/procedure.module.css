@@ -1,0 +1,214 @@
+/* Defib pad zones and the resuscitation panel (spec 9, VISUAL_AUDIT section 9). */
+
+.padLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 18;
+}
+
+.pad {
+  position: absolute;
+  width: 64px;
+  height: 98px;
+  border-radius: 14px;
+  border: 2px solid #b4342c;
+  background: transparent;
+  color: #b4342c;
+  font-size: 17px;
+  font-weight: 700;
+  pointer-events: auto;
+  transition: background 200ms ease, opacity 200ms ease;
+}
+
+/* Anterolateral placement, mirrored because we view the body from the front:
+   the patient's right pad sits on the viewer's left. */
+.padRight {
+  left: calc(50% - 86px);
+  top: calc(50% - 96px);
+}
+
+.padLeft {
+  left: calc(50% + 12px);
+  top: calc(50% - 40px);
+}
+
+.padIdle {
+  opacity: 0.25;
+}
+
+.padPrompt {
+  animation: padPulse 1.4s ease-in-out infinite;
+}
+
+.padPlaced {
+  background: rgba(180, 52, 44, 0.12);
+}
+
+@keyframes padPulse {
+  0%, 100% { background: rgba(180, 52, 44, 0); }
+  50% { background: rgba(180, 52, 44, 0.16); }
+}
+
+.panel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 74px);
+  width: min(340px, calc(100vw - 32px));
+  background: var(--sheet-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-card);
+  padding: 14px 16px 12px;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 26;
+}
+
+.headerRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.downtime {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--severity-warn-ink);
+}
+
+.metrics {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-dim);
+}
+
+.cprRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cprButton {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-chip);
+  background: rgba(0, 0, 0, 0.07);
+  font-weight: 700;
+  font-size: 15px;
+  touch-action: none;
+  user-select: none;
+}
+
+.cprButton:active,
+.cprActive {
+  background: var(--organ-active);
+  color: #fff;
+}
+
+.quality {
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 96px;
+  text-align: right;
+  color: var(--ink-faint);
+}
+
+.quality_good { color: #2f7d4f; }
+.quality_slow { color: var(--severity-warn-ink); }
+.quality_fast { color: var(--severity-warn-ink); }
+
+.energyRow {
+  display: flex;
+  gap: 8px;
+}
+
+.energy {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--radius-chip);
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.energyActive {
+  background: rgba(0, 0, 0, 0.14);
+  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.16);
+}
+
+.actionRow {
+  display: flex;
+  gap: 8px;
+}
+
+.charge,
+.shock {
+  flex: 1;
+  padding: 12px;
+  border-radius: var(--radius-chip);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.charge {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.shock {
+  background: var(--organ-active);
+  color: #fff;
+}
+
+.charge:disabled,
+.shock:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.outcome {
+  border-radius: var(--radius-chip);
+  padding: 10px 12px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.outcome strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.outcome p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.outcomeGood {
+  background: rgba(47, 125, 79, 0.12);
+  color: #1f5c39;
+}
+
+.outcomeBad {
+  background: var(--severity-warn-bg);
+  color: var(--severity-warn-ink);
+}
+
+.cancel {
+  align-self: center;
+  padding: 8px 20px;
+  border-radius: var(--radius-chip);
+  background: rgba(0, 0, 0, 0.06);
+  font-weight: 700;
+}

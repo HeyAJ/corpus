@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # Layer isolation is a build failure, not a review comment: src/sim must stay
+      # free of three, React, the DOM, Math.random and Date.now.
+      - name: Lint (includes layer isolation)
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # The whole suite, including the 24-hour homeostasis run, the determinism
+      # check, the pharmacology golden tests against each drug's own citation, the
+      # render order-independence proof, and the tick-budget test.
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # The pipeline must be idempotent and must diff cleanly against the committed
+      # data (spec 5.6). Re-running it from the cache and finding a diff means either
+      # the data was hand-edited or the pipeline is not deterministic.
+      - name: Regenerate data from cache and check it is unchanged
+        run: |
+          if [ -d .cache/ingest ]; then
+            npm run ingest:offline
+            git diff --exit-code -- src/data/drugs.json src/data/receptors.json
+          else
+            echo "No ingest cache committed; skipping idempotence check."
+          fi
+
+      - name: Placeholder triangle budget
+        run: npm run organs

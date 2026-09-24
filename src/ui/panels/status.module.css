@@ -1,0 +1,157 @@
+/*
+ * "WHAT IS HAPPENING" PANEL.
+ *
+ * Prose, not a readout, and styled as prose: a comfortable measure, real line height,
+ * and enough room between items to read one without the next crowding it. Every other
+ * panel in this interface is dense on purpose because it answers "what changed". This
+ * one answers "what does that mean", and density is the enemy of that.
+ *
+ * Bottom-left, opposite the metric cluster: the numbers live top-left and their
+ * explanation lives under them, which is the direction the eye already travels.
+ *
+ * The left edge carries the severity colour rather than the whole card. A panel that
+ * turns red is an alarm and competes with the actual alarms; a panel with a red edge is
+ * a label.
+ */
+
+.wrap {
+  position: absolute;
+  left: var(--inset-hud);
+  bottom: calc(var(--inset-hud) + 52px);
+  width: min(360px, calc(100vw - 2 * var(--inset-hud)));
+  max-height: min(52vh, 520px);
+  display: flex;
+  flex-direction: column;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  border-left: 3px solid transparent;
+  pointer-events: auto;
+  z-index: 28;
+  overflow: hidden;
+  transition: border-color 220ms ease;
+}
+
+.edge_critical { border-left-color: #c8231d; }
+.edge_warn { border-left-color: #d98014; }
+.edge_watch { border-left-color: #b8a52c; }
+.edge_none { border-left-color: rgba(0, 0, 0, 0.12); }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+}
+
+.count {
+  min-width: 22px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--chip-bg-strong);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  color: var(--ink-mid);
+}
+
+.dot_critical { background: #c8231d; color: #fff; }
+.dot_warn { background: #d98014; color: #fff; }
+.dot_watch { background: #b8a52c; color: #fff; }
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 0 14px 14px;
+  overflow-y: auto;
+}
+
+.calm {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.item:first-child {
+  padding-top: 0;
+  border-top: none;
+}
+
+.itemHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--chip-bg-strong);
+  color: var(--ink-mid);
+}
+
+.badge_critical { background: #c8231d; color: #fff; }
+.badge_warn { background: #d98014; color: #fff; }
+.badge_watch { background: #b8a52c; color: #fff; }
+
+.plain {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink);
+}
+
+/* The model's own words and numbers, kept visually distinct from the explanation so it
+   is never ambiguous which part is measured and which part is us talking. */
+.measure {
+  margin: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+}
+
+.line {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink-mid);
+}
+
+.lead {
+  font-weight: 600;
+  color: var(--ink);
+}

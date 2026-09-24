@@ -1,0 +1,123 @@
+/*
+ * BLOOD CONTENTS.
+ *
+ * Bottom-left, opposite the organ telemetry, so the two read as a pair: what the
+ * organs are doing on one side, what is reaching them on the other.
+ */
+
+.wrap {
+  position: absolute;
+  left: var(--inset-hud);
+  bottom: 110px;
+  width: min(280px, calc(100vw - 2 * var(--inset-hud)));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--radius-well);
+  pointer-events: auto;
+  z-index: 21;
+}
+
+.title {
+  margin: 0;
+  font-size: 10px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  grid-template-areas:
+    'swatch name compartment'
+    'bar bar pct';
+  align-items: center;
+  gap: 2px 6px;
+}
+
+.swatch {
+  grid-area: swatch;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.name {
+  grid-area: name;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.compartment {
+  grid-area: compartment;
+  font-size: 9px;
+  color: var(--ink-faint);
+}
+
+.bar {
+  grid-area: bar;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  transition: width var(--tween-state) var(--ease-out);
+}
+
+.pct {
+  grid-area: pct;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+}
+
+.flow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+  padding-top: 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.note {
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.4;
+  color: var(--ink-faint);
+}
+
+.note code {
+  background: var(--chip-bg);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}
