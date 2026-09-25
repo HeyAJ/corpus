@@ -537,7 +537,9 @@ export const PK_LITERATURE: PkLiteratureEntry[] = [
  * volume and clearance could not both be sourced is not in it.
  */
 import { PK_LITERATURE_2 } from './pk_literature_2';
+import { PK_LITERATURE_3 } from './pk_literature_3';
 
 PK_LITERATURE.push(...PK_LITERATURE_2);
+PK_LITERATURE.push(...PK_LITERATURE_3);
 
 export const PK_BY_ID = new Map(PK_LITERATURE.map((e) => [e.drugId, e]));

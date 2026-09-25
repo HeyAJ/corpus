@@ -61,8 +61,11 @@ export function stepNeuro(s: SimState, dt: number): void {
   else if (cpp < lo) flowFactor = Math.max(0, Math.pow(Math.max(0, cpp / lo), 2));
   else flowFactor = 1 + Math.min(0.4, (cpp - hi) * 0.004);
 
-  // Cerebral vessels are exquisitely CO2-reactive: ~2-4 % flow change per mmHg.
-  const co2Reactivity = 1 + Math.max(-0.6, Math.min(1.2, (s.resp.arterialPco2 - 40) * 0.03));
+  // Cerebral vessels are exquisitely CO2-reactive: ~2-4 % flow change per mmHg. Measured
+  // against the MODEL'S OWN resting PaCO2, not a textbook 40, because this loop settles
+  // a little below 40 and referencing 40 docked a resting body's cerebral flow (and, with
+  // no dead-zone below, its consciousness) by about a tenth for no physiological reason.
+  const co2Reactivity = 1 + Math.max(-0.6, Math.min(1.2, (s.resp.arterialPco2 - P('resp.restingPaco2_mmHg')) * 0.03));
 
   const target = P('neuro.cerebralBloodFlow_mL_per_min') * flowFactor * co2Reactivity;
   n.cbf += ((target - n.cbf) * dt) / 3;
@@ -70,7 +73,13 @@ export function stepNeuro(s: SimState, dt: number): void {
   // --- consciousness -------------------------------------------------------
   const cbfFraction = n.cbf / P('neuro.cerebralBloodFlow_mL_per_min');
   const syncope = P('neuro.consciousnessLossCBF_fraction');
-  const perfusionTerm = Math.max(0, Math.min(1, (cbfFraction - syncope * 0.6) / (1 - syncope * 0.6)));
+  // A DEAD-ZONE at the top: any cerebral flow at or above the resting operating point is
+  // fully alert. Without it, the ordinary few-per-cent swings in flow that hypocapnia and
+  // posture produce read as measurable progress toward syncope, and a resting body scored
+  // 0.87 rather than 1.0. Consciousness should only fall once flow drops toward the
+  // syncope threshold, which is what this normalisation now says.
+  const alertFloor = 0.95;
+  const perfusionTerm = Math.max(0, Math.min(1, (cbfFraction - syncope) / (alertFloor - syncope)));
 
   // Hypoxia acts on top of perfusion. Below SpO2 ~ 0.75 consciousness is not
   // sustainable however good the flow.

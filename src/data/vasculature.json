@@ -336,6 +336,286 @@
       "source": "GRAYS41",
       "confidence": "measured",
       "note": "Diameter about 3.9 mm. Supplies the sinoatrial node in most people, which is why a right coronary occlusion causes bradycardia."
+    },
+    {
+      "id": "lad",
+      "label": "Left anterior descending",
+      "side": "arterial",
+      "radius_m": [0.0015, 0.0008],
+      "points": [[-0.046, 0.158, 0.014], [-0.034, 0.138, 0.020], [-0.020, 0.118, 0.022], [-0.014, 0.104, 0.018]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Geometry drawn for continuity down the anterior interventricular groove toward the apex; the LAD is 'the widow-maker' because it feeds most of the left ventricle. Left-main radius near 2 mm tapers to under 1 mm here per Gray's; the centreline itself is an engineering approximation, not a measurement."
+    },
+    {
+      "id": "circumflex",
+      "label": "Left circumflex artery",
+      "side": "arterial",
+      "radius_m": [0.0014, 0.0009],
+      "points": [[-0.046, 0.158, 0.014], [-0.058, 0.156, 0.002], [-0.060, 0.150, -0.012], [-0.052, 0.146, -0.022]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Curls left in the atrioventricular groove toward the posterior heart. Radius basis Gray's (circumflex ~1.5 mm); the path is drawn so a small coronary vessel is visible, so this is an engineering geometry rather than a segmentation."
+    },
+    {
+      "id": "rca_marginal",
+      "label": "Right marginal branch",
+      "side": "arterial",
+      "radius_m": [0.0012, 0.0008],
+      "points": [[0.022, 0.152, 0.014], [0.030, 0.138, 0.014], [0.028, 0.120, 0.016], [0.018, 0.108, 0.018]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Runs down the acute margin of the right ventricle. A small vessel added so the coronary supply reads as a branching tree rather than two stubs; geometry is an engineering default, radius scale from Gray's."
+    },
+    {
+      "id": "basilar",
+      "label": "Basilar artery",
+      "side": "arterial",
+      "radius_m": [0.0016, 0.0014],
+      "points": [[0.000, 0.372, -0.014], [0.000, 0.398, -0.012], [0.000, 0.418, -0.008]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Formed by the vertebral arteries and ascending the front of the brainstem to the circle of Willis. Basilar diameter about 3 mm per Gray's; the vertebral supply is elided and the path is an engineering approximation so the posterior cerebral circulation is at least suggested."
+    },
+    {
+      "id": "cerebral_l",
+      "label": "Left middle cerebral artery",
+      "side": "arterial",
+      "radius_m": [0.0013, 0.0008],
+      "points": [[-0.020, 0.392, 0.000], [-0.034, 0.414, 0.004], [-0.048, 0.430, 0.002], [-0.056, 0.438, -0.006]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "From the internal carotid termination into the Sylvian fissure and out over the hemisphere. Drawn as a single sweep standing in for the circle of Willis and the cerebral tree; MCA radius near 1.5 mm from Gray's, geometry an engineering default."
+    },
+    {
+      "id": "cerebral_r",
+      "label": "Right middle cerebral artery",
+      "side": "arterial",
+      "radius_m": [0.0013, 0.0008],
+      "points": [[0.020, 0.392, 0.000], [0.034, 0.414, 0.004], [0.048, 0.430, 0.002], [0.056, 0.438, -0.006]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Mirror of the left. A carotid supplies the brain on its own side, which is why a carotid embolus is a one-sided stroke; this is a drawn approximation, not a segmentation."
+    },
+    {
+      "id": "cerebral_anterior",
+      "label": "Anterior cerebral arteries",
+      "side": "arterial",
+      "radius_m": [0.0010, 0.0007],
+      "points": [[0.000, 0.396, 0.006], [0.000, 0.420, 0.020], [0.000, 0.438, 0.026]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "The midline pair sweeping up between the hemispheres over the corpus callosum. Drawn as one midline vessel to complete the circle-of-Willis suggestion; an engineering geometry with a Gray's-scale radius."
+    },
+    {
+      "id": "splenic_artery",
+      "label": "Splenic artery",
+      "side": "arterial",
+      "radius_m": [0.0020, 0.0014],
+      "points": [[-0.040, 0.066, -0.010], [-0.064, 0.060, -0.018], [-0.084, 0.056, -0.026], [-0.093, 0.055, -0.030]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "The most tortuous artery in the body in life; drawn here as a smooth curve from the coeliac trunk to the spleen. Splenic radius about 2 mm per Gray's; the tortuous course is not reproduced, so the geometry is an engineering approximation."
+    },
+    {
+      "id": "left_gastric",
+      "label": "Left gastric artery",
+      "side": "arterial",
+      "radius_m": [0.0015, 0.0010],
+      "points": [[-0.040, 0.066, -0.010], [-0.048, 0.070, -0.006], [-0.052, 0.062, -0.004]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "The smallest branch of the coeliac trunk, running to the lesser curve of the stomach. Added so the coeliac trifurcation reads as three vessels; geometry an engineering default, radius from Gray's."
+    },
+    {
+      "id": "ima",
+      "label": "Inferior mesenteric artery",
+      "side": "arterial",
+      "radius_m": [0.0018, 0.0012],
+      "points": [[-0.012, 0.010, -0.031], [-0.036, -0.010, -0.024], [-0.060, -0.036, -0.018], [-0.072, -0.058, -0.014]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Supplies the descending and sigmoid colon from low on the aorta. IMA diameter about 3 mm per Gray's; the watershed with the SMA at the splenic flexure is the reason ischaemic colitis strikes there. Path is an engineering approximation."
+    },
+    {
+      "id": "jejunal_arcade",
+      "label": "Jejunal arteries",
+      "side": "arterial",
+      "radius_m": [0.0012, 0.0007],
+      "points": [[-0.008, 0.038, -0.006], [-0.028, 0.006, 0.010], [-0.040, -0.024, 0.018], [-0.030, -0.048, 0.020]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "One branch of the SMA fan into the small-bowel mesentery, drawn to make the mesenteric supply read as a tree reaching the gut rather than stopping at the aorta. Engineering geometry; small-artery radius scale from Gray's."
+    },
+    {
+      "id": "ileal_arcade",
+      "label": "Ileal arteries",
+      "side": "arterial",
+      "radius_m": [0.0011, 0.0007],
+      "points": [[-0.006, 0.030, -0.002], [0.014, 0.000, 0.010], [0.030, -0.036, 0.016], [0.020, -0.070, 0.014]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "A second SMA branch to the ileum on the right of the mesenteric fan. Added for visible small vessels within the abdomen; an engineering-default path, radius from Gray's."
+    },
+    {
+      "id": "brachial_l",
+      "label": "Left brachial artery",
+      "side": "arterial",
+      "radius_m": [0.0020, 0.0014],
+      "points": [[-0.100, 0.250, 0.004], [-0.128, 0.210, 0.008], [-0.150, 0.160, 0.010], [-0.158, 0.120, 0.010]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Continues the axillary artery down the medial arm; it is the vessel a blood-pressure cuff occludes. Brachial radius about 2 mm per Gray's; the limb is not modelled in organs.json, so its path is an engineering default drawn to give the arterial tree limbs."
+    },
+    {
+      "id": "brachial_r",
+      "label": "Right brachial artery",
+      "side": "arterial",
+      "radius_m": [0.0020, 0.0014],
+      "points": [[0.098, 0.248, 0.004], [0.126, 0.208, 0.008], [0.148, 0.158, 0.010], [0.156, 0.118, 0.010]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Mirror of the left brachial. An engineering geometry, since the limbs are drawn for the vasculature view rather than positioned from organs.json."
+    },
+    {
+      "id": "femoral_l",
+      "label": "Left femoral artery",
+      "side": "arterial",
+      "radius_m": [0.0038, 0.0028],
+      "points": [[-0.056, -0.125, -0.010], [-0.058, -0.170, 0.004], [-0.058, -0.220, 0.008], [-0.056, -0.262, 0.006]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "The continuation of the external iliac into the thigh; the common femoral is the standard arterial-access site. Femoral radius about 4 mm per Gray's; the leg is not in organs.json so this centreline is an engineering approximation."
+    },
+    {
+      "id": "femoral_r",
+      "label": "Right femoral artery",
+      "side": "arterial",
+      "radius_m": [0.0038, 0.0028],
+      "points": [[0.044, -0.125, -0.010], [0.048, -0.170, 0.004], [0.050, -0.220, 0.008], [0.050, -0.262, 0.006]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Mirror of the left femoral. Engineering geometry drawn so the arterial tree extends into both legs."
+    },
+    {
+      "id": "popliteal_l",
+      "label": "Left popliteal artery",
+      "side": "arterial",
+      "radius_m": [0.0026, 0.0018],
+      "points": [[-0.056, -0.262, 0.006], [-0.054, -0.300, -0.002], [-0.052, -0.336, -0.004]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Behind the knee, continuing the femoral before it trifurcates in the calf. Added so the leg supply tapers realistically; an engineering path, radius scale from Gray's."
+    },
+    {
+      "id": "popliteal_r",
+      "label": "Right popliteal artery",
+      "side": "arterial",
+      "radius_m": [0.0026, 0.0018],
+      "points": [[0.050, -0.262, 0.006], [0.052, -0.300, -0.002], [0.054, -0.336, -0.004]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Mirror of the left. Engineering geometry for the distal leg."
+    },
+    {
+      "id": "splenic_vein",
+      "label": "Splenic vein",
+      "side": "portal",
+      "radius_m": [0.0028, 0.0035],
+      "points": [[-0.093, 0.055, -0.030], [-0.060, 0.036, -0.014], [-0.024, 0.020, -0.004], [-0.004, 0.010, 0.000]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Drains the spleen and joins the superior mesenteric vein to form the portal vein; it is portal, not systemic, so what it carries goes to the liver first. Radius from Gray's (~3 mm); path is an engineering approximation converging on the portal confluence."
+    },
+    {
+      "id": "smv",
+      "label": "Superior mesenteric vein",
+      "side": "portal",
+      "radius_m": [0.0030, 0.0042],
+      "points": [[0.010, -0.060, 0.016], [0.002, -0.020, 0.008], [-0.002, 0.000, 0.002], [-0.004, 0.010, 0.000]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Carries everything absorbed from the small bowel up to the portal confluence — the first leg of first-pass metabolism. Radius from Gray's (~6 mm at the confluence); geometry an engineering default authored gut-to-liver so its particles flow the right way."
+    },
+    {
+      "id": "brachial_vein_l",
+      "label": "Left brachial vein",
+      "side": "venous",
+      "radius_m": [0.0018, 0.0026],
+      "points": [[-0.158, 0.120, 0.006], [-0.150, 0.160, 0.006], [-0.128, 0.210, 0.004], [-0.100, 0.248, 0.000]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Paired deep vein of the arm, authored periphery-to-heart so it flows opposite its companion artery. Veins run wider than their arteries at the same flow; radius scale from Gray's, path an engineering default for the limb."
+    },
+    {
+      "id": "brachial_vein_r",
+      "label": "Right brachial vein",
+      "side": "venous",
+      "radius_m": [0.0018, 0.0026],
+      "points": [[0.156, 0.118, 0.006], [0.148, 0.158, 0.006], [0.126, 0.208, 0.004], [0.098, 0.246, 0.000]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Mirror of the left brachial vein. Engineering geometry, flow authored toward the subclavian."
+    },
+    {
+      "id": "femoral_vein_l",
+      "label": "Left femoral vein",
+      "side": "venous",
+      "radius_m": [0.0034, 0.0046],
+      "points": [[-0.056, -0.262, 0.002], [-0.058, -0.220, 0.004], [-0.058, -0.170, 0.000], [-0.052, -0.125, -0.014]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "The deep vein returning the leg, and the commonest source of a deep-vein thrombosis. Authored leg-to-pelvis so it flows into the iliac vein; radius from Gray's, path an engineering approximation."
+    },
+    {
+      "id": "femoral_vein_r",
+      "label": "Right femoral vein",
+      "side": "venous",
+      "radius_m": [0.0034, 0.0046],
+      "points": [[0.050, -0.262, 0.002], [0.048, -0.220, 0.004], [0.048, -0.170, 0.000], [0.048, -0.125, -0.014]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Mirror of the left femoral vein. Engineering geometry, flow authored toward the iliac vein."
+    },
+    {
+      "id": "pulm_lobar_l",
+      "label": "Left lobar pulmonary artery",
+      "side": "pulmonary_artery",
+      "radius_m": [0.0055, 0.0032],
+      "points": [[-0.068, 0.205, 0.000], [-0.082, 0.196, 0.006], [-0.090, 0.180, 0.008]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "A lobar division of the left pulmonary artery carrying deoxygenated blood deeper into the lung. Drawn so the pulmonary tree branches into the lung rather than ending at its hilum; radius scale from Gray's, path an engineering default. It stays coloured dark because it is a pulmonary ARTERY."
+    },
+    {
+      "id": "pulm_lobar_r",
+      "label": "Right lobar pulmonary artery",
+      "side": "pulmonary_artery",
+      "radius_m": [0.0055, 0.0032],
+      "points": [[0.072, 0.210, 0.000], [0.088, 0.200, 0.006], [0.098, 0.184, 0.008]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Lobar division on the right, where there are three lobes to the left's two. Engineering geometry; carries the body's most deoxygenated blood, so it is drawn dark."
+    },
+    {
+      "id": "pulm_vein_trib_l",
+      "label": "Left pulmonary vein tributary",
+      "side": "pulmonary_vein",
+      "radius_m": [0.0030, 0.0050],
+      "points": [[-0.090, 0.182, 0.012], [-0.082, 0.196, 0.010], [-0.068, 0.205, 0.006]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "A tributary gathering freshly oxygenated blood from the lung back toward the pulmonary vein trunk — authored lung-to-heart so it flows correctly. It is the brightest blood in the body; radius scale from Gray's, path an engineering approximation."
+    },
+    {
+      "id": "pulm_vein_trib_r",
+      "label": "Right pulmonary vein tributary",
+      "side": "pulmonary_vein",
+      "radius_m": [0.0030, 0.0050],
+      "points": [[0.098, 0.186, 0.012], [0.088, 0.200, 0.010], [0.072, 0.210, 0.006]],
+      "source": "ENGINEERING",
+      "confidence": "assumed",
+      "note": "Tributary on the right, flowing lung-to-heart. Engineering geometry; drawn bright because a pulmonary VEIN carries oxygenated blood, the counter-intuitive case this whole tree is coloured to show."
     }
   ]
 }

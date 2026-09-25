@@ -348,7 +348,27 @@ export const MANIFEST_2: ManifestEntry[] = [
     ],
     pulseName: null, gtopdbLigand: 'tramadol', gtopdbAliases: [],
     receptorAllowList: ['mu', 'sert', 'net'],
-    notes: 'A weak opioid that is also a serotonin and noradrenaline reuptake inhibitor, which is why it lowers the seizure threshold and interacts with antidepressants. Two mechanisms in one molecule, and the model has both.',
+    // GtoPdb carries tramadol at the opioid receptors only (mu, and tighter-binding delta
+    // and kappa the allow-list deliberately drops, because clinically its opioid action is
+    // weak and runs mostly through the M1 metabolite at mu). Its SNRI limb — the reason
+    // the notes call it two mechanisms in one molecule, and the reason it lowers the
+    // seizure threshold and interacts with antidepressants — had no data behind it, so the
+    // reuptake affinities are added from literature. Direction -1 (reuptake inhibitor).
+    literatureTargets: [
+      {
+        receptorId: 'net', Ki_nM: 780, intrinsicActivity: -1,
+        source: 'Gillen C, Haurand M, Kobelt DJ, Wnendt S. Affinity, potency and efficacy of tramadol and its metabolites at the cloned human mu-opioid receptor. Naunyn-Schmiedebergs Arch Pharmacol 362(2):116-121, 2000.',
+        sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/10961373/',
+        note: 'Tramadol inhibits noradrenaline reuptake, IC50 ~0.78 uM. Direction -1 (reuptake inhibitor), which raises synaptic noradrenaline the same way a reuptake-inhibiting antidepressant does.',
+      },
+      {
+        receptorId: 'sert', Ki_nM: 990, intrinsicActivity: -1,
+        source: 'Gillen C, Haurand M, Kobelt DJ, Wnendt S. Affinity, potency and efficacy of tramadol and its metabolites at the cloned human mu-opioid receptor. Naunyn-Schmiedebergs Arch Pharmacol 362(2):116-121, 2000.',
+        sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/10961373/',
+        note: 'Tramadol inhibits serotonin reuptake, IC50 ~0.99 uM. Direction -1 (reuptake inhibitor). Together with the noradrenaline limb this is why tramadol can precipitate serotonin toxicity and lower the seizure threshold.',
+      },
+    ],
+    notes: 'A weak opioid that is also a serotonin and noradrenaline reuptake inhibitor, which is why it lowers the seizure threshold and interacts with antidepressants. Two mechanisms in one molecule: the opioid arm from GtoPdb, the reuptake arm supplied from literature because GtoPdb carries no transporter affinity for it.',
   },
   {
     id: 'naltrexone', displayName: 'Naltrexone', class: 'opioid', drawerGroup: 'Opioids',
@@ -370,7 +390,20 @@ export const MANIFEST_2: ManifestEntry[] = [
     ],
     pulseName: null, gtopdbLigand: 'haloperidol', gtopdbAliases: [],
     receptorAllowList: ['d2', 'd3', 'ht2a', 'ht1a', 'ht7', 'alpha1', 'herg'],
-    notes: 'A high-potency typical antipsychotic: almost pure D2 blockade, which is why it is so extrapyramidal. Its hERG affinity is the reason it needs an ECG.',
+    // hERG is fully wired to QT and arrhythmia now, but GtoPdb carries haloperidol only
+    // at Kv10.1 (EAG1), which the narrowed hERG aliases correctly no longer accept —
+    // Kv10.1 is not IKr. So the drug whose ECG requirement is its signature bound nothing
+    // on the channel that requirement is about. The measured Kv11.1 block is added from
+    // literature.
+    literatureTargets: [
+      {
+        receptorId: 'herg', Ki_nM: 27, intrinsicActivity: 0,
+        source: 'Redfern WS, et al. Relationships between preclinical cardiac electrophysiology, clinical QT interval prolongation and torsade de pointes for a broad range of drugs. Cardiovasc Res 58(1):32-45, 2003.',
+        sourceUrl: 'https://doi.org/10.1016/S0008-6363(02)00846-5',
+        note: 'Haloperidol hERG/Kv11.1 IC50 ~0.027 uM. Direction 0 (a channel blocker, driving the inhibited-state effect vector as written). This is the affinity behind its QT prolongation and its ECG-monitoring requirement.',
+      },
+    ],
+    notes: 'A high-potency typical antipsychotic: almost pure D2 blockade, which is why it is so extrapyramidal. Its hERG affinity — carried here from the Redfern torsades survey, because GtoPdb lists it only at the unrelated Kv10.1 — is the reason it needs an ECG.',
   },
   {
     id: 'olanzapine', displayName: 'Olanzapine', class: 'other', drawerGroup: 'Psychotropics',
@@ -440,7 +473,28 @@ export const MANIFEST_2: ManifestEntry[] = [
     presetDoses: [{ route: 'ORAL', amount: 25, unit: 'mg', label: '25 mg', ...dailymed('amitriptyline hydrochloride tablets') }],
     pulseName: null, gtopdbLigand: 'amitriptyline', gtopdbAliases: [],
     receptorAllowList: ['sert', 'net', 'h1', 'm1', 'm2', 'm3', 'alpha1', 'ht2a', 'ht6', 'nav', 'herg'],
-    notes: 'The reason tricyclics were replaced. It hits the transporters it is meant to and eight other things it is not, and in overdose the sodium-channel and hERG blockade is what kills — which this model can actually show.',
+    // The notes below promised that amitriptyline overdose kills through sodium-channel
+    // and hERG block — but GtoPdb carries NEITHER for it (it has SERT, NET, H1, the
+    // muscarinics, alpha1A and 5-HT6/2A, and an unrelated LPA1 row, but no Nav and no
+    // Kv11.1). So the cardiotoxicity the drug is infamous for, and which this model can
+    // now actually show, bound nothing. Both channel affinities are added from
+    // literature. The transporter, histamine and muscarinic actions still come from
+    // GtoPdb.
+    literatureTargets: [
+      {
+        receptorId: 'nav', Ki_nM: 10000, intrinsicActivity: 0,
+        source: 'Nau C, Seaver M, Wang SY, Wang GK. Block of human heart hH1 sodium channels by amitriptyline. J Pharmacol Exp Ther 292(3):1015-1023, 2000.',
+        sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/10688618/',
+        note: 'Amitriptyline blocks the cardiac sodium channel Nav1.5; resting-state Kd ~10-20 uM, but the block is strongly USE-DEPENDENT, so it deepens at the fast rates and depolarised tissue of an overdose — which is why the QRS widens then. Modelled at 10 uM tonic; direction 0 (blocker).',
+      },
+      {
+        receptorId: 'herg', Ki_nM: 3300, intrinsicActivity: 0,
+        source: 'Redfern WS, et al. Relationships between preclinical cardiac electrophysiology, clinical QT interval prolongation and torsade de pointes for a broad range of drugs. Cardiovasc Res 58(1):32-45, 2003.',
+        sourceUrl: 'https://doi.org/10.1016/S0008-6363(02)00846-5',
+        note: 'Amitriptyline hERG/Kv11.1 IC50 ~3.3 uM. Direction 0 (channel blocker). The QT prolongation that compounds the sodium-channel block in the tricyclic overdose.',
+      },
+    ],
+    notes: 'The reason tricyclics were replaced. It hits the transporters it is meant to and eight other things it is not, and in overdose the sodium-channel and hERG blockade is what kills — which this model can now show, because those two channel affinities are supplied from literature where GtoPdb has neither.',
   },
   {
     id: 'duloxetine', displayName: 'Duloxetine', class: 'other', drawerGroup: 'Psychotropics',
@@ -456,13 +510,21 @@ export const MANIFEST_2: ManifestEntry[] = [
     presetDoses: [{ route: 'ORAL', amount: 15, unit: 'mg', label: '15 mg', ...dailymed('mirtazapine tablets') }],
     pulseName: null, gtopdbLigand: 'mirtazapine', gtopdbAliases: [],
     receptorAllowList: ['alpha2', 'ht2a', 'ht2c', 'ht3', 'h1'],
-    targetsNote:
-      'The receptor panel shows no H1 for this drug and it is therefore far less sedating here than it is in a '
-      + 'patient. H1 is on the allow list, so this is not an omission in the manifest - GtoPdb simply publishes no '
-      + 'human H1 affinity for mirtazapine that the pipeline can convert to a Ki, and inventing one is not '
-      + 'permitted. The sedation you would expect at a low dose is therefore missing, which is unfortunate '
-      + 'precisely because it is the most recognisable thing about the drug.',
-    notes: 'An antidepressant that blocks rather than inhibits reuptake: alpha-2 autoreceptor antagonism raises monoamine release. Clinically its H1 affinity is why the LOWER dose is the more sedating one - as the dose rises, noradrenergic activation starts to offset the antihistamine sedation. That inversion is not modelled, because no H1 affinity is available for it; see targetsNote.',
+    // GtoPdb carries mirtazapine at alpha-2, 5-HT2A and 5-HT2C but publishes no human H1
+    // affinity for it — and H1 is its DOMINANT action, the source of the sedation and
+    // appetite gain that are the most recognisable things about the drug. An earlier note
+    // here explained that absence and left the drug barely sedating. The H1 affinity is
+    // now supplied from literature, where it is one of the highest-affinity H1 antagonists
+    // in clinical use.
+    literatureTargets: [
+      {
+        receptorId: 'h1', Ki_nM: 1.5, intrinsicActivity: 0,
+        source: 'Anttila SA, Leinonen EV. A review of the pharmacological and clinical profile of mirtazapine. CNS Drug Rev 7(3):249-264, 2001.',
+        sourceUrl: 'https://doi.org/10.1111/j.1527-3458.2001.tb00198.x',
+        note: 'Mirtazapine is a very high-affinity histamine H1 antagonist (Ki ~1.5 nM), which is its dominant action and the mechanism of its sedation and appetite stimulation. Direction 0 (neutral antagonist, which removes the resting H1 tone).',
+      },
+    ],
+    notes: 'An antidepressant that blocks rather than inhibits reuptake: alpha-2 autoreceptor antagonism raises monoamine release. Its dominant H1 blockade — supplied from literature because GtoPdb has no human H1 row for it — is why the LOWER dose is the more sedating one, as rising noradrenergic activation begins to offset the antihistamine sedation. That dose inversion is a documented feature the model still cannot show (occupancy only rises with dose), which is now the limitation rather than a missing target.',
   },
   {
     id: 'diazepam', displayName: 'Diazepam', class: 'sedative', drawerGroup: 'Sedatives',
@@ -583,7 +645,13 @@ export const MANIFEST_2: ManifestEntry[] = [
     ],
     pulseName: null, gtopdbLigand: 'ipratropium', gtopdbAliases: [],
     receptorAllowList: ['m1', 'm2', 'm3', 'm4', 'm5'],
-    notes: 'A QUATERNARY antimuscarinic, so it is charged at every pH and essentially cannot cross a membrane — which is why an inhaled dose stays in the lung and causes none of atropine’s central effects. The physicochemical model here should show that gate closing.',
+    bbbPenetration: {
+      value: 0.02,
+      source: 'FDA Structured Product Label via DailyMed — ipratropium bromide inhalation solution (a quaternary ammonium compound that does not readily cross the blood-brain barrier).',
+      sourceUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=ipratropium',
+      note: 'The passive-permeability rule scores ipratropium as brain-penetrant because it cannot see the PERMANENT POSITIVE CHARGE of a quaternary ammonium. Ipratropium is charged at every pH and essentially cannot cross a lipid membrane, which is the whole reason an inhaled dose stays in the lung and produces none of atropine\'s central effects. Overridden to a near-zero penetration the label\'s pharmacology supports.',
+    },
+    notes: 'A QUATERNARY antimuscarinic, so it is charged at every pH and essentially cannot cross a membrane — which is why an inhaled dose stays in the lung and causes none of atropine’s central effects. The physicochemical rule cannot see the charge, so the penetration is overridden to near zero, which is what closes that gate.',
   },
   {
     id: 'theophylline', displayName: 'Theophylline', class: 'other', drawerGroup: 'Respiratory',
@@ -625,7 +693,16 @@ export const MANIFEST_2: ManifestEntry[] = [
     ],
     pulseName: null, gtopdbLigand: 'hydrocortisone', gtopdbAliases: ['cortisol'],
     receptorAllowList: ['glucocorticoid', 'mineralocorticoid'],
-    notes: 'Cortisol itself. It binds the mineralocorticoid receptor as well, which is the contrast with dexamethasone and the reason it is the replacement steroid in an adrenal crisis.',
+    hormoneAnalogue: {
+      pool: 'cortisol',
+      // 1 mg/L = 100 ug/dL, a unit identity. Hydrocortisone IS cortisol, so its plasma
+      // level adds directly to the cortisol pool the HPA model and the lab panel read.
+      unitsPerMgPerL: 100,
+      note: 'Hydrocortisone is cortisol itself, so its plasma level (mg/L) adds to the endogenous cortisol pool in the pool unit of ug/dL (1 mg/L = 100 ug/dL). The glucocorticoid and mineralocorticoid RECEPTORS carry the anti-inflammatory and salt-retaining effects; the pool carries the level the HPA feedback and the lab panel read, so an exogenous dose suppresses the axis the way a real steroid course does.',
+      source: 'Unit identity (1 mg/L = 100 ug/dL); reference cortisol range from Guyton & Hall, 14th ed.',
+      sourceUrl: 'https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8',
+    },
+    notes: 'Cortisol itself. It binds the mineralocorticoid receptor as well, which is the contrast with dexamethasone and the reason it is the replacement steroid in an adrenal crisis. Modelled as a hormone as well as a receptor ligand: its plasma level feeds the cortisol pool, so a dose suppresses the body\'s own HPA axis exactly as a steroid course does.',
   },
   {
     id: 'prednisolone', displayName: 'Prednisolone', class: 'other', drawerGroup: 'Steroids',
@@ -644,7 +721,17 @@ export const MANIFEST_2: ManifestEntry[] = [
     ],
     pulseName: null, gtopdbLigand: 'ondansetron', gtopdbAliases: [],
     receptorAllowList: ['ht3', 'herg'],
-    notes: 'A 5-HT3 antagonist acting on vagal afferents and the area postrema. Its hERG affinity is why the intravenous dose was capped.',
+    // GtoPdb gives ondansetron only its 5-HT3 rows, so the hERG block behind the dose cap
+    // was missing from a now-wired channel. Added from the Redfern survey.
+    literatureTargets: [
+      {
+        receptorId: 'herg', Ki_nM: 810, intrinsicActivity: 0,
+        source: 'Redfern WS, et al. Relationships between preclinical cardiac electrophysiology, clinical QT interval prolongation and torsade de pointes for a broad range of drugs. Cardiovasc Res 58(1):32-45, 2003.',
+        sourceUrl: 'https://doi.org/10.1016/S0008-6363(02)00846-5',
+        note: 'Ondansetron hERG/Kv11.1 IC50 ~0.81 uM. Direction 0 (channel blocker). This is the affinity behind the QT prolongation that led the FDA to cap the single intravenous dose at 16 mg.',
+      },
+    ],
+    notes: 'A 5-HT3 antagonist acting on vagal afferents and the area postrema. Its hERG affinity — carried from the Redfern survey because GtoPdb lists only its 5-HT3 rows — is why the intravenous dose was capped.',
   },
   {
     id: 'metoclopramide', displayName: 'Metoclopramide', class: 'other', drawerGroup: 'Gastrointestinal',
@@ -727,7 +814,13 @@ export const MANIFEST_2: ManifestEntry[] = [
     presetDoses: [{ route: 'ORAL', amount: 10, unit: 'mg', label: '10 mg', ...dailymed('loratadine tablets') }],
     pulseName: null, gtopdbLigand: 'loratadine', gtopdbAliases: [],
     receptorAllowList: ['h1'],
-    notes: 'A second-generation antihistamine. The reason it does not sedate is not its receptor profile but its inability to cross the blood-brain barrier, and this model expresses that with the same physicochemical gate it uses for everything else.',
+    bbbPenetration: {
+      value: 0.05,
+      source: 'FDA Structured Product Label via DailyMed — loratadine tablets (a non-sedating second-generation antihistamine and P-glycoprotein substrate with low CNS penetration).',
+      sourceUrl: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=loratadine',
+      note: 'The passive-permeability rule scores loratadine as brain-penetrant on its lipophilicity alone; it cannot see that loratadine is a P-GLYCOPROTEIN SUBSTRATE actively pumped back out of the brain, which is exactly why it is non-sedating where the equally lipophilic first-generation antihistamines are not. Overridden to a low penetration matching its non-sedating clinical profile.',
+    },
+    notes: 'A second-generation antihistamine. The reason it does not sedate is not its receptor profile but its inability to accumulate in the brain — it is a P-glycoprotein substrate pumped back out — and because the passive-permeability rule cannot see that efflux, the penetration is overridden to a low, cited value so the gate closes.',
   },
   {
     id: 'metformin', displayName: 'Metformin', class: 'other', drawerGroup: 'Endocrine',
@@ -752,11 +845,26 @@ export const MANIFEST_2: ManifestEntry[] = [
     pulseName: null, gtopdbLigand: 'levothyroxine', gtopdbAliases: ['thyroxine', 'L-thyroxine'],
     receptorAllowList: [],
     targetsNote: 'Deliberate. Thyroid hormone acts through a nuclear receptor over days to weeks; the endocrine subsystem already models free T4 with a seven-day half-life, so an exogenous dose is represented there rather than as a separate binding target.',
+    hormoneAnalogue: {
+      pool: 'thyroxine',
+      // Plasma total T4 (mg/L) -> free T4 (ng/dL). 1 mg/L = 1e5 ng/dL total; multiply by
+      // the free fraction ~0.03% (T4 is ~99.97% bound to TBG/transthyretin/albumin),
+      // 1e5 * 0.0003 = 30 ng/dL of FREE T4 per mg/L of total drug.
+      unitsPerMgPerL: 30,
+      note: 'Plasma levothyroxine (total T4) in mg/L converted to the pool unit of FREE T4 in ng/dL: 1 mg/L = 1e5 ng/dL total, times the free fraction of ~0.03% (T4 is ~99.97% protein bound), giving 30 ng/dL free T4 per mg/L. Added to the endogenous free-T4 pool so the metabolic and cardiac effects run through the one hormone the endocrine model already tracks.',
+      source: 'Free-fraction of thyroxine ~0.03% (99.97% protein bound); Guyton & Hall, 14th ed., thyroid hormone transport and free-T4 reference range 0.8-1.8 ng/dL.',
+      sourceUrl: 'https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8',
+    },
     directEffects: [
-      { target: 'metabolic.basalRate', gain: 0.45, note: 'Raises basal metabolic rate across essentially every tissue, over WEEKS. The model applies it far faster than that, which is stated in MODEL_LIMITATIONS.', ...dailymed('levothyroxine sodium tablets') },
-      { target: 'cardio.heartRate', gain: 0.30, note: 'Increased myocardial beta-adrenoceptor density, so thyroid state changes how the heart answers catecholamines.', ...dailymed('levothyroxine sodium tablets') },
+      // The metabolic.basalRate direct effect was REMOVED: basalRate is a readout-only
+      // bus target (nothing consumes it), so it was dead, and the thyroxine hormone pool
+      // above now drives the real thermogenic and metabolic response through the endocrine
+      // model — which is where thyroid hormone belongs. The cardiac effect is kept as a
+      // direct effect because it is a distinct action (raised myocardial beta-adrenoceptor
+      // density) and is live on the bus.
+      { target: 'cardio.heartRate', gain: 0.30, note: 'Increased myocardial beta-adrenoceptor density, so thyroid state changes how the heart answers catecholamines — a cardiac action distinct from the hormone pool\'s metabolic one.', ...dailymed('levothyroxine sodium tablets') },
     ],
-    notes: 'A seven-day half-life, so this is the slowest drug in the set by two orders of magnitude.',
+    notes: 'A seven-day half-life, so this is the slowest drug in the set by two orders of magnitude. Modelled as the hormone it is: its plasma level feeds the endogenous free-T4 pool, so the metabolic rate rises through the same path the body\'s own thyroxine uses, applied far faster than the weeks it really takes (stated in MODEL_LIMITATIONS).',
   },
   {
     id: 'allopurinol', displayName: 'Allopurinol', class: 'other', drawerGroup: 'Other',
@@ -867,15 +975,25 @@ export const MANIFEST_2: ManifestEntry[] = [
     routes: ['ORAL'],
     presetDoses: [{ route: 'ORAL', amount: 20, unit: 'mg', label: '20 mg (study exposure)', ...study('Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009. Controlled human laboratory exposures.', 'https://doi.org/10.1111/j.1360-0443.2009.02564.x') }],
     pulseName: null, gtopdbLigand: 'metamfetamine', gtopdbAliases: ['methamphetamine', 'methamfetamine', '(+)-methamphetamine'],
-    receptorAllowList: ['dat', 'net', 'taar1'],
-    targetsNote: 'Deliberate in the sense that nothing better exists: GtoPdb publishes no human affinity row for this ligand. Its mechanism is well established and well cited, so it is carried as direct effects - the drug behaves correctly and the receptor panel honestly shows nothing bound.',
+    // GtoPdb publishes no human affinity row for this ligand, so the monoamine
+    // transporters it acts on had no occupancy — the drug drove everything through flat
+    // direct effects and could not COMPETE at DAT/NET/SERT with anything else. The
+    // transporter potencies are now supplied from Rothman & Baumann's human transporter
+    // survey, as a SUBSTRATE (direction +1, a releaser), so methamphetamine now competes
+    // at the shared carriers like amfetamine does. The direct effects are kept ONLY for
+    // what the transporter vectors do not carry — inotropy, arrhythmogenicity, seizure
+    // threshold, appetite, dependence and the multi-source hyperthermia — with the
+    // chronotropy, pressor response and arousal now coming through NET and DAT.
+    literatureTargets: [
+      { receptorId: 'net', Ki_nM: 12.3, intrinsicActivity: 1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'Methamphetamine releases noradrenaline via NET (release EC50 ~12 nM). Direction +1 (substrate/releaser) — it runs the carrier backwards, which is why its sympathomimetic effect exceeds any pure reuptake blocker.' },
+      { receptorId: 'dat', Ki_nM: 24.5, intrinsicActivity: 1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'Methamphetamine releases dopamine via DAT (release EC50 ~24 nM). Direction +1 (substrate/releaser); the striatal dopamine release is its arousal and its reinforcement.' },
+      { receptorId: 'sert', Ki_nM: 736, intrinsicActivity: 1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'Weaker serotonin release via SERT (release EC50 ~736 nM), the reason its serotonergic effects are much smaller than MDMA\'s. Direction +1 (substrate/releaser).' },
+    ],
+    targetsNote: 'GtoPdb publishes no human affinity row for this ligand, so its monoamine-transporter potencies are supplied from Rothman & Baumann\'s human transporter survey (see literatureTargets), making it a releaser that competes at DAT/NET/SERT. The remaining direct effects carry only what the transporter vectors do not.',
     directEffects: [
-      { target: 'cardio.heartRate', gain: 0.85, note: 'Indirect sympathomimetic: it is a transporter SUBSTRATE, so it reverses noradrenaline transport and drives transmitter out of the terminal rather than merely blocking reuptake. That is why the effect exceeds anything a pure blocker produces.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
-      { target: 'cardio.systemicResistance', gain: 0.7, note: 'Raised synaptic noradrenaline at vascular alpha-1. The hypertension is often severe and is the proximate cause of the haemorrhagic strokes.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
-      { target: 'cardio.contractility', gain: 0.55, note: 'Beta-1 stimulation by released noradrenaline.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
+      { target: 'cardio.contractility', gain: 0.55, note: 'Beta-1 stimulation by released noradrenaline. Kept as a direct effect because the transporter vectors carry chronotropy and vasoconstriction but not inotropy.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
       { target: 'cardio.arrhythmogenicity', gain: 0.75, note: 'Catecholamine excess lowers the fibrillation threshold; ventricular arrhythmia is a recognised mode of death.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
-      { target: 'thermal.heatProduction', gain: 0.95, note: 'HYPERTHERMIA IS THE DANGEROUS PART. It comes from three places at once - increased motor activity, cutaneous vasoconstriction impairing heat loss, and direct thermogenesis - and the temperatures reached are lethal.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
-      { target: 'neuro.arousal', gain: 0.9, note: 'Massive striatal and cortical dopamine release.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
+      { target: 'thermal.heatProduction', gain: 0.85, note: 'HYPERTHERMIA IS THE DANGEROUS PART. It comes from three places at once - increased motor activity, cutaneous vasoconstriction impairing heat loss, and direct thermogenesis - beyond the baseline the transporter vectors contribute, and the temperatures reached are lethal.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
       { target: 'neuro.seizureThreshold', gain: -0.45, note: 'The threshold falls; seizures are common in overdose.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
       { target: 'gi.appetite', gain: -0.7, note: 'Profound appetite suppression.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
       { target: 'neuro.dependence', gain: 0.85, note: 'Mesolimbic reward signalling, and among the most reinforcing profiles known.', ...{ source: 'Cruickshank CC, Dyer KR. A review of the clinical pharmacology of methamphetamine. Addiction 104(7):1085-1099, 2009.', sourceUrl: 'https://doi.org/10.1111/j.1360-0443.2009.02564.x' } },
@@ -893,14 +1011,23 @@ export const MANIFEST_2: ManifestEntry[] = [
     ],
     pulseName: null, gtopdbLigand: 'cocaine', gtopdbAliases: [],
     receptorAllowList: ['dat', 'net', 'sert', 'nav', 'ht3'],
-    targetsNote: 'Partly deliberate. GtoPdb publishes human affinities for cocaine only at 5-HT3, which is real but incidental; the monoamine transporter and sodium-channel affinities that constitute its actual pharmacology have no human rows. The 5-HT3 binding is kept and the rest is carried as cited direct effects.',
+    // GtoPdb carries cocaine only at 5-HT3, which is real but incidental — the monoamine
+    // transporter block that IS its pharmacology had no human rows, so it could not
+    // compete at DAT/NET/SERT with the releasers. The reuptake potencies are supplied
+    // from Rothman & Baumann as an INHIBITOR (direction -1), keeping the 5-HT3 binding
+    // from GtoPdb. The sodium-channel block, which GtoPdb also lacks and which is what
+    // makes cocaine's cardiotoxicity distinctive, stays a cited direct effect. The
+    // direct effects keep only what the transporters do not carry.
+    literatureTargets: [
+      { receptorId: 'dat', Ki_nM: 478, intrinsicActivity: -1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'Cocaine inhibits dopamine reuptake (uptake Ki ~478 nM at the human DAT). Direction -1 (reuptake inhibitor) — unlike the amfetamines it is a blocker, so its effect is bounded by the transmitter being released anyway.' },
+      { receptorId: 'net', Ki_nM: 779, intrinsicActivity: -1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'Cocaine inhibits noradrenaline reuptake (uptake Ki ~779 nM). Direction -1; the raised synaptic noradrenaline at vascular alpha-1, coronary circulation included, is why it infarcts clean arteries.' },
+      { receptorId: 'sert', Ki_nM: 304, intrinsicActivity: -1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'Cocaine inhibits serotonin reuptake (uptake Ki ~304 nM). Direction -1.' },
+    ],
+    targetsNote: 'GtoPdb carries cocaine only at 5-HT3 (kept); its monoamine-transporter block is supplied from Rothman & Baumann (see literatureTargets), so it now competes at DAT/NET/SERT as a reuptake inhibitor. The sodium-channel block, which GtoPdb also lacks, remains a cited direct effect, and the remaining direct effects carry only what the transporter vectors do not.',
     directEffects: [
-      { target: 'cardio.heartRate', gain: 0.7, note: 'Noradrenaline reuptake inhibition. Unlike the amfetamines it is a blocker rather than a substrate, so the effect is bounded by how much transmitter is being released anyway.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
-      { target: 'cardio.systemicResistance', gain: 0.75, note: 'Raised synaptic noradrenaline at vascular alpha-1, including in the coronary circulation - which is why cocaine causes myocardial infarction in people with clean arteries.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
-      { target: 'cardio.conductionVelocity', gain: -0.55, note: 'Sodium-channel block. THIS IS WHAT MAKES ITS CARDIAC TOXICITY DISTINCTIVE: a wide-complex arrhythmia on top of a catecholamine surge, which is why sodium bicarbonate and not a beta blocker is the treatment.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
-      { target: 'cardio.arrhythmogenicity', gain: 0.7, note: 'Both mechanisms contribute, and they compound.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
-      { target: 'thermal.heatProduction', gain: 0.55, note: 'Hyperthermia from vasoconstriction and agitation together.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
-      { target: 'neuro.arousal', gain: 0.8, note: 'Dopamine reuptake inhibition in the mesolimbic system.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
+      { target: 'cardio.conductionVelocity', gain: -0.55, note: 'Sodium-channel block. THIS IS WHAT MAKES ITS CARDIAC TOXICITY DISTINCTIVE: a wide-complex arrhythmia on top of a catecholamine surge, which is why sodium bicarbonate and not a beta blocker is the treatment. Kept as a direct effect because GtoPdb has no cocaine sodium-channel affinity.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
+      { target: 'cardio.arrhythmogenicity', gain: 0.7, note: 'The catecholamine surge and the sodium-channel block compound each other.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
+      { target: 'thermal.heatProduction', gain: 0.55, note: 'Hyperthermia from vasoconstriction and agitation together, beyond the transporter baseline.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
       { target: 'neuro.seizureThreshold', gain: -0.5, note: 'The threshold falls markedly.', ...{ source: 'Schwartz BG, Rezkalla S, Kloner RA. Cardiovascular effects of cocaine. Circulation 122(24):2558-2569, 2010.', sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.940569' } },
     ],
     scheduled: true,
@@ -912,14 +1039,22 @@ export const MANIFEST_2: ManifestEntry[] = [
     routes: ['ORAL'],
     presetDoses: [{ route: 'ORAL', amount: 100, unit: 'mg', label: '100 mg (study exposure)', ...study('de la Torre R, et al. Human pharmacology of MDMA. Ther Drug Monit 26(2):137-144, 2004. Controlled human laboratory exposures.', 'https://doi.org/10.1097/00007691-200404000-00009') }],
     pulseName: null, gtopdbLigand: 'MDMA', gtopdbAliases: ['3,4-methylenedioxymethamphetamine', 'midomafetamine'],
-    receptorAllowList: ['sert', 'dat', 'net', 'ht2a', 'taar1'],
-    targetsNote: 'Deliberate in the sense that nothing better exists: GtoPdb publishes no human affinity row for this ligand. Its mechanism is well established and well cited, so it is carried as direct effects - the drug behaves correctly and the receptor panel honestly shows nothing bound.',
+    // GtoPdb publishes no human affinity row for this ligand, so its transporter action
+    // had no occupancy and it could not compete at the shared carriers. The potencies are
+    // supplied from Rothman & Baumann as a SUBSTRATE (direction +1, a releaser),
+    // predominantly SEROTONERGIC — SERT and NET tight, DAT much weaker — which is exactly
+    // what distinguishes it from the dopaminergic amfetamines. The direct effects keep
+    // only what the transporters do not carry: the serotonergic hyperthermia, the
+    // vasopressin-driven water retention, and the euphoria.
+    literatureTargets: [
+      { receptorId: 'sert', Ki_nM: 56.6, intrinsicActivity: 1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'MDMA is predominantly a serotonin releaser (release EC50 ~57 nM at SERT). Direction +1 (substrate/releaser); the serotonergic dominance is the whole difference from amfetamine.' },
+      { receptorId: 'net', Ki_nM: 54.1, intrinsicActivity: 1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'Noradrenaline release via NET (release EC50 ~54 nM), the source of the modest sympathomimetic signs. Direction +1 (substrate/releaser).' },
+      { receptorId: 'dat', Ki_nM: 1572, intrinsicActivity: 1, source: 'Rothman RB, Baumann MH. Monoamine transporters and psychostimulant drugs. Eur J Pharmacol 479(1-3):23-40, 2003.', sourceUrl: 'https://doi.org/10.1016/j.ejphar.2003.08.054', note: 'Weak dopamine release via DAT (release EC50 ~1572 nM) — an order of magnitude weaker than at SERT, which is why MDMA is empathogenic where amfetamine is stimulant. Direction +1 (substrate/releaser).' },
+    ],
+    targetsNote: 'GtoPdb publishes no human affinity row for this ligand, so its transporter potencies are supplied from Rothman & Baumann (see literatureTargets), making it a predominantly serotonergic releaser that competes at SERT/NET/DAT. The remaining direct effects carry only the serotonergic hyperthermia, the vasopressin-driven water retention and the euphoria the transporter vectors do not.',
     directEffects: [
       { target: 'thermal.heatProduction', gain: 0.85, note: 'Serotonergic hyperthermia, mediated largely through 5-HT2A. It is worse when heat loss is impaired, which is a real interaction between pharmacology and thermoregulation rather than a property of the drug alone.', ...{ source: 'de la Torre R, et al. Human pharmacology of MDMA. Ther Drug Monit 26(2):137-144, 2004.', sourceUrl: 'https://doi.org/10.1097/00007691-200404000-00009' } },
-      { target: 'cardio.heartRate', gain: 0.6, note: 'Indirect sympathomimetic, weaker than amfetamine because the release is predominantly serotonergic rather than dopaminergic.', ...{ source: 'de la Torre R, et al. Human pharmacology of MDMA. Ther Drug Monit 26(2):137-144, 2004.', sourceUrl: 'https://doi.org/10.1097/00007691-200404000-00009' } },
-      { target: 'cardio.systemicResistance', gain: 0.45, note: 'Modest pressor effect.', ...{ source: 'de la Torre R, et al. Human pharmacology of MDMA. Ther Drug Monit 26(2):137-144, 2004.', sourceUrl: 'https://doi.org/10.1097/00007691-200404000-00009' } },
       { target: 'renal.waterReabsorption', gain: 0.55, note: 'Vasopressin release. Combined with free-water drinking this is what produces the hyponatraemia that is the other characteristic toxicity, and the model has both halves of that mechanism.', ...{ source: 'de la Torre R, et al. Human pharmacology of MDMA. Ther Drug Monit 26(2):137-144, 2004.', sourceUrl: 'https://doi.org/10.1097/00007691-200404000-00009' } },
-      { target: 'neuro.arousal', gain: 0.55, note: 'Cortical and limbic monoamine release.', ...{ source: 'de la Torre R, et al. Human pharmacology of MDMA. Ther Drug Monit 26(2):137-144, 2004.', sourceUrl: 'https://doi.org/10.1097/00007691-200404000-00009' } },
       { target: 'neuro.euphoria', gain: 0.85, note: 'Predominantly serotonergic, which is what distinguishes the subjective effect from a stimulant.', ...{ source: 'de la Torre R, et al. Human pharmacology of MDMA. Ther Drug Monit 26(2):137-144, 2004.', sourceUrl: 'https://doi.org/10.1097/00007691-200404000-00009' } },
     ],
     scheduled: true,

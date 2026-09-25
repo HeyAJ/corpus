@@ -21,6 +21,10 @@ import { TimeScaleControl } from './components/TimeScaleControl';
 import styles from './app.module.css';
 import { StatusPanel } from './panels/StatusPanel';
 import { PhysiologyPanel } from './panels/PhysiologyPanel';
+import { ImpactPanel } from './panels/ImpactPanel';
+import { EnvironmentPanel } from './panels/EnvironmentPanel';
+import { InfectionPanel } from './panels/InfectionPanel';
+import { NoticeToasts } from './components/NoticeToasts';
 
 /**
  * LAYER C — the application shell.
@@ -52,7 +56,6 @@ export function App() {
   const pushLog = useStore((s) => s.pushLog);
 
   const snapshot = useStore((s) => s.snapshot);
-  const physiologyOpen = useStore((s) => s.physiologyPanelOpen);
   const selected = useStore((s) => s.selectedOrgan);
   const labels = useStore((s) => s.labels);
   const reducedMotion = useStore((s) => s.reducedMotion);
@@ -105,8 +108,16 @@ export function App() {
     const onResize = () => viewer.resize();
     window.addEventListener('resize', onResize);
 
+    // The canvas no longer fills the window — it fills the STAGE column, which changes
+    // width whenever the rail is toggled between the desktop and phone layouts, or when
+    // a panel opening pushes the grid around. A window `resize` event never fires for
+    // that, so observe the canvas box directly and reframe the body whenever it moves.
+    const observer = new ResizeObserver(() => viewer.resize());
+    observer.observe(canvas);
+
     return () => {
       window.removeEventListener('resize', onResize);
+      observer.disconnect();
       viewer.dispose();
       client.dispose();
       viewerRef.current = null;
@@ -181,88 +192,119 @@ export function App() {
 
   return (
     <div className={styles.root}>
-      <canvas
-        ref={canvasRef}
-        className={styles.canvas}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerLeave={() => viewerRef.current?.handlePointerLeave()}
-        onWheel={onWheel}
-        aria-label="Three-dimensional body. Tap an organ to read its telemetry."
-        role="img"
-      />
+      {/*
+        THE STAGE. The body and everything that must sit OVER the body: its own HUD,
+        the screen-space labels, the condition tags, the speed control, the engine's
+        toasts, the defib pad zones and the administration drawer. It is a positioning
+        context of its own, so a label projected at canvas pixel (x, y) lands at (x, y)
+        here and a pad placed at 50 % is centred on the body, not on a viewport that now
+        also contains the rail.
+      */}
+      <div className={styles.stage}>
+        <canvas
+          ref={canvasRef}
+          className={styles.canvas}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerLeave={() => viewerRef.current?.handlePointerLeave()}
+          onWheel={onWheel}
+          aria-label="Three-dimensional body. Tap an organ to read its telemetry."
+          role="img"
+        />
 
-      {/* Screen-space organ labels, anchored to the projected centroid. Not 3D
-          sprites: they must stay pixel-crisp and must not scale with distance. */}
-      {labels.map((l) =>
-        l.visible ? (
-          <span key={l.id} className={styles.organLabel} style={{ left: l.x, top: l.y }} aria-hidden="true">
-            {ORGANS.find((o) => o.id === l.id)?.displayName}
-          </span>
-        ) : null,
-      )}
-
-      <div className={styles.hud}>
-        {!ready && <div className={styles.booting}>Starting body engine{'…'}</div>}
-        {ready && snapshot && (
-          <>
-            {Panel && selectedDef ? (
-              <Panel snapshot={snapshot} organ={selectedDef} ring={client?.ring ?? null} channelIndex={channelIndex} />
-            ) : (
-              <CardiacPanel snapshot={snapshot} organ={heartDef} ring={client?.ring ?? null} channelIndex={channelIndex} />
-            )}
-          </>
+        {/* Screen-space organ labels, anchored to the projected centroid. Not 3D
+            sprites: they must stay pixel-crisp and must not scale with distance. */}
+        {labels.map((l) =>
+          l.visible ? (
+            <span key={l.id} className={styles.organLabel} style={{ left: l.x, top: l.y }} aria-hidden="true">
+              {ORGANS.find((o) => o.id === l.id)?.displayName}
+            </span>
+          ) : null,
         )}
-      </div>
 
-      {snapshot && <ConditionStack conditions={snapshot.conditions} />}
-      <StatusPanel />
-      {physiologyOpen && <PhysiologyPanel />}
+        <div className={styles.hud} data-hud>
+          {!ready && <div className={styles.booting}>Starting body engine{'…'}</div>}
+          {ready && snapshot && (
+            <>
+              {Panel && selectedDef ? (
+                <Panel snapshot={snapshot} organ={selectedDef} ring={client?.ring ?? null} channelIndex={channelIndex} />
+              ) : (
+                <CardiacPanel snapshot={snapshot} organ={heartDef} ring={client?.ring ?? null} channelIndex={channelIndex} />
+              )}
+            </>
+          )}
+        </div>
+
+        {snapshot && <ConditionStack conditions={snapshot.conditions} />}
+        <TimeScaleControl />
+        <NoticeToasts />
+
+        {/* The resuscitation flow is spatial — pads on the thorax, eyes on the chest —
+            so it stays anchored to the body rather than joining the rail. */}
+        <ProcedurePanel />
+
+        {/* The administration drawer is a confined modal sheet: it covers the body only,
+            never the rail beside it or the dock below it. */}
+        <DrugDrawer />
+      </div>
 
       {/*
-        The toast and the timeline are the same conversation — "this just happened"
-        and "here is everything that happened" — so they share one bottom-anchored
-        column instead of being two absolutely-positioned siblings that collide the
-        moment the timeline is expanded.
+        THE RAIL. Every readout and control panel is a plain card here, laid out top to
+        bottom by a flex column that scrolls once the stack outgrows the viewport. Because
+        a column cannot make two children share a line, no panel can ever hide another —
+        the whole point of the rebuild. Each panel renders null when closed, so the rail
+        holds exactly what is open, and the always-present "what is happening" leads it.
       */}
-      <div className={styles.bottomStack}>
-        {log.length > 0 && (
-          <div className={styles.log} role="log" aria-live="polite">
-            {log.slice(-3).map((l) => (
-              <span key={l.id} className={styles[`log_${l.tone}`]}>
-                {l.text}
-              </span>
-            ))}
-          </div>
-        )}
-        <Timeline />
+      <aside className={styles.rail} aria-label="Panels">
+        <StatusPanel />
+        <ImpactPanel />
+        <PhysiologyPanel />
+        <EnvironmentPanel />
+        <InfectionPanel />
+        <EndocrinePanel />
+        <LabPanel />
+        <ReceptorPanel />
+        <BloodContents />
+        <BodyPanel />
+      </aside>
+
+      {/*
+        THE BOTTOM BAR. A reserved row for the timeline and its toasts, the tool dock,
+        and the permanent warning. Nothing in the stage or the rail can paint into it, so
+        "the drawer covers the dock" is now a layout impossibility rather than a bug.
+      */}
+      <div className={styles.bottomBar}>
+        <div className={styles.bottomStack}>
+          {log.length > 0 && (
+            <div className={styles.log} role="log" aria-live="polite">
+              {log.slice(-3).map((l) => (
+                <span key={l.id} className={styles[`log_${l.tone}`]}>
+                  {l.text}
+                </span>
+              ))}
+            </div>
+          )}
+          <Timeline />
+        </div>
+
+        <ToolDock />
+
+        {/* Permanently visible, not dismissible (spec 10.1). */}
+        <footer className={styles.disclaimer}>
+          <strong>NOT FOR CLINICAL USE {'—'} EDUCATIONAL SIMULATION</strong>
+          <a href="docs/MODEL_LIMITATIONS.md" target="_blank" rel="noreferrer">
+            Model limitations
+          </a>
+          {!sharedArrayBuffer && ready && (
+            <span className={styles.degraded} title="SharedArrayBuffer is unavailable, so waveforms arrive in 50 ms bursts instead of continuously. See docs/MODEL_LIMITATIONS.md.">
+              degraded waveform transport
+            </span>
+          )}
+        </footer>
       </div>
 
-      <TimeScaleControl />
-      <ToolDock />
-      <BodyPanel />
-      <DrugDrawer />
-      <ReceptorPanel />
-      <EndocrinePanel />
-      <LabPanel />
-      <BloodContents />
-      <ProcedurePanel />
-
       {!firstRunAccepted && <FirstRunModal />}
-
-      {/* Permanently visible, not dismissible (spec 10.1). */}
-      <footer className={styles.disclaimer}>
-        <strong>NOT FOR CLINICAL USE {'—'} EDUCATIONAL SIMULATION</strong>
-        <a href="docs/MODEL_LIMITATIONS.md" target="_blank" rel="noreferrer">
-          Model limitations
-        </a>
-        {!sharedArrayBuffer && ready && (
-          <span className={styles.degraded} title="SharedArrayBuffer is unavailable, so waveforms arrive in 50 ms bursts instead of continuously. See docs/MODEL_LIMITATIONS.md.">
-            degraded waveform transport
-          </span>
-        )}
-      </footer>
     </div>
   );
 }

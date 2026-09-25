@@ -1,15 +1,29 @@
-/* Bottom dock, two clusters, respecting the safe area (spec 8.3). */
-
+/*
+ * The tool dock, two clusters. It used to float absolutely at the bottom of the whole
+ * screen, which is what let an open sheet land on top of it. It now lives in the shell's
+ * reserved bottom bar as an ordinary flex row, so it has dedicated space that nothing
+ * else can occupy.
+ */
 .dock {
-  position: absolute;
-  left: var(--inset-hud);
-  right: var(--inset-hud);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  width: 100%;
   pointer-events: none;
-  z-index: 20;
+  /* Now that there are more tools, a very narrow phone cannot show them all on one row.
+     Rather than wrap — which would grow the bottom bar and let the drawer reach the
+     dock again — the row scrolls sideways, keeping the bar a fixed, predictable height. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.dock::-webkit-scrollbar {
+  display: none;
+}
+
+.cluster {
+  flex: none;
 }
 
 .cluster {

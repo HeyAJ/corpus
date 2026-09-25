@@ -9,14 +9,25 @@ import * as THREE from 'three';
  * thorax reads as the same size as it would at chest height. A default 50 deg FOV
  * looks immediately wrong and no amount of shader work rescues it.
  *
- * The polar range is constrained to the front hemisphere (+/-35 deg). That is not a
- * usability compromise: the flat, unlit material and the exploded stack only read
- * correctly from the front, and letting the user get underneath the body would show
- * them the inside of a hollow shell.
+ * AZIMUTH IS NOW FREE, 360 degrees. The rig was originally penned into a +/-35 deg
+ * front arc on the argument that the flat, unlit material only reads correctly from
+ * the front. That is true — from directly behind, the exploded stack of hollow shells
+ * is plainly a set of hollow shells — but it was the wrong trade: people reach for a
+ * 3D body expecting to turn it over, and a body that refuses to rotate reads as broken
+ * long before it reads as tastefully constrained. So azimuth WRAPS rather than clamps:
+ * you can spin all the way round and keep going, with no wall to hit at the back. The
+ * back view being less flattering than the front is an accepted cost of that freedom.
+ *
+ * POLAR IS OPENED to a generous 15..165 deg — nearly pole to pole — so you can look
+ * down onto the shoulders or up from below the pelvis, while still stopping short of
+ * the singularities at 0 and 180 where the up-vector flips and the camera rolls. That
+ * band is the one real constraint left, and it is a numerical one, not an aesthetic one.
  *
  * Damped orbit is hand-rolled rather than three's OrbitControls because the focus
  * animation needs to drive the same target the user is dragging, and fighting
- * OrbitControls for ownership of that is more code than owning it outright.
+ * OrbitControls for ownership of that is more code than owning it outright. The same
+ * damped path serves the mouse and the touch handlers in Viewer, so a one-finger drag
+ * and a click-drag feel identical.
  */
 
 export interface OrbitLimits {
@@ -34,11 +45,16 @@ const DEG = Math.PI / 180;
 export const BODY_FRAMING_RADIUS = 0.40;
 
 export const DEFAULT_LIMITS: OrbitLimits = {
-  minAzimuth: -35 * DEG,
-  maxAzimuth: 35 * DEG,
-  // Polar measured from +Y. 90 deg is level with the target.
-  minPolar: 58 * DEG,
-  maxPolar: 122 * DEG,
+  // Azimuth is WRAPPED, not clamped (see the header and update()), so these bounds
+  // describe the full turn rather than a fence. They are kept in the struct so the
+  // interface stays uniform and a future caller could re-fence a single axis.
+  minAzimuth: -Math.PI,
+  maxAzimuth: Math.PI,
+  // Polar measured from +Y. 90 deg is level with the target. Opened almost pole to
+  // pole; the 15 deg margin at each end keeps the camera clear of the gimbal
+  // singularity where lookAt's up-vector flips and the view rolls.
+  minPolar: 15 * DEG,
+  maxPolar: 165 * DEG,
   minDistance: 0.45,
   maxDistance: 3.6,
 };
@@ -130,7 +146,9 @@ export class OrbitRig {
     this.polarVel *= decay;
     this.distanceVel *= decay;
 
-    this.azimuth = THREE.MathUtils.clamp(this.azimuth, this.limits.minAzimuth, this.limits.maxAzimuth);
+    // Azimuth WRAPS into (-pi, pi] so the body turns all the way round with no wall at
+    // the back; polar and distance still clamp, because those bounds are real.
+    this.azimuth = ((this.azimuth + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
     this.polar = THREE.MathUtils.clamp(this.polar, this.limits.minPolar, this.limits.maxPolar);
     this.distance = THREE.MathUtils.clamp(this.distance, this.limits.minDistance, this.limits.maxDistance);
 

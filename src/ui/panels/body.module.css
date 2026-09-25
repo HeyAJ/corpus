@@ -1,18 +1,11 @@
 .panel {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 74px);
-  width: min(360px, calc(100vw - 32px));
-  max-height: 64vh;
-  overflow-y: auto;
+  width: 100%;
   background: var(--sheet-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-radius: var(--radius-card);
   padding: 16px;
-  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.14);
-  z-index: 26;
+  pointer-events: auto;
 }
 
 .title {

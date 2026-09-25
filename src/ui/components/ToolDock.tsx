@@ -162,6 +162,66 @@ function Tube({ filled }: { filled: boolean }) {
   );
 }
 
+/** Diverging bars: the impact panel — what your actions are doing to the body. */
+function Impact({ filled }: { filled: boolean }) {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <line x1="12" y1="3.5" x2="12" y2="20.5" stroke="#1a1a1a" strokeWidth="1.4" strokeLinecap="round" opacity="0.5" />
+      <g fill={filled ? '#1a1a1a' : 'none'} stroke="#1a1a1a" strokeWidth="1.5" strokeLinejoin="round">
+        <rect x="12" y="5" width="6.5" height="3.4" rx="1" />
+        <rect x="6" y="10" width="6" height="3.4" rx="1" />
+        <rect x="12" y="15" width="4.5" height="3.4" rx="1" />
+      </g>
+    </svg>
+  );
+}
+
+/** A mountain under a sun: the environment panel — altitude, temperature, oxygen. */
+function Mountain({ filled }: { filled: boolean }) {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="17.5" cy="6" r="2.2" fill={filled ? '#1a1a1a' : 'none'} stroke="#1a1a1a" strokeWidth="1.4" />
+      <path
+        d="M3 19.5 9 9l3.6 5.6 2-3.1L20.8 19.5Z"
+        fill={filled ? '#1a1a1a' : 'none'}
+        stroke="#1a1a1a"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** A microbe: the infection panel. */
+function Microbe({ filled }: { filled: boolean }) {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <g stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round">
+        <line x1="12" y1="2.5" x2="12" y2="5" />
+        <line x1="12" y1="19" x2="12" y2="21.5" />
+        <line x1="2.5" y1="12" x2="5" y2="12" />
+        <line x1="19" y1="12" x2="21.5" y2="12" />
+        <line x1="5.5" y1="5.5" x2="7.3" y2="7.3" />
+        <line x1="16.7" y1="16.7" x2="18.5" y2="18.5" />
+        <line x1="18.5" y1="5.5" x2="16.7" y2="7.3" />
+        <line x1="7.3" y1="16.7" x2="5.5" y2="18.5" />
+      </g>
+      <circle cx="12" cy="12" r="5" fill={filled ? '#1a1a1a' : 'none'} stroke="#1a1a1a" strokeWidth="1.6" />
+      {filled ? (
+        <g fill="#fff">
+          <circle cx="10.4" cy="11" r="0.9" />
+          <circle cx="13.4" cy="13.2" r="0.9" />
+        </g>
+      ) : (
+        <g fill="#1a1a1a">
+          <circle cx="10.4" cy="11" r="0.9" />
+          <circle cx="13.4" cy="13.2" r="0.9" />
+        </g>
+      )}
+    </svg>
+  );
+}
+
 export function ToolDock() {
   const audio = useVitalsAudio();
   const tool = useStore((s) => s.tool);
@@ -175,6 +235,12 @@ export function ToolDock() {
   const togglePhysiology = useStore((s) => s.togglePhysiologyPanel);
   const physiologyOpen = useStore((s) => s.physiologyPanelOpen);
   const labOpen = useStore((s) => s.labPanelOpen);
+  const toggleImpact = useStore((s) => s.toggleImpactPanel);
+  const impactOpen = useStore((s) => s.impactPanelOpen);
+  const toggleEnvironment = useStore((s) => s.toggleEnvironmentPanel);
+  const environmentOpen = useStore((s) => s.environmentPanelOpen);
+  const toggleInfection = useStore((s) => s.toggleInfectionPanel);
+  const infectionOpen = useStore((s) => s.infectionPanelOpen);
   const toggleVascular = useStore((s) => s.toggleVascular);
   const vascularOn = useStore((s) => s.vascularVisible);
   const drawerOpen = useStore((s) => s.drawerOpen);
@@ -216,6 +282,13 @@ export function ToolDock() {
           <Tube filled={labOpen} />
         </DockButton>
         {/*
+          The impact panel: the single most useful readout for WHY a vital sign moved.
+          It sits with the readouts, because that is what it is — the effect bus, read.
+        */}
+        <DockButton label="Impact — what your actions are doing to the body" active={impactOpen} onClick={toggleImpact}>
+          <Impact filled={impactOpen} />
+        </DockButton>
+        {/*
           Sound is OFF until asked for, and the button is the gesture that starts it:
           browsers refuse an AudioContext without one, and a page that starts beeping at
           you unprompted is a page you close.
@@ -243,6 +316,17 @@ export function ToolDock() {
           onClick={togglePhysiology}
         >
           <Runner filled={physiologyOpen} />
+        </DockButton>
+        {/*
+          Environment and infection are interventions — they change the world around the
+          body or introduce a pathogen into it — so they sit with the body, procedure and
+          syringe rather than with the readouts.
+        */}
+        <DockButton label="Environment — temperature, altitude, oxygen, posture, fluid" active={environmentOpen} onClick={toggleEnvironment}>
+          <Mountain filled={environmentOpen} />
+        </DockButton>
+        <DockButton label="Infection — inoculate, watch and clear" active={infectionOpen} onClick={toggleInfection}>
+          <Microbe filled={infectionOpen} />
         </DockButton>
         <DockButton label="Body configuration" active={tool === 'body'} onClick={() => pick('body')}>
           <Person filled={tool === 'body'} />

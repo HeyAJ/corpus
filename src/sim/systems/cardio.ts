@@ -2,6 +2,8 @@ import { P } from '../core/constants';
 import type { CardioState, SimState } from '../core/state';
 import type { Rng } from '../core/rng';
 import { effect } from '../core/effects';
+import { myocardialContractilityFactor, sinusHypoxiaFactor } from './myocardium';
+import { B } from './activity';
 
 /**
  * CARDIOVASCULAR SYSTEM — closed-loop lumped-parameter circuit (spec 4.2).
@@ -143,7 +145,12 @@ export function stepCardio(s: SimState, dt: number, rng: Rng): void {
   const venousTransmission = P('arrest.cprVenousTransmission');
 
   // Drug/receptor modulation, read once per tick from the effect accumulator.
-  const inotropy = c.contractilityScale * (1 + effect(s, 'cardio.contractility'));
+  // Myocardial oxygen supply and acidaemia scale contractility on top of every drug
+  // and reflex effect. At full supply and a normal pH this is exactly 1, so a well
+  // perfused heart is unchanged; a hypoxic or acidaemic one weakens, which is the
+  // pump failure of an arrest and of severe shock. See systems/myocardium.ts.
+  const oxygenAcid = myocardialContractilityFactor(s);
+  const inotropy = c.contractilityScale * (1 + effect(s, 'cardio.contractility')) * oxygenAcid;
   const svr = c.svrScale * (1 + effect(s, 'cardio.systemicResistance'));
   const venousTone = c.venousToneScale;
 
@@ -188,7 +195,12 @@ export function stepCardio(s: SimState, dt: number, rng: Rng): void {
 
     c.aorta.P = (c.aorta.V - c.aorta.V0) / c.aorta.C + pExt * arterialTransmission;
     const vuVein = P('cardio.venous.unstressedVolume_mL') * venousTone * (1 - effect(s, 'cardio.venousTone')) -
-      P('baroreflex.gainVenousTone_mL') * (s.reflex.symp - 0.5) * 2;
+      P('baroreflex.gainVenousTone_mL') * (s.reflex.symp - 0.5) * 2 +
+      // Blood gravity holds in the dependent veins on standing is blood not returning
+      // to the heart: it acts exactly as extra unstressed venous volume. The reflex
+      // answers it, so an intact baroreflex barely moves the pressure and an impaired
+      // one faints. See systems/environment.ts.
+      s.environment.pooled_mL;
     c.veins.V0 = vuVein;
     c.veins.P = Math.max(0, (c.veins.V - vuVein) / c.veins.C) + pExt * venousTransmission;
     c.pulmArt.P = (c.pulmArt.V - c.pulmArt.V0) / c.pulmArt.C + pExt;
@@ -432,14 +444,32 @@ function updateRate(s: SimState, _rng: Rng): void {
   const gs = P('baroreflex.gainHR_sym_bpm');
   const gv = P('baroreflex.gainHR_vagal_bpm');
 
-  const reflexHr = rest + gs * (s.reflex.symp - 0.5) * 2 - gv * (s.reflex.vagal - 0.5) * 2;
+  // Central command subsumes the baroreflex's chronotropy during exercise, so the reflex
+  // heart-rate deviation is attenuated in proportion to exertion (behaviour.json / Fadel
+  // 2008). Otherwise the direct Karvonen exercise term below multiplies a reflex that is
+  // itself racing to defend the exercising pressure, and the two stack past 240 bpm.
+  const centralCommand = 1 - B('exercise.centralCommandReflexAttenuation') * s.activity.exertion;
+  const reflexHr = rest + (gs * (s.reflex.symp - 0.5) * 2 - gv * (s.reflex.vagal - 0.5) * 2) * centralCommand;
 
   // Direct drug chronotropy on top of the reflex (beta-1 agonism, muscarinic block,
   // adenosine-mediated AV nodal effects, ...).
   let hr = reflexHr * c.chronotropicScale * (1 + effect(s, 'cardio.heartRate')) + c.hrOffset;
 
-  // Hyperkalaemia slows conduction and, at high levels, the sinus node itself.
-  if (s.chem.k > 6.0) hr *= Math.max(0.35, 1 - (s.chem.k - 6.0) * 0.18);
+  // Hyperkalaemia slows conduction and, at high levels, the sinus node itself. IONISED
+  // CALCIUM ANTAGONISES IT at the membrane - it raises the threshold potential back away
+  // from the resting potential that hyperkalaemia has depolarised - which is why IV
+  // calcium is the first drug given for a hyperkalaemic arrest and why it works within
+  // minutes without changing the potassium at all. Modelled as calcium reducing the
+  // EFFECTIVE potassium excess: a normal ionised calcium leaves it unchanged, a high one
+  // blunts it, a low one worsens it.
+  const caFactor = Math.max(0.4, Math.min(1.6, P('blood.caIonised_mmol_per_L') / Math.max(0.2, s.chem.ca)));
+  const kExcess = Math.max(0, s.chem.k - 6.0) * caFactor;
+  if (kExcess > 0) hr *= Math.max(0.35, 1 - kExcess * 0.18);
+
+  // HYPOXIC BRADYCARDIA. A myocardium short of oxygen slows its own pacemaker; this is
+  // the falling heart rate of an asphyxial arrest, before the rhythm degenerates to
+  // PEA. At full oxygen supply the factor is 1 and nothing changes. See myocardium.ts.
+  hr *= sinusHypoxiaFactor(s);
 
   // --- atrioventricular conduction ----------------------------------------
   //
@@ -489,10 +519,24 @@ function updateRate(s: SimState, _rng: Rng): void {
   }
 }
 
-/** Add or remove circulating volume. Fluids and haemorrhage both land in the veins. */
+/**
+ * Add or remove circulating volume. Fluids and haemorrhage both land in the veins.
+ *
+ * ISOTONIC BY DEFAULT, and this is the fix for a serious bug. `rebalanceElectrolytes`
+ * concentrates every serum solute by the fractional change in blood volume - which is
+ * right for a free-water shift and completely wrong for whole blood. Every caller of
+ * this function moves ISOTONIC fluid: whole blood (a haemorrhage), normal saline, a
+ * transfusion. Losing a litre of whole blood removes plasma and its dissolved sodium in
+ * the same proportion, so the serum sodium does not budge - yet the blanket rebalance
+ * was driving it from 142 to 161 within one tick of a 1.5 L bleed. The volume moved here
+ * is therefore tagged isotonic and excluded from the concentration step; only the water
+ * fluxes that reach the veins directly (gut water absorption, urine, insensible loss,
+ * transcapillary refill) move the concentrations, which is exactly the set that should.
+ */
 export function addVolume(c: CardioState, mL: number): void {
   c.veins.V = Math.max(50, c.veins.V + mL);
   c.targetBloodVolume = Math.max(500, c.targetBloodVolume + mL);
+  c.isotonicDelta_mL += mL;
 }
 
 /**

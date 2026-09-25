@@ -94,6 +94,7 @@ export const REGISTRY: RegistryEntry[] = [
       fx('renal.vascularResistance', 0.55, 'GH14', 'Afferent arteriolar constriction; enough of it drops renal plasma flow.'),
       fx('cardio.contractility', 0.15, 'GG14', 'Weak positive inotropy in human myocardium; minor next to beta-1.'),
       fx('gi.motility', -0.25, 'RANG10', 'Sphincter contraction with reduced propulsive activity.'),
+      fx('neuro.pupilDiameter', 0.4, 'GH14', 'Radial dilator pupillae contraction: sympathetic mydriasis. Why a sympathomimetic toxidrome has wide pupils and why phenylephrine is used to dilate them.'),
     ],
     notes: 'Gq-coupled. Modelled as the combined α1A/B/D response; the subtypes are not separated because no drug in the set discriminates them meaningfully.',
   },
@@ -214,6 +215,7 @@ export const REGISTRY: RegistryEntry[] = [
       fx('gi.motility', 0.70, 'GH14', 'Smooth-muscle contraction and propulsive peristalsis.'),
       fx('gi.acidSecretion', 0.65, 'GH14', 'Direct parietal-cell stimulation plus ECL histamine release.'),
       fx('resp.tidalVolume', -0.30, 'GG14', 'Bronchoconstriction raises airway resistance.'),
+      fx('neuro.pupilDiameter', -0.8, 'GH14', 'Circular sphincter pupillae contraction under parasympathetic (oculomotor) tone. Written for the ACTIVATED receptor, so blockade removes the resting tone and the pupil DILATES: the mydriasis of atropine and of the anticholinergic toxidrome.'),
     ],
     notes: 'Gq-coupled.',
   },
@@ -379,8 +381,38 @@ export const REGISTRY: RegistryEntry[] = [
     activationModel: 'endogenous-agonist',
     effects: [
       fx('neuro.analgesia', 1.0, 'GG14', 'Spinal and supraspinal antinociception.'),
-      fx('resp.drive', -0.85, 'GG14', 'Reduced sensitivity of the medullary chemoreceptors to CO2 — the mechanism of opioid death.'),
+      {
+        target: 'resp.drive',
+        gain: -1.0,
+        // RAISED FROM -0.85. At -0.85 a saturating mu agonist could depress central
+        // respiratory drive by only 85%, leaving a residual the chemoreflex always
+        // rescued: a behavioural sweep found fentanyl at the 10x multiplier plateauing
+        // at a respiratory rate of 11 and SpO2 95%, when the defining lethal event of
+        // opioid pharmacology is APNOEA — the abolition of respiratory rhythm, not its
+        // attenuation. Saturating mu agonism silences the pre-Botzinger rhythm
+        // generator outright, and the gain has to be able to reach that floor.
+        source: 'Pattinson KTS. Opioids and the control of respiration. Br J Anaesth 100(6):747-758, 2008.',
+        sourceUrl: 'https://doi.org/10.1093/bja/aen094',
+        note:
+          'Reduced sensitivity of the medullary chemoreceptors to CO2 AND depression of '
+          + 'the pre-Botzinger rhythm generator: at full occupancy the two together abolish '
+          + 'respiratory rhythm, which is the mechanism of opioid death and must be reachable, '
+          + 'not merely approached.',
+      },
       fx('neuro.sedation', 0.55, 'GG14', 'Dose-dependent depression of consciousness.'),
+      {
+        target: 'neuro.pupilDiameter',
+        gain: -0.55,
+        // Pinpoint pupils are THE bedside sign of opioid toxicity, and until the pupil had a
+        // consumer (sim/systems/mind.ts) nothing needed this entry. At full activation it
+        // takes a 3.5 mm resting pupil to about 1.6 mm, the pinpoint range.
+        source: 'Knaggs RD, Crighton IM, Cobby TF, Fletcher AJ, Hobbs GJ. The pupillary effects of intravenous morphine, codeine, and tramadol in volunteers. Anesth Analg 99(1):108-112, 2004.',
+        sourceUrl: 'https://doi.org/10.1213/01.ANE.0000116924.16535.BA',
+        note:
+          'Miosis via disinhibition of the Edinger-Westphal nucleus: mu agonism removes the '
+          + 'GABAergic brake on the parasympathetic pupilloconstrictor outflow. Tolerance to it '
+          + 'develops little, which is why it persists as a sign in chronic users.',
+      },
       fx('gi.motility', -0.75, 'GG14', 'Enteric μ receptors suppress propulsive peristalsis.'),
       fx('cardio.heartRate', -0.20, 'GG14', 'Central vagal predominance.'),
     ],
@@ -480,6 +512,7 @@ export const REGISTRY: RegistryEntry[] = [
       fx('cardio.heartRate', 0.55, 'GG14', 'Raised synaptic noradrenaline at cardiac sympathetic terminals.'),
       fx('cardio.systemicResistance', 0.50, 'GG14', 'Raised noradrenaline at vascular α1.'),
       fx('neuro.arousal', 0.45, 'RANG10', 'Cortical noradrenergic tone.'),
+      fx('neuro.pupilDiameter', 0.35, 'GH14', 'Raised noradrenaline at the iris dilator: the wide pupils of the sympathomimetic toxidrome (cocaine, amfetamines), the sign that separates it from the pinpoint pupils of opioid toxicity.'),
     ],
     notes: 'Same transporter semantics as DAT.',
   },

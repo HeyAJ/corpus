@@ -221,7 +221,9 @@ function buildDrug(
     ? buildTargets(m, gtopdb, receptorKeys, unmapped)
     : [];
 
-  if (m.gtopdbLigand && targets.length === 0) {
+  appendLiteratureTargets(m, targets);
+
+  if (m.gtopdbLigand && targets.length === 0 && (m.literatureTargets?.length ?? 0) === 0) {
     // An empty target list has two very different causes, and reporting them
     // identically made a deliberate modelling decision look like a pipeline failure.
     // Distinguish them: GtoPdb having nothing to say is an upstream gap; the
@@ -304,6 +306,8 @@ function buildDrug(
       sourceUrl: d.sourceUrl,
     })),
     ...(m.payload ? { payload: m.payload } : {}),
+    ...(m.hormoneAnalogue ? { hormoneAnalogue: m.hormoneAnalogue } : {}),
+    ...(m.antimicrobial ? { antimicrobial: m.antimicrobial } : {}),
     notes: m.notes,
     sources: [...sources].sort(),
   };
@@ -431,6 +435,39 @@ function buildTargets(
   return out;
 }
 
+/** Set of receptor ids the registry actually carries; a literature target for anything else is a mistake. */
+const KNOWN_RECEPTOR_IDS = new Set(REGISTRY.map((r) => r.id));
+
+/**
+ * Append CITED LITERATURE affinities for targets GtoPdb has no human row for. A GtoPdb
+ * row always wins: a literature target for a receptor already built from GtoPdb is
+ * dropped, never duplicated, so the automatic source stays authoritative wherever it
+ * has something to say. See ManifestEntry.literatureTargets.
+ */
+function appendLiteratureTargets(m: ManifestEntry, targets: DrugTarget[]): void {
+  if (!m.literatureTargets?.length) return;
+  const present = new Set(targets.map((t) => t.receptorId));
+  for (const lt of m.literatureTargets) {
+    if (!KNOWN_RECEPTOR_IDS.has(lt.receptorId)) {
+      throw new Error(`${m.id}: literatureTarget names receptor "${lt.receptorId}", which the registry does not carry.`);
+    }
+    if (present.has(lt.receptorId)) continue; // GtoPdb already covered it; do not double-count.
+    if (!(lt.Ki_nM > 0)) throw new Error(`${m.id}: literatureTarget for ${lt.receptorId} has no positive Ki.`);
+    targets.push({
+      receptorId: lt.receptorId,
+      Ki_nM: lt.Ki_nM,
+      intrinsicActivity: lt.intrinsicActivity,
+      kon: null,
+      koff: null,
+      source: `Curated literature affinity (NOT from GtoPdb, which has no human row for this pair): ${lt.source}. ${lt.note}`,
+      sourceUrl: lt.sourceUrl,
+      confidence: lt.confidence ?? 'measured',
+    });
+    present.add(lt.receptorId);
+  }
+  targets.sort((a, b) => (a.Ki_nM ?? Infinity) - (b.Ki_nM ?? Infinity));
+}
+
 function buildPk(
   m: ManifestEntry,
   lit: PkLiteratureEntry | undefined,
@@ -518,6 +555,15 @@ function buildPk(
     // Without descriptors we cannot say whether the drug reaches the brain, so central
     // receptor effects are left at full strength rather than silently suppressed.
     missing.push({ drugId: m.id, field: 'bbbPenetration', reason: 'No physicochemical descriptors in PubChem or the Pulse substance table, so central versus peripheral receptor access cannot be distinguished. Central effects are applied in full, which may overstate the central action of a hydrophilic drug.' });
+  }
+
+  // A CITED override of the computed penetration, for a drug the passive-permeability
+  // rule scores wrongly because it cannot see active efflux or a permanent charge.
+  // Applied last so it beats whatever PubChem or Pulse produced above, and it carries
+  // its own citation. See ManifestEntry.bbbPenetration.
+  if (m.bbbPenetration) {
+    pk.bbbPenetration = m.bbbPenetration.value;
+    cite('bbbPenetration', m.bbbPenetration.source, m.bbbPenetration.sourceUrl, 'derived', m.bbbPenetration.note);
   }
 
   /* --- protein binding ----------------------------------------------------- */

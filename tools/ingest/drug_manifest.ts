@@ -1,4 +1,4 @@
-import type { DrugClass, PresetDose } from '../../src/data/pharma-types';
+import type { Drug, DrugClass, PresetDose } from '../../src/data/pharma-types';
 import type { Route } from '../../src/bridge/types';
 
 /**
@@ -85,6 +85,48 @@ export interface ManifestEntry {
   /** Why this compound is modelled, shown alongside it. Required when `scheduled`. */
   scheduleNote?: string;
 
+  /**
+   * A receptor affinity taken from PUBLISHED LITERATURE, for a target this model
+   * carries but GtoPdb has no human row for.
+   *
+   * GtoPdb is the only source for the receptor route, and correctly so — but it is not
+   * complete, and a handful of clinically load-bearing affinities are simply not in it:
+   * haloperidol's hERG block, a tricyclic's cardiac sodium-channel block, dopamine's
+   * indirect action at the noradrenaline transporter. Left to GtoPdb alone those drugs'
+   * notes promised a mechanism the data did not carry, which Rule 1 forbids in the other
+   * direction — the prose asserting a number that is not there.
+   *
+   * So this is the same instrument as a curated intrinsic activity or a cited direct
+   * effect: a PUBLISHED, CITED measurement, written where it can be checked, filling a
+   * gap the automatic source left. Each entry carries the paper it comes from, the
+   * emitted target's `source` says the affinity is curated from literature and NOT from
+   * GtoPdb, and a target GtoPdb DOES publish always wins — a literature target for a
+   * receptor already built from GtoPdb is dropped rather than duplicated. The
+   * `intrinsicActivity` follows the target's activationModel exactly as a GtoPdb one
+   * does (a direction for an enzyme/channel/transporter, an efficacy for a receptor).
+   */
+  literatureTargets?: {
+    receptorId: string;
+    Ki_nM: number;
+    intrinsicActivity: number;
+    source: string;
+    sourceUrl: string;
+    confidence?: 'measured' | 'derived' | 'assumed';
+    note: string;
+  }[];
+
+  /**
+   * A CITED override of the computed blood-brain-barrier penetration.
+   *
+   * bbbPenetration is normally derived from PubChem descriptors by a passive-permeability
+   * rule (fetch_pubchem.bbbPenetrationFrom). That rule cannot see active efflux or a
+   * permanent charge, so it scores a P-glycoprotein substrate (loratadine) or a
+   * quaternary ammonium (ipratropium) as freely brain-penetrant when neither is — which
+   * would hand a non-sedating antihistamine full central H1 blockade. This override
+   * replaces the computed value with a published one and says why in the note.
+   */
+  bbbPenetration?: { value: number; source: string; sourceUrl: string; note: string };
+
   /** Effects that are not receptor-mediated (channel block, osmotic load...). */
   directEffects?: { target: string; gain: number; note: string; source: string; sourceUrl: string }[];
 
@@ -95,7 +137,17 @@ export interface ManifestEntry {
     ca_mmol?: number;
     cl_mEq?: number;
     iron_mg?: number;
+    /** Grams of glucose per preset unit (dextrose). */
+    glucose_g?: number;
+    /** mEq bicarbonate per preset unit (sodium bicarbonate). */
+    hco3_mEq?: number;
   };
+
+  /** The drug IS a hormone: its plasma level adds to the endogenous pool. See pharma-types.ts. */
+  hormoneAnalogue?: Drug['hormoneAnalogue'];
+
+  /** Activity against pathogens in src/data/pathogens.json. See pharma-types.ts. */
+  antimicrobial?: Drug['antimicrobial'];
 
   notes: string;
 }
@@ -153,8 +205,46 @@ export const MANIFEST: ManifestEntry[] = [
     pulseName: null,
     gtopdbLigand: 'dopamine',
     gtopdbAliases: [],
-    receptorAllowList: ['d1', 'd2', 'alpha1', 'beta1', 'dat', 'net'],
-    notes: 'Dose-dependent receptor recruitment: dopaminergic, then beta-1, then alpha-1. That progression falls out of the affinity ranking in the binding data, which is exactly why it is worth modelling with real affinities rather than three hard-coded dose bands.',
+    receptorAllowList: ['d1', 'd2', 'd3'],
+    // GtoPdb publishes dopamine's affinity at the five DOPAMINE receptors and NOWHERE
+    // ELSE — no adrenoceptor rows at all — so the allow-list entries for alpha1 and
+    // beta1 it used to carry silently produced nothing, and the drug's entire
+    // cardiovascular identity (the pressor and inotropic action that is the reason it is
+    // on an arrest trolley) was missing. That is Rule 1 failing in the quiet direction:
+    // the notes promised a dose-dependent adrenergic recruitment the data did not carry.
+    //
+    // Dopamine's clinical pressor at infusion doses is largely INDIRECT — it is a
+    // substrate for the noradrenaline transporter and displaces noradrenaline out of the
+    // sympathetic terminal — so that limb is modelled honestly through NET (and DAT) with
+    // the published uptake affinities, which raises synaptic noradrenaline and drives the
+    // chronotropy and vasoconstriction the NET effect vector already carries. The DIRECT
+    // beta-1 inotropy that the transporter vector does not carry is a cited direct effect,
+    // because GtoPdb has no dopamine beta-1 affinity to build it from.
+    literatureTargets: [
+      {
+        receptorId: 'net', Ki_nM: 700, intrinsicActivity: 1,
+        source: 'Eshleman AJ, et al. Characteristics of drug interactions with recombinant human dopamine, norepinephrine and serotonin transporters. J Pharmacol Exp Ther 289(2):877-885, 1999.',
+        sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/10215666/',
+        note: 'Dopamine is a SUBSTRATE of the noradrenaline transporter (uptake Km ~0.5-1 uM at the human NET), so it releases noradrenaline — the indirect sympathomimetic limb that is most of dopamine\'s pressor effect at clinical infusion rates. Direction +1 (releaser), as for the amfetamines.',
+      },
+      {
+        receptorId: 'dat', Ki_nM: 1200, intrinsicActivity: 1,
+        source: 'Eshleman AJ, et al. Characteristics of drug interactions with recombinant human dopamine, norepinephrine and serotonin transporters. J Pharmacol Exp Ther 289(2):877-885, 1999.',
+        sourceUrl: 'https://pubmed.ncbi.nlm.nih.gov/10215666/',
+        note: 'Dopamine is the endogenous substrate of its own transporter (uptake Km ~1-2 uM at the human DAT). It does not cross the blood-brain barrier, so the central DAT arousal is gated away by the physicochemical rule — which is the single most famous fact about the drug, reproduced rather than asserted.',
+      },
+    ],
+    targetsNote:
+      'GtoPdb has dopamine at the dopamine receptors only and at no adrenoceptor, so the '
+      + 'adrenergic cardiovascular action is carried two ways that ARE sourceable: the pressor '
+      + 'and chronotropic limb through the cited noradrenaline-transporter release (dopamine is '
+      + 'an NET substrate), and the direct beta-1 inotropy as a cited direct effect. The dose-'
+      + 'dependent recruitment is therefore emergent from affinity where the data supports it and '
+      + 'cited directly where it does not.',
+    directEffects: [
+      { target: 'cardio.contractility', gain: 0.5, note: 'Direct beta-1 positive inotropy. GtoPdb has no dopamine beta-1 affinity, and the NET-release limb above raises noradrenaline but the transporter effect vector carries chronotropy and vasoconstriction, not contractility — so the inotropy the label describes ("exerts an inotropic effect on the myocardium") is carried here directly.', ...dailymed('dopamine hydrochloride injection') },
+    ],
+    notes: 'Dose-dependent action: dopaminergic vasodilation low, then noradrenaline-mediated inotropy and chronotropy, then frank alpha-1 vasoconstriction high. In this model the dopaminergic receptors come from GtoPdb, the pressor/chronotropic limb from the cited NET/DAT release, and the direct inotropy from a cited direct effect — because GtoPdb carries dopamine at no adrenoceptor, and a number that is not there is not invented.',
   },
 
   /* -------------------------------------------------- antiarrhythmics */
@@ -431,7 +521,19 @@ export const MANIFEST: ManifestEntry[] = [
     gtopdbLigand: 'phenylephrine',
     gtopdbAliases: [],
     receptorAllowList: ['alpha1', 'alpha2'],
-    notes: 'A selective alpha-1 agonist. The reflex bradycardia it produces is not coded anywhere: it emerges because the baroreflex sees the pressure rise.',
+    // The alpha-1 BINDING affinity GtoPdb publishes for phenylephrine is weak — pKi 5.4
+    // at alpha1A, about 4000 nM — while its FUNCTIONAL EC50 in the same records is pEC50
+    // 8.3, three log units tighter. That gap is receptor reserve, and the pipeline takes
+    // the binding Ki over the functional EC50 by its ranking rule, so at 95% protein
+    // binding the modelled occupancy never clears the EC50 and a textbook selective
+    // pressor read almost inert. The occupancy is kept (it is real and correctly weak),
+    // and the pressor action the weak Ki cannot produce is carried by a cited direct
+    // effect anchored to the label — the same instrument used where a binding number and
+    // a functional number disagree.
+    directEffects: [
+      { target: 'cardio.systemicResistance', gain: 0.6, note: 'Selective alpha-1 arteriolar vasoconstriction: the pressor action of a pure alpha-1 agonist. Carried directly because phenylephrine\'s binding Ki (~4000 nM) sits three log units above its functional EC50 (receptor reserve), so the modelled occupancy alone understates a drug whose entire clinical use is raising the blood pressure. The reflex bradycardia remains emergent from the baroreflex seeing the rise.', ...dailymed('phenylephrine hydrochloride injection') },
+    ],
+    notes: 'A selective alpha-1 agonist and the textbook pure pressor. Its binding affinity is weak but its functional potency is not, because of receptor reserve, so the vasoconstriction is carried by a cited direct effect while the (correctly weak) alpha-1 occupancy still shows in the panel. The reflex bradycardia it produces is not coded anywhere: it emerges because the baroreflex sees the pressure rise.',
   },
   {
     id: 'albuterol',
@@ -474,5 +576,7 @@ export const MANIFEST_BY_ID = new Map(MANIFEST.map((m) => [m.id, m]));
  * than what could be named.
  */
 import { MANIFEST_2 } from './drug_manifest_2';
+import { MANIFEST_3 } from './drug_manifest_3';
 
 MANIFEST.push(...MANIFEST_2);
+MANIFEST.push(...MANIFEST_3);

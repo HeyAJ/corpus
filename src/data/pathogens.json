@@ -1,0 +1,223 @@
+{
+  "version": 1,
+  "about": "Pathogens the body can be inoculated with. Each is a coarse but sourced model of one infection: a replication rate, an immune-control rate, an incubation period, and an effect vector onto the SAME effect bus every drug and hormone uses, so a fever from influenza and a fever from a pyrogen arrive at thermal.heatProduction by one path and an antipyretic blunts both. The burden runs 0..1 relative to that pathogen's untreated peak; the dynamics are logistic growth checked by innate then adaptive immunity, which is the shape every acute self-limiting infection has. This is NOT a model of any individual's illness and carries the same NOT-FOR-CLINICAL-USE line as the rest of CORPUS. No transmission, no exposure routes, no anything a person could act on outside a simulator: a pathogen here is a set of rate constants and an effect vector.",
+  "sources": {
+    "MANDELL9": { "label": "Bennett JE, Dolin R, Blaser MJ (eds). Mandell, Douglas, and Bennett's Principles and Practice of Infectious Diseases, 9th ed. Elsevier, 2020.", "url": "https://www.elsevier.com/books/mandell-douglas-and-bennetts-principles-and-practice-of-infectious-diseases/bennett/978-0-323-48255-4" },
+    "BACCAM2006": { "label": "Baccam P, Beauchemin C, Macken CA, Hayden FG, Perelson AS. Kinetics of influenza A virus infection in humans. J Virol 80(15):7590-7599, 2006.", "url": "https://doi.org/10.1128/JVI.01623-05" },
+    "GONCALVES2020": { "label": "Goncalves A, et al. Timing of antiviral treatment initiation is critical to reduce SARS-CoV-2 viral load. CPT Pharmacometrics Syst Pharmacol 9(9):509-514, 2020.", "url": "https://doi.org/10.1002/psp4.12543" },
+    "WHO_CHOLERA": { "label": "World Health Organization. Cholera fact sheet, 2023 (incubation 12 h - 5 days; fluid loss up to 0.5-1 L/h in severe disease).", "url": "https://www.who.int/news-room/fact-sheets/detail/cholera" },
+    "WHO_MALARIA": { "label": "World Health Organization. Guidelines for malaria, 2023 (P. falciparum 48-hour erythrocytic cycle; incubation 7-30 days).", "url": "https://www.who.int/publications/i/item/guidelines-for-malaria" },
+    "SINGER2016": { "label": "Singer M, et al. The Third International Consensus Definitions for Sepsis and Septic Shock (Sepsis-3). JAMA 315(8):801-810, 2016.", "url": "https://doi.org/10.1001/jama.2016.0287" },
+    "WHO_HIV": { "label": "World Health Organization. HIV data and statistics; CD4 decline in untreated infection averages roughly 50-100 cells/uL per year, AIDS defined below 200 cells/uL.", "url": "https://www.who.int/data/gho/data/themes/hiv-aids" }
+  },
+  "pathogens": [
+    {
+      "id": "influenza_a",
+      "label": "Influenza A",
+      "kind": "virus",
+      "site": "respiratory tract",
+      "incubation_h": 48,
+      "growthRate_per_h": 0.35,
+      "innateControl_per_h": 0.05,
+      "adaptiveOnset_h": 96,
+      "adaptivePeakControl_per_h": 0.35,
+      "clearanceFloor": 0.001,
+      "lethalBurden": null,
+      "effects": [
+        { "target": "immune.inflammation", "gain": 0.55, "note": "Systemic cytokine response; the source of the fever, myalgia and prostration." },
+        { "target": "resp.shunt", "gain": 0.06, "note": "Viral pneumonitis: a small ventilation-perfusion mismatch at peak burden, larger in the minority who progress." },
+        { "target": "resp.cough", "gain": 0.7, "note": "Airway inflammation. Readout only in this model." }
+      ],
+      "source": "BACCAM2006",
+      "confidence": "derived",
+      "note": "Target-cell-limited influenza kinetics (Baccam 2006): peak viral load about 2-3 days after inoculation, cleared by 6-8 days as the adaptive response arrives. The rates here reproduce that time course as a normalised burden; they are not per-cell virological constants."
+    },
+    {
+      "id": "sars_cov_2",
+      "label": "SARS-CoV-2",
+      "kind": "virus",
+      "site": "respiratory tract",
+      "incubation_h": 120,
+      "growthRate_per_h": 0.22,
+      "innateControl_per_h": 0.03,
+      "adaptiveOnset_h": 168,
+      "adaptivePeakControl_per_h": 0.25,
+      "clearanceFloor": 0.001,
+      "lethalBurden": null,
+      "effects": [
+        { "target": "immune.inflammation", "gain": 0.6, "note": "The cytokine response that drives the fever and, in the severe minority, the systemic inflammatory picture." },
+        { "target": "resp.shunt", "gain": 0.12, "note": "Diffuse alveolar involvement: the hypoxaemia that is out of proportion to the work of breathing, which is the characteristic finding." },
+        { "target": "resp.cough", "gain": 0.6, "note": "Readout only." }
+      ],
+      "source": "GONCALVES2020",
+      "confidence": "derived",
+      "note": "Longer incubation and a slower rise than influenza (Goncalves 2020), with a larger pulmonary shunt so that hypoxaemia rather than airway obstruction is what the model shows. Normalised burden, not a per-cell viral load."
+    },
+    {
+      "id": "strep_pneumoniae",
+      "label": "Streptococcus pneumoniae (lobar pneumonia)",
+      "kind": "bacterium",
+      "site": "lung",
+      "incubation_h": 24,
+      "growthRate_per_h": 0.5,
+      "innateControl_per_h": 0.04,
+      "adaptiveOnset_h": 72,
+      "adaptivePeakControl_per_h": 0.2,
+      "clearanceFloor": 0.002,
+      "lethalBurden": 1.6,
+      "effects": [
+        { "target": "immune.inflammation", "gain": 0.9, "note": "A brisk, high acute-phase response: the rigors and high fever of lobar pneumonia and, at high burden, the systemic inflammatory response that defines sepsis." },
+        { "target": "resp.shunt", "gain": 0.28, "note": "A consolidated lobe is perfused but not ventilated - a true shunt - which is the hypoxaemia of pneumonia and the reason it responds only partly to oxygen." },
+        { "target": "resp.cough", "gain": 0.8, "note": "Readout only." }
+      ],
+      "source": "MANDELL9",
+      "confidence": "derived",
+      "note": "Fast bacterial growth checked poorly by innate immunity alone, so that without antibiotics the burden climbs into the range that produces septic shock. The lethal burden is where the modelled physiology (shunt plus distributive shock) becomes unsurvivable; it is a modelling landmark, not an epidemiological figure."
+    },
+    {
+      "id": "e_coli",
+      "label": "Escherichia coli (urosepsis / Gram-negative sepsis)",
+      "kind": "bacterium",
+      "site": "bloodstream",
+      "incubation_h": 12,
+      "growthRate_per_h": 0.55,
+      "innateControl_per_h": 0.04,
+      "adaptiveOnset_h": 72,
+      "adaptivePeakControl_per_h": 0.18,
+      "clearanceFloor": 0.002,
+      "lethalBurden": 1.5,
+      "effects": [
+        { "target": "immune.inflammation", "gain": 1.0, "note": "Endotoxin (lipopolysaccharide) drives the most florid distributive response of any organism here: the warm, vasodilated, tachycardic picture of early Gram-negative sepsis." },
+        { "target": "vascular.permeability", "gain": 1.0, "note": "Capillary leak: the intravascular volume loss that turns sepsis into septic shock." },
+        { "target": "cardio.contractility", "gain": -0.25, "note": "Septic cardiomyopathy: myocardial depression by circulating mediators, on top of the vasodilation." }
+      ],
+      "source": "SINGER2016",
+      "confidence": "derived",
+      "note": "A bloodstream infection with no shunt but the strongest distributive and capillary-leak vector, so it presents as shock rather than as hypoxaemia. Sepsis-3 defines the organ dysfunction the model reproduces through those targets."
+    },
+    {
+      "id": "staph_aureus",
+      "label": "Staphylococcus aureus (MSSA bacteraemia)",
+      "kind": "bacterium",
+      "site": "bloodstream",
+      "incubation_h": 24,
+      "growthRate_per_h": 0.45,
+      "innateControl_per_h": 0.05,
+      "adaptiveOnset_h": 96,
+      "adaptivePeakControl_per_h": 0.18,
+      "clearanceFloor": 0.002,
+      "lethalBurden": 1.6,
+      "effects": [
+        { "target": "immune.inflammation", "gain": 0.85, "note": "Systemic sepsis response." },
+        { "target": "vascular.permeability", "gain": 0.6, "note": "Capillary leak, less florid than the Gram-negative endotoxin response." },
+        { "target": "blood.plateletCount", "gain": -0.3, "note": "Consumptive fall in platelets in established sepsis." }
+      ],
+      "source": "MANDELL9",
+      "confidence": "derived",
+      "note": "Methicillin-susceptible S. aureus, chosen so a beta-lactam is effective against it in the antimicrobial model and MRSA-active drugs are the contrast."
+    },
+    {
+      "id": "vibrio_cholerae",
+      "label": "Vibrio cholerae (cholera)",
+      "kind": "bacterium",
+      "site": "gut lumen",
+      "incubation_h": 24,
+      "growthRate_per_h": 0.5,
+      "innateControl_per_h": 0.06,
+      "adaptiveOnset_h": 72,
+      "adaptivePeakControl_per_h": 0.3,
+      "clearanceFloor": 0.002,
+      "lethalBurden": null,
+      "effects": [
+        { "target": "gi.diarrhoea_mL_per_min", "gain": 12, "note": "Cholera toxin locks intestinal adenylate cyclase on, and the gut secretes isotonic fluid at up to 0.5-1 L/h. This is an ABSOLUTE rate in mL/min (the target name says so), scaled by burden. It is the whole disease: everything lethal about cholera is the volume and electrolyte loss, which the fluid and electrolyte model already answers." },
+        { "target": "immune.inflammation", "gain": 0.1, "note": "A non-inflammatory toxin-mediated diarrhoea; the fever is slight, which is diagnostic." }
+      ],
+      "source": "WHO_CHOLERA",
+      "confidence": "derived",
+      "note": "Modelled almost entirely as a fluid-loss rate, because that is what it is clinically: rehydration cures it and its absence kills within hours. The diarrhoea target feeds the fluid balance in fluids.ts with a stool electrolyte composition."
+    },
+    {
+      "id": "norovirus",
+      "label": "Norovirus (viral gastroenteritis)",
+      "kind": "virus",
+      "site": "gut",
+      "incubation_h": 24,
+      "growthRate_per_h": 0.6,
+      "innateControl_per_h": 0.08,
+      "adaptiveOnset_h": 48,
+      "adaptivePeakControl_per_h": 0.5,
+      "clearanceFloor": 0.002,
+      "lethalBurden": null,
+      "effects": [
+        { "target": "gi.nausea", "gain": 0.8, "note": "The prominent nausea and vomiting; feeds the vomiting model in mind.ts, which loses gastric acid and fluid." },
+        { "target": "gi.diarrhoea_mL_per_min", "gain": 3, "note": "A moderate secretory and osmotic diarrhoea, far less than cholera." },
+        { "target": "immune.inflammation", "gain": 0.25, "note": "A brief low-grade febrile response." }
+      ],
+      "source": "MANDELL9",
+      "confidence": "derived",
+      "note": "A short, sharp, self-limiting illness: fast growth, fast adaptive control, cleared in 2-3 days. It is here as the mild counterpart to cholera and as the model's route to vomiting-driven fluid and acid loss."
+    },
+    {
+      "id": "dengue",
+      "label": "Dengue virus",
+      "kind": "virus",
+      "site": "bloodstream",
+      "incubation_h": 120,
+      "growthRate_per_h": 0.3,
+      "innateControl_per_h": 0.04,
+      "adaptiveOnset_h": 120,
+      "adaptivePeakControl_per_h": 0.4,
+      "clearanceFloor": 0.002,
+      "lethalBurden": null,
+      "effects": [
+        { "target": "immune.inflammation", "gain": 0.7, "note": "The high fever of dengue." },
+        { "target": "blood.plateletCount", "gain": -0.85, "note": "The thrombocytopenia that defines the illness and warns of the haemorrhagic form; feeds the platelet count in coagulation.ts." },
+        { "target": "vascular.permeability", "gain": 0.9, "note": "The plasma leak of severe dengue, at the defervescence when the burden is already falling - which is the trap of the disease." }
+      ],
+      "source": "MANDELL9",
+      "confidence": "derived",
+      "note": "Chosen because its danger is not the fever but the thrombocytopenia and plasma leak, two mechanisms this model now has. The plasma leak is weighted to appear as the burden falls, which is when severe dengue actually strikes."
+    },
+    {
+      "id": "p_falciparum",
+      "label": "Plasmodium falciparum (malaria)",
+      "kind": "parasite",
+      "site": "bloodstream",
+      "incubation_h": 240,
+      "growthRate_per_h": 0.09,
+      "innateControl_per_h": 0.01,
+      "adaptiveOnset_h": 336,
+      "adaptivePeakControl_per_h": 0.06,
+      "clearanceFloor": 0.002,
+      "lethalBurden": 1.4,
+      "effects": [
+        { "target": "immune.inflammation", "gain": 0.8, "note": "The paroxysmal high fevers of malaria, driven by schizont rupture on the 48-hour erythrocytic cycle (approximated here as a smooth febrile response)." },
+        { "target": "blood.haemolysis_per_h", "gain": 0.02, "note": "Red cells are destroyed as parasitised cells rupture: the anaemia of malaria, and part of the jaundice. Feeds the haematocrit fall in fluids.ts." },
+        { "target": "metabolic.hepaticGlucoseOutput", "gain": -0.3, "note": "Hypoglycaemia is a feature of severe falciparum malaria, from parasite glucose consumption and impaired gluconeogenesis." }
+      ],
+      "source": "WHO_MALARIA",
+      "confidence": "derived",
+      "note": "A slow build over one to two weeks (the incubation and low growth rate), poorly controlled by immunity in a non-immune host, with haemolysis and hypoglycaemia as the mechanisms that make severe malaria lethal. Growth is smoothed rather than cyclical; the 48-hour periodicity is noted, not reproduced."
+    },
+    {
+      "id": "hiv_1",
+      "label": "HIV-1 (untreated)",
+      "kind": "virus",
+      "site": "CD4+ lymphocytes",
+      "incubation_h": 336,
+      "growthRate_per_h": 0.02,
+      "innateControl_per_h": 0.004,
+      "adaptiveOnset_h": 504,
+      "adaptivePeakControl_per_h": 0.02,
+      "clearanceFloor": 0.05,
+      "lethalBurden": null,
+      "cd4DeclinePerBurden_per_h": 0.006,
+      "effects": [
+        { "target": "immune.inflammation", "gain": 0.2, "note": "The seroconversion illness is a brief mononucleosis-like syndrome; chronic infection is largely silent, which the low steady inflammation reflects." }
+      ],
+      "source": "WHO_HIV",
+      "confidence": "derived",
+      "note": "The only chronic infection in the set, and it is here for one number: the CD4 count, which falls with viral burden over the untreated years and defines AIDS below 200 cells/uL. The dynamics are far too slow to see in one session; the model states that and lets the CD4 fall be watched at high time scale rather than pretending to an acute illness. Antiretrovirals suppress the burden and let the CD4 recover, which is the whole story of treatment."
+    }
+  ]
+}

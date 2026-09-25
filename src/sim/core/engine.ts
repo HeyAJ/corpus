@@ -5,7 +5,7 @@ import foodsFile from '../../data/foods.json';
 
 import { P } from './constants';
 import { Rng } from './rng';
-import { clearEffects } from './effects';
+import { clearEffects, setEffectSource, trackEffectSources, effectBreakdown, addEffect } from './effects';
 import { createInitialState, type SimState } from './state';
 
 import { stepCardio, addVolume, SUBSTEP_AORTIC_P, CARDIO_SUBSTEPS } from '../systems/cardio';
@@ -42,7 +42,16 @@ import type { SimIntent, SimSnapshot, GiDigestaSnapshot } from '../../bridge/typ
 import { stepActivity } from '../systems/activity';
 import { stepAffect } from '../systems/affect';
 import { stepPathology } from '../systems/pathology';
-import { stepInfection } from '../systems/infection';
+import { stepInfection, setInfectionDrugTable, newBurden, PATHOGEN_BY_ID, isSepsis } from '../systems/infection';
+import { stepEnvironment } from '../systems/environment';
+import { stepAcidBase, baseExcess, anionGap, interpretAcidBase } from '../systems/acidbase';
+import { stepMyocardium } from '../systems/myocardium';
+import { stepMind, seizureMargin } from '../systems/mind';
+import { stepCoagulation, inr, aptt } from '../systems/coagulation';
+import { stepAirway } from '../systems/airway';
+import { barometricPressure } from '../systems/respiratory';
+import { inspiredPo2 } from '../systems/environment';
+import { voidBladder } from '../systems/fluids';
 import {
   WAVEFORM_CHANNELS,
   MIN_DOSE_MULTIPLIER,
@@ -207,6 +216,15 @@ export class Engine {
   /** Reported by the last shock, surfaced once then cleared. */
   lastShock: ShockResult | null = null;
 
+  /** Rolling engine notices (a refused dose, a warning). Surfaced in the snapshot. */
+  private notices: { id: number; t: number; tone: 'info' | 'warn' | 'critical'; text: string }[] = [];
+  private noticeId = 1;
+
+  private notice(tone: 'info' | 'warn' | 'critical', text: string): void {
+    this.notices.push({ id: this.noticeId++, t: this.state.t, tone, text });
+    if (this.notices.length > 12) this.notices.shift();
+  }
+
   constructor(seed: number) {
     this.state = createRestingState(seed);
     this.rng = new Rng(seed);
@@ -214,15 +232,19 @@ export class Engine {
     this.pulsePlans = buildPulsePdPlans(DRUGS, RECEPTORS);
     this.directRefCp = buildDirectReferenceCp(DRUGS);
     this.state.receptors = createReceptorStates(RECEPTORS);
+    setInfectionDrugTable(DRUG_BY_ID);
+    trackEffectSources(this.state.effects);
   }
 
   reset(seed: number): void {
     this.state = createRestingState(seed);
     this.rng = new Rng(seed);
     this.state.receptors = createReceptorStates(RECEPTORS);
+    trackEffectSources(this.state.effects);
     this.seq = 0;
     this.pending.length = 0;
     this.lastShock = null;
+    this.notices = [];
   }
 
   /** One fixed physiology step. `dt` is always P('sim.dt_s'). */
@@ -234,27 +256,51 @@ export class Engine {
 
     clearEffects(s.effects, s.prevEffects);
 
-    // 0. What the body is doing, feeling, suffering and fighting.
+    // 0. What the body is doing, feeling, suffering and fighting, and where it is.
     //
-    // BEFORE pharmacodynamics, so that everything these four push onto the bus is
-    // already there when the drugs push on the same targets in the same tick. A body
-    // that is frightened AND given a beta blocker should have the two arrive together
-    // and argue, which is the entire point of routing both through one accumulator.
+    // BEFORE pharmacodynamics, so that everything these push onto the bus is already
+    // there when the drugs push on the same targets in the same tick. A body that is
+    // frightened AND given a beta blocker should have the two arrive together and argue,
+    // which is the entire point of routing both through one accumulator. The `source`
+    // set before each call is display-only attribution (effects.ts): it records who put
+    // each number on the bus, for the impact panel, and changes nothing about the sum.
+    stepEnvironment(s, dt);
+    setEffectSource('activity');
     stepActivity(s, dt);
+    setEffectSource('affect');
     stepAffect(s, dt);
+    setEffectSource('pathology');
     stepPathology(s, dt);
-    stepInfection(s, dt);
+    stepInfection(s, dt); // labels its own sources per pathogen
+    setEffectSource('anaphylaxis');
+    stepAirway(s, dt);
+    setEffectSource('body');
 
     // 1. Pharmacodynamics reads last tick's free concentrations.
     this.drugConc.clear();
     for (const d of s.drugs) this.drugConc.set(d.drugId, d.freeNM);
+    setEffectSource('receptors');
     stepPd(s, dt, RECEPTORS, this.links, this.drugConc);
     applyPulsePd(s, this.pulsePlans, s.drugs);
+    setEffectSource('body');
     this.applyDirectEffects();
+    this.applyHormoneAnalogues();
+
+    // 1b. Signs the bus now carries a consumer for: pupils, tone, nausea, seizures.
+    setEffectSource('seizure');
+    stepMind(s, dt);
+    setEffectSource('body');
+
+    // 1c. The heart's own oxygen supply, BEFORE the circulation that reads it. This is
+    //     the link that lets the lungs kill the heart: hypoxaemia and acidaemia weaken
+    //     the pump and, if profound, degenerate the rhythm to PEA and asystole.
+    stepMyocardium(s, dt, this.rng);
 
     // 2. Reflex, then circulation. The reflex must run first so the circulation
     //    sees this tick's tone, not last tick's.
+    setEffectSource('baroreflex');
     stepBaroreflex(s, dt);
+    setEffectSource('body');
     stepCardio(s, dt, this.rng);
 
     // 3. Waveforms at 500 Hz, tapped to the 250 Hz ring every second sub-step.
@@ -291,8 +337,13 @@ export class Engine {
     // pressure, so they must see this tick's values rather than last tick's; and the
     // effects they add have to be on the bus before the systems that consume them run.
     stepMetabolic(s, dt);
-    stepEndocrine(s, dt);
+    // Acid-base after metabolic (which sets lactate) and respiratory (which set PaCO2):
+    // pH is Henderson-Hasselbalch on those two, and it stops being a frozen constant.
+    stepAcidBase(s, dt);
+    stepEndocrine(s, dt); // labels its own sources per hormone
+    setEffectSource('body');
     stepNeuro(s, dt);
+    stepCoagulation(s, dt);
     stepProcedures(s, dt, this.rng);
     stepArrestProgression(s, dt);
 
@@ -355,10 +406,38 @@ export class Engine {
       const multiple = referenceCp > 0 ? st.cp / referenceCp : st.cp;
       const scaled = (DIRECT_EFFECT_CEILING * multiple) / (DIRECT_EFFECT_CEILING + multiple);
 
+      setEffectSource(`drug:${drug.id}`);
       for (const e of drug.directEffects) {
-        s.effects[e.target] = (s.effects[e.target] ?? 0) + e.gain * scaled;
+        addEffect(s.effects, e.target, e.gain * scaled);
       }
+      setEffectSource('body');
     }
+  }
+
+  /**
+   * A DRUG THAT IS A HORMONE adds to that hormone's pool. Insulin lands in the Bergman
+   * model's plasma insulin; every other hormone lands in `s.endocrine.exogenous`, which
+   * stepEndocrine reads alongside the secreted level. The amount is the drug's plasma
+   * concentration (mg/L) times the cited unit conversion, so the drug's own
+   * pharmacokinetics govern the rise and fall and the pool is not integrated twice.
+   */
+  private applyHormoneAnalogues(): void {
+    const s = this.state;
+    for (const k in s.endocrine.exogenous) s.endocrine.exogenous[k] = 0;
+    let exogenousInsulin = 0;
+    for (const st of s.drugs) {
+      if (st.cp <= 0) continue;
+      const drug = DRUG_BY_ID.get(st.drugId);
+      const ha = drug?.hormoneAnalogue;
+      if (!ha) continue;
+      const units = st.cp * ha.unitsPerMgPerL;
+      if (ha.pool === 'insulin') exogenousInsulin += units;
+      else s.endocrine.exogenous[ha.pool] = (s.endocrine.exogenous[ha.pool] ?? 0) + units;
+    }
+    // Injected insulin joins plasma insulin, so it suppresses hepatic glucose output and
+    // drives uptake through the same Bergman terms the pancreas's own insulin uses. It
+    // is ADDED as a floor rather than integrated, because the drug PK already decays it.
+    s.metabolic.exogenousInsulin_uU_per_mL = exogenousInsulin;
   }
 
   private stepWaveforms(dt: number): void {
@@ -392,7 +471,9 @@ export class Engine {
         this.reset(intent.seed ?? s.seed);
         break;
       case 'SET_TIME_SCALE':
-        s.timeScale = Math.max(1, Math.min(P('sim.maxTimeScale'), intent.x));
+        // A non-finite scale used to become NaN, poison the worker's accumulator, and
+        // freeze the whole simulation silently. Collapse it to real-time instead.
+        s.timeScale = Number.isFinite(intent.x) ? Math.max(1, Math.min(P('sim.maxTimeScale'), intent.x)) : 1;
         break;
       case 'ADMINISTER': {
         const drug = DRUG_BY_ID.get(intent.drugId);
@@ -414,7 +495,10 @@ export class Engine {
           ? clampDoseDuration(intent.durationMin)
           : preset.durationMin;
 
-        administer(s, drug, intent.route, toMilligrams(preset.amount * multiplier, preset.unit), duration);
+        const result = administer(s, drug, intent.route, toMilligrams(preset.amount * multiplier, preset.unit), duration);
+        // A refused dose used to vanish silently, which looked exactly like a broken
+        // drug (CLAUDE.md's own trap). Now the reason reaches the interface.
+        if (!result.ok) this.notice('warn', `${drug.displayName}: ${result.reason ?? 'dose refused'}`);
         break;
       }
       case 'STOP_INFUSION':
@@ -516,17 +600,13 @@ export class Engine {
         s.pathology.vertigo = clamp01(intent.level);
         break;
       case 'INOCULATE': {
-        const existing = s.infection.active.find((x) => x.pathogenId === intent.pathogenId);
+        if (!PATHOGEN_BY_ID.has(intent.pathogenId)) return;
+        const existing = s.infection.active.find((x) => x.pathogenId === intent.pathogenId && !x.cleared);
         if (existing) {
           // A second exposure adds to the burden rather than restarting the clock.
-          existing.load_log10 = Math.max(existing.load_log10, intent.dose_log10 ?? existing.load_log10);
+          existing.burden = Math.min(1.2, existing.burden + 0.1);
         } else {
-          s.infection.active.push({
-            pathogenId: intent.pathogenId,
-            load_log10: intent.dose_log10 ?? 0,
-            t: 0,
-            symptomatic: false,
-          });
+          s.infection.active.push(newBurden(intent.pathogenId, intent.dose_log10 ?? 0));
         }
         break;
       }
@@ -545,14 +625,54 @@ export class Engine {
         }
         break;
       case 'SET_BODY': {
-        if (intent.mass_kg) s.body.mass_kg = intent.mass_kg;
-        if (intent.height_m) s.body.height_m = intent.height_m;
-        if (intent.age_y) s.body.age_y = intent.age_y;
+        // Every field is clamped to a physiological range, because a negative or zero
+        // mass or height makes the DuBois BSA NaN and poisons cardiac index and every
+        // per-BSA readout downstream, silently and forever.
+        const finite = (x: number | undefined): x is number => typeof x === 'number' && Number.isFinite(x);
+        if (finite(intent.mass_kg)) s.body.mass_kg = Math.max(2, Math.min(300, intent.mass_kg));
+        if (finite(intent.height_m)) s.body.height_m = Math.max(0.3, Math.min(2.5, intent.height_m));
+        if (finite(intent.age_y)) s.body.age_y = Math.max(0, Math.min(120, intent.age_y));
         if (intent.sex) s.body.sex = intent.sex;
-        // DuBois body surface area.
         s.body.bsa_m2 = 0.007184 * Math.pow(s.body.height_m * 100, 0.725) * Math.pow(s.body.mass_kg, 0.425);
         break;
       }
+
+      /* --------------------------------------------------------- environment */
+      case 'SET_ENVIRONMENT': {
+        const env = s.environment;
+        if (intent.ambientTemp_C !== undefined) env.ambientTemp_C = Math.max(-40, Math.min(60, intent.ambientTemp_C));
+        if (intent.altitude_m !== undefined) env.altitude_m = Math.max(-400, Math.min(9000, intent.altitude_m));
+        if (intent.fio2 !== undefined) env.fio2 = Math.max(0.1, Math.min(1, intent.fio2));
+        break;
+      }
+      case 'SET_POSTURE':
+        s.environment.posture = intent.posture;
+        break;
+      case 'DRINK_WATER':
+        swallow(s, {
+          volume_mL: Math.max(0, Math.min(3000, intent.volume_mL)),
+          carb_g: 0,
+          fat_g: 0,
+          protein_g: 0,
+          solidFraction: 0,
+          label: 'Water',
+        });
+        break;
+      case 'VOID_BLADDER':
+        voidBladder(s);
+        break;
+      case 'SET_BRONCHOSPASM':
+        s.airway.asthma = clamp01(intent.level);
+        break;
+      case 'ALLERGEN_EXPOSURE':
+        // A mast-cell discharge: sets the release that airway.ts then plays out over
+        // minutes. Adds to any release already running rather than restarting it.
+        s.airway.releaseRemaining = Math.min(1, s.airway.releaseRemaining + clamp01(intent.severity));
+        break;
+      case 'STOP_ALL_BLEEDING':
+        s.pathology.bleedRate_mL_per_min = 0;
+        s.pathology.bloodLost_mL = 0;
+        break;
     }
   }
 
@@ -653,7 +773,7 @@ export class Engine {
           return {
             id: def.id,
             label: def.label,
-            level: h?.level ?? def.baseline,
+            level: (h?.level ?? def.baseline) + (s.endocrine.exogenous[def.id] ?? 0),
             unit: def.unit,
             activity: h?.activity ?? 0,
             refLow: def.refLow,
@@ -756,8 +876,115 @@ export class Engine {
         downtime_s: s.procedures.arrestStartT === null ? 0 : s.t - s.procedures.arrestStartT,
         ivAccess: s.procedures.ivAccess,
       },
+      environment: {
+        ambientTemp_C: s.environment.ambientTemp_C,
+        altitude_m: s.environment.altitude_m,
+        barometric_mmHg: barometricPressure(s.environment.altitude_m),
+        fio2: s.environment.fio2,
+        inspiredPo2_mmHg: inspiredPo2(s),
+        posture: s.environment.posture,
+      },
+      acidBase: {
+        ph: s.chem.ph,
+        hco3_mEq_per_L: s.chem.hco3,
+        paco2_mmHg: s.resp.arterialPco2,
+        baseExcess_mEq_per_L: baseExcess(s.chem.hco3, s.chem.ph),
+        anionGap_mEq_per_L: anionGap(s),
+        ketones_mmol_per_L: s.acidBase.ketones,
+        interpretation: interpretAcidBase(s.chem.ph, s.resp.arterialPco2, s.chem.hco3),
+      },
+      mind: {
+        pupil_mm: s.mind.pupil_mm,
+        anxiety: clamp01(effectValue(s, 'neuro.anxiety')),
+        euphoria: clamp01(effectValue(s, 'neuro.euphoria')),
+        psychedelia: clamp01(effectValue(s, 'neuro.psychedelia')),
+        dependence: clamp01(effectValue(s, 'neuro.dependence')),
+        nausea: s.mind.nausea,
+        appetite: clamp01(1 + effectValue(s, 'gi.appetite')),
+        muscleTone: s.mind.muscleTone,
+        seizureMargin: Math.max(0, Math.min(1, seizureMargin(s))),
+        seizing: s.mind.seizing,
+        vomiting: s.mind.vomiting,
+        vomitus_mL: s.mind.vomitus_mL,
+      },
+      coagulation: {
+        inr: inr(s),
+        aptt_s: aptt(s),
+        plateletFunction: s.coagulation.plateletFunction,
+        platelets_10e9_per_L: s.coagulation.platelets,
+        haemostasis: s.coagulation.haemostasis,
+      },
+      infection: {
+        active: s.infection.active.map((b) => {
+          const def = PATHOGEN_BY_ID.get(b.pathogenId);
+          return {
+            pathogenId: b.pathogenId,
+            label: def?.label ?? b.pathogenId,
+            kind: (def?.kind ?? 'toxin') as 'virus' | 'bacterium' | 'parasite' | 'toxin',
+            site: def?.site ?? '',
+            burden: b.burden,
+            load_log10: b.load_log10,
+            t_h: b.t / 3600,
+            phase: (b.cleared
+              ? 'cleared'
+              : !b.symptomatic
+                ? 'incubating'
+                : b.sincePeak > 0
+                  ? 'resolving'
+                  : 'symptomatic') as 'incubating' | 'symptomatic' | 'resolving' | 'cleared',
+            drugKill_per_h: b.drugKill_per_h,
+          };
+        }),
+        immuneActivation: s.infection.immuneActivation,
+        wbc_10e9_per_L: s.infection.wbc,
+        crp_mg_per_L: s.infection.crp,
+        cd4_per_uL: s.infection.cd4_per_uL,
+        sepsis: isSepsis(s),
+      },
+      fluids: {
+        interstitial_mL: s.fluids.interstitial,
+        balance_mL: s.fluids.balance_mL,
+        osmolality_mOsm_per_kg: 2 * s.chem.na + s.metabolic.G / 18 + 5,
+        extraLosses_mL_per_min: s.fluidLossRate_mL_per_min,
+        bronchoconstriction: s.resp.bronchoconstriction,
+      },
+      effects: activeEffects(s),
+      effectSources: buildEffectSources(s),
+      notices: this.notices.map((n) => ({ ...n })),
     };
   }
+}
+
+/** A bus target's current value (0 when absent). */
+function effectValue(s: SimState, target: string): number {
+  return s.effects[target] ?? 0;
+}
+
+/** Every non-zero bus target, for the impact panel. */
+function activeEffects(s: SimState): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const k in s.effects) {
+    const v = s.effects[k];
+    if (Math.abs(v) > 1e-4) out[k] = v;
+  }
+  return out;
+}
+
+/** The bus broken down by who is pushing each target, above a small threshold. */
+function buildEffectSources(s: SimState): Record<string, Record<string, number>> {
+  const rows = effectBreakdown(s.effects);
+  if (!rows) return {};
+  const out: Record<string, Record<string, number>> = {};
+  for (const target in rows) {
+    const row = rows[target];
+    let kept: Record<string, number> | null = null;
+    for (const src in row) {
+      const v = row[src];
+      if (Math.abs(v) > 1e-3) (kept ?? (kept = {}))[src] = v;
+    }
+    if (kept) out[target] = kept;
+  }
+  return out;
 }
 
 function gutAmountOf(s: SimState, drugId: string): number {

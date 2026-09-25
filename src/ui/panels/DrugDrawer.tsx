@@ -204,6 +204,7 @@ export function DrugDrawer() {
       className={`${styles.sheet} ${snap === 1 ? styles.sheetFull : ''}`}
       role="dialog"
       aria-label="Administration drawer"
+      data-drawer
     >
       <button
         className={styles.grabber}

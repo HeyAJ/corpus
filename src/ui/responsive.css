@@ -1,47 +1,40 @@
 /*
- * RESPONSIVE LAYOUT.
+ * RESPONSIVE RULES.
  *
- * Every panel in this application was designed floating: absolutely positioned, sized
- * in pixels, and placed relative to a corner. That is right on a desktop, where there
- * is room beside the body for a panel to sit without covering it.
+ * The heavy lifting of layout now lives in the app-shell grid (src/ui/app.module.css):
+ * a stage column for the body, a rail column for the docked panels, and a reserved
+ * bottom row for the dock and the warning. Panels are plain cards with no position of
+ * their own, so "which panel sits where and what covers what" is answered once, by the
+ * grid, rather than by nine competing sets of absolute coordinates.
  *
- * It is wrong on a phone. A 400px panel on a 390px screen IS the screen — open the
- * laboratory and the body it describes disappears behind it, which defeats the point
- * of a panel that exists to be read against what it is describing.
+ * What is left for this file is the part that genuinely depends on the VIEWPORT rather
+ * than on the relationship between panels: how large the screen-space type is, how wide
+ * the rail should be, and — the one rule that is about input rather than size — how big
+ * a touch target has to be. The rail-becomes-a-bottom-sheet behaviour on a phone is in
+ * app.module.css with the rest of the grid, because it is a grid change, not a token.
  *
- * So below the breakpoint the floating panels become BOTTOM SHEETS: full width,
- * anchored above the dock, capped at a fraction of the viewport so the body stays
- * visible above them, and scrollable within themselves. That is the same shape the
- * drug drawer already had, and it was already the right shape.
- *
- * WHY ONE FILE RATHER THAN A MEDIA QUERY IN EACH MODULE. These rules are about the
- * RELATIONSHIP between panels — which one sits where, what covers what, how much of
- * the viewport each may take. Splitting them across nine CSS modules would mean the
- * answer to "why does the endocrine panel stop at 58vh" lives somewhere other than the
- * answer to "what else is on screen at the same time". They belong together.
- *
- * The selectors reach into the CSS Modules' generated class names via :global on the
- * data attributes each panel sets, which is why every responsive panel carries a
- * `data-panel` attribute. That is deliberate: it gives this file a stable hook that
- * does not depend on a hashed class name.
+ * A few global hooks survive as `data-` attributes so this file and the shell can reach
+ * a panel without depending on a hashed CSS-module class name: `data-panel` on every
+ * docked card, `data-drawer` on the administration sheet, `data-blood-contents` on the
+ * vascular legend, `data-timeline` on the timeline.
  */
 
 :root {
-  /* Below this, the layout is a phone: one column, sheets not panels. */
+  /* Below this the layout is a phone: one column, the rail becomes a bottom sheet. */
   --bp-phone: 720px;
-  /* Below this, panels narrow but keep their positions. */
+  /* Below this the rail narrows but the columns stay. */
   --bp-tablet: 1080px;
-  /* Height of the tool dock plus the disclaimer, so sheets can clear them. */
-  --dock-clearance: 92px;
 }
 
 /* ===================================================== tablet and narrower */
 
 @media (max-width: 1080px) {
-  /* The organ label competes with the HUD for the same corner at this width. */
   :root {
+    /* The organ label competes with the HUD for the same corner at this width. */
     --size-label: 26px;
     --inset-hud: 12px;
+    /* A narrower rail leaves the body room on a tablet without starving the panels. */
+    --rail-w: 340px;
   }
 }
 
@@ -54,77 +47,28 @@
     --size-tag: 13px;
     --inset-hud: 10px;
     --gap-hud: 7px;
+    /* The bottom bar is shorter on a phone; the drawer clears this smaller value. */
+    --corpus-bar-h: 84px;
   }
 
   /*
-   * THE FLOATING PANELS BECOME SHEETS.
-   *
-   * Anchored to the bottom above the dock, full width inside the gutter, and capped
-   * at 58% of the viewport so more than half the body stays visible behind them —
-   * which is the whole reason to keep them off the top.
+   * The administration drawer is the one panel that stays a modal bottom sheet rather
+   * than joining the rail — it is a task surface, not a readout, and it wants the whole
+   * width while it is open. It is anchored ABOVE the bottom bar so it can never cover
+   * the dock (which was the reported bug), and it spans the gutter width.
    */
-  [data-panel] {
-    position: fixed !important;
-    top: auto !important;
-    right: var(--inset-hud) !important;
-    left: var(--inset-hud) !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--dock-clearance)) !important;
-    width: auto !important;
-    max-width: none !important;
-    max-height: 58vh !important;
-    transform: none !important;
-    border-radius: var(--radius-card);
-  }
-
-  /*
-   * Only ONE sheet at a time on a phone. Two stacked sheets on a 390px screen is not
-   * a layout, it is an accident — so the later ones in DOM order win and the rest are
-   * pushed behind. The panels are mutually exclusive in practice; this makes that
-   * true rather than hoped for.
-   */
-  [data-panel] {
-    z-index: 34;
-  }
-
-  /*
-   * The blood readout is a legend for the vascular overlay, so it must not cover the
-   * thing it is a legend for. On a phone it becomes a short strip above the dock and
-   * its explanatory note is dropped — the note is worth its space on a desktop and is
-   * not worth a third of a phone screen.
-   */
-  [data-blood-contents] {
+  [data-drawer] {
     left: var(--inset-hud) !important;
     right: var(--inset-hud) !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--dock-clearance)) !important;
-    width: auto !important;
-    max-height: 34vh;
-    overflow-y: auto;
-  }
-
-  [data-blood-contents] [data-note] {
-    display: none;
-  }
-
-  /* The timeline shares the same bottom region, so it moves above the blood strip. */
-  [data-timeline] {
-    max-width: none !important;
   }
 }
 
 /* ========================================================= short viewports */
 
-/*
- * A landscape phone is wide enough for the desktop layout and far too short for it:
- * a panel capped at 58vh of 390px is 226px, which fits nothing. Height gets its own
- * rule rather than being inferred from width.
- */
 @media (max-height: 560px) {
-  [data-panel] {
-    max-height: 72vh !important;
-  }
-
   :root {
     --size-label: 20px;
+    --corpus-bar-h: 76px;
   }
 }
 
@@ -132,10 +76,8 @@
 
 /*
  * Pointer-coarse, not width. A tablet with a stylus and a laptop with a touchscreen
- * are both wide and both need targets a finger can hit; width is a proxy for input
- * type and it is a bad one.
- *
- * 44px is the smallest target that is reliably hittable, which is why both Apple and
+ * are both wide and both need targets a finger can hit; width is a bad proxy for the
+ * input type. 44px is the smallest reliably-hittable target, which is why Apple and
  * Google landed on it independently.
  */
 @media (pointer: coarse) {

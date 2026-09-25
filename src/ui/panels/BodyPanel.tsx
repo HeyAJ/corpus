@@ -28,6 +28,7 @@ export function BodyPanel() {
   const pushLog = useStore((s) => s.pushLog);
   const pushEvent = useStore((s) => s.pushEvent);
   const clearEvents = useStore((s) => s.clearEvents);
+  const resetUiState = useStore((s) => s.resetUiState);
   const reduced = useStore((s) => s.reducedMotion);
   const setReduced = useStore((s) => s.setReducedMotion);
 
@@ -140,6 +141,12 @@ export function BodyPanel() {
           // buffers with it rather than plotting across the discontinuity.
           clearEvents();
           clearTrends();
+          // The defibrillator's charge and the last shock's verdict are interface state,
+          // not simulation state, so the RESET intent does not reach them. A body that
+          // has just been reset to a resting baseline must not still be showing "Charged
+          // 200 J" or "No conversion" from the arrest that no longer happened — so clear
+          // those here, on the same path.
+          resetUiState();
           pushLog('Simulation reset', 'info');
           pushEvent({ kind: 'state', label: 'Simulation reset', tone: 'info' });
         }}

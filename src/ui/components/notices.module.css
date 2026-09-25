@@ -1,0 +1,48 @@
+/*
+ * ENGINE NOTICE TOASTS.
+ *
+ * Top-centre of the stage, over the body, because a refused dose has to be seen where
+ * the eye already is — on the thing you just tried to change. Same pill language as the
+ * action log, so the two read as one voice.
+ */
+
+.toasts {
+  position: absolute;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: min(90%, 420px);
+  pointer-events: none;
+  z-index: 32;
+}
+
+.toast {
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  background: var(--chip-bg-strong);
+  color: var(--ink);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.tone_info {
+  color: var(--ink-dim);
+}
+
+.tone_warn {
+  background: var(--severity-warn-bg);
+  color: var(--severity-warn-ink);
+}
+
+.tone_critical {
+  background: var(--severity-critical-bg);
+  color: #fff;
+}

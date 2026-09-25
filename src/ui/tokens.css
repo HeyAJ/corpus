@@ -58,6 +58,13 @@
   --gap-hud: 10px;
   --inset-hud: 16px;
 
+  /* --- app-shell geometry (see app.module.css) ------------------------ */
+  /* Width of the docked right rail; narrowed at tablet width in responsive.css. */
+  --rail-w: 384px;
+  /* Reserved height of the bottom bar (timeline + dock + warning). The drug drawer
+     clears this so it can never sit on top of the tool dock. */
+  --corpus-bar-h: 92px;
+
   /* --- type ----------------------------------------------------------- */
   --font-ui: 'Nunito', 'Varela Round', 'M PLUS Rounded 1c', ui-rounded,
     -apple-system, 'Segoe UI', system-ui, sans-serif;

@@ -26,7 +26,8 @@ import {
  * without touching the guarantee. Vessels are tinted tissue, so they are absorption;
  * particles are something glowing as it moves, so they are additive. Both land in a
  * bucket that already exists, and `tests/render/order-independence.test.ts` continues
- * to hold unchanged.
+ * to hold unchanged. The tree grew from 32 to 60 segments and everything that follows
+ * still lives in exactly those two buckets, so nothing about the guarantee moved.
  *
  * WHAT THE PARTICLES ACTUALLY SHOW.
  *
@@ -36,6 +37,15 @@ import {
  * represents. Speed comes from real aortic flow and pulses with the real cardiac
  * phase, so the surge you see in systole is the surge the Windkessel computed.
  *
+ * THE DRUG DOES NOT APPEAR EVERYWHERE AT ONCE. A bolus takes time to circulate, so a
+ * marker's colour is gated behind a TRAVELLING FRONT: a value that grows from 0 to 1
+ * and only tints a vessel once the front has reached that vessel's distance from the
+ * heart. The result is a coloured wave that spreads out of the central vessels into
+ * the periphery over a few seconds — which is the thing a student is told about
+ * (arm-to-brain circulation time) and almost never sees. The front is pure per-frame
+ * colour bookkeeping in the additive bucket; it changes what the particles are tinted,
+ * never how they are blended, so the order-independence guarantee is untouched.
+ *
  * COLOUR BY SATURATION, NOT BY NAME. A vessel's colour comes from the oxygen
  * saturation of the blood in it, so the pulmonary artery is drawn dark and the
  * pulmonary veins bright — the opposite of every "arteries are red" diagram, and the
@@ -43,11 +53,33 @@ import {
  */
 
 /** Particles per metre of vessel. Tuned so the aorta reads as a stream, not a queue. */
-const PARTICLE_DENSITY = 700;
-const MAX_PARTICLES = 2200;
+const PARTICLE_DENSITY = 620;
+/**
+ * Raised from 2200 for the denser 60-vessel tree, but kept well under the ~6000
+ * ceiling the perf note asks for: at this density the whole tree lands near 5.3 k
+ * particles, each of which is one point sprite, so the cost is a single draw call and
+ * one Float32 write per particle per frame.
+ */
+const MAX_PARTICLES = 5600;
 
 /** Aortic flow that corresponds to one body-unit per second of particle travel. */
 const FLOW_REFERENCE_mL_per_s = 90;
+
+/**
+ * How fast an injected marker's front crosses the whole tree, in units of normalised
+ * heart-distance per second at reference flow. 0.28 puts a full sweep at roughly three
+ * to four seconds, which reads as "watch it spread" rather than as a switch flipping.
+ */
+const FRONT_RATE = 0.28;
+
+/** Soft width of the front, in normalised heart-distance, so the edge is a gradient. */
+const FRONT_BAND = 0.16;
+
+/** The heart's own origin in body-local space; the front spreads outward from here. */
+const HEART_ORIGIN = new THREE.Vector3(-0.016, 0.168, 0.016);
+
+/** Markers that are steady-state properties of the blood rather than injected boluses. */
+const STEADY_MARKERS = new Set(['glucose', 'lactate']);
 
 const OXY_COLOUR = new THREE.Color(0xc8323a);
 const DEOXY_COLOUR = new THREE.Color(0x6a4a7a);
@@ -57,6 +89,20 @@ interface Particle {
   s: number;
   speedJitter: number;
   colour: THREE.Color;
+  /** Blood colour by saturation, recomputed each snapshot; the base the front tints. */
+  base: THREE.Color;
+  /** Index into `activeMarkers`, or -1 when this particle carries only blood. */
+  marker: number;
+  /** This particle's distance from the heart, normalised 0..1: when the front reaches it. */
+  depth: number;
+}
+
+interface ActiveMarker {
+  id: string;
+  colour: THREE.Color;
+  weight: number;
+  /** A bolus sweeps out from the heart; a steady-state marker fills the tree at once. */
+  sweeps: boolean;
 }
 
 export class VascularSystem {
@@ -72,14 +118,20 @@ export class VascularSystem {
   private readonly sizeAttr: THREE.BufferAttribute;
 
   private readonly wallMaterials: THREE.ShaderMaterial[] = [];
-  private readonly wallSides: ReturnType<typeof saturationFor> extends never ? never[] : string[] = [];
+  private readonly wallSides: string[] = [];
+
+  /** Per-line normalised distance of the line's midpoint from the heart, 0..1. */
+  private readonly lineDepth: number[] = [];
 
   private flowSpeed = 1;
   private pulse = 1;
   private arterialSat = 0.97;
   private venousSat = 0.72;
-  private markerColours: THREE.Color[] = [];
-  private markerWeights: number[] = [];
+
+  private activeMarkers: ActiveMarker[] = [];
+  /** Per-marker travelling front, 0..1, advanced every frame. Keyed by marker id. */
+  private readonly fronts = new Map<string, number>();
+  private animating = false;
 
   private readonly scratch = new THREE.Vector3();
 
@@ -87,6 +139,19 @@ export class VascularSystem {
     this.lines = buildCentrelines();
     this.root.visible = false;
     this.root.add(this.wallGroup);
+
+    // Heart-distance per line, then normalised against the deepest vessel, so the
+    // front's 0..1 spans the whole tree from the aortic root to the toes.
+    const mid = new THREE.Vector3();
+    const raw: number[] = [];
+    let maxD = 1e-6;
+    for (const line of this.lines) {
+      mid.copy(line.positions[Math.floor(line.positions.length / 2)]);
+      const d = mid.distanceTo(HEART_ORIGIN);
+      raw.push(d);
+      if (d > maxD) maxD = d;
+    }
+    for (const d of raw) this.lineDepth.push(d / maxD);
 
     this.buildWalls();
 
@@ -103,6 +168,9 @@ export class VascularSystem {
           // A little variation so the stream does not look like a conveyor belt.
           speedJitter: 0.82 + 0.36 * ((j * 2654435761) % 1000) / 1000,
           colour: new THREE.Color(),
+          base: new THREE.Color(),
+          marker: -1,
+          depth: this.lineDepth[i],
         });
         budget++;
       }
@@ -173,9 +241,15 @@ export class VascularSystem {
   private buildWalls(): void {
     for (const line of this.lines) {
       const path = new THREE.CatmullRomCurve3(line.positions, false, 'catmullrom', 0.5);
-      // Radial segments kept low: there are thirty vessels and the silhouette at this
-      // scale is a few pixels across. tests/perf/budget.test.ts is the constraint.
-      const geometry = new THREE.TubeGeometry(path, 20, 1, 6, false);
+
+      // Resolution scaled to the vessel's calibre. A wide vessel earns a rounder tube;
+      // the many new small branches are a few pixels across at body framing, so they
+      // draw with a pentagonal cross-section that is invisible at that size and keeps
+      // the whole tree — sixty tubes now — well under the ~40 k-triangle budget.
+      const maxRadius = Math.max(...line.radii);
+      const radial = maxRadius > 0.006 ? 8 : maxRadius > 0.0018 ? 6 : 5;
+      const tubular = maxRadius > 0.006 ? 22 : 16;
+      const geometry = new THREE.TubeGeometry(path, tubular, 1, radial, false);
 
       // TubeGeometry takes a constant radius, so the taper is applied afterwards by
       // scaling each ring's offset from its centre. Cheaper and more controllable
@@ -233,7 +307,7 @@ export class VascularSystem {
       mesh.frustumCulled = false;
       this.wallGroup.add(mesh);
       this.wallMaterials.push(material);
-      (this.wallSides as string[]).push(line.side);
+      this.wallSides.push(line.side);
     }
   }
 
@@ -261,51 +335,95 @@ export class VascularSystem {
     // systole occupies roughly its first third.
     this.pulse = t.pulsePhase < 0.33 ? 1.0 + 1.6 * Math.sin((t.pulsePhase / 0.33) * Math.PI) : 0.55;
 
-    // Rebuild the colour mix. A particle is tinted by one marker, chosen in
+    // Rebuild the active-marker set. A particle is tinted by one marker, chosen in
     // proportion to that marker's level, so a drug at 30 % of its scale tints roughly
     // 30 % of the particles — density as the visual variable rather than brightness,
     // which stays readable when several substances are present at once.
-    this.markerColours = [];
-    this.markerWeights = [];
+    this.activeMarkers = [];
     for (const m of t.markers) {
       if (m.level <= 0.001) continue;
       // Oxygen and CO2 are carried by the blood itself, not floating in it; they
       // colour the VESSEL, not the particles, so they are skipped here.
       if (m.id === 'oxygen' || m.id === 'co2') continue;
-      this.markerColours.push(new THREE.Color(m.colour));
-      this.markerWeights.push(m.level);
+      this.activeMarkers.push({
+        id: m.id,
+        colour: new THREE.Color(m.colour),
+        weight: m.level,
+        // A steady-state marker (glucose, lactate) is everywhere already; only an
+        // injected substance travels, and gets a front that starts at the heart.
+        sweeps: !STEADY_MARKERS.has(m.id),
+      });
     }
 
-    this.assignColours();
+    // Retire fronts whose marker is no longer present, and seed a new sweeping marker
+    // just above zero so its first frame lights the central vessels rather than nothing.
+    const activeIds = new Set(this.activeMarkers.map((m) => m.id));
+    for (const id of [...this.fronts.keys()]) if (!activeIds.has(id)) this.fronts.delete(id);
+    for (const m of this.activeMarkers) {
+      if (!m.sweeps) this.fronts.set(m.id, 1);
+      else if (!this.fronts.has(m.id)) this.fronts.set(m.id, 0.04);
+    }
+
+    this.assignBaseColours();
+    this.assignMarkers();
+    this.refreshColours();
     this.updateWallColours();
+
+    this.animating = this.activeMarkers.some((m) => m.sweeps && (this.fronts.get(m.id) ?? 1) < 0.999);
   }
 
-  private assignColours(): void {
-    const total = this.markerWeights.reduce((a, b) => a + b, 0);
-
-    for (let i = 0; i < this.particles.length; i++) {
-      const p = this.particles[i];
+  /** Blood colour by saturation for every particle; the base the marker front tints over. */
+  private assignBaseColours(): void {
+    for (const p of this.particles) {
       const side = this.lines[p.line].side;
       const sat = saturationFor(side, this.arterialSat, this.venousSat);
+      p.base.copy(DEOXY_COLOUR).lerp(OXY_COLOUR, Math.max(0, Math.min(1, (sat - 0.5) / 0.5)));
+    }
+  }
 
-      // Base colour: the blood itself, by saturation.
-      p.colour.copy(DEOXY_COLOUR).lerp(OXY_COLOUR, Math.max(0, Math.min(1, (sat - 0.5) / 0.5)));
-
-      if (total > 0.001) {
-        // Deterministic per-particle draw against the weights, so the same particle
-        // keeps carrying the same substance from frame to frame and the stream does
-        // not shimmer.
-        const r = ((i * 2654435761) % 10000) / 10000 * Math.max(1, total);
-        let acc = 0;
-        for (let m = 0; m < this.markerColours.length; m++) {
-          acc += this.markerWeights[m];
-          if (r < acc) {
-            p.colour.copy(this.markerColours[m]);
-            break;
-          }
+  /**
+   * Assign each particle at most one marker by a deterministic weighted draw, so the
+   * same particle keeps carrying the same substance from frame to frame and the stream
+   * does not shimmer. The FRONT decides whether that assignment is yet visible; this
+   * only decides which colour it would be.
+   */
+  private assignMarkers(): void {
+    const total = this.activeMarkers.reduce((a, m) => a + m.weight, 0);
+    for (let i = 0; i < this.particles.length; i++) {
+      const p = this.particles[i];
+      if (total <= 0.001) {
+        p.marker = -1;
+        continue;
+      }
+      const r = ((i * 2654435761) % 10000) / 10000 * Math.max(1, total);
+      let acc = 0;
+      p.marker = -1;
+      for (let m = 0; m < this.activeMarkers.length; m++) {
+        acc += this.activeMarkers[m].weight;
+        if (r < acc) {
+          p.marker = m;
+          break;
         }
       }
+    }
+  }
 
+  /** Blend each particle from blood toward its marker colour, gated by the front. */
+  private refreshColours(): void {
+    for (let i = 0; i < this.particles.length; i++) {
+      const p = this.particles[i];
+      if (p.marker < 0) {
+        p.colour.copy(p.base);
+      } else {
+        const m = this.activeMarkers[p.marker];
+        const front = this.fronts.get(m.id) ?? 1;
+        // How far the front has swept past this particle's distance from the heart,
+        // softened over FRONT_BAND so the leading edge is a gradient, not a hard line.
+        const reach = m.sweeps
+          ? Math.max(0, Math.min(1, (front - p.depth) / FRONT_BAND + 0.5))
+          : 1;
+        p.colour.copy(p.base).lerp(m.colour, reach);
+      }
       this.colourAttr.setXYZ(i, p.colour.r, p.colour.g, p.colour.b);
     }
     this.colourAttr.needsUpdate = true;
@@ -344,6 +462,24 @@ export class VascularSystem {
       this.positionAttr.setXYZ(i, this.scratch.x, this.scratch.y, this.scratch.z);
     }
     this.positionAttr.needsUpdate = true;
+
+    // Advance every sweeping marker's front and recolour, so the drug is SEEN to move
+    // out of the central vessels. This is the one part of the flow that runs off wall
+    // time rather than snapshot time, because a front creeping forward at 20 Hz reads
+    // as stepping and at 60 Hz reads as flowing.
+    if (this.animating) {
+      let stillMoving = false;
+      for (const m of this.activeMarkers) {
+        if (!m.sweeps) continue;
+        const next = Math.min(1, (this.fronts.get(m.id) ?? 0) + dt * this.flowSpeed * FRONT_RATE);
+        this.fronts.set(m.id, next);
+        if (next < 0.999) stillMoving = true;
+      }
+      this.refreshColours();
+      // Keep refreshing for one settled frame after the front lands, then stop the
+      // per-frame recolour so a body sitting with a steady drug level costs nothing.
+      this.animating = stillMoving;
+    }
   }
 
   dispose(): void {
@@ -365,6 +501,11 @@ export class VascularSystem {
       n += index ? index.count / 3 : g.getAttribute('position').count / 3;
     }
     return n;
+  }
+
+  /** Live particle count, for the perf budget report. */
+  get particleCount(): number {
+    return this.particles.length;
   }
 }
 

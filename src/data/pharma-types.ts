@@ -189,6 +189,53 @@ export interface Drug {
     ca_mmol?: number;
     cl_mEq?: number;
     iron_mg?: number;
+    /** Grams of glucose per preset unit: dextrose. Lands in the Bergman glucose pool. */
+    glucose_g?: number;
+    /** mEq of bicarbonate per preset unit: sodium bicarbonate. Lands in the buffer. */
+    hco3_mEq?: number;
+  };
+  /**
+   * A DRUG THAT IS A HORMONE.
+   *
+   * Insulin, hydrocortisone, glucagon, vasopressin and levothyroxine are the body's own
+   * molecules given from outside. Modelling them through a receptor alone would give the
+   * body two insulins that never meet - the injected one acting at `insulin_r` and the
+   * secreted one in the Bergman model - so a hypoglycaemic patient's own counter-
+   * regulation could never see the dose. Instead the drug's plasma concentration is
+   * converted into the hormone's own clinical unit and ADDED to the endogenous pool, and
+   * everything downstream (feedback, effects, the lab panel) sees one number.
+   *
+   * `unitsPerMgPerL` converts plasma concentration in mg/L into the pool's unit
+   * (uU/mL for insulin, ug/dL for cortisol, pg/mL for glucagon and ADH, ng/dL for free
+   * T4). It is arithmetic on a cited molar or unit definition, never a fitted number.
+   */
+  hormoneAnalogue?: {
+    pool: 'insulin' | 'cortisol' | 'glucagon' | 'adh' | 'thyroxine' | 'epo';
+    unitsPerMgPerL: number;
+    note: string;
+    source: string;
+    sourceUrl: string;
+  };
+  /**
+   * WHAT A DRUG DOES TO A PATHOGEN.
+   *
+   * Kill (or, for a virustatic drug, suppressed replication) follows an Emax model on
+   * the FREE plasma concentration with the MIC (or antiviral EC50) as the potency term -
+   * the standard pharmacokinetic-pharmacodynamic form for antimicrobials (Nielsen &
+   * Friberg, Pharmacol Rev 2013). Only pathogens listed in `spectrum` are affected, so
+   * an antibiotic given for influenza visibly does nothing, which is the lesson.
+   */
+  antimicrobial?: {
+    spectrum: { pathogenId: string; mic_mg_per_L: number; source: string; sourceUrl: string; note?: string }[];
+    /** Maximal kill rate at saturating concentration, per hour. */
+    maxKill_per_h: number;
+    /** Hill slope of the concentration-kill curve. */
+    hill: number;
+    /** Which exposure index predicts efficacy, for the explanation text. */
+    pattern: 'time-dependent' | 'concentration-dependent' | 'exposure-dependent';
+    killSource: string;
+    killSourceUrl: string;
+    note: string;
   };
   notes: string;
   sources: string[];

@@ -1,25 +1,33 @@
-/* Bottom sheet, snap points at 45 % and 90 % (spec 8.3). */
-
+/*
+ * ADMINISTRATION DRAWER — a modal bottom sheet, snap points at roughly 46 % and 82 %.
+ *
+ * It is the one panel that does NOT join the rail: it is a task surface you open, act
+ * in, and close, not a readout you keep on screen, and it wants the width while it is
+ * up. So it stays a bottom sheet, but a confined one — it covers the STAGE (the body)
+ * only, never the rail beside it, and it is anchored above the reserved bottom bar so
+ * it can no longer sit on top of the tool dock, which was the reported bug. On a phone
+ * responsive.css lets it span the full gutter width.
+ */
 .sheet {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 45%;
+  position: fixed;
+  left: var(--inset-hud);
+  right: calc(var(--rail-w) + var(--inset-hud));
+  bottom: calc(var(--corpus-bar-h) + 4px);
+  height: 46vh;
+  max-height: calc(100vh - var(--corpus-bar-h) - 24px);
   display: flex;
   flex-direction: column;
   background: var(--sheet-bg);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border-radius: var(--radius-card) var(--radius-card) 0 0;
-  box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.1);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  border-radius: var(--radius-card);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.16);
   transition: height var(--tween-state) var(--ease-out);
   z-index: 30;
 }
 
 .sheetFull {
-  height: 90%;
+  height: calc(100vh - var(--corpus-bar-h) - 24px);
 }
 
 .grabber {

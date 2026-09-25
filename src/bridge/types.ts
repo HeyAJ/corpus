@@ -296,6 +296,141 @@ export interface PathologySnapshot {
   vertigo: number;
 }
 
+/* ==========================================================================
+ * THE WIDER BODY: environment, acid-base, mind, blood clotting, infection.
+ *
+ * Added together because they were the parts of a body that the snapshot could not
+ * describe. Every field here is a COMPUTED OUTPUT of the engine, never a stored
+ * display value, exactly like the vital signs above: pupil size is what the effect
+ * bus has done to a resting pupil, the INR is what the coagulation state has done to
+ * a normal clotting time, and pH is Henderson-Hasselbalch applied to the live PaCO2
+ * and bicarbonate. Nothing in this block can be set directly by the interface; the
+ * interface sets the ENVIRONMENT (and the scenario), and the body answers.
+ * ========================================================================== */
+
+/** Where the body is. Operator-set, and read back so the interface can show it. */
+export interface EnvironmentSnapshot {
+  /** Air temperature around the body, C. */
+  ambientTemp_C: number;
+  /** Height above sea level, m. Sets the barometric pressure. */
+  altitude_m: number;
+  /** Barometric pressure derived from altitude, mmHg. */
+  barometric_mmHg: number;
+  /** Fraction of inspired oxygen actually being breathed, 0.21 in room air. */
+  fio2: number;
+  /** Inspired PO2 after water-vapour correction, mmHg. The number altitude changes. */
+  inspiredPo2_mmHg: number;
+  /** Body position. Standing pools blood in the legs; lying down returns it. */
+  posture: 'supine' | 'sitting' | 'standing';
+}
+
+/** Arterial acid-base, computed every tick from PaCO2 and the metabolic buffer. */
+export interface AcidBaseSnapshot {
+  ph: number;
+  hco3_mEq_per_L: number;
+  paco2_mmHg: number;
+  /** Standard base excess, mEq/L. Negative is a metabolic acidosis. */
+  baseExcess_mEq_per_L: number;
+  /** Na - (Cl + HCO3), mEq/L. Raised by lactate and ketones. */
+  anionGap_mEq_per_L: number;
+  /** Beta-hydroxybutyrate + acetoacetate, mmol/L. */
+  ketones_mmol_per_L: number;
+  /** Plain-language reading: 'normal', 'respiratory acidosis', 'mixed ...' etc. */
+  interpretation: string;
+}
+
+/**
+ * The effect-bus targets that describe experience and signs rather than a vital:
+ * what a clinician would SEE (pupils, tone, a seizure) and what the patient would
+ * REPORT (nausea, euphoria). 0..1 unless stated.
+ */
+export interface MindSnapshot {
+  /** Pupil diameter, mm. Opioids constrict, antimuscarinics and sympathomimetics dilate. */
+  pupil_mm: number;
+  anxiety: number;
+  euphoria: number;
+  psychedelia: number;
+  /** Reinforcement signal. Not addiction: the drive the drug is producing now. */
+  dependence: number;
+  nausea: number;
+  /** Hunger, 0 = none; appetite suppressants lower it, fasting raises it. */
+  appetite: number;
+  /** Skeletal muscle tone, -1 = flaccid paralysis, 0 = normal, +1 = rigidity. */
+  muscleTone: number;
+  /** Margin before a seizure, 1 = normal, 0 = at threshold. */
+  seizureMargin: number;
+  seizing: boolean;
+  /** Vomiting is happening right now. */
+  vomiting: boolean;
+  /** Cumulative volume vomited, mL. */
+  vomitus_mL: number;
+}
+
+/** Blood clotting, as a clinician's coagulation screen reads it. */
+export interface CoagulationSnapshot {
+  /** International normalised ratio. 1.0 is normal. */
+  inr: number;
+  /** Activated partial thromboplastin time, s. */
+  aptt_s: number;
+  /** Platelet aggregation relative to normal, 0..1+. Aspirin and clopidogrel lower it. */
+  plateletFunction: number;
+  /** Platelet count, x10^9/L. */
+  platelets_10e9_per_L: number;
+  /** 0..1, how much of an active bleed the clotting system is currently holding. */
+  haemostasis: number;
+}
+
+export interface PathogenSnapshot {
+  pathogenId: string;
+  label: string;
+  kind: 'virus' | 'bacterium' | 'parasite' | 'toxin';
+  site: string;
+  /** Burden relative to this pathogen's untreated peak, 0..1+. */
+  burden: number;
+  /** log10 of burden relative to the inoculum, for the "growth" readout. */
+  load_log10: number;
+  /** Hours since inoculation. */
+  t_h: number;
+  phase: 'incubating' | 'symptomatic' | 'resolving' | 'cleared';
+  /** Antimicrobial kill currently being applied, per hour. */
+  drugKill_per_h: number;
+}
+
+export interface InfectionSnapshot {
+  active: PathogenSnapshot[];
+  /** Combined innate and adaptive activation, 0..1. */
+  immuneActivation: number;
+  /** White cell count, x10^9/L. */
+  wbc_10e9_per_L: number;
+  /** C-reactive protein, mg/L. */
+  crp_mg_per_L: number;
+  /** CD4+ T cells, per uL. */
+  cd4_per_uL: number;
+  /** qSOFA-style sepsis flag computed from live signs. */
+  sepsis: boolean;
+}
+
+/** Fluid compartments and balance. */
+export interface FluidSnapshot {
+  interstitial_mL: number;
+  /** Net fluid balance since the run began, mL. Positive is a gain. */
+  balance_mL: number;
+  /** Plasma osmolality, mOsm/kg (2Na + glucose/18 + urea/2.8). */
+  osmolality_mOsm_per_kg: number;
+  /** Losses happening now that are not urine: diarrhoea, vomiting, sweat, leak. mL/min. */
+  extraLosses_mL_per_min: number;
+  /** Airway narrowing, 0 = open, 1 = closed. Bronchospasm, anaphylaxis. */
+  bronchoconstriction: number;
+}
+
+/** One message from the engine that the operator should see: a refused dose, say. */
+export interface EngineNotice {
+  id: number;
+  t: number;
+  tone: 'info' | 'warn' | 'critical';
+  text: string;
+}
+
 export interface SimSnapshot {
   /** Monotonic sequence number; the renderer interpolates between seq and seq-1. */
   seq: number;
@@ -323,6 +458,27 @@ export interface SimSnapshot {
   procedures: ProcedureSnapshot;
   behaviour: BehaviourSnapshot;
   pathology: PathologySnapshot;
+  environment: EnvironmentSnapshot;
+  acidBase: AcidBaseSnapshot;
+  mind: MindSnapshot;
+  coagulation: CoagulationSnapshot;
+  infection: InfectionSnapshot;
+  fluids: FluidSnapshot;
+  /**
+   * THE EFFECT BUS, as it stood at the end of the last tick: every target, its summed
+   * fractional modifier. This is the single most useful thing for explaining WHY a
+   * vital sign moved — a beta blocker and a fright argue here, in plain numbers, before
+   * either reaches the heart. Zero-valued targets are omitted.
+   */
+  effects: Record<string, number>;
+  /**
+   * Who is pushing on each target: the same bus broken down by source ('drug:morphine',
+   * 'hormone:cortisol', 'baroreflex', 'exertion', 'pathogen:influenza_a', ...). Only
+   * contributions above a small threshold are kept, so the object stays small.
+   */
+  effectSources: Record<string, Record<string, number>>;
+  /** Recent engine messages, newest last. Refused doses land here instead of vanishing. */
+  notices: EngineNotice[];
 }
 
 /* ------------------------------------------------------------- dose bounds */
@@ -423,7 +579,32 @@ export type SimIntent =
   /** Inoculate with a pathogen from src/data/pathogens.json. */
   | { type: 'INOCULATE'; pathogenId: string; dose_log10?: number }
   /** Clear one pathogen, or all of them when no id is given. */
-  | { type: 'CLEAR_INFECTION'; pathogenId?: string };
+  | { type: 'CLEAR_INFECTION'; pathogenId?: string }
+
+  /* ----------------------------------------------------------- environment */
+  /**
+   * Where the body is and what it is breathing. Every field optional; an absent field
+   * leaves that part of the environment as it was. `fio2` is the oxygen fraction the
+   * operator is delivering (room air 0.21, a non-rebreather mask about 0.8, a
+   * ventilator anything up to 1.0) — a setting of the equipment, not of the body.
+   */
+  | {
+      type: 'SET_ENVIRONMENT';
+      ambientTemp_C?: number;
+      altitude_m?: number;
+      fio2?: number;
+    }
+  | { type: 'SET_POSTURE'; posture: 'supine' | 'sitting' | 'standing' }
+  /** Drink plain water, mL. Absorbed through the gut like any other fluid. */
+  | { type: 'DRINK_WATER'; volume_mL: number }
+  /** Empty the bladder. */
+  | { type: 'VOID_BLADDER' }
+  /** Airway narrowing from an asthma attack, 0..1. Bronchodilators oppose it. */
+  | { type: 'SET_BRONCHOSPASM'; level: number }
+  /** Exposure to an allergen the body is sensitised to: a mast-cell discharge, 0..1. */
+  | { type: 'ALLERGEN_EXPOSURE'; severity: number }
+  /** Clamp and set a bleed back to zero AND reset the lost-blood tally. */
+  | { type: 'STOP_ALL_BLEEDING' };
 
 /** Waveform channel layout in the shared ring (spec 3). */
 export const WAVEFORM_CHANNELS = ['ecg', 'eeg', 'abp', 'resp'] as const;

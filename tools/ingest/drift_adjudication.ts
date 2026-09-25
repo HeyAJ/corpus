@@ -110,6 +110,79 @@ export const DRIFT_ADJUDICATIONS: DriftAdjudication[] = [
       'lasts. This is also the only one of the six where the curated value does not come from the ' +
       'same document as the parse.',
   },
+
+  /* ---- part three: the wider emergency/endocrine/anti-infective set ---- */
+  {
+    drugId: 'losartan',
+    matches: 'protein binding',
+    verdict: 'curated stands',
+    because:
+      'The parser read the FREE fraction as the bound fraction. The label states "plasma free fractions ' +
+      'of 1.3% and 0.2%" for losartan and its metabolite; the regex took 1.3% and emitted it as protein ' +
+      'binding 0.013. A free fraction of 1.3% is a bound fraction of 98.7%, which is exactly the curated ' +
+      '0.99. Same document, opposite quantity.',
+  },
+  {
+    drugId: 'zolpidem',
+    matches: 'protein binding',
+    verdict: 'curated stands',
+    because:
+      'The label states "Total protein binding was found to be 92.5%"; the parser matched a later, ' +
+      'unrelated "0.1%" figure (a change in binding, not the binding itself) and emitted 0.001. The ' +
+      'curated 0.92 is the label\'s own stated total protein binding.',
+  },
+  {
+    drugId: 'valproate',
+    matches: 'protein binding',
+    verdict: 'curated stands',
+    because:
+      'The parser read the FREE fraction. The label says valproate protein binding is concentration-' +
+      'dependent and "the free fraction increases from approximately 10%"; the regex took 10% and emitted ' +
+      'it as the bound fraction. A 10% free fraction is 90% bound, which is the curated 0.90. Same ' +
+      'document, opposite quantity.',
+  },
+  {
+    drugId: 'valproate',
+    matches: 'terminal half-life',
+    verdict: 'curated stands',
+    because:
+      'The label reports a terminal half-life of "16 ± 3 hours" after a 1000 mg IV dose and 9-16 hours ' +
+      'on oral monotherapy; the parser, unable to read "16 ± 3" as one number, latched onto a partial ' +
+      'figure. The curated 13 hours sits squarely inside the label\'s own 9-16 hour oral range, which is ' +
+      'the exposure CORPUS administers.',
+  },
+  {
+    drugId: 'levetiracetam',
+    matches: 'terminal half-life',
+    verdict: 'curated stands',
+    because:
+      'The label states the half-life is "7 ± 1 hour"; the parser could not read "7 ± 1" as one value and ' +
+      'took the "1" from the "± 1 hour", emitting 60 minutes. The curated 420 minutes is exactly the ' +
+      'label\'s stated 7 hours.',
+  },
+  {
+    drugId: 'pantoprazole',
+    matches: 'terminal half-life',
+    verdict: 'curated stands',
+    because:
+      'The sentence the parser matched is about a SUBPOPULATION, not the reference adult: "these sub-' +
+      'populations of slow pantoprazole metabolizers have elimination half-life values from 3.5 to 10 ' +
+      'hours." The normal elimination half-life the curated value uses is about 1 hour, which the label ' +
+      'states plainly elsewhere; the drug\'s effect outlasting that hour is covalent pump binding, not a ' +
+      'long plasma half-life. A poor-metaboliser half-life would misrepresent the ordinary body the ' +
+      'model is.',
+  },
+  {
+    drugId: 'azithromycin',
+    matches: 'protein binding',
+    verdict: 'curated stands',
+    because:
+      'CONCENTRATION-DEPENDENT binding, and the two figures are two points on the same curve. The label ' +
+      'says serum protein binding "decreas[es] from 51% at 0.02 mcg/mL to 7% at 2 mcg/mL"; the parser ' +
+      'took the 51% at the lowest concentration, while the curated 0.30 is a representative value across ' +
+      'the therapeutic range, where azithromycin binding is well below the low-concentration peak. Both ' +
+      'come from the same sentence.',
+  },
 ];
 
 /** The ruling for a disagreement, or `null` if nobody has ruled on it yet. */

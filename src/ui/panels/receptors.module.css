@@ -1,15 +1,12 @@
 /* The only dark surface in the app (spec 8.5, VISUAL_AUDIT section 8). */
 
+/* The only dark surface in the app; it keeps that identity as a rail card. */
 .card {
-  position: absolute;
-  right: var(--inset-hud);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
-  width: min(360px, calc(100vw - 32px));
+  width: 100%;
   background: var(--chip-darker);
   border-radius: var(--radius-card);
   padding: 14px 12px 10px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-  z-index: 25;
 }
 
 .titleRow {

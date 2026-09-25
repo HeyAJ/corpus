@@ -103,6 +103,15 @@ export function endogenousTone(s: SimState, r: Receptor): number {
     case 'parasympathetic':
       return Math.max(0, Math.min(1, r.baselineTone * (s.reflex.vagal / 0.5)));
     default:
+      // Histamine receptors follow the circulating mediator a mast-cell discharge
+      // releases. Raising the TONE rather than writing the effect directly is what lets
+      // an antihistamine compete for it through the same binding kinetics as any
+      // antagonist: it occupies the site, displaces the raised tone, and removes exactly
+      // the histamine share of an anaphylaxis - which is why it helps the itch and not
+      // the shock. See systems/airway.ts.
+      if ((r.id === 'h1' || r.id === 'h2') && s.airway.histamine > 0) {
+        return Math.max(0, Math.min(1, r.baselineTone + (1 - r.baselineTone) * s.airway.histamine));
+      }
       return r.baselineTone;
   }
 }

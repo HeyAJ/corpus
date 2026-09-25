@@ -94,6 +94,10 @@
     "SUNAGAWA2017": {
       "label": "Sunagawa K. Guyton's venous return curves should be taught at medical schools (complete English translation of the Japanese version). J Physiol Sci 2017;67(4):447-458.",
       "url": "https://doi.org/10.1007/s12576-017-0533-0"
+    },
+    "FADEL2008": {
+      "label": "Fadel PJ. Arterial baroreflex control of the peripheral vasculature in humans: rest and exercise. Med Sci Sports Exerc 40(12):2055-2062, 2008.",
+      "url": "https://doi.org/10.1249/MSS.0b013e318180bc80"
     }
   },
   "constants": {
@@ -178,12 +182,12 @@
       "note": "Leg glucose uptake rises manyfold during exercise; a fourfold whole-body figure is the conservative end. Written onto `metabolic.glucoseUptake`, which in the Bergman minimal model multiplies the INSULIN-dependent limb only - so at basal insulin it contributes almost nothing and the contraction-mediated, insulin-independent limb has no path at all. That gap is real and is named in docs/BEHAVIOUR.md."
     },
     "exercise.baroreflexResetting": {
-      "value": null,
-      "unit": "mmHg of setpoint shift per unit exertion",
+      "value": 16,
+      "unit": "mmHg of setpoint elevation at maximal exertion",
       "source": "ROWELL1990",
-      "sourceUrl": "https://pubmed.ncbi.nlm.nih.gov/?term=Rowell+O%27Leary+reflex+control+of+the+circulation+during+exercise+chemoreflexes+mechanoreflexes",
-      "confidence": "measured",
-      "note": "DELIBERATELY NULL, AND THE ENGINE MUST NOT READ IT. Central command and the exercise pressor reflex reset the arterial baroreflex to a higher operating pressure, which is why heart rate and arterial pressure rise TOGETHER during exercise instead of the reflex cancelling one with the other. There is no effect-bus target for the baroreflex setpoint, so this subsystem cannot do it, and the un-reset baroreflex costs the model some of its exercise tachycardia. Kept here as a named, sourced hole rather than as silence."
+      "sourceUrl": "https://doi.org/10.1152/jappl.1990.69.2.407",
+      "confidence": "derived",
+      "note": "Central command and the exercise pressor reflex reset the arterial baroreflex to defend a higher pressure during exercise, which is why heart rate and arterial pressure RISE together instead of the reflex trading one for the other. Rowell & O'Leary report mean arterial pressure rising roughly 20-40 mmHg through heavy dynamic exercise as the reflex operating point is carried upward; the lower end is used. Without this the reflex read exercise vasodilation as hypotension and drove heart rate through its ceiling while pressure fell - the opposite of real exercise."
     },
     "sleep.deepeningTimeConstant_s": {
       "value": 900,
@@ -400,6 +404,14 @@
       "sourceUrl": "https://doi.org/10.1152/ajpheart.1998.275.5.H1733",
       "confidence": "derived",
       "note": "THE PRELOAD SIDE OF EXERCISE, AND WHY IT IS NOT A NEW NUMBER. Cardiac output cannot quadruple on a fixed venous unstressed volume: the circulation is closed, so more flow into the heart requires more of the venous reservoir's blood to become 'stressed' (pressure-bearing) rather than sitting unstressed. Guyton's venous-return-curve work (textbook home: GH14, the cardiac-output/venous-return chapter in Unit IV) is where this is taught - sympathetic venoconstriction converts unstressed to stressed volume and raises mean systemic filling pressure without any change in total blood volume. Sunagawa 2017 (SUNAGAWA2017, a checked, DOI-resolving translation of the same teaching) states it for exercise specifically: 'In exercise, activation of sympathetic nerve increases stressed volume resulting in marked increase in mean circulatory filling pressure' (section on Fig. 4), which is the mechanism this constant supplies. THE NUMBER ITSELF IS NOT NEW: this engine already trusts a figure for exactly this quantity - `baroreflex.gainVenousTone_mL` = 700 mL, 'unstressed venous volume recruited at full sympathetic drive' (URSINO1998, same model family Ursino 1998 as the rest of the baroreflex) - and reuses it rather than inventing a second one. 700 mL against this engine's own `cardio.venous.unstressedVolume_mL` (2520 mL) is 0.278, rounded to 0.28. WHY IT IS WRITTEN HERE INSTEAD OF LEFT TO THE BAROREFLEX, WHICH ALREADY READS `baroreflex.gainVenousTone_mL`: because `exercise.baroreflexResetting` is a declared null a few entries above this one - the arterial baroreflex in this model is NOT reset to a higher operating pressure during exercise, so as exercise raises mean arterial pressure the baroreflex afferent senses MORE pressure and, if anything, WITHDRAWS sympathetic tone rather than supplying it. A real exercising body gets its venoconstriction from central command and the exercise pressor reflex, which this model does not have a baroreflex-shaped path for. `cardio.venousTone` on the effect bus is that path, sized to the SAME full-sympathetic-drive magnitude the model already trusts, triggered by exertion directly rather than by an arterial pressure the model cannot reset. NAMED APPROXIMATIONS. (1) This conflates two distinct drives - central-command venoconstriction and baroreflex venoconstriction - by giving them the same cited magnitude; nobody has published a separate number for the central-command component alone. (2) It does not model the skeletal-muscle pump, which is a real and separately significant contributor to venous return during rhythmic (not isometric) exercise and is entirely absent from this two-element circuit - so venous return here is under-supplied relative to a real running body and over-supplied relative to a real cycling-with-legs-still body, and both are worth naming rather than averaging away. See docs/BEHAVIOUR.md."
+    },
+    "exercise.centralCommandReflexAttenuation": {
+      "value": 0.8,
+      "unit": "fraction of baroreflex HR gain subsumed at maximal exertion",
+      "source": "FADEL2008",
+      "sourceUrl": "https://doi.org/10.1113/expphysiol.2007.039487",
+      "confidence": "derived",
+      "note": "During exercise the tachycardia is driven by central command and the muscle metaboreflex, and arterial baroreflex control of heart rate is reset and progressively subordinated to them (Fadel 2008). Without accounting for this the model double-counted chronotropy: the direct Karvonen exercise term multiplied a baroreflex that was ALSO cranking heart rate to defend a pressure the exercise vasodilation had lowered, taking heart rate through its 240 bpm ceiling while the age-predicted maximum is 183. This attenuates the baroreflex's heart-rate contribution in proportion to exertion so the two mechanisms compose to the Karvonen rate rather than stacking."
     }
   }
 }

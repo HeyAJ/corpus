@@ -6,8 +6,10 @@
  * panel in this interface is dense on purpose because it answers "what changed". This
  * one answers "what does that mean", and density is the enemy of that.
  *
- * Bottom-left, opposite the metric cluster: the numbers live top-left and their
- * explanation lives under them, which is the direction the eye already travels.
+ * It is a card in the rail like every other panel now, and it is the one panel that is
+ * always present — "nothing is wrong" is genuinely useful while you wait for a drug to
+ * arrive, so it never hides. It leads the rail because in an emergency the reading order
+ * is the triage order.
  *
  * The left edge carries the severity colour rather than the whole card. A panel that
  * turns red is an alarm and competes with the actual alarms; a panel with a red edge is
@@ -15,20 +17,16 @@
  */
 
 .wrap {
-  position: absolute;
-  left: var(--inset-hud);
-  bottom: calc(var(--inset-hud) + 52px);
-  width: min(360px, calc(100vw - 2 * var(--inset-hud)));
-  max-height: min(52vh, 520px);
+  width: 100%;
   display: flex;
   flex-direction: column;
+  max-height: min(52vh, 520px);
   background: var(--sheet-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radius-card);
   border-left: 3px solid transparent;
   pointer-events: auto;
-  z-index: 28;
   overflow: hidden;
   transition: border-color 220ms ease;
 }

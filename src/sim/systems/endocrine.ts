@@ -1,6 +1,6 @@
 import hormonesFile from '../../data/hormones.json';
 import type { SimState } from '../core/state';
-import { addEffect } from '../core/effects';
+import { addEffect, prevEffect } from '../core/effects';
 
 /**
  * ENDOCRINE SYSTEM.
@@ -85,7 +85,13 @@ export function stepEndocrine(s: SimState, dt: number): void {
   const hypotension = Math.max(0, (70 - s.cardio.map) / 40);
   const hypoxia = Math.max(0, (0.92 - s.resp.spo2) / 0.2);
   const hypoglycaemia = Math.max(0, (70 - s.metabolic.G) / 40);
-  const target = Math.min(1, hypotension + hypoxia + hypoglycaemia);
+  // PSYCHOLOGICAL drive on the HPA axis, from affect.ts (fright, stress, depression) and
+  // pain. It reaches here through the bus, read from the completed previous tick because
+  // affect runs before endocrine. This was the missing line the affect.ts comment named:
+  // psychological stress wrote `neuro.stressAxis` and nothing read it, so a month of
+  // stress produced no cortisol. Now it drives the same axis a haemorrhage does.
+  const psychological = Math.max(0, prevEffect(s, 'neuro.stressAxis'));
+  const target = Math.min(1, hypotension + hypoxia + hypoglycaemia + psychological);
   e.stressAxis += ((target - e.stressAxis) * dt) / 600;
 
   // --- each hormone --------------------------------------------------------
@@ -122,11 +128,21 @@ export function stepEndocrine(s: SimState, dt: number): void {
     h.level += (secretion - k * h.level) * dt;
     h.level = Math.max(0, h.level);
 
+    // A DRUG THAT IS THIS HORMONE adds to the effective level here. Its pharmacokinetics
+    // already govern its rise and fall in `s.endocrine.exogenous[id]` (set by the engine
+    // from the drug's plasma concentration), so it is ADDED to the secreted pool for the
+    // activity, the effects and the lab readout without being integrated again. This is
+    // what makes an injection of hydrocortisone suppress the body's own cortisol drive
+    // through the same feedback the adrenal gland answers to, and an insulin infusion
+    // reach glucose uptake by the pancreas's own path.
+    const exo = s.endocrine.exogenous[def.id] ?? 0;
+    const effectiveLevel = h.level + exo;
+
     // Receptor-level activity: a Hill transform of concentration. This is what the
     // effects scale on, NOT the raw level, because a hormone at ten times its
     // reference does not produce ten times its effect — it saturates, like everything
     // else that acts through a receptor.
-    const x = Math.pow(Math.max(0, h.level), def.hill);
+    const x = Math.pow(Math.max(0, effectiveLevel), def.hill);
     const e50 = Math.pow(def.ec50, def.hill);
     h.activity = x / (x + e50);
 
