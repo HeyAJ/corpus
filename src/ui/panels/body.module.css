@@ -92,3 +92,79 @@
   background: rgba(0, 0, 0, 0.06);
   font-weight: 700;
 }
+
+/* ---------------------------------------------------------------- subject */
+
+.note {
+  margin: 2px 0 8px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--ink-dim);
+}
+
+.field b {
+  color: var(--ink);
+  font-weight: 700;
+  margin-left: 4px;
+}
+
+.field input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent, #c8323a);
+}
+
+/* -------------------------------------------------------------- scenarios */
+
+.scenarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.scenario {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 8px 10px;
+  text-align: left;
+  border-radius: 12px;
+  background: var(--chip-bg);
+  color: var(--ink);
+}
+
+.scenario strong {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.scenario span {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--ink-faint);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.scenario:hover,
+.scenario:focus-visible {
+  background: var(--chip-bg-strong);
+}

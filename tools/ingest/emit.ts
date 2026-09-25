@@ -9,8 +9,9 @@ import type {
 } from '../../src/data/pharma-types';
 import { MANIFEST, type ManifestEntry } from './drug_manifest';
 import { ROUTE_ADDITIONS } from './route_presets';
-import { PK_BY_ID, type PkLiteratureEntry } from './pk_literature';
+import { BLOOD_CLEARED, PK_BY_ID, type PkLiteratureEntry } from './pk_literature';
 import { REGISTRY, SOURCES as REGISTRY_SOURCES } from './receptor_registry';
+import { isCentralEffect } from './central_effects';
 import {
   GTOPDB_ATTRIBUTION,
   cleanName,
@@ -171,7 +172,10 @@ function buildReceptors(gtopdb: GtopdbData): Receptor[] {
       centralFraction: r.centralFraction,
       ec50Occupancy: r.ec50Occupancy,
       hill: r.hill,
-      effects: r.effects,
+      // Each effect says whether it happens behind the blood-brain barrier, which is
+      // what pd.ts gates on a drug's penetration. See central_effects.ts for why the
+      // old per-receptor blend (centralFraction) was replaced.
+      effects: r.effects.map((e) => ({ ...e, central: isCentralEffect(r.id, e.target) })),
       gtopdbTargetId: id ?? null,
       notes: r.notes,
     };
@@ -488,6 +492,7 @@ function buildPk(
     k10_min: null, k12_min: null, k21_min: null, k13_min: null, k31_min: null,
     renalFraction: null, proteinBound: null, MW_gmol: null,
     ka_min: null, lagTime_min: null, bioavailability: null, hepaticExtraction: null,
+    bloodClearance: null,
     vmax_mg_per_min: null, km_mg_per_L: null,
     provenance,
   };
@@ -605,6 +610,11 @@ function buildPk(
   if (lit?.hepaticExtraction !== undefined) {
     pk.hepaticExtraction = lit.hepaticExtraction;
     cite('hepaticExtraction', lit.citations[0].source, lit.citations[0].url, 'derived');
+  }
+  const blood = BLOOD_CLEARED[m.id];
+  if (blood) {
+    pk.bloodClearance = true;
+    cite('bloodClearance', blood.source, blood.url, 'measured', blood.note);
   }
   if (lit?.vmax_mg_per_min !== undefined) {
     pk.vmax_mg_per_min = lit.vmax_mg_per_min;

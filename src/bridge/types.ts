@@ -479,6 +479,8 @@ export interface SimSnapshot {
   effectSources: Record<string, Record<string, number>>;
   /** Recent engine messages, newest last. Refused doses land here instead of vanishing. */
   notices: EngineNotice[];
+  /** The subject being simulated, as the engine is using it. Set with SET_BODY. */
+  body: { mass_kg: number; height_m: number; age_y: number; sex: 'male' | 'female'; bsa_m2: number };
 }
 
 /* ------------------------------------------------------------- dose bounds */

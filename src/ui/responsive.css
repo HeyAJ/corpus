@@ -88,6 +88,12 @@
     min-height: 44px;
   }
 
+  /* Panel close buttons are a bare glyph, so height alone left them 19 px wide - a
+     sliver, not a target. Width too. */
+  button[aria-label^='Close'] {
+    min-width: 44px;
+  }
+
   /* Except inside dense tabular data, where 44px rows would make a lab panel
      unreadable — those get horizontal padding for the touch target instead. */
   table button,

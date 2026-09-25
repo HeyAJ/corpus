@@ -4,9 +4,11 @@ import { Engine } from '../../src/sim/core/engine';
 import drugsFile from '../../src/data/drugs.json';
 import foodsFile from '../../src/data/foods.json';
 import type { DrugsFile } from '../../src/data/pharma-types';
-import type { SimSnapshot } from '../../src/bridge/types';
+import type { SimIntent, SimSnapshot } from '../../src/bridge/types';
 import { toMilligrams, isMassUnit } from '../../src/sim/pharma/units';
 import { routeSpec, depotParamsFor, ROUTE_IDS } from '../../src/sim/pharma/routes';
+import { PATHOGENS } from '../../src/sim/systems/infection';
+import { P } from '../../src/sim/core/constants';
 
 /**
  * INTEGRITY SWEEP.
@@ -85,6 +87,38 @@ describe('no NaN ever reaches a snapshot', () => {
     });
     for (const sample of s.samples) {
       expect(findNonFinite(sample), `at t=${sample.t}`).toBeNull();
+    }
+  });
+
+  it('refuses an intent carrying a NaN instead of letting it poison the body', () => {
+    // Twelve intents once accepted NaN and six of them turned the heart rate itself into
+    // NaN within a second, for ever. Each is sent here with every numeric field NaN, into
+    // a separate body, and the body must stay finite and say that it refused.
+    const poisoned: SimIntent[] = [
+      { type: 'HAEMORRHAGE', volume_mL: Number.NaN },
+      { type: 'SET_EXERTION', level: Number.NaN },
+      { type: 'FRIGHTEN', intensity: Number.NaN },
+      { type: 'SET_AFFECT', stress: Number.NaN, depression: Number.NaN },
+      { type: 'SET_BRONCHOSPASM', level: Number.NaN },
+      { type: 'ALLERGEN_EXPOSURE', severity: Number.NaN },
+      { type: 'SET_PAIN', level: Number.NaN },
+      { type: 'SET_BLEED', rate_mL_per_min: Number.NaN },
+      { type: 'SET_VERTIGO', level: Number.NaN },
+      { type: 'EAT', foodId: 'white_rice', portions: Number.NaN },
+      { type: 'DRINK_WATER', volume_mL: Number.POSITIVE_INFINITY },
+      { type: 'INOCULATE', pathogenId: 'e_coli', dose_log10: Number.NaN },
+      { type: 'CHARGE_DEFIB', joules: Number.NaN },
+    ];
+    for (const intent of poisoned) {
+      const e = new Engine(0x5eed);
+      e.applyIntent(intent);
+      for (let i = 0; i < 300; i++) {
+        e.tick(DT);
+        e.pending.length = 0;
+      }
+      const snap = e.snapshot();
+      expect(findNonFinite(snap), intent.type).toBeNull();
+      expect(snap.notices.some((n) => n.text.startsWith(`${intent.type} refused`)), intent.type).toBe(true);
     }
   });
 
@@ -221,14 +255,40 @@ describe('the data has no silent categories', () => {
     // well through the Pulse concentration-effect block. The test was wrong; the
     // drugs were fine. What WAS wrong was their targetsNote, which claimed direct
     // effects they did not have.
+    //
+    // Two more routes arrived with the 2026-09-24 drugs, and this test reported fourteen
+    // of them as inert until it learned about them - the same mistake as pulsePd, made
+    // again. Insulin joins the body's own insulin pool (`hormoneAnalogue`, read by
+    // endocrine.ts), and an antibiotic or antiviral acts on a PATHOGEN rather than on a
+    // receptor (`antimicrobial`, read by infection.ts). Neither touches a healthy,
+    // uninfected body's vitals directly, which is correct and is not inertness.
     const inert = DRUGS.filter(
       (d) =>
         d.targets.length === 0 &&
         d.directEffects.length === 0 &&
         d.pulsePd === null &&
-        !d.payload,
+        !d.payload &&
+        !d.hormoneAnalogue &&
+        !d.antimicrobial,
     );
     expect(inert.map((d) => d.id).join(', ')).toBe('');
+  });
+
+  it('points every antimicrobial at a pathogen the body can actually carry', () => {
+    // An antimicrobial whose spectrum names only pathogens that are not in
+    // pathogens.json is inert by a longer road: the kill term is summed over the
+    // infections present, and it can never be present. So the spectrum has to resolve.
+    const known = new Set(PATHOGENS.map((p) => p.id));
+    const orphaned = DRUGS.filter((d) => d.antimicrobial).flatMap((d) =>
+      d.antimicrobial!.spectrum.filter((x) => !known.has(x.pathogenId)).map((x) => `${d.id}->${x.pathogenId}`),
+    );
+    expect(orphaned.join(', ')).toBe('');
+    // And every spectrum entry needs a finite, positive MIC, or the Emax term divides
+    // by zero or never engages.
+    const badMic = DRUGS.filter((d) => d.antimicrobial).flatMap((d) =>
+      d.antimicrobial!.spectrum.filter((x) => !(x.mic_mg_per_L > 0 && Number.isFinite(x.mic_mg_per_L))).map((x) => `${d.id}->${x.pathogenId}`),
+    );
+    expect(badMic.join(', ')).toBe('');
   });
 
   it('actually depresses respiration for every drug that should', () => {
@@ -450,7 +510,23 @@ describe('a body without a circulation stops breathing', () => {
     // would pass the line above and still be wrong.
     expect(after.cardio.cardiacOutput_L_per_min, 'the arrest did not abolish output').toBeLessThan(0.5);
     expect(after.neuro.consciousness, 'consciousness survived an arrest').toBeLessThan(0.05);
-    expect(after.resp.paco2_mmHg, 'CO2 did not accumulate without a circulation').toBeGreaterThan(before.resp.paco2_mmHg + 20);
+    //
+    // HOW MUCH CO2, and why this threshold was lowered on 2026-09-24. It used to demand
+    // +20 mmHg in three and a half minutes, which the old respiratory model met because
+    // it chased 863·VCO2/VA with a 35 s lag: as ventilation fell toward zero that target
+    // ran to the 180 mmHg cap and PaCO2 climbed several mmHg a SECOND - faster than
+    // metabolism can make CO2. Mass balance caps the rise at production over the body's
+    // CO2 capacitance, measured during complete airway obstruction at 3.4 mmHg/min
+    // (Stock 1989, `resp.apnoeaPaco2Rise_mmHg_per_min`). That paper's extra ~12 mmHg in
+    // the first minute is lung and blood equilibrating with mixed venous gas, which needs
+    // pulmonary blood flow, and an arrested circulation has none. So the honest
+    // expectation over the ~3.5 apnoeic minutes here is roughly 3.4 x 3.5 = 12 mmHg, and
+    // the line below asks for well over half of it: clearly accumulating, and bounded by
+    // a measured rate rather than by the old model's overshoot.
+    const apnoeicMinutes = (after.t - 30) / 60;
+    expect(after.resp.paco2_mmHg, 'CO2 did not accumulate without a circulation').toBeGreaterThan(
+      before.resp.paco2_mmHg + 0.6 * P('resp.apnoeaPaco2Rise_mmHg_per_min') * apnoeicMinutes,
+    );
   });
 });
 

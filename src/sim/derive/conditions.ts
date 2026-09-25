@@ -1,4 +1,5 @@
 import { P } from '../core/constants';
+import { referenceBloodVolume } from '../core/body';
 import type { SimState } from '../core/state';
 import type { ConditionTag, Severity } from '../../bridge/types';
 
@@ -30,11 +31,11 @@ const RULES: Rule[] = [
   {
     id: 'hypovolemia',
     label: 'Hypovolemia',
-    severity: (s) => (s.cardio.bloodVolume < 0.7 * P('blood.totalVolume_mL') ? 'critical' : 'warn'),
+    severity: (s) => (s.cardio.bloodVolume < 0.7 * referenceBloodVolume(s) ? 'critical' : 'warn'),
     measure: (s) => s.cardio.bloodVolume,
-    threshold: () => 0.85 * P('blood.totalVolume_mL'),
+    threshold: (s) => 0.85 * referenceBloodVolume(s),
     above: false,
-    detail: (s) => `Circulating volume ${Math.round(s.cardio.bloodVolume)} mL of ${P('blood.totalVolume_mL')} mL baseline`,
+    detail: (s) => `Circulating volume ${Math.round(s.cardio.bloodVolume)} mL of ${Math.round(referenceBloodVolume(s))} mL baseline`,
   },
   {
     id: 'hypotension',

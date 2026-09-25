@@ -1,5 +1,7 @@
 import type { Drug } from '../../data/pharma-types';
 import type { DrugPkState, SimState } from '../core/state';
+import { effect } from '../core/effects';
+import { volumeScale, rateConstantScale, clearanceScale } from '../core/body';
 
 /**
  * PHARMACOKINETICS (spec 5.2).
@@ -43,7 +45,9 @@ export function stepPk(
   const dtMin = dt / 60;
   const pk = drug.pk;
 
-  const V1 = pk.V1_L;
+  // BODY SIZE. Volumes scale with mass and clearances with mass^0.75 (core/body.ts), so a
+  // heavier body dilutes the same dose into more volume. Exactly 1 at the reference mass.
+  const V1 = pk.V1_L === null ? null : pk.V1_L * volumeScale(s);
   if (V1 === null || V1 <= 0) {
     // No sourced central volume: the drug cannot be simulated. Everything it was
     // given stays at zero and the UI renders an em-dash (spec 0.4, 0.6).
@@ -52,11 +56,12 @@ export function stepPk(
     return;
   }
 
-  const k10 = pk.k10_min ?? 0;
-  const k12 = pk.k12_min ?? 0;
-  const k21 = pk.k21_min ?? 0;
-  const k13 = pk.k13_min ?? 0;
-  const k31 = pk.k31_min ?? 0;
+  const kScale = rateConstantScale(s);
+  const k10 = (pk.k10_min ?? 0) * kScale;
+  const k12 = (pk.k12_min ?? 0) * kScale;
+  const k21 = (pk.k21_min ?? 0) * kScale;
+  const k13 = (pk.k13_min ?? 0) * kScale;
+  const k31 = (pk.k31_min ?? 0) * kScale;
 
   // --- input ---------------------------------------------------------------
   let input = st.infusionRate * dtMin;
@@ -116,16 +121,27 @@ export function stepPk(
   // Hepatic clearance tracks hepatic blood flow, which tracks cardiac output for a
   // high-extraction drug. Modelled as a proportional scaling, floored so a low-output
   // state does not abolish metabolism entirely.
-  const hepaticScale = Math.max(0.15, Math.min(1.6, s.cardio.co / 5.0));
+  //
+  // ENZYME INDUCTION AND INHIBITION. `hepatic.enzymeActivity` was a declared target that
+  // carbamazepine, rifampicin-type inducers and enzyme inhibitors could write and nothing
+  // read, so no drug could speed or slow another's metabolism. It now multiplies the
+  // hepatic share of clearance: +1 doubles it (an inducer), -0.5 halves it (an
+  // inhibitor). A drug that induces its own enzyme speeds its own clearance too, which
+  // is carbamazepine's autoinduction and is correct.
+  const enzymeActivity = Math.max(0.1, Math.min(5, 1 + effect(s, 'hepatic.enzymeActivity')));
+  const hepaticScale = Math.max(0.15, Math.min(1.6, s.cardio.co / 5.0)) * enzymeActivity;
 
-  const k10eff = k10 * (renalFraction * renalScale + (1 - renalFraction) * hepaticScale);
+  // A drug destroyed in the blood (adenosine, esmolol, remifentanil, succinylcholine) is
+  // not limited by liver blood flow, so its non-renal clearance ignores cardiac output.
+  const organScale = pk.bloodClearance ? enzymeActivity : hepaticScale;
+  const k10eff = k10 * (renalFraction * renalScale + (1 - renalFraction) * organScale);
 
   // Saturable (Michaelis-Menten) elimination replaces the first-order term when the
   // drug declares it: ethanol and phenytoin are zero-order at therapeutic levels.
   let mmElimination = 0;
   if (pk.vmax_mg_per_min !== null && pk.km_mg_per_L !== null) {
     const c = st.a1 / V1;
-    mmElimination = (pk.vmax_mg_per_min * c) / (pk.km_mg_per_L + c);
+    mmElimination = (pk.vmax_mg_per_min * clearanceScale(s) * c) / (pk.km_mg_per_L + c);
   }
 
   // --- integrate -----------------------------------------------------------

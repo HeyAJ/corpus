@@ -55,10 +55,28 @@ export function stepMetabolic(s: SimState, dt: number): void {
   // counter-regulatory drive (glucose above threshold) the two forms are identical, so a
   // resting or fed body is unchanged.
   const insulinSuppression = Math.max(0.15, 1 - 0.055 * (effectiveInsulin - Ib));
+
+  // GLYCOGENOLYSIS is its own term, scaled on the share of hepatic output that comes
+  // from glycogen (36 % post-absorptive, Rothman 1991), and it is ADDED - not
+  // multiplied by insulin's suppression - for the same reason the counter-regulation
+  // term beside it is (see above): glucagon breaking down liver glycogen overrides the
+  // insulin brake, which is why glucagon rescues an insulin overdose at all.
+  //
+  // Until 2026-09-25 nothing read `metabolic.glycogenolysis`: the glucagon receptor and
+  // the glucagon hormone both wrote it and it went nowhere, so glucagon's principal acute
+  // action was missing and 1 mg of it raised glucose by 2 mg/dL. Wired first as one more
+  // modifier on the insulin-suppressed output, it still did almost nothing, because the
+  // pancreas answered the first few mg/dL with insulin and the suppression multiplied the
+  // stimulus away - the defect the counter-regulation comment above describes, reproduced
+  // for the drug. At rest the target is zero, so a resting or fed body is unchanged.
+  const glycogenolysis = P('metabolic.glycogenolysisFraction') * effect(s, 'metabolic.glycogenolysis');
   const hepaticOutput =
     P('metabolic.hepaticGlucoseOutput_mg_per_min') *
-    (1 + effect(s, 'metabolic.hepaticGlucoseOutput')) *
-    (insulinSuppression + 2.2 * m.glucagonDrive);
+    Math.max(
+      0,
+      Math.max(0, 1 + effect(s, 'metabolic.hepaticGlucoseOutput')) * (insulinSuppression + 2.2 * m.glucagonDrive) +
+        glycogenolysis,
+    );
 
   // Gut appearance from GI absorption, mg/min.
   const Ra = s.gi.glucoseAbsorptionRate + hepaticOutput;
@@ -96,6 +114,29 @@ export function stepMetabolic(s: SimState, dt: number): void {
 
   // --- thermal balance -----------------------------------------------------
   stepThermal(s, dt);
+}
+
+/**
+ * RUN THE GLUCOSE-INSULIN LOOP TO ITS OWN RESTING STATE.
+ *
+ * The engine's 30 s warm-up (engine.ts, createRestingState) settles the circulation, but
+ * this loop's time constants are tens of minutes: remote insulin action X relaxes at p2,
+ * glucose at p1, and the pancreas has to find the insulin level that balances hepatic
+ * output. Booted at the textbook basal values (G = Gb, I = Ib, X = 0) the loop is not at
+ * rest - hepatic output is flowing and nothing yet opposes it - so every fresh body's
+ * glucose climbed from 93 to 100 mg/dL over its first quarter of an hour and took most of
+ * an hour to come back. That transient sat under every drug run and every control.
+ *
+ * So the loop is asked where its own rest is, by running THIS FILE'S OWN step with the
+ * effect vector frozen at the warmed-up body's values, rather than by a separate
+ * closed-form solution that could quietly disagree with the step it is meant to match.
+ * Twelve simulated hours at a one-second step is far past the slowest time constant and
+ * costs a few milliseconds, once per process.
+ */
+export function settleGlucoseInsulin(s: SimState): void {
+  const dt = 1;
+  const steps = 12 * 3600;
+  for (let i = 0; i < steps; i++) stepMetabolic(s, dt);
 }
 
 /**

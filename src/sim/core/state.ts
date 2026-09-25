@@ -387,14 +387,25 @@ export interface EndocrineState {
   /** Simulated hour of day, 0..24, for the circadian terms several hormones carry. */
   clockHour: number;
   /**
-   * Exogenous hormone added by a drug that IS that hormone, in each hormone's own unit.
+   * Exogenous hormone added by a drug that IS that hormone and has NO receptor of its own
+   * in this model (levothyroxine), in each hormone's own unit. It ACTS through the
+   * pool: the endocrine system adds it to the secreted level before the Hill transform,
+   * so the drug reaches physiology by the path the gland's own output uses.
    * Kept separate from the secreted `level` because the drug's pharmacokinetics already
    * govern its rise and fall - folding it into the integrated pool would decay it twice.
-   * The endocrine system reads the SUM of this and the secreted level for both the
-   * effect vector and the lab readout, so an insulin infusion and the pancreas's own
-   * output reach glucose uptake by one path. Keyed by hormone id.
+   * Keyed by hormone id. (Insulin has its own home, metabolic.exogenousInsulin_uU_per_mL.)
    */
   exogenous: Record<string, number>;
+  /**
+   * EVERY exogenous contribution to a hormone's measured level, including drugs that act
+   * through their own receptors (vasopressin at V1a/V2, hydrocortisone at GR/MR, glucagon
+   * at its receptor). Those drugs must not ALSO act through the pool - the receptor gains
+   * and the hormone's effect gains describe the same action, and applying both counted
+   * it twice (found 2026-09-25: a vasopressin bolus pushed systemic resistance through
+   * V1a and again through the ADH pool). But an assay cannot tell a drug molecule from
+   * the gland's, so the lab readout still sees all of it. Display only.
+   */
+  exogenousMeasured: Record<string, number>;
 }
 
 /**
@@ -831,6 +842,7 @@ export function createInitialState(seed: number): SimState {
     stressAxis: 0,
     clockHour: 8,
     exogenous: {},
+    exogenousMeasured: {},
   };
 
   const neuro: NeuroState = {

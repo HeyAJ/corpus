@@ -1,6 +1,7 @@
 import { P } from '../core/constants';
 import type { SimState } from '../core/state';
 import { effect } from '../core/effects';
+import { referenceBloodVolume } from '../core/body';
 
 /**
  * BODY FLUID BALANCE.
@@ -45,7 +46,7 @@ export function stepFluids(s: SimState, dt: number): void {
   // interstitium. The gradient is the plasma deficit; the rate is first-order with
   // the published restitution time constant.
   const plasma = s.cardio.bloodVolume * (1 - s.chem.hct);
-  const plasmaTarget = P('blood.totalVolume_mL') * (1 - P('blood.haematocrit'));
+  const plasmaTarget = referenceBloodVolume(s) * (1 - P('blood.haematocrit'));
   const deficit = plasmaTarget - plasma;
 
   const tau = P('fluid.transcapillaryRefillTau_min');
@@ -72,7 +73,7 @@ export function stepFluids(s: SimState, dt: number): void {
   // with no permeability effect behaves exactly as before.
   const permeability = Math.max(0, effect(s, 'vascular.permeability'));
   if (permeability > 0) {
-    const leak = (P('blood.totalVolume_mL') * 0.02 * permeability) * dtMin;
+    const leak = (referenceBloodVolume(s) * 0.02 * permeability) * dtMin;
     const moved = Math.min(leak, Math.max(0, s.cardio.veins.V - 50));
     s.cardio.veins.V -= moved;
     f.interstitial += moved;

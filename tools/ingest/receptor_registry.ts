@@ -57,7 +57,7 @@
  * for exactly this reason.
  */
 
-import type { Receptor } from '../../src/data/pharma-types';
+import type { Receptor, ReceptorEffect } from '../../src/data/pharma-types';
 
 export { SOURCES } from './pharm_sources';
 import { SOURCES } from './pharm_sources';
@@ -75,7 +75,12 @@ function fx(target: string, gain: number, source: SourceKey, note: string) {
  */
 export type { Receptor };
 
-export interface RegistryEntry extends Omit<Receptor, 'gtopdbTargetId'> {
+export interface RegistryEntry extends Omit<Receptor, 'gtopdbTargetId' | 'effects'> {
+  /**
+   * Effects as authored. Whether each is central is not written here but decided at
+   * emit time by central_effects.ts, so the rule lives in one place.
+   */
+  effects: Omit<ReceptorEffect, 'central'>[];
   gtopdbName: string;
   gtopdbAliases: string[];
 }
@@ -304,7 +309,7 @@ export const REGISTRY: RegistryEntry[] = [
       fx('thermal.heatProduction', 0.55, 'RANG10', 'Central 5-HT2A drives hyperthermia; the mechanism behind serotonin-toxicity temperature rise.'),
       fx('neuro.arousal', 0.50, 'CONCISE2023', 'Cortical layer V pyramidal excitation.'),
     ],
-    notes: 'Gq-coupled. This entry exists because the reference app foregrounds it; no drug in the shipped set is a 5-HT2A agonist.',
+    notes: 'Gq-coupled. The primary target of the classical psychedelics, which the drug set now contains as agonists, and of the atypical antipsychotics as antagonists. Psychedelic mydriasis is also 5-HT2A-mediated (ketanserin reduces it; Becker 2023), but no source in hand gives its size, so no pupil effect is carried here - MODEL_LIMITATIONS records the gap rather than a guessed gain.',
   },
   {
     id: 'ht2c', label: '5-HT2C', group: 'serotonergic',

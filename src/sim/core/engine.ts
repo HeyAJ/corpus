@@ -14,7 +14,7 @@ import { stepRespiratory } from '../systems/respiratory';
 import { stepRenal } from '../systems/renal';
 import { stepFluids } from '../systems/fluids';
 import { stepGi, gastricVolume, gastricPh, swallow, SEGMENTS, STOMACH_INDEX } from '../systems/gi';
-import { stepMetabolic } from '../systems/metabolic';
+import { settleGlucoseInsulin, stepMetabolic } from '../systems/metabolic';
 import { stepEndocrine, HORMONES } from '../systems/endocrine';
 import { buildTransport } from '../derive/transport';
 import { toMilligrams, isMassUnit } from '../pharma/units';
@@ -170,6 +170,9 @@ export interface WaveformFrame {
  * precisely the kind of silent non-determinism this engine exists to avoid. Noise after
  * t = 0 is driven by the caller's own seed as usual.
  */
+/** Intents whose handlers deal with a non-finite field themselves (see applyIntent). */
+const SELF_GUARDING_INTENTS = new Set<SimIntent['type']>(['SET_TIME_SCALE', 'ADMINISTER', 'SET_BODY', 'SET_ENVIRONMENT']);
+
 const SETTLE_S = 30;
 const SETTLE_SEED = 0x5eed;
 let restingBaseline: SimState | null = null;
@@ -188,6 +191,9 @@ function createRestingState(seed: number): SimState {
         warm.tick(dt);
         warm.pending.length = 0;
       }
+      // The glucose-insulin loop settles over tens of minutes, not thirty seconds; it is
+      // run to its own fixed point separately (see settleGlucoseInsulin for why).
+      settleGlucoseInsulin(warm.state);
       warm.state.t = 0;
       restingBaseline = structuredClone(warm.state);
     } finally {
@@ -416,23 +422,39 @@ export class Engine {
 
   /**
    * A DRUG THAT IS A HORMONE adds to that hormone's pool. Insulin lands in the Bergman
-   * model's plasma insulin; every other hormone lands in `s.endocrine.exogenous`, which
-   * stepEndocrine reads alongside the secreted level. The amount is the drug's plasma
-   * concentration (mg/L) times the cited unit conversion, so the drug's own
-   * pharmacokinetics govern the rise and fall and the pool is not integrated twice.
+   * model's plasma insulin; every other hormone lands in `s.endocrine.exogenous*`. The
+   * amount is the drug's plasma concentration (mg/L) times the cited unit conversion, so
+   * the drug's own pharmacokinetics govern the rise and fall and the pool is not
+   * integrated twice.
+   *
+   * ONE PATH TO THE BODY PER DRUG. A hormone drug that binds receptors this model carries
+   * (vasopressin, hydrocortisone, glucagon) already acts through them in stepPd, and
+   * those receptors' gains are the hormone's own effects - V1a is ADH's pressor action,
+   * GR is cortisol's. Letting the same molecule act again through the hormone pool
+   * counted every one of its effects twice, which is what the first version of this
+   * function did despite each drug's note saying the receptors carried the effects. So
+   * such a drug now contributes to the MEASURED level only (the lab panel), and only a
+   * drug with no receptor of its own (levothyroxine) acts through the pool.
    */
   private applyHormoneAnalogues(): void {
     const s = this.state;
     for (const k in s.endocrine.exogenous) s.endocrine.exogenous[k] = 0;
+    for (const k in s.endocrine.exogenousMeasured) s.endocrine.exogenousMeasured[k] = 0;
     let exogenousInsulin = 0;
     for (const st of s.drugs) {
       if (st.cp <= 0) continue;
       const drug = DRUG_BY_ID.get(st.drugId);
       const ha = drug?.hormoneAnalogue;
-      if (!ha) continue;
+      if (!drug || !ha) continue;
       const units = st.cp * ha.unitsPerMgPerL;
-      if (ha.pool === 'insulin') exogenousInsulin += units;
-      else s.endocrine.exogenous[ha.pool] = (s.endocrine.exogenous[ha.pool] ?? 0) + units;
+      if (ha.pool === 'insulin') {
+        exogenousInsulin += units;
+        continue;
+      }
+      s.endocrine.exogenousMeasured[ha.pool] = (s.endocrine.exogenousMeasured[ha.pool] ?? 0) + units;
+      if (drug.targets.length === 0) {
+        s.endocrine.exogenous[ha.pool] = (s.endocrine.exogenous[ha.pool] ?? 0) + units;
+      }
     }
     // Injected insulin joins plasma insulin, so it suppresses hepatic glucose output and
     // drives uptake through the same Bergman terms the pancreas's own insulin uses. It
@@ -460,6 +482,28 @@ export class Engine {
 
   applyIntent(intent: SimIntent): void {
     const s = this.state;
+
+    // ONE GUARD FOR EVERY INTENT. A single NaN field used to poison the body for good:
+    // `Math.max(0, NaN)` and `clamp01(NaN)` are both NaN, so HAEMORRHAGE, SET_EXERTION,
+    // FRIGHTEN, SET_AFFECT, SET_BRONCHOSPASM and ALLERGEN_EXPOSURE with a NaN field turned
+    // the heart rate itself into NaN within a second and it never came back, and six more
+    // intents (SET_PAIN, SET_BLEED, SET_VERTIGO, EAT, DRINK_WATER, INOCULATE) left a
+    // permanently non-finite field behind (found by the round-2 tester, 2026-09-25).
+    // Four intents had been guarded one at a time; twelve had not. So the rule is now
+    // structural: an intent carrying a non-finite number is refused whole, with a notice,
+    // before any handler sees it. The four that already handle a bad field on purpose
+    // keep their documented per-field behaviour (a NaN time scale collapses to real time;
+    // a NaN multiplier falls back to the reference dose; a NaN body or environment field
+    // is ignored while the others apply) and are exempt.
+    if (!SELF_GUARDING_INTENTS.has(intent.type)) {
+      for (const [field, value] of Object.entries(intent)) {
+        if (typeof value === 'number' && !Number.isFinite(value)) {
+          this.notice('warn', `${intent.type} refused: ${field} is not a finite number`);
+          return;
+        }
+      }
+    }
+
     switch (intent.type) {
       case 'START':
         s.running = true;
@@ -477,7 +521,10 @@ export class Engine {
         break;
       case 'ADMINISTER': {
         const drug = DRUG_BY_ID.get(intent.drugId);
-        if (!drug) return;
+        if (!drug) {
+          this.notice('warn', `Unknown drug "${intent.drugId}" — dose refused`);
+          return;
+        }
         const preset = drug.presetDoses.find(
           (p) => p.route === intent.route && p.amount === intent.dose && p.unit === intent.unit,
         );
@@ -488,7 +535,10 @@ export class Engine {
         // What is new is that the anchor can be SCALED. The intent says "this cited
         // dose, times x", so every dose the model integrates remains traceable to a
         // published figure, and the interface can never express one that is not.
-        if (!preset) return;
+        if (!preset) {
+          this.notice('warn', `${drug.displayName}: ${intent.dose} ${intent.unit} by ${intent.route} is not a cited preset — dose refused`);
+          return;
+        }
 
         const multiplier = clampDoseMultiplier(intent.multiplier ?? 1);
         const duration = intent.durationMin !== undefined
@@ -600,7 +650,10 @@ export class Engine {
         s.pathology.vertigo = clamp01(intent.level);
         break;
       case 'INOCULATE': {
-        if (!PATHOGEN_BY_ID.has(intent.pathogenId)) return;
+        if (!PATHOGEN_BY_ID.has(intent.pathogenId)) {
+          this.notice('warn', `Unknown pathogen "${intent.pathogenId}" — nothing was inoculated`);
+          return;
+        }
         const existing = s.infection.active.find((x) => x.pathogenId === intent.pathogenId && !x.cleared);
         if (existing) {
           // A second exposure adds to the burden rather than restarting the clock.
@@ -629,9 +682,10 @@ export class Engine {
         // mass or height makes the DuBois BSA NaN and poisons cardiac index and every
         // per-BSA readout downstream, silently and forever.
         const finite = (x: number | undefined): x is number => typeof x === 'number' && Number.isFinite(x);
-        if (finite(intent.mass_kg)) s.body.mass_kg = Math.max(2, Math.min(300, intent.mass_kg));
+        // Mass scales drug disposition (core/body.ts); the circulation stays reference-sized.
+        if (finite(intent.mass_kg)) s.body.mass_kg = Math.max(30, Math.min(250, intent.mass_kg));
         if (finite(intent.height_m)) s.body.height_m = Math.max(0.3, Math.min(2.5, intent.height_m));
-        if (finite(intent.age_y)) s.body.age_y = Math.max(0, Math.min(120, intent.age_y));
+        if (finite(intent.age_y)) s.body.age_y = Math.max(16, Math.min(100, intent.age_y));
         if (intent.sex) s.body.sex = intent.sex;
         s.body.bsa_m2 = 0.007184 * Math.pow(s.body.height_m * 100, 0.725) * Math.pow(s.body.mass_kg, 0.425);
         break;
@@ -639,10 +693,14 @@ export class Engine {
 
       /* --------------------------------------------------------- environment */
       case 'SET_ENVIRONMENT': {
+        // Non-finite values are ignored rather than clamped: Math.min/Math.max pass NaN
+        // straight through, and a NaN altitude poisons the inspired PO2 and from there
+        // every blood gas, silently, on the next tick.
         const env = s.environment;
-        if (intent.ambientTemp_C !== undefined) env.ambientTemp_C = Math.max(-40, Math.min(60, intent.ambientTemp_C));
-        if (intent.altitude_m !== undefined) env.altitude_m = Math.max(-400, Math.min(9000, intent.altitude_m));
-        if (intent.fio2 !== undefined) env.fio2 = Math.max(0.1, Math.min(1, intent.fio2));
+        const ok = (x: number | undefined): x is number => typeof x === 'number' && Number.isFinite(x);
+        if (ok(intent.ambientTemp_C)) env.ambientTemp_C = Math.max(-40, Math.min(60, intent.ambientTemp_C));
+        if (ok(intent.altitude_m)) env.altitude_m = Math.max(-400, Math.min(9000, intent.altitude_m));
+        if (ok(intent.fio2)) env.fio2 = Math.max(0.1, Math.min(1, intent.fio2));
         break;
       }
       case 'SET_POSTURE':
@@ -770,12 +828,20 @@ export class Engine {
       endocrine: {
         hormones: HORMONES.map((def) => {
           const h = s.endocrine.hormones[def.id];
+          // The panel shows what an assay would read and the receptor activity that level
+          // implies - including a drug that acts through its own receptors rather than
+          // through the pool (see applyHormoneAnalogues). `h.activity` is the POOL's
+          // activity, which deliberately leaves those drugs out, so showing it beside
+          // their level would print ADH at thousands of pg/mL at resting activity.
+          const measured = (h?.level ?? def.baseline) + (s.endocrine.exogenousMeasured[def.id] ?? 0);
+          const x = Math.pow(Math.max(0, measured), def.hill);
+          const e50 = Math.pow(def.ec50, def.hill);
           return {
             id: def.id,
             label: def.label,
-            level: (h?.level ?? def.baseline) + (s.endocrine.exogenous[def.id] ?? 0),
+            level: measured,
             unit: def.unit,
-            activity: h?.activity ?? 0,
+            activity: x / (x + e50),
             refLow: def.refLow,
             refHigh: def.refHigh,
             gland: def.gland,
@@ -951,6 +1017,7 @@ export class Engine {
       effects: activeEffects(s),
       effectSources: buildEffectSources(s),
       notices: this.notices.map((n) => ({ ...n })),
+      body: { ...s.body },
     };
   }
 }

@@ -12,9 +12,13 @@
   position: fixed;
   left: var(--inset-hud);
   right: calc(var(--rail-w) + var(--inset-hud));
-  bottom: calc(var(--corpus-bar-h) + 4px);
+  /* The MEASURED bar height (App.tsx publishes it), falling back to the nominal token.
+     The nominal value assumed 36 px dock buttons, but on a touch screen the 44 px target
+     rule makes the bar taller, and the sheet then sat 6-14 px over the dock it exists
+     to stay clear of (round-2 tester). */
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 4px);
   height: 46vh;
-  max-height: calc(100vh - var(--corpus-bar-h) - 24px);
+  max-height: calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
   display: flex;
   flex-direction: column;
   background: var(--sheet-bg);
@@ -27,13 +31,35 @@
 }
 
 .sheetFull {
-  height: calc(100vh - var(--corpus-bar-h) - 24px);
+  height: calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
 }
 
+/*
+ * The grabber is a button, so on a touch screen the global 44 px target rule gave it a
+ * 44 px height - and because the bar was drawn as the button's own background, the 4 px
+ * handle swelled into a grey blob. The button is now a transparent hit area of whatever
+ * height the input needs, and the handle is drawn inside it at its real size.
+ */
 .grabber {
+  position: relative;
+  display: block;
+  width: 72px;
+  height: 18px;
+  margin: 2px auto 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.grabber::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
   width: 40px;
   height: 4px;
-  margin: 10px auto 4px;
+  transform: translate(-50%, -50%);
   border-radius: var(--radius-pill);
   background: rgba(0, 0, 0, 0.18);
 }

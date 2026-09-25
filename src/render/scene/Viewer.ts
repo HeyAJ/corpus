@@ -281,7 +281,7 @@ export class Viewer {
   }
 
   handlePinch(scale: number): void {
-    this.rig.dolly(-(scale - 1) * 6);
+    this.rig.zoomBy(scale);
   }
 
   handleTap(x: number, y: number): void {

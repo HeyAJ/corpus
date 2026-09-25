@@ -62,6 +62,11 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+  /* A size container so the HUD can shed its secondary lines when the stage is short
+     (a phone with the rail open), instead of having them cut off by `overflow: hidden`.
+     Safe because the stage's row is minmax(0, 1fr): its size never comes from content. */
+  container-type: size;
+  container-name: stage;
 }
 
 .canvas {
@@ -87,7 +92,22 @@
   max-width: min(44vw, 340px);
 }
 
-.hud > * {
+/*
+ * THE HUD IS A READOUT, NOT A CONTROL. On a touch screen it overlays the body - on a
+ * phone its detail lines reach past the middle of the stage - and it used to take pointer
+ * events on every child, so a finger landing on it never reached the canvas: one-finger
+ * orbit and two-finger pinch both did nothing, while a desktop mouse (whose drags start
+ * clear of the HUD) worked, which is why it was missed (round-2 tester). Now only real
+ * controls inside it take events on a touch screen; with a mouse the readouts keep them
+ * too, so their hover tooltips still work.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .hud > * {
+    pointer-events: auto;
+  }
+}
+
+.hud :is(button, a, input, select, summary, [role='button']) {
   pointer-events: auto;
 }
 

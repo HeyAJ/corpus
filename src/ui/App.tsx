@@ -41,6 +41,7 @@ const ORGANS = organDefs();
 
 export function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const bottomBarRef = useRef<HTMLDivElement | null>(null);
   const viewerRef = useRef<Viewer | null>(null);
   const clientRef = useRef<SimClient | null>(null);
   const [ready, setReady] = useState(false);
@@ -62,6 +63,27 @@ export function App() {
   const firstRunAccepted = useStore((s) => s.firstRunAccepted);
   const sharedArrayBuffer = useStore((s) => s.sharedArrayBuffer);
   const log = useStore((s) => s.log);
+
+  /* --------------------------------------------------- bottom bar height */
+
+  // The drawer is anchored above the bottom bar by CSS, and CSS alone cannot know the
+  // bar's height: it holds the dock, the toasts and the warning, and on a touch screen the
+  // 44 px target rule makes its buttons taller than the nominal token assumes. So the bar
+  // is measured and published as --corpus-bar-actual, which drawer.module.css reads (with
+  // the token as a fallback). Guessing the height is what let the sheet overlap the dock.
+  useEffect(() => {
+    const bar = bottomBarRef.current;
+    if (!bar) return;
+    const root = document.documentElement;
+    const publish = () => root.style.setProperty('--corpus-bar-actual', `${Math.ceil(bar.getBoundingClientRect().height)}px`);
+    publish();
+    const observer = new ResizeObserver(publish);
+    observer.observe(bar);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--corpus-bar-actual');
+    };
+  }, []);
 
   /* ------------------------------------------------------------ bootstrap */
 
@@ -274,7 +296,7 @@ export function App() {
         and the permanent warning. Nothing in the stage or the rail can paint into it, so
         "the drawer covers the dock" is now a layout impossibility rather than a bug.
       */}
-      <div className={styles.bottomBar}>
+      <div className={styles.bottomBar} ref={bottomBarRef}>
         <div className={styles.bottomStack}>
           {log.length > 0 && (
             <div className={styles.log} role="log" aria-live="polite">

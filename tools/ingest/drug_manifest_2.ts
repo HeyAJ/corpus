@@ -662,6 +662,12 @@ export const MANIFEST_2: ManifestEntry[] = [
     ],
     pulseName: null, gtopdbLigand: 'theophylline', gtopdbAliases: [],
     receptorAllowList: ['a1', 'a2a'],
+    bbbPenetration: {
+      value: 1.0,
+      source: 'FDA Structured Product Label (openFDA), theophylline anhydrous: "Theophylline passes freely across the placenta, into breast milk and into the cerebrospinal fluid (CSF)."',
+      sourceUrl: 'https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=04f1d1da-ce61-45b3-acf4-903cc81d16da',
+      note: 'The passive-permeability rule scored theophylline at 0.28 because it is small and polar, which the rule reads as poorly permeant. The label says the opposite - it passes freely into the CSF - and its central toxicity (agitation, seizures) is the clinical proof. Harmless while the engine blended central and peripheral access; once central effects were gated on penetration alone (2026-09-25) it would have taken most of theophylline\'s central stimulation away. Overridden to free passage.',
+    },
     notes: 'An adenosine antagonist with a narrow therapeutic index; its toxicity is arrhythmia and seizure. The direct opposition to adenosine is something this model can show literally — give both and watch them compete at A1.',
   },
   {
@@ -696,9 +702,9 @@ export const MANIFEST_2: ManifestEntry[] = [
     hormoneAnalogue: {
       pool: 'cortisol',
       // 1 mg/L = 100 ug/dL, a unit identity. Hydrocortisone IS cortisol, so its plasma
-      // level adds directly to the cortisol pool the HPA model and the lab panel read.
+      // level adds directly to the cortisol pool the lab panel reads.
       unitsPerMgPerL: 100,
-      note: 'Hydrocortisone is cortisol itself, so its plasma level (mg/L) adds to the endogenous cortisol pool in the pool unit of ug/dL (1 mg/L = 100 ug/dL). The glucocorticoid and mineralocorticoid RECEPTORS carry the anti-inflammatory and salt-retaining effects; the pool carries the level the HPA feedback and the lab panel read, so an exogenous dose suppresses the axis the way a real steroid course does.',
+      note: 'Hydrocortisone is cortisol itself, so its plasma level (mg/L) adds to the endogenous cortisol pool in the pool unit of ug/dL (1 mg/L = 100 ug/dL). The glucocorticoid and mineralocorticoid RECEPTORS carry the anti-inflammatory and salt-retaining effects; the pool carries the level the lab panel reads, and does not act a second time. The HPA negative feedback by which a real steroid course suppresses the adrenal\'s own output is NOT modelled - no hormone driver here reads a hormone level - so the endogenous cortisol carries on being secreted underneath the dose (MODEL_LIMITATIONS §9).',
       source: 'Unit identity (1 mg/L = 100 ug/dL); reference cortisol range from Guyton & Hall, 14th ed.',
       sourceUrl: 'https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8',
     },
@@ -855,16 +861,17 @@ export const MANIFEST_2: ManifestEntry[] = [
       source: 'Free-fraction of thyroxine ~0.03% (99.97% protein bound); Guyton & Hall, 14th ed., thyroid hormone transport and free-T4 reference range 0.8-1.8 ng/dL.',
       sourceUrl: 'https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8',
     },
-    directEffects: [
-      // The metabolic.basalRate direct effect was REMOVED: basalRate is a readout-only
-      // bus target (nothing consumes it), so it was dead, and the thyroxine hormone pool
-      // above now drives the real thermogenic and metabolic response through the endocrine
-      // model — which is where thyroid hormone belongs. The cardiac effect is kept as a
-      // direct effect because it is a distinct action (raised myocardial beta-adrenoceptor
-      // density) and is live on the bus.
-      { target: 'cardio.heartRate', gain: 0.30, note: 'Increased myocardial beta-adrenoceptor density, so thyroid state changes how the heart answers catecholamines — a cardiac action distinct from the hormone pool\'s metabolic one.', ...dailymed('levothyroxine sodium tablets') },
-    ],
-    notes: 'A seven-day half-life, so this is the slowest drug in the set by two orders of magnitude. Modelled as the hormone it is: its plasma level feeds the endogenous free-T4 pool, so the metabolic rate rises through the same path the body\'s own thyroxine uses, applied far faster than the weeks it really takes (stated in MODEL_LIMITATIONS).',
+    // NO DIRECT EFFECTS, and both have now been removed for the same reason: each one
+    // counted a thyroid action the hormone pool above already carries. The
+    // metabolic.basalRate effect went first (it was also a dead bus target). The
+    // cardio.heartRate one went on 2026-09-25: hormones.json gives thyroxine its own
+    // cardio.heartRate gain (+0.4), so the pool and this direct effect were adding the SAME
+    // chronotropic action twice, and the direct one did it on the wrong clock - at the
+    // speed of plasma concentration, hours after a tablet, when thyroid hormone's cardiac
+    // action is genomic (raised myocardial beta-adrenoceptor and SERCA expression) and
+    // takes days. Its note called it "a cardiac action distinct from the hormone pool's
+    // metabolic one", which was true of neither the physiology nor the data.
+    notes: 'A seven-day half-life, so this is the slowest drug in the set by two orders of magnitude. Modelled as the hormone it is: its plasma level feeds the endogenous free-T4 pool, so the metabolic rate, heat production and heart rate rise through the same path the body\'s own thyroxine uses, applied far faster than the weeks it really takes (stated in MODEL_LIMITATIONS).',
   },
   {
     id: 'allopurinol', displayName: 'Allopurinol', class: 'other', drawerGroup: 'Other',
@@ -904,6 +911,12 @@ export const MANIFEST_2: ManifestEntry[] = [
     ],
     pulseName: null, gtopdbLigand: 'caffeine', gtopdbAliases: [],
     receptorAllowList: ['a1', 'a2a'],
+    bbbPenetration: {
+      value: 1.0,
+      source: 'FDA Structured Product Label (openFDA), caffeine citrate: "Caffeine is rapidly distributed into the brain. Caffeine levels in the cerebrospinal fluid of preterm neonates approximate their plasma levels."',
+      sourceUrl: 'https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=21489401-f2a7-47d3-897a-4b7efa04dd7a',
+      note: 'The passive-permeability rule scored caffeine at 0.30 on its low lipophilicity, and caffeine is the textbook counter-example: a small molecule that equilibrates across the blood-brain barrier, CSF level equal to plasma. Once central effects were gated on penetration alone (2026-09-25) the rule\'s number would have removed most of the arousal that is the reason anyone drinks coffee. Overridden to free passage, as the label states.',
+    },
     notes: 'An adenosine antagonist, and the most widely consumed psychoactive drug there is. It is here because it is the cleanest demonstration of competitive antagonism at a receptor whose endogenous agonist the model already carries.',
   },
   {

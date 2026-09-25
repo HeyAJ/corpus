@@ -34,31 +34,67 @@
 }
 
 /*
- * PHONE: the stage is only a third of the screen tall and the HUD owns its left
- * two-thirds, so a centred horizontal pill sat directly on the heart-rate chip. Stacked
- * vertically against the right edge it occupies a strip the HUD (capped at 62vw) never
- * reaches and the centred body never crosses.
+ * PHONE: a horizontal pill at the BOTTOM CENTRE of the stage. It used to be stacked
+ * vertically against the right edge, which was clear of the HUD but shared the top-right
+ * corner with the condition tags, and it set `min-height: 0` - a class rule, so it beat
+ * the global 44 px touch-target rule and left the four speed buttons 21 px tall on the
+ * one breakpoint guaranteed to be driven by a finger (round-2 tester). The bottom centre
+ * is the one place on a phone stage that neither the HUD (top left), the tags (top
+ * right) nor the drawer's own controls use.
  */
 @media (max-width: 720px) {
   .wrap {
-    left: auto;
-    right: 8px;
-    transform: none;
-    flex-direction: column;
+    top: auto;
+    bottom: 8px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    flex-direction: row;
     gap: 2px;
-    padding: 4px;
-    border-radius: 14px;
+    padding: 3px 4px;
   }
 
   .clock {
-    padding: 2px 0;
+    padding: 0 6px 0 4px;
     font-size: 11px;
   }
 
   .button,
   .active {
-    padding: 4px 8px;
+    padding: 4px 9px;
     font-size: 11px;
+  }
+}
+
+/* Only a fine pointer may shrink them below the touch minimum. */
+@media (max-width: 720px) and (pointer: fine) {
+  .button,
+  .active {
     min-height: 0;
+  }
+}
+
+/*
+ * A SHORT STAGE (a phone with rail panels open, stage under ~380 px): at the bottom
+ * centre the pill landed on the HUD's heart-rate and ECG rows. It moves to the top-right
+ * corner instead, and the condition tags step down beneath it (panels.module.css).
+ */
+@container stage (max-height: 380px) {
+  .wrap {
+    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    bottom: auto;
+    left: auto;
+    right: 8px;
+    transform: none;
+    /* A 2 x 2 block fits the strip right of the HUD's rows even at 360 px, where a
+       single row of four did not. */
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    padding: 3px;
+    border-radius: 14px;
+  }
+
+  .clock {
+    display: none;
   }
 }

@@ -41,6 +41,18 @@ export interface OrbitLimits {
 
 const DEG = Math.PI / 180;
 
+/** Radians of azimuth per normalised unit of drag: the canvas is 2 units wide, so a full-width drag is one turn. */
+const AZIMUTH_PER_UNIT = Math.PI;
+/** Radians of polar per normalised unit of drag: a full-height drag sweeps about the 150 deg polar band. */
+const POLAR_PER_UNIT = (75 * Math.PI) / 180;
+/**
+ * Residual velocity as a multiple of each step's angle per second. With the 9/s decay
+ * every step coasts on by FLING/9 of itself, and that happens during the drag as well
+ * as after it, so the value is kept small: 1.5 makes a drag about a sixth longer than
+ * the finger's travel and leaves a short, soft settle on release.
+ */
+const FLING = 1.5;
+
 /** Half-height of the whole exploded body, metres: brain crown to pelvic floor. */
 export const BODY_FRAMING_RADIUS = 0.40;
 
@@ -91,15 +103,42 @@ export class OrbitRig {
     this.camera.updateProjectionMatrix();
   }
 
-  /** Pointer drag, in normalised screen units. */
+  /**
+   * Pointer drag, in normalised screen units (the canvas spans -1..1 on each axis).
+   *
+   * DIRECT MANIPULATION, with a little fling on release. The drag used to add only
+   * VELOCITY (2.4 x dx), which then decayed at 9 per second, so the angle a drag could
+   * produce was a ninth of that: a whole canvas-width drag turned the body about thirty
+   * degrees, and a 300 px drag a few degrees - moving, but not visibly, which the round-2
+   * tester (rightly) reported as "does not rotate at all". On a slow frame rate it was
+   * worse, because the integrator clamps each step to 50 ms. Now the angle follows the
+   * finger one-to-one - a full canvas-width drag is one full turn, a full-height drag
+   * sweeps the polar band - and only a small residual velocity carries on after release,
+   * so the weighty feel survives without the drag feeling disconnected.
+   */
   orbit(dx: number, dy: number): void {
-    this.azimuthVel += dx * 2.4;
-    this.polarVel += dy * 1.8;
+    this.azimuth += dx * AZIMUTH_PER_UNIT;
+    this.polar += dy * POLAR_PER_UNIT;
+    this.azimuthVel = dx * AZIMUTH_PER_UNIT * FLING;
+    this.polarVel = dy * POLAR_PER_UNIT * FLING;
     this.focusT = 1; // a manual drag cancels any running focus animation
   }
 
   dolly(delta: number): void {
     this.distanceVel += delta * 0.9;
+    this.focusT = 1; // likewise: a running focus animation would overwrite the distance
+  }
+
+  /**
+   * Pinch: scale the viewing distance by the change in finger spread (fingers apart =
+   * closer). Direct, like the drag, and it cancels a running focus animation - which
+   * sets `distance` itself every frame and so silently undid a pinch made during it.
+   */
+  zoomBy(spreadRatio: number): void {
+    if (!(spreadRatio > 0) || !Number.isFinite(spreadRatio)) return;
+    this.distance = THREE.MathUtils.clamp(this.distance / spreadRatio, this.limits.minDistance, this.limits.maxDistance);
+    this.distanceVel = 0;
+    this.focusT = 1;
   }
 
   /**

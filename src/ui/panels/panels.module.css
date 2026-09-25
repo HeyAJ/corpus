@@ -35,6 +35,20 @@
   padding: 2px 2px 0;
 }
 
+/* On a short stage (a phone with the rail panels open) the secondary detail lines no
+   longer fit above the body and were being cut off by the stage's clipping mid-line. The
+   headline numbers stay; the full detail is in the Physiology panel in the rail. */
+@container stage (max-height: 380px) {
+  .detail {
+    display: none;
+  }
+
+  /* The speed control takes the top-right corner on a short stage (timescale.module.css). */
+  .conditions {
+    top: calc(env(safe-area-inset-top, 0px) + 112px);
+  }
+}
+
 .noteText {
   font-weight: 500;
   line-height: 1.4;

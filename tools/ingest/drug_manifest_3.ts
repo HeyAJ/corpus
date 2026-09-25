@@ -47,6 +47,15 @@ const ACLS = {
   sourceUrl: 'https://doi.org/10.1161/CIR.0000000000000916',
 };
 
+// The 40-unit vasopressin arrest dose is stated in the 2010 guideline ("1 dose of
+// vasopressin 40 units IV/IO may replace either the first or second dose of epinephrine",
+// Class IIb) and was taken out of the arrest algorithm in 2015; the 2020 guideline above
+// discusses vasopressin without restating the dose, so it cannot be the citation for it.
+const ACLS_2010 = {
+  source: 'Neumar RW, et al. Part 8: Adult Advanced Cardiovascular Life Support: 2010 AHA Guidelines for CPR and ECC. Circulation 122(18 Suppl 3):S729-S767, 2010. The dose was removed from the arrest algorithm in 2015.',
+  sourceUrl: 'https://doi.org/10.1161/CIRCULATIONAHA.110.970988',
+};
+
 /* The Emax antimicrobial kill framework, cited once and shared. The absolute maximal
  * kill rate for each drug is a modelling anchor calibrated to the class's published
  * time-kill behaviour, in exactly the sense the receptor effect gains are: the SHAPE
@@ -68,9 +77,19 @@ export const MANIFEST_3: ManifestEntry[] = [
   {
     id: 'vasopressin', displayName: 'Vasopressin', class: 'other', drawerGroup: 'Vasopressors',
     routes: ['IV_PUSH', 'IV_DRIP'],
+    // DOSED IN MILLIGRAMS, converted from USP units by the label's own statement, "One
+    // mg is equivalent to 530 units" (Vasostrict, DESCRIPTION; MW 1084.23). Until
+    // 2026-09-25 these presets said `unit: 'unit'`, and toMilligrams passes a unit
+    // straight through as if it were a milligram - correct for a payload drug, whose
+    // dosing.ts reads the amount in its own unit, and badly wrong for a drug with real
+    // pharmacokinetics. So the 40-unit bolus entered the plasma as 40 mg, 530 times the
+    // dose, and the ADH pool read in the millions of pg/mL. Insulin and heparin had the
+    // same defect and were fixed the same way. At 0.04 units/min the corrected infusion
+    // gives a steady-state level of order 100 pg/mL, which is where the septic-shock
+    // literature finds it; 530 times that was never physiology.
     presetDoses: [
-      { route: 'IV_PUSH', amount: 40, unit: 'unit', label: '40 units', ...ACLS },
-      { route: 'IV_DRIP', amount: 2.4, unit: 'unit', label: '0.04 unit/min', durationMin: 60, ...dailymed('vasopressin injection') },
+      { route: 'IV_PUSH', amount: 0.0755, unit: 'mg', label: '40 units (0.0755 mg)', ...ACLS_2010 },
+      { route: 'IV_DRIP', amount: 0.00453, unit: 'mg', label: '0.04 unit/min (4.5 mcg/h)', durationMin: 60, ...dailymed('vasopressin injection') },
     ],
     pulseName: null, gtopdbLigand: 'vasopressin', gtopdbAliases: ['[Arg8]-vasopressin', 'argipressin'],
     receptorAllowList: ['v1a', 'v2'],
@@ -79,11 +98,11 @@ export const MANIFEST_3: ManifestEntry[] = [
       // 1 mg/L = 1e9 pg/L = 1e6 pg/mL. A mass-to-mass identity, the same one glucagon
       // uses; the clinical ADH assay reports pg/mL.
       unitsPerMgPerL: 1_000_000,
-      note: 'Plasma vasopressin in mg/L converted to the ADH pool unit of pg/mL (1 mg/L = 1e6 pg/mL). The receptor targets carry the pressor and antidiuretic EFFECTS; the pool carries the level the feedback and the lab panel read, exactly as hydrocortisone does for cortisol.',
+      note: 'Plasma vasopressin in mg/L converted to the ADH pool unit of pg/mL (1 mg/L = 1e6 pg/mL). The receptor targets carry the pressor and antidiuretic EFFECTS; the pool carries the level the lab panel reads and does not act a second time, exactly as hydrocortisone does for cortisol.',
       source: 'Unit identity (1 mg/L = 1e6 pg/mL); reference ADH assay range from Guyton & Hall, 14th ed.',
       sourceUrl: 'https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8',
     },
-    notes: 'A non-adrenergic vasopressor: it raises systemic resistance through V1A, so it still works in the acidotic, catecholamine-refractory circulation where an adrenaline infusion has stopped biting. The 40-unit arrest dose and the low-rate shock infusion are the two ways it is given.',
+    notes: 'A non-adrenergic vasopressor: it raises systemic resistance through V1A, so it still works in the acidotic, catecholamine-refractory circulation where an adrenaline infusion has stopped biting. The 40-unit arrest dose and the low-rate shock infusion are the two ways it has been given. Doses are carried in mg using the label conversion, one mg = 530 USP units (Vasostrict prescribing information), so 40 units is 0.0755 mg.',
   },
   {
     id: 'rocuronium', displayName: 'Rocuronium', class: 'other', drawerGroup: 'Neuromuscular',
@@ -350,7 +369,7 @@ export const MANIFEST_3: ManifestEntry[] = [
     hormoneAnalogue: {
       pool: 'glucagon',
       unitsPerMgPerL: 1_000_000,
-      note: 'Plasma glucagon in mg/L converted to the pool unit of pg/mL (1 mg/L = 1e6 pg/mL). The glucagon receptor carries the hepatic and cardiac EFFECTS; the pool carries the level the counter-regulatory feedback and the lab read, the same split hydrocortisone uses.',
+      note: 'Plasma glucagon in mg/L converted to the pool unit of pg/mL (1 mg/L = 1e6 pg/mL). The glucagon receptor carries the hepatic and cardiac EFFECTS; the pool carries the level the lab panel reads and does not act a second time, the same split hydrocortisone uses.',
       source: 'Unit identity (1 mg/L = 1e6 pg/mL); reference glucagon range from Guyton & Hall, 14th ed.',
       sourceUrl: 'https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8',
     },
@@ -501,7 +520,13 @@ export const MANIFEST_3: ManifestEntry[] = [
     presetDoses: [{ route: 'ORAL', amount: 10, unit: 'mg', label: '10 mg', ...dailymed('cetirizine hydrochloride tablets') }],
     pulseName: null, gtopdbLigand: 'cetirizine', gtopdbAliases: [],
     receptorAllowList: ['h1'],
-    notes: 'A second-generation antihistamine: a zwitterion that barely crosses the blood-brain barrier, so it blocks peripheral H1 without the sedation. The model expresses that with the same physicochemical gate it uses for everything else, so the sedation is absent for a reason the data carries.',
+    bbbPenetration: {
+      value: 0.14,
+      source: 'Tashiro M, et al. Dose dependency of brain histamine H1 receptor occupancy following oral administration of cetirizine hydrochloride measured using PET with [11C]doxepin. Hum Psychopharmacol 24(7):540-548, 2009: brain H1 occupancy 12.6% after 10 mg (25.2% after 20 mg; hydroxyzine 30 mg 67.6%).',
+      sourceUrl: 'https://doi.org/10.1002/hup.1051',
+      note: 'DERIVED so the model reproduces the PET measurement: brain occupancy 0.126 divided by the model\'s own peak peripheral H1 occupancy after 10 mg (0.873, at 79 min) is 0.14. The passive-permeability rule had scored cetirizine at 0.90 - it cannot see that cetirizine is a zwitterion and a P-glycoprotein substrate - and that made 10 mg cut consciousness to 0.35, the largest sedation of any drug in a 152-drug sweep (round-2 tester). Loratadine\'s override had been made; this one had been missed.',
+    },
+    notes: 'A second-generation antihistamine: a zwitterion that barely crosses the blood-brain barrier, so it blocks peripheral H1 without the sedation. The model expresses that with the same blood-brain barrier gate it uses for everything else, set from PET brain-occupancy data because the physicochemical rule gets cetirizine wrong, so the sedation is absent for a reason the data carries.',
   },
   {
     id: 'promethazine', displayName: 'Promethazine', class: 'other', drawerGroup: 'Antihistamines',

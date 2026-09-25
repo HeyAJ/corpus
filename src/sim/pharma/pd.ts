@@ -69,12 +69,13 @@ export interface DrugTargetLink {
   /** Efficacy or direction, depending on the target's activationModel. See ADR-025. */
   intrinsicActivity: number;
   /**
-   * Fraction of this receptor's effect this ligand can actually reach, given the
-   * receptor's central share and the drug's blood-brain barrier access. 1 for a
-   * peripheral receptor or a lipophilic drug; well below 1 for, say, adrenaline at
-   * the central alpha-2 autoreceptor, which it does not reach.
+   * How much of this ligand reaches the receptor's CENTRAL effects: the drug's blood-brain
+   * barrier penetration, or 1 when that is unknown (we cannot claim a drug is excluded
+   * from the brain without a measurement, and the gap is reported, not assumed away).
+   * Peripheral effects are always reached in full. See central_effects.ts in the ingest
+   * pipeline for why this replaced the old per-receptor blended access factor.
    */
-  access: number;
+  centralAccess: number;
 }
 
 /** Association rate applied when a target has a measured Ki but no measured kon. */
@@ -187,8 +188,18 @@ export function stepPd(
       st.total = 0;
     }
 
-    // --- signed activation -------------------------------------------------
+    // --- signed activation, peripheral and central ----------------------------
+    //
+    // TWO ACTIVATIONS, because a drug does not reach both sides of the blood-brain
+    // barrier equally. Peripheral effects see every bound ligand in full; central effects
+    // (flagged per effect, tools/ingest/central_effects.ts) see each ligand scaled by its
+    // barrier penetration - and that includes the endogenous tone an ANTAGONIST displaces,
+    // which the old single blended factor never scaled at all. That omission is why
+    // glycopyrrolate, which cannot enter the brain, removed exactly as much wakefulness as
+    // atropine. The occupancy integration above is shared: binding happens once; only
+    // what each compartment sees of it differs.
     let activationNow: number;
+    let activationNowCentral: number;
     let activationRest: number;
 
     switch (r.activationModel) {
@@ -202,13 +213,17 @@ export function stepPd(
         // the vector as written. A positive value is an activator or channel opener and
         // drives it backwards, which `hillResponse` handles because it is odd.
         let engaged = 0;
+        let engagedCentral = 0;
         if (ls) {
           for (const l of ls) {
             const direction = l.intrinsicActivity > 0 ? -1 : 1;
-            engaged += (st.byLigand[l.drugId] ?? 0) * l.access * direction;
+            const held = (st.byLigand[l.drugId] ?? 0) * direction;
+            engaged += held;
+            engagedCentral += held * l.centralAccess;
           }
         }
         activationNow = clamp(engaged, -1, 1);
+        activationNowCentral = clamp(engagedCentral, -1, 1);
         // Nothing is inhibited at rest, so the reference state is zero and the drug's
         // whole occupancy is the signal. `baselineTone` deliberately does not appear:
         // the gains already describe the step from "constitutively active" to
@@ -229,8 +244,16 @@ export function stepPd(
         // same occupancy. No cited efficacy scale exists for that, so the distinction is
         // carried by affinity alone and the gap is stated in MODEL_LIMITATIONS.
         let engaged = 0;
-        if (ls) for (const l of ls) engaged += (st.byLigand[l.drugId] ?? 0) * l.access;
+        let engagedCentral = 0;
+        if (ls) {
+          for (const l of ls) {
+            const held = st.byLigand[l.drugId] ?? 0;
+            engaged += held;
+            engagedCentral += held * l.centralAccess;
+          }
+        }
         activationNow = clamp(engaged, 0, 1);
+        activationNowCentral = clamp(engagedCentral, 0, 1);
         activationRest = 0;
         break;
       }
@@ -239,18 +262,36 @@ export function stepPd(
         // A RECEPTOR WITH AN ENDOGENOUS AGONIST. `intrinsicActivity` is efficacy
         // relative to that agonist, which is the only reading under which a fraction
         // means anything, and drug occupancy displaces the endogenous ligand
-        // proportionally.
+        // proportionally - in each compartment, by the occupancy that compartment sees.
+        //
+        // A BOUND RECEPTOR SIGNALS BETWEEN NOTHING AND FULL, so each ligand contributes its
+        // occupancy times max(0, IA). An inverse agonist (IA < 0) therefore silences the
+        // receptors it holds - removing their share of the resting tone, exactly as a
+        // neutral antagonist does - and cannot reach the ones it does not. It used to add
+        // occupancy x IA, which with IA = -1 subtracted a whole full-agonist unit per
+        // occupied receptor: 12 % brain H1 occupancy by cetirizine (the PET value) removed
+        // 80 % of the histaminergic tone and dropped consciousness to 0.41, where the PET
+        // study found no sleepiness at all. At high occupancy the two forms agree (both
+        // reach the floor), which is why the error hid behind the peripheral effects.
+        // This model has no separate constitutive-activity term for an inverse agonist to
+        // suppress below that floor; MODEL_LIMITATIONS records it.
         const tone = endogenousTone(s, r);
-        const remainingTone = tone * Math.max(0, 1 - st.total);
+        let occupiedCentral = 0;
         let drugActivation = 0;
+        let drugActivationCentral = 0;
         if (ls) {
           for (const l of ls) {
-            drugActivation += (st.byLigand[l.drugId] ?? 0) * l.intrinsicActivity * l.access;
+            const held = st.byLigand[l.drugId] ?? 0;
+            const efficacy = Math.max(0, l.intrinsicActivity);
+            occupiedCentral += held * l.centralAccess;
+            drugActivation += held * efficacy;
+            drugActivationCentral += held * efficacy * l.centralAccess;
           }
         }
         // Floor at zero: see the header. A pathway that is not signalling is the bottom
         // of the range, not the middle of it.
-        activationNow = clamp(remainingTone + drugActivation, 0, 1);
+        activationNow = clamp(tone * Math.max(0, 1 - st.total) + drugActivation, 0, 1);
+        activationNowCentral = clamp(tone * Math.max(0, 1 - occupiedCentral) + drugActivationCentral, 0, 1);
         activationRest = clamp(tone, 0, 1);
         break;
       }
@@ -259,14 +300,24 @@ export function stepPd(
     st.activation = activationNow;
 
     // --- downstream effects ------------------------------------------------
-    const responseNow = hillResponse(activationNow, r.ec50Occupancy, r.hill);
+    // A receptor sitting at its resting activation writes nothing, and that is most of
+    // the 56 on most ticks (no drug bound, tone unchanged). The Hill transform of equal
+    // inputs is equal, so the deltas below would be exactly zero; skipping the Math.pow-
+    // heavy evaluations changes no result and was a fifth of all tick time.
+    if (activationNow === activationRest && activationNowCentral === activationRest) continue;
     const responseRest = hillResponse(activationRest, r.ec50Occupancy, r.hill);
-    const delta = responseNow - responseRest;
+    const delta =
+      activationNow === activationRest ? 0 : hillResponse(activationNow, r.ec50Occupancy, r.hill) - responseRest;
+    const deltaCentral =
+      activationNowCentral === activationNow
+        ? delta
+        : activationNowCentral === activationRest
+          ? 0
+          : hillResponse(activationNowCentral, r.ec50Occupancy, r.hill) - responseRest;
 
-    if (delta !== 0) {
-      for (const e of r.effects) {
-        addEffect(s.effects, e.target, e.gain * delta);
-      }
+    for (const e of r.effects) {
+      const d = e.central ? deltaCentral : delta;
+      if (d !== 0) addEffect(s.effects, e.target, e.gain * d);
     }
   }
 }
@@ -316,14 +367,11 @@ export function buildLinks(
       if (!known.has(t.receptorId)) continue;
       const kin = deriveKinetics(t.Ki_nM, t.kon, t.koff, defaultKon);
       if (!kin) continue; // no affinity, no binding — never a guessed Ki
-      const receptor = receptors.find((r) => r.id === t.receptorId)!;
       const penetration = d.pk.bbbPenetration;
       // No measured lipophilicity means we cannot claim the drug is excluded from
       // the brain, so it gets full access and the gap is reported rather than
       // silently assumed away.
-      const access = penetration === null
-        ? 1
-        : 1 - receptor.centralFraction * (1 - penetration);
+      const centralAccess = penetration === null ? 1 : Math.max(0, Math.min(1, penetration));
 
       map.get(t.receptorId)!.push({
         drugId: d.id,
@@ -331,7 +379,7 @@ export function buildLinks(
         kon: kin.kon,
         koff: kin.koff,
         intrinsicActivity: t.intrinsicActivity,
-        access,
+        centralAccess,
       });
     }
   }

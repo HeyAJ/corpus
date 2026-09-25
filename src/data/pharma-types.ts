@@ -64,6 +64,12 @@ export interface PkParams {
   bioavailability: number | null;
   /** Hepatic extraction ratio, for oral first-pass. */
   hepaticExtraction: number | null;
+  /**
+   * Eliminated IN THE BLOOD (red-cell uptake, plasma or erythrocyte esterases) rather than
+   * by the liver or kidney, so clearance does NOT fall with cardiac output. null means
+   * the ordinary organ-flow-limited assumption applies. See sim/pharma/pk.ts.
+   */
+  bloodClearance: boolean | null;
   /** Michaelis-Menten parameters for saturable metabolism (ethanol, phenytoin). */
   vmax_mg_per_min: number | null;
   km_mg_per_L: number | null;
@@ -257,6 +263,12 @@ export interface ReceptorEffect {
   source: string;
   sourceUrl: string;
   note?: string;
+  /**
+   * True when this effect happens behind the blood-brain barrier, so a drug reaches it
+   * only through its `bbbPenetration`; false when the drug reaches it fully. Decided per
+   * (receptor, effect) in tools/ingest/central_effects.ts.
+   */
+  central: boolean;
 }
 
 /**
@@ -314,11 +326,13 @@ export interface Receptor {
   /** What drives baselineTone dynamically, if anything. */
   endogenousDriver: 'sympathetic' | 'parasympathetic' | 'none';
   /**
-   * How much of this receptor's modelled effect sits behind the blood-brain
-   * barrier, 0..1. A drug that cannot cross reaches only the peripheral share.
-   * This is what stops circulating adrenaline producing central sympatholysis
-   * through alpha-2, which it does not do and which would cancel its own pressor
-   * effect if modelled naively.
+   * DESCRIPTIVE ONLY since 2026-09-25: roughly how much of this receptor population
+   * sits behind the blood-brain barrier, 0..1. It used to be the pharmacology - one
+   * `1 - centralFraction x (1 - penetration)` access factor per drug per receptor,
+   * applied to every effect - and that blend let barrier-excluded drugs keep a quarter of
+   * the central action while under-dosing their peripheral one. The gate is now the
+   * per-effect `ReceptorEffect.central` flag (tools/ingest/central_effects.ts). This
+   * number is kept because it is still a true statement about the receptor.
    */
   centralFraction: number;
   /** Occupancy at half-maximal downstream effect, 0..1. See receptor reserve. */

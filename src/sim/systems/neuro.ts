@@ -55,7 +55,21 @@ export function stepNeuro(s: SimState, dt: number): void {
   // equally, and only the gradient form can tell them apart.
   const lo = P('neuro.autoregLow_mmHg');
   const hi = P('neuro.autoregHigh_mmHg');
-  const cpp = Math.max(0, map - s.cardio.ra.P);
+  // UPRIGHT, THE BRAIN SITS ABOVE THE HEART. `map` is heart-level pressure; the brain
+  // perfuses at head-level pressure, lower by the column of blood between them (22 mmHg
+  // for a 30 cm column, RAO2013), against an intracranial pressure that itself falls
+  // below zero as the neck veins collapse (-2.4 mmHg standing, PETERSEN2016). Without
+  // this a standing body perfused its brain at heart-level pressure, and the classic
+  // orthostatic lesson could not happen: after a litre of blood loss, standing dropped
+  // the MAP to about 60 and the body stayed fully alert, where a real one greys out. At
+  // rest the upright CPP (about 94 - 22 + 2.4 = 74) stays inside the autoregulated
+  // range, so a healthy body stands without symptoms, as it should. Sitting keeps the
+  // trunk upright, so the same column applies; lying down, the brain is at heart level
+  // and central venous pressure stands in for the outflow pressure, as before.
+  const upright = s.environment.posture !== 'supine';
+  const cpp = upright
+    ? Math.max(0, map - P('posture.uprightHeadHydrostatic_mmHg') - P('posture.uprightIcp_mmHg'))
+    : Math.max(0, map - s.cardio.ra.P);
   let flowFactor: number;
   if (cpp >= lo && cpp <= hi) flowFactor = 1;
   else if (cpp < lo) flowFactor = Math.max(0, Math.pow(Math.max(0, cpp / lo), 2));
@@ -73,13 +87,23 @@ export function stepNeuro(s: SimState, dt: number): void {
   // --- consciousness -------------------------------------------------------
   const cbfFraction = n.cbf / P('neuro.cerebralBloodFlow_mL_per_min');
   const syncope = P('neuro.consciousnessLossCBF_fraction');
-  // A DEAD-ZONE at the top: any cerebral flow at or above the resting operating point is
-  // fully alert. Without it, the ordinary few-per-cent swings in flow that hypocapnia and
-  // posture produce read as measurable progress toward syncope, and a resting body scored
-  // 0.87 rather than 1.0. Consciousness should only fall once flow drops toward the
-  // syncope threshold, which is what this normalisation now says.
-  const alertFloor = 0.95;
-  const perfusionTerm = Math.max(0, Math.min(1, (cbfFraction - syncope) / (alertFloor - syncope)));
+  // FULLY AWAKE DOWN TO THE SYNCOPE THRESHOLD, then graded to nothing at no flow. That is
+  // what the constant says ("below this, level of consciousness falls") and it is the
+  // same gate the brainstem's respiratory drive uses (respiratory.ts, ADR-024). The
+  // brain holds its oxygen consumption as flow falls by extracting more of the oxygen it
+  // is sent, so function is preserved until flow is well down, and only then fails.
+  //
+  // It used to be a straight line from zero consciousness at the syncope threshold to
+  // full at 95 % of resting flow, which made every few per cent of flow cost
+  // consciousness: 1 mg of adrenaline (PaCO2 down 4 mmHg, flow down 13 %) scored 0.74,
+  // a healthy body at 5500 m 0.76, and acetazolamide's hyperventilation 0.52 - people
+  // who are in fact awake and talking (round-2 tester, 2026-09-25). Hypocapnia to 30
+  // mmHg makes you light-headed, not obtunded. The cost of the new form is at the other
+  // end: the cortex really fails before the brainstem (the EEG flattens at around a third
+  // of normal flow), so between about 0.3 and 0.55 of resting flow this reads a little
+  // too awake. MODEL_LIMITATIONS records it; no cited threshold was available to do
+  // better without inventing one.
+  const perfusionTerm = Math.max(0, Math.min(1, cbfFraction / syncope));
 
   // Hypoxia acts on top of perfusion. Below SpO2 ~ 0.75 consciousness is not
   // sustainable however good the flow.

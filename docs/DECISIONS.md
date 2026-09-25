@@ -525,3 +525,76 @@ minute it showed before.
 
 **What is still not right.** The gasping plateaus rather than ceasing; real agonal
 respiration fades over minutes and stops. Recorded in `MODEL_LIMITATIONS.md`.
+
+## ADR-025 — A receptor declares how a drug's occupancy becomes activation
+
+**Cited from `pd.ts` and the registries since it was introduced, and written down here
+on 2026-09-25 because it never had been.** Every receptor carries an `activationModel`,
+and the same occupancy means three different things under the three values:
+
+1. **`endogenous-agonist`** — the receptor has a resting tone from its own ligand.
+   Occupancy displaces that tone, and a bound ligand contributes `max(0, IA)` of full
+   activation, where `intrinsicActivity` is efficacy relative to the endogenous agonist.
+2. **`transporter`** — the readout is synaptic transmitter. An inhibitor and a releaser
+   both raise it, so both signs of IA point the same way.
+3. **`inhibition`** — an enzyme or channel with no tone to displace. The effect vector
+   is written for the INHIBITED state, and IA is a direction, not an efficacy.
+
+Getting the model wrong inverts a drug, which is why it is the first field to get right
+on a new entry.
+
+**Amended 2026-09-25: the floor at zero is per bound receptor, not per receptor.** The
+engine used to add `occupancy x IA` and clamp the total, so an inverse agonist (IA = -1)
+subtracted a whole full-agonist unit for every receptor it held. At high occupancy that
+is indistinguishable from the floor; at low occupancy it is wildly too strong: 12 % brain
+H1 occupancy by cetirizine (the PET value) removed 80 % of histaminergic tone. A bound
+receptor cannot signal below nothing, so it now removes exactly its own share of tone.
+Five drugs changed (four antipsychotics at serotonin receptors, and cetirizine); the
+antipsychotics kept their sedation ranking.
+
+## ADR-026 — Blood-brain barrier penetration gates central EFFECTS, not receptors
+
+**The symptom.** Glycopyrrolate, a quaternary amine given precisely because it stays out
+of the brain, took as much consciousness away as atropine. Adrenaline sedated. A 10 mg
+tablet of cetirizine, a non-sedating antihistamine, dropped consciousness to 0.35.
+
+**Two defects.** Each drug had ONE access factor per receptor,
+`1 - centralFraction x (1 - penetration)`, applied to every effect of that receptor - so
+a drug that cannot cross kept a quarter of the central action and lost part of its
+peripheral one. And for antagonists the factor was never applied at all, because the
+tone a blocker displaces was computed from raw occupancy.
+
+**The decision.** Every receptor effect carries a `central` flag, decided in
+`tools/ingest/central_effects.ts` by target (sedation, arousal, anxiety, dependence,
+seizure threshold, analgesia, respiratory drive) with explicit, argued exceptions where
+the same target is central for one receptor and peripheral for another (alpha-2's fall in
+resistance is brainstem sympatholysis; its insulin suppression is pancreatic). Central
+effects see each ligand scaled by its penetration - including the tone it displaces -
+and peripheral effects see it fully. `centralFraction` survives as a descriptive number.
+
+**The cost.** Penetration data now matters more, and the physicochemical rule was wrong
+for three more drugs, each overridden with its source: caffeine and theophylline cross
+freely (labels: CSF approximates plasma), cetirizine barely does (PET: 12.6 % brain H1
+occupancy at 10 mg, penetration derived as 0.14).
+
+## ADR-027 — Slow loops are settled before t = 0, from the model's own equations
+
+ADR-022's thirty-second warm-up settles the circulation, but two loops run on clocks of
+tens of minutes to hours, and both booted out of equilibrium. The glucose–insulin loop
+started at textbook basal values with hepatic output already flowing, so every body's
+glucose climbed from 93 to 100 mg/dL in its first quarter hour. Cortisol started at its
+daily mean at 08:00 and spent three hours climbing to the morning peak.
+
+Both are now settled from the model's own equations rather than from typed-in numbers:
+`settleGlucoseInsulin` runs `stepMetabolic` itself for twelve simulated hours with the
+warmed-up effect vector frozen (so the settle cannot disagree with the step), and a
+circadian hormone is seeded at the exact periodic steady state of a first-order pool
+driven by a sinusoid - 17.3 µg/dL for cortisol at 08:00, which is where a 24-hour run
+arrives on its own. Every hormone driver is also referenced to the model's own resting
+value (osmolality, potassium), so a hormone at rest stays at the baseline its basal
+secretion is solved for.
+
+**What the 24-hour test found on the way.** The cortisol trough was being read as an
+inflammatory stimulus: cortisol's anti-inflammatory effect was applied symmetrically, so
+every afternoon a resting body ran a low fever, sweated, leaked plasma and was
+tachycardic by 21:00. Suppression by excess is now applied only above baseline.

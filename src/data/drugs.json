@@ -7,7 +7,7 @@
     "Pulse Physiology Engine (Kitware Inc.), Apache License 2.0 — https://pulse.kitware.com",
     "PubChem (Kim S, et al. Nucleic Acids Res 2023;51:D1373-D1380). Computed molecular descriptors, US National Library of Medicine, public domain.",
     "Data from openFDA (api.fda.gov). openFDA is a research tool. Its data has not been validated for clinical or production use. It does not constitute FDA endorsement, and should not be used to make decisions about medical care.",
-    "Receptor effect vectors are curated from: Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023. | Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023. | Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023. | Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021."
+    "Receptor effect vectors are curated from: Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023. | Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023. | Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023. | Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021. | GlucaGen (glucagon) prescribing information, section 12.2: \"In a study of 25 volunteers, a subcutaneous dose of 1 mg glucagon resulted in a mean peak glucose concentration of 136 mg/dL 30 minutes after injection\"; IM mean peak 138 mg/dL at 26 minutes."
   ],
   "drugs": [
     {
@@ -83,6 +83,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -267,6 +268,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -431,6 +433,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -601,6 +604,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": true,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -624,6 +628,12 @@
             "source": "Derived, not measured. No plasma protein binding figure is published for adenosine, because on this timescale the quantity is not the one that matters: the label puts the half-life under ten seconds, set by carrier-mediated uptake into erythrocytes and endothelium rather than by anything in plasma. Treating it as unbound is also the conservative direction here, since it maximises free concentration and therefore A1 occupancy, which is the effect the model is trying not to understate. Supported by the physical chemistry: a nucleoside with 140 A^2 of polar surface and four hydrogen-bond donors (PubChem CID 60961) has no albumin binding motif.",
             "sourceUrl": "https://pubchem.ncbi.nlm.nih.gov/compound/60961",
             "confidence": "derived"
+          },
+          "bloodClearance": {
+            "source": "FDA Structured Product Label — Adenocard (adenosine) injection",
+            "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=adenosine",
+            "confidence": "measured",
+            "note": "Section 12.3: rapidly taken up by erythrocytes and vascular endothelial cells and metabolised by adenosine deaminase and adenosine kinase in the circulation, with a half-life under 10 seconds. Clearance is therefore not limited by hepatic blood flow."
           },
           "renalFraction": {
             "source": "curated literature table",
@@ -723,6 +733,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -857,6 +868,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -940,6 +952,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -1011,6 +1024,7 @@
         "lagTime_min": 15,
         "bioavailability": 0.1,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -1106,6 +1120,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -1237,6 +1252,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -1447,6 +1463,7 @@
         "lagTime_min": null,
         "bioavailability": 0.25,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -1660,6 +1677,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -1835,6 +1853,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -2025,6 +2044,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -2172,6 +2192,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -2329,6 +2350,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -2510,6 +2532,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -2655,6 +2678,7 @@
         "lagTime_min": null,
         "bioavailability": 0.15,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -2816,6 +2840,7 @@
         "lagTime_min": 10,
         "bioavailability": 0.6,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -2971,6 +2996,7 @@
         "lagTime_min": null,
         "bioavailability": 0.26,
         "hepaticExtraction": 0.7,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -3118,6 +3144,7 @@
         "lagTime_min": null,
         "bioavailability": 0.5,
         "hepaticExtraction": 0.5,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -3258,6 +3285,7 @@
         "lagTime_min": null,
         "bioavailability": 0.5,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -3392,6 +3420,7 @@
         "lagTime_min": null,
         "bioavailability": 0.3,
         "hepaticExtraction": 0.7,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -3550,6 +3579,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": true,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -3573,6 +3603,12 @@
             "source": "FDA Structured Product Label via DailyMed — esmolol hydrochloride injection",
             "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=esmolol%20hydrochloride%20injection",
             "confidence": "measured"
+          },
+          "bloodClearance": {
+            "source": "FDA Structured Product Label — Brevibloc (esmolol hydrochloride) injection",
+            "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=esmolol",
+            "confidence": "measured",
+            "note": "Section 12.3: hydrolysed by esterases in the cytosol of red blood cells, not by plasma cholinesterase or the liver; elimination half-life about 9 minutes, independent of hepatic flow."
           },
           "renalFraction": {
             "source": "curated literature table",
@@ -3621,6 +3657,7 @@
       "sources": [
         "Computed from PubChem CID 59768 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
         "FDA Structured Product Label via DailyMed — esmolol hydrochloride injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=esmolol%20hydrochloride%20injection)",
+        "FDA Structured Product Label — Brevibloc (esmolol hydrochloride) injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=esmolol)",
         "IUPHAR/BPS Guide to PHARMACOLOGY 2026.3 - published: 2026-09-16: esmolol at &beta;<sub>1</sub>-adrenoceptor, Ki 6.65 (Antagonist), PMID 27451411 (https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId=7178)",
         "IUPHAR/BPS Guide to PHARMACOLOGY 2026.3 - published: 2026-09-16: esmolol at &beta;<sub>2</sub>-adrenoceptor, Ki 5.45 (Antagonist), PMID 27451411 (https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId=7178)",
         "PubChem CID 59768 (queried as \"Esmolol\"), MolecularWeight (https://pubchem.ncbi.nlm.nih.gov/compound/59768)",
@@ -3662,6 +3699,7 @@
         "lagTime_min": null,
         "bioavailability": 0.68,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -3789,6 +3827,7 @@
         "lagTime_min": null,
         "bioavailability": 0.22,
         "hepaticExtraction": 0.75,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -3917,6 +3956,7 @@
         "lagTime_min": null,
         "bioavailability": 0.7,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4048,6 +4088,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4149,6 +4190,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4273,6 +4315,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4403,6 +4446,7 @@
         "lagTime_min": null,
         "bioavailability": 0.75,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4528,6 +4572,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4629,6 +4674,7 @@
         "lagTime_min": null,
         "bioavailability": 0.7,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4751,6 +4797,7 @@
         "lagTime_min": null,
         "bioavailability": 0.73,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4870,6 +4917,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -4983,6 +5031,7 @@
         "lagTime_min": null,
         "bioavailability": 0.68,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -5106,6 +5155,7 @@
         "lagTime_min": null,
         "bioavailability": 0.85,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -5229,6 +5279,7 @@
         "lagTime_min": null,
         "bioavailability": 0.95,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -5352,6 +5403,7 @@
         "lagTime_min": null,
         "bioavailability": 0.4,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -5494,6 +5546,7 @@
         "lagTime_min": null,
         "bioavailability": 0.88,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -5625,6 +5678,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -5750,6 +5804,7 @@
         "lagTime_min": null,
         "bioavailability": 0.6,
         "hepaticExtraction": 0.4,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -5892,6 +5947,7 @@
         "lagTime_min": null,
         "bioavailability": 0.24,
         "hepaticExtraction": 0.75,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -6039,6 +6095,7 @@
         "lagTime_min": null,
         "bioavailability": 0.75,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -6174,6 +6231,7 @@
         "lagTime_min": null,
         "bioavailability": 0.2,
         "hepaticExtraction": 0.8,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -6327,6 +6385,7 @@
         "lagTime_min": null,
         "bioavailability": 0.6,
         "hepaticExtraction": 0.4,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -6507,6 +6566,7 @@
         "lagTime_min": null,
         "bioavailability": 0.6,
         "hepaticExtraction": 0.4,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -6680,6 +6740,7 @@
         "lagTime_min": null,
         "bioavailability": 0.09,
         "hepaticExtraction": 0.9,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -6841,6 +6902,7 @@
         "lagTime_min": null,
         "bioavailability": 0.7,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -7052,6 +7114,7 @@
         "lagTime_min": null,
         "bioavailability": 0.27,
         "hepaticExtraction": 0.7,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -7297,6 +7360,7 @@
         "lagTime_min": null,
         "bioavailability": 0.32,
         "hepaticExtraction": 0.65,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -7503,6 +7567,7 @@
         "lagTime_min": null,
         "bioavailability": 0.72,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -7615,6 +7680,7 @@
         "lagTime_min": null,
         "bioavailability": 0.44,
         "hepaticExtraction": 0.5,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -7732,6 +7798,7 @@
         "lagTime_min": null,
         "bioavailability": 0.48,
         "hepaticExtraction": 0.5,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -7948,6 +8015,7 @@
         "lagTime_min": 120,
         "bioavailability": 0.5,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -8110,6 +8178,7 @@
         "lagTime_min": null,
         "bioavailability": 0.5,
         "hepaticExtraction": 0.45,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -8274,6 +8343,7 @@
         "lagTime_min": null,
         "bioavailability": 0.93,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -8402,6 +8472,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -8532,6 +8603,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -8641,6 +8713,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": 0.33,
         "km_mg_per_L": 5.7,
         "provenance": {
@@ -8765,6 +8838,7 @@
         "lagTime_min": null,
         "bioavailability": 0.8,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -8880,6 +8954,7 @@
         "lagTime_min": null,
         "bioavailability": 0.98,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -8988,6 +9063,7 @@
         "lagTime_min": null,
         "bioavailability": 0.15,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -9123,6 +9199,7 @@
         "lagTime_min": null,
         "bioavailability": 0.07,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -9266,7 +9343,7 @@
       ],
       "pk": {
         "logP": 0,
-        "bbbPenetration": 0.2816666666666667,
+        "bbbPenetration": 1,
         "V1_L": 35,
         "V2_L": null,
         "V3_L": null,
@@ -9282,6 +9359,7 @@
         "lagTime_min": null,
         "bioavailability": 1,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -9296,10 +9374,10 @@
             "confidence": "measured"
           },
           "bbbPenetration": {
-            "source": "Computed from PubChem CID 2153 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005.",
-            "sourceUrl": "https://doi.org/10.1023/A:1015040217741",
+            "source": "FDA Structured Product Label (openFDA), theophylline anhydrous: \"Theophylline passes freely across the placenta, into breast milk and into the cerebrospinal fluid (CSF).\"",
+            "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=04f1d1da-ce61-45b3-acf4-903cc81d16da",
             "confidence": "derived",
-            "note": "XLogP 0, TPSA 69.3 A^2, 1 H-bond donors -> lipophilicity 0.33 x polar-surface 0.85 x donor 1.00 = 0.28. Limiting term: lipophilicity XLogP 0. A passive-permeability likelihood, not a measured brain-plasma ratio; active efflux and carrier-mediated uptake are not modelled."
+            "note": "The passive-permeability rule scored theophylline at 0.28 because it is small and polar, which the rule reads as poorly permeant. The label says the opposite - it passes freely into the CSF - and its central toxicity (agitation, seizures) is the clinical proof. Harmless while the engine blended central and peripheral access; once central effects were gated on penetration alone (2026-09-25) it would have taken most of theophylline's central stimulation away. Overridden to free passage."
           },
           "proteinBound": {
             "source": "FDA Structured Product Label via DailyMed — theophylline tablets",
@@ -9362,7 +9440,7 @@
       "directEffects": [],
       "notes": "An adenosine antagonist with a narrow therapeutic index; its toxicity is arrhythmia and seizure. The direct opposition to adenosine is something this model can show literally — give both and watch them compete at A1.",
       "sources": [
-        "Computed from PubChem CID 2153 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
+        "FDA Structured Product Label (openFDA), theophylline anhydrous: \"Theophylline passes freely across the placenta, into breast milk and into the cerebrospinal fluid (CSF).\" (https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=04f1d1da-ce61-45b3-acf4-903cc81d16da)",
         "FDA Structured Product Label via DailyMed — aminophylline injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=aminophylline%20injection)",
         "FDA Structured Product Label via DailyMed — theophylline tablets (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=theophylline%20tablets)",
         "IUPHAR/BPS Guide to PHARMACOLOGY 2026.3 - published: 2026-09-16: theophylline at A<sub>1</sub> receptor, Ki 5.05 (Antagonist), PMID 7798201 (https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId=413)",
@@ -9406,6 +9484,7 @@
         "lagTime_min": null,
         "bioavailability": 0.64,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -9532,6 +9611,7 @@
         "lagTime_min": null,
         "bioavailability": 0.8,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -9663,6 +9743,7 @@
         "lagTime_min": null,
         "bioavailability": 0.95,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -9744,7 +9825,7 @@
       "hormoneAnalogue": {
         "pool": "cortisol",
         "unitsPerMgPerL": 100,
-        "note": "Hydrocortisone is cortisol itself, so its plasma level (mg/L) adds to the endogenous cortisol pool in the pool unit of ug/dL (1 mg/L = 100 ug/dL). The glucocorticoid and mineralocorticoid RECEPTORS carry the anti-inflammatory and salt-retaining effects; the pool carries the level the HPA feedback and the lab panel read, so an exogenous dose suppresses the axis the way a real steroid course does.",
+        "note": "Hydrocortisone is cortisol itself, so its plasma level (mg/L) adds to the endogenous cortisol pool in the pool unit of ug/dL (1 mg/L = 100 ug/dL). The glucocorticoid and mineralocorticoid RECEPTORS carry the anti-inflammatory and salt-retaining effects; the pool carries the level the lab panel reads, and does not act a second time. The HPA negative feedback by which a real steroid course suppresses the adrenal's own output is NOT modelled - no hormone driver here reads a hormone level - so the endogenous cortisol carries on being secreted underneath the dose (MODEL_LIMITATIONS §9).",
         "source": "Unit identity (1 mg/L = 100 ug/dL); reference cortisol range from Guyton & Hall, 14th ed.",
         "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
       },
@@ -9794,6 +9875,7 @@
         "lagTime_min": null,
         "bioavailability": 0.82,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -9924,6 +10006,7 @@
         "lagTime_min": null,
         "bioavailability": 0.6,
         "hepaticExtraction": 0.4,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -10067,6 +10150,7 @@
         "lagTime_min": null,
         "bioavailability": 0.8,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -10195,6 +10279,7 @@
         "lagTime_min": 60,
         "bioavailability": 0.4,
         "hepaticExtraction": 0.5,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -10322,6 +10407,7 @@
         "lagTime_min": null,
         "bioavailability": 0.43,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -10445,6 +10531,7 @@
         "lagTime_min": null,
         "bioavailability": 0.61,
         "hepaticExtraction": 0.4,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -10563,6 +10650,7 @@
         "lagTime_min": null,
         "bioavailability": 0.4,
         "hepaticExtraction": 0.5,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -10680,6 +10768,7 @@
         "lagTime_min": null,
         "bioavailability": 0.55,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -10802,6 +10891,7 @@
         "lagTime_min": null,
         "bioavailability": 0.75,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -10858,15 +10948,7 @@
       },
       "targets": [],
       "pulsePd": null,
-      "directEffects": [
-        {
-          "target": "cardio.heartRate",
-          "gain": 0.3,
-          "note": "Increased myocardial beta-adrenoceptor density, so thyroid state changes how the heart answers catecholamines — a cardiac action distinct from the hormone pool's metabolic one.",
-          "source": "FDA Structured Product Label via DailyMed — levothyroxine sodium tablets",
-          "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=levothyroxine%20sodium%20tablets"
-        }
-      ],
+      "directEffects": [],
       "hormoneAnalogue": {
         "pool": "thyroxine",
         "unitsPerMgPerL": 30,
@@ -10874,7 +10956,7 @@
         "source": "Free-fraction of thyroxine ~0.03% (99.97% protein bound); Guyton & Hall, 14th ed., thyroid hormone transport and free-T4 reference range 0.8-1.8 ng/dL.",
         "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
       },
-      "notes": "A seven-day half-life, so this is the slowest drug in the set by two orders of magnitude. Modelled as the hormone it is: its plasma level feeds the endogenous free-T4 pool, so the metabolic rate rises through the same path the body's own thyroxine uses, applied far faster than the weeks it really takes (stated in MODEL_LIMITATIONS).",
+      "notes": "A seven-day half-life, so this is the slowest drug in the set by two orders of magnitude. Modelled as the hormone it is: its plasma level feeds the endogenous free-T4 pool, so the metabolic rate, heat production and heart rate rise through the same path the body's own thyroxine uses, applied far faster than the weeks it really takes (stated in MODEL_LIMITATIONS).",
       "sources": [
         "Computed from PubChem CID 5819 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
         "FDA Structured Product Label via DailyMed — levothyroxine sodium for injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=levothyroxine%20sodium%20for%20injection)",
@@ -10918,6 +11000,7 @@
         "lagTime_min": null,
         "bioavailability": 0.8,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -11038,6 +11121,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -11145,6 +11229,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -11243,7 +11328,7 @@
       ],
       "pk": {
         "logP": -0.1,
-        "bbbPenetration": 0.3,
+        "bbbPenetration": 1,
         "V1_L": 42,
         "V2_L": null,
         "V3_L": null,
@@ -11259,6 +11344,7 @@
         "lagTime_min": null,
         "bioavailability": 1,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -11273,10 +11359,10 @@
             "confidence": "measured"
           },
           "bbbPenetration": {
-            "source": "Computed from PubChem CID 2519 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005.",
-            "sourceUrl": "https://doi.org/10.1023/A:1015040217741",
+            "source": "FDA Structured Product Label (openFDA), caffeine citrate: \"Caffeine is rapidly distributed into the brain. Caffeine levels in the cerebrospinal fluid of preterm neonates approximate their plasma levels.\"",
+            "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=21489401-f2a7-47d3-897a-4b7efa04dd7a",
             "confidence": "derived",
-            "note": "XLogP -0.1, TPSA 58.4 A^2, 0 H-bond donors -> lipophilicity 0.30 x polar-surface 1.00 x donor 1.00 = 0.30. Limiting term: lipophilicity XLogP -0.1. A passive-permeability likelihood, not a measured brain-plasma ratio; active efflux and carrier-mediated uptake are not modelled."
+            "note": "The passive-permeability rule scored caffeine at 0.30 on its low lipophilicity, and caffeine is the textbook counter-example: a small molecule that equilibrates across the blood-brain barrier, CSF level equal to plasma. Once central effects were gated on penetration alone (2026-09-25) the rule's number would have removed most of the arousal that is the reason anyone drinks coffee. Overridden to free passage, as the label states."
           },
           "proteinBound": {
             "source": "FDA Structured Product Label via DailyMed — caffeine citrate injection",
@@ -11339,7 +11425,7 @@
       "directEffects": [],
       "notes": "An adenosine antagonist, and the most widely consumed psychoactive drug there is. It is here because it is the cleanest demonstration of competitive antagonism at a receptor whose endogenous agonist the model already carries.",
       "sources": [
-        "Computed from PubChem CID 2519 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
+        "FDA Structured Product Label (openFDA), caffeine citrate: \"Caffeine is rapidly distributed into the brain. Caffeine levels in the cerebrospinal fluid of preterm neonates approximate their plasma levels.\" (https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=21489401-f2a7-47d3-897a-4b7efa04dd7a)",
         "FDA Structured Product Label via DailyMed — caffeine citrate injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=caffeine%20citrate%20injection)",
         "Fredholm BB, et al. Actions of caffeine in the brain. Pharmacol Rev 51(1):83-133, 1999. A 100 mg exposure is roughly one cup of coffee. (https://pubmed.ncbi.nlm.nih.gov/10049999/)",
         "IUPHAR/BPS Guide to PHARMACOLOGY 2026.3 - published: 2026-09-16: caffeine at A<sub>1</sub> receptor, Ki 4.66 (Antagonist), PMID 8469419 (https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId=407)",
@@ -11399,6 +11485,7 @@
         "lagTime_min": null,
         "bioavailability": 0.3,
         "hepaticExtraction": 0.7,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -11520,6 +11607,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": 120,
         "km_mg_per_L": 100,
         "provenance": {
@@ -11684,6 +11772,7 @@
         "lagTime_min": null,
         "bioavailability": 0.08,
         "hepaticExtraction": 0.75,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -11803,6 +11892,7 @@
         "lagTime_min": null,
         "bioavailability": 0.13,
         "hepaticExtraction": 0.7,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -11922,6 +12012,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -12059,6 +12150,7 @@
         "lagTime_min": null,
         "bioavailability": 0.67,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -12246,6 +12338,7 @@
         "lagTime_min": null,
         "bioavailability": 0.8,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -12425,6 +12518,7 @@
         "lagTime_min": null,
         "bioavailability": 0.75,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -12561,15 +12655,15 @@
       "presetDoses": [
         {
           "route": "IV_PUSH",
-          "amount": 40,
-          "unit": "unit",
-          "label": "40 units"
+          "amount": 0.0755,
+          "unit": "mg",
+          "label": "40 units (0.0755 mg)"
         },
         {
           "route": "IV_DRIP",
-          "amount": 2.4,
-          "unit": "unit",
-          "label": "0.04 unit/min",
+          "amount": 0.00453,
+          "unit": "mg",
+          "label": "0.04 unit/min (4.5 mcg/h)",
           "durationMin": 60
         }
       ],
@@ -12591,6 +12685,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -12661,17 +12756,17 @@
       "hormoneAnalogue": {
         "pool": "adh",
         "unitsPerMgPerL": 1000000,
-        "note": "Plasma vasopressin in mg/L converted to the ADH pool unit of pg/mL (1 mg/L = 1e6 pg/mL). The receptor targets carry the pressor and antidiuretic EFFECTS; the pool carries the level the feedback and the lab panel read, exactly as hydrocortisone does for cortisol.",
+        "note": "Plasma vasopressin in mg/L converted to the ADH pool unit of pg/mL (1 mg/L = 1e6 pg/mL). The receptor targets carry the pressor and antidiuretic EFFECTS; the pool carries the level the lab panel reads and does not act a second time, exactly as hydrocortisone does for cortisol.",
         "source": "Unit identity (1 mg/L = 1e6 pg/mL); reference ADH assay range from Guyton & Hall, 14th ed.",
         "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
       },
-      "notes": "A non-adrenergic vasopressor: it raises systemic resistance through V1A, so it still works in the acidotic, catecholamine-refractory circulation where an adrenaline infusion has stopped biting. The 40-unit arrest dose and the low-rate shock infusion are the two ways it is given.",
+      "notes": "A non-adrenergic vasopressor: it raises systemic resistance through V1A, so it still works in the acidotic, catecholamine-refractory circulation where an adrenaline infusion has stopped biting. The 40-unit arrest dose and the low-rate shock infusion are the two ways it has been given. Doses are carried in mg using the label conversion, one mg = 530 USP units (Vasostrict prescribing information), so 40 units is 0.0755 mg.",
       "sources": [
         "Computed from PubChem CID 644077 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
         "FDA Structured Product Label via DailyMed — vasopressin injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=vasopressin%20injection)",
         "IUPHAR/BPS Guide to PHARMACOLOGY 2026.3 - published: 2026-09-16: vasopressin at V<sub>1A</sub> receptor, Ki 8.90 (Full agonist), PMID 8106369 (https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId=2168)",
         "IUPHAR/BPS Guide to PHARMACOLOGY 2026.3 - published: 2026-09-16: vasopressin at V<sub>1B</sub> receptor, Ki 9.25 (Full agonist), PMID 9884074 (https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId=2168)",
-        "Panchal AR, et al. Part 3: Adult Basic and Advanced Life Support: 2020 AHA Guidelines for CPR and ECC. Circulation 142(16_suppl_2), 2020. (https://doi.org/10.1161/CIR.0000000000000916)",
+        "Neumar RW, et al. Part 8: Adult Advanced Cardiovascular Life Support: 2010 AHA Guidelines for CPR and ECC. Circulation 122(18 Suppl 3):S729-S767, 2010. The dose was removed from the arrest algorithm in 2015. (https://doi.org/10.1161/CIRCULATIONAHA.110.970988)",
         "PubChem CID 644077 (queried as \"Vasopressin\"), XLogP3-AA (https://pubchem.ncbi.nlm.nih.gov/compound/644077)",
         "PubChem CID 644077 (vasopressin). (https://pubchem.ncbi.nlm.nih.gov/compound/644077)",
         "curated literature table ()"
@@ -12711,6 +12806,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -12807,6 +12903,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": true,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -12830,6 +12927,12 @@
             "source": "curated literature table",
             "sourceUrl": "",
             "confidence": "measured"
+          },
+          "bloodClearance": {
+            "source": "FDA Structured Product Label — Anectine (succinylcholine chloride) injection",
+            "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=succinylcholine",
+            "confidence": "measured",
+            "note": "Section 12.3: rapidly hydrolysed by plasma cholinesterase (pseudocholinesterase) in the circulation, so its short action does not depend on liver blood flow."
           },
           "renalFraction": {
             "source": "curated literature table",
@@ -12865,6 +12968,7 @@
       "sources": [
         "Computed from PubChem CID 5314 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
         "FDA Structured Product Label via DailyMed — succinylcholine chloride injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=succinylcholine%20chloride%20injection)",
+        "FDA Structured Product Label — Anectine (succinylcholine chloride) injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=succinylcholine)",
         "PubChem CID 5314 (queried as \"Succinylcholine\"), XLogP3-AA (https://pubchem.ncbi.nlm.nih.gov/compound/5314)",
         "curated ()",
         "curated literature table ()"
@@ -12904,6 +13008,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13014,6 +13119,7 @@
         "lagTime_min": null,
         "bioavailability": 0.05,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13164,6 +13270,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13269,6 +13376,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": true,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13292,6 +13400,12 @@
             "source": "FDA Structured Product Label via DailyMed — remifentanil hydrochloride injection",
             "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=remifentanil%20hydrochloride%20injection",
             "confidence": "measured"
+          },
+          "bloodClearance": {
+            "source": "FDA Structured Product Label — Ultiva (remifentanil hydrochloride) for injection",
+            "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=remifentanil",
+            "confidence": "measured",
+            "note": "Section 12.3: metabolised by non-specific blood and tissue esterases; its clearance is not affected by hepatic or renal impairment."
           },
           "renalFraction": {
             "source": "curated literature table",
@@ -13348,6 +13462,7 @@
       "sources": [
         "Computed from PubChem CID 60815 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
         "FDA Structured Product Label via DailyMed — remifentanil hydrochloride injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=remifentanil%20hydrochloride%20injection)",
+        "FDA Structured Product Label — Ultiva (remifentanil hydrochloride) for injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=remifentanil)",
         "PubChem CID 60815 (queried as \"Remifentanil\"), XLogP3-AA (https://pubchem.ncbi.nlm.nih.gov/compound/60815)",
         "curated ()",
         "curated literature table ()"
@@ -13387,6 +13502,7 @@
         "lagTime_min": null,
         "bioavailability": 0.25,
         "hepaticExtraction": 0.6,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13544,6 +13660,7 @@
         "lagTime_min": null,
         "bioavailability": 0.35,
         "hepaticExtraction": 0.6,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13666,6 +13783,7 @@
         "lagTime_min": null,
         "bioavailability": 0.4,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13783,6 +13901,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13874,6 +13993,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13938,6 +14058,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -13996,6 +14117,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14054,6 +14176,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14159,6 +14282,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14256,6 +14380,7 @@
         "lagTime_min": null,
         "bioavailability": 0.7,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14379,6 +14504,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14483,6 +14609,7 @@
         "lagTime_min": null,
         "bioavailability": 0.8,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14577,6 +14704,7 @@
         "lagTime_min": null,
         "bioavailability": 0.7,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14698,6 +14826,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14769,7 +14898,7 @@
       "hormoneAnalogue": {
         "pool": "glucagon",
         "unitsPerMgPerL": 1000000,
-        "note": "Plasma glucagon in mg/L converted to the pool unit of pg/mL (1 mg/L = 1e6 pg/mL). The glucagon receptor carries the hepatic and cardiac EFFECTS; the pool carries the level the counter-regulatory feedback and the lab read, the same split hydrocortisone uses.",
+        "note": "Plasma glucagon in mg/L converted to the pool unit of pg/mL (1 mg/L = 1e6 pg/mL). The glucagon receptor carries the hepatic and cardiac EFFECTS; the pool carries the level the lab panel reads and does not act a second time, the same split hydrocortisone uses.",
         "source": "Unit identity (1 mg/L = 1e6 pg/mL); reference glucagon range from Guyton & Hall, 14th ed.",
         "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
       },
@@ -14817,6 +14946,7 @@
         "lagTime_min": null,
         "bioavailability": 0.89,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -14929,6 +15059,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15037,6 +15168,7 @@
         "lagTime_min": null,
         "bioavailability": 0.14,
         "hepaticExtraction": 0.7,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15154,6 +15286,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15266,6 +15399,7 @@
         "lagTime_min": null,
         "bioavailability": 0.25,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15388,6 +15522,7 @@
         "lagTime_min": null,
         "bioavailability": 0.33,
         "hepaticExtraction": 0.5,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15505,6 +15640,7 @@
         "lagTime_min": null,
         "bioavailability": 0.5,
         "hepaticExtraction": 0.5,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15637,6 +15773,7 @@
         "lagTime_min": null,
         "bioavailability": 0.3,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15726,6 +15863,7 @@
         "lagTime_min": null,
         "bioavailability": 0.92,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15815,6 +15953,7 @@
         "lagTime_min": null,
         "bioavailability": 0.95,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -15923,6 +16062,7 @@
         "lagTime_min": null,
         "bioavailability": 0.5,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -16032,6 +16172,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -16117,6 +16258,7 @@
         "lagTime_min": null,
         "bioavailability": 0.4,
         "hepaticExtraction": 0.5,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -16219,7 +16361,7 @@
       ],
       "pk": {
         "logP": 1.7,
-        "bbbPenetration": 0.9,
+        "bbbPenetration": 0.14,
         "V1_L": 35,
         "V2_L": null,
         "V3_L": null,
@@ -16235,6 +16377,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -16249,10 +16392,10 @@
             "confidence": "measured"
           },
           "bbbPenetration": {
-            "source": "Computed from PubChem CID 2678 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005.",
-            "sourceUrl": "https://doi.org/10.1023/A:1015040217741",
+            "source": "Tashiro M, et al. Dose dependency of brain histamine H1 receptor occupancy following oral administration of cetirizine hydrochloride measured using PET with [11C]doxepin. Hum Psychopharmacol 24(7):540-548, 2009: brain H1 occupancy 12.6% after 10 mg (25.2% after 20 mg; hydroxyzine 30 mg 67.6%).",
+            "sourceUrl": "https://doi.org/10.1002/hup.1051",
             "confidence": "derived",
-            "note": "XLogP 1.7, TPSA 53 A^2, 1 H-bond donors -> lipophilicity 0.90 x polar-surface 1.00 x donor 1.00 = 0.90. Limiting term: lipophilicity XLogP 1.7. A passive-permeability likelihood, not a measured brain-plasma ratio; active efflux and carrier-mediated uptake are not modelled."
+            "note": "DERIVED so the model reproduces the PET measurement: brain occupancy 0.126 divided by the model's own peak peripheral H1 occupancy after 10 mg (0.873, at 79 min) is 0.14. The passive-permeability rule had scored cetirizine at 0.90 - it cannot see that cetirizine is a zwitterion and a P-glycoprotein substrate - and that made 10 mg cut consciousness to 0.35, the largest sedation of any drug in a 152-drug sweep (round-2 tester). Loratadine's override had been made; this one had been missed."
           },
           "proteinBound": {
             "source": "FDA Structured Product Label via DailyMed — cetirizine hydrochloride tablets",
@@ -16303,12 +16446,12 @@
       ],
       "pulsePd": null,
       "directEffects": [],
-      "notes": "A second-generation antihistamine: a zwitterion that barely crosses the blood-brain barrier, so it blocks peripheral H1 without the sedation. The model expresses that with the same physicochemical gate it uses for everything else, so the sedation is absent for a reason the data carries.",
+      "notes": "A second-generation antihistamine: a zwitterion that barely crosses the blood-brain barrier, so it blocks peripheral H1 without the sedation. The model expresses that with the same blood-brain barrier gate it uses for everything else, set from PET brain-occupancy data because the physicochemical rule gets cetirizine wrong, so the sedation is absent for a reason the data carries.",
       "sources": [
-        "Computed from PubChem CID 2678 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
         "FDA Structured Product Label via DailyMed — cetirizine hydrochloride tablets (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=cetirizine%20hydrochloride%20tablets)",
         "IUPHAR/BPS Guide to PHARMACOLOGY 2026.3 - published: 2026-09-16: cetirizine at H<sub>1</sub> receptor, Ki 8.20 (Inverse agonist), PMID 7925364 (https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId=1222)",
         "PubChem CID 2678 (queried as \"Cetirizine\"), XLogP3-AA (https://pubchem.ncbi.nlm.nih.gov/compound/2678)",
+        "Tashiro M, et al. Dose dependency of brain histamine H1 receptor occupancy following oral administration of cetirizine hydrochloride measured using PET with [11C]doxepin. Hum Psychopharmacol 24(7):540-548, 2009: brain H1 occupancy 12.6% after 10 mg (25.2% after 20 mg; hydroxyzine 30 mg 67.6%). (https://doi.org/10.1002/hup.1051)",
         "curated ()",
         "curated literature table ()"
       ]
@@ -16361,6 +16504,7 @@
         "lagTime_min": null,
         "bioavailability": 0.25,
         "hepaticExtraction": 0.6,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -16501,6 +16645,7 @@
         "lagTime_min": null,
         "bioavailability": 0.13,
         "hepaticExtraction": 0.8,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -16649,6 +16794,7 @@
         "lagTime_min": null,
         "bioavailability": 0.004,
         "hepaticExtraction": 0.6,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -16769,6 +16915,7 @@
         "lagTime_min": 60,
         "bioavailability": 0.77,
         "hepaticExtraction": 0.3,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -16890,6 +17037,7 @@
         "lagTime_min": null,
         "bioavailability": 0.67,
         "hepaticExtraction": 0.3,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -17007,6 +17155,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -17119,6 +17268,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -17239,6 +17389,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -17363,6 +17514,7 @@
         "lagTime_min": null,
         "bioavailability": 1,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -17471,6 +17623,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -17601,6 +17754,7 @@
         "lagTime_min": null,
         "bioavailability": 0.3,
         "hepaticExtraction": 0.6,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -17739,6 +17893,7 @@
         "lagTime_min": null,
         "bioavailability": 0.8,
         "hepaticExtraction": 0.4,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -17889,6 +18044,7 @@
         "lagTime_min": null,
         "bioavailability": 0.53,
         "hepaticExtraction": 0.4,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -18016,6 +18172,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -18156,6 +18313,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -18274,6 +18432,7 @@
         "lagTime_min": null,
         "bioavailability": 0.9,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -18405,6 +18564,7 @@
         "lagTime_min": null,
         "bioavailability": 1,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -18543,6 +18703,7 @@
         "lagTime_min": null,
         "bioavailability": 1,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -18668,6 +18829,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -18780,6 +18942,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -18907,6 +19070,7 @@
         "lagTime_min": null,
         "bioavailability": 0.7,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -19046,6 +19210,7 @@
         "lagTime_min": null,
         "bioavailability": 0.95,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -19186,6 +19351,7 @@
         "lagTime_min": null,
         "bioavailability": 0.38,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -19318,6 +19484,7 @@
         "lagTime_min": null,
         "bioavailability": 0.75,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -19436,6 +19603,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -19542,6 +19710,7 @@
         "lagTime_min": null,
         "bioavailability": 0.5,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -19659,6 +19828,7 @@
         "lagTime_min": null,
         "bioavailability": null,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {
@@ -19765,6 +19935,7 @@
         "lagTime_min": null,
         "bioavailability": 0.25,
         "hepaticExtraction": null,
+        "bloodClearance": null,
         "vmax_mg_per_min": null,
         "km_mg_per_L": null,
         "provenance": {

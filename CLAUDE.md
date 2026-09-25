@@ -1,8 +1,8 @@
 # CORPUS — working notes
 
-Browser-based real-time human physiology simulator. Vite + TypeScript strict + three.js r170 + React 18 + Zustand + Comlink/SharedArrayBuffer + Vitest. **Not a git repo** — there is no undo, so read before you overwrite.
+Browser-based real-time human physiology simulator. Vite + TypeScript strict + three.js r170 + React 18 + Zustand + Comlink/SharedArrayBuffer + Vitest. Now tracked in git, but generated data and long probes are easy to clobber — read before you overwrite.
 
-**Read this file instead of exploring the repo.** It exists so you do not have to re-derive the architecture from 24 ADRs and 40 source files. If something here is wrong, fix it here as well as in the code.
+**Read this file instead of exploring the repo.** It exists so you do not have to re-derive the architecture from 27 ADRs and 40 source files. If something here is wrong, fix it here as well as in the code.
 
 ---
 
@@ -44,13 +44,14 @@ for (let i = 0; i < Math.round(seconds / DT); i++) { e.tick(DT); e.pending.lengt
 `tests/sim/inert-sweep.ts` is a complete worked example. Always compare against a no-drug control run of the same length.
 
 **Resting baseline — check this after ANY change to `src/sim`:**
-HR ~66, MAP ~94, CO ~4.9, RR ~12, SpO₂ ~97–98, PaCO₂ ~37, pH ~7.42, HCO₃ ~24, temp 37.0, glucose ~94, rhythm `nsr`, consciousness ~1.0, **no conditions firing**.
+HR ~66, MAP ~94, CO ~4.8, RR ~12, SpO₂ ~97–98, PaCO₂ ~36–37, pH ~7.43, HCO₃ ~24, temp 37.0, glucose ~94 (flat from t = 0), cortisol ~17 µg/dL at the 08:00 start, rhythm `nsr`, consciousness 1.0, **no conditions firing — for 24 simulated hours** (`tests/sim/homeostasis.test.ts`).
 If a resting body stops looking like this, you broke something. (Probe scripts: `.cache/probes/*.ts` — `baseline.ts`, `verify.ts` for heart–lung/acid–base/exercise, `newmech.ts` for the new drug mechanisms.)
 
 ## Key concepts you will need
 
 - **Receptor reserve** (`ec50Occupancy`): 5 % occupancy can give 50 % effect. Dose–response curves look wrong until you know this. ADR-007.
-- **`activationModel`** on each receptor, three cases in `src/sim/pharma/pd.ts`: `endogenous-agonist` (43) where `intrinsicActivity` is efficacy vs the endogenous ligand; `transporter` (4) where there is no tone to displace; `inhibition` (9) where gains are written for the *inhibited* state and `intrinsicActivity` is a direction, not an efficacy. Getting this wrong inverts a drug's action.
+- **`activationModel`** on each receptor, three cases in `src/sim/pharma/pd.ts`: `endogenous-agonist` (43) where `intrinsicActivity` is efficacy vs the endogenous ligand; `transporter` (4) where there is no tone to displace; `inhibition` (9) where gains are written for the *inhibited* state and `intrinsicActivity` is a direction, not an efficacy. Getting this wrong inverts a drug's action. A bound receptor contributes `max(0, IA)`: inverse agonists silence what they hold, no more (ADR-025).
+- **Central vs peripheral is per EFFECT** (`central` flag on every receptor effect, decided in `tools/ingest/central_effects.ts`). A drug reaches central effects through `bbbPenetration` only — including the tone an antagonist displaces — and peripheral effects fully. `centralFraction` is now descriptive only (ADR-026). If you add a receptor effect whose target is central for one receptor and peripheral for another, add an explicit exception there.
 - **Multiply-blend Beer–Lambert absorption** is order-independent *because multiplication commutes*. Buckets: 10 absorption (multiply), 20 rim (additive), 30 solid, 12 vessel walls, 22 flow particles. ADR-002.
 - **Fixed 10 ms step**, cardio/ECG sub-stepped at dt/5. Determinism depends on it.
 
@@ -87,8 +88,12 @@ New snapshot blocks: `environment, acidBase, mind, coagulation, infection, fluid
 - **CaCl₂ antagonises hyperkalaemia** at the myocardium; NaN guards on `SET_TIME_SCALE` and `SET_BODY`; refused doses surface in `snapshot.notices`.
 - All ten `renal.*`/dead targets from the old note are wired; the 30-odd dead targets the 2026-09-24 testers found are now consumed by the nine new subsystems above.
 
-**Known outstanding / accepted limitations:** glycopyrrolate keeps a small central M1 arousal reading because the engine carries one `centralFraction` per receptor, not per effect; exercise consciousness dips slightly with hyperventilation (CBF-during-exercise not modelled); metabolic-alkalosis respiratory compensation is deliberately weak; adenosine duration; HIV/thyroxine act too slowly to see in one session (stated, not faked).
+## State as of 2026-09-25 (round-2 testing)
+
+**Fixed — do not revert:** every intent is refused whole if any numeric field is non-finite (`applyIntent`, four self-guarding intents exempt); 24 h rest is now flat (the evening cortisol trough was driving fever/sweat/plasma leak — cortisol's anti-inflammatory effect is `aboveBaselineOnly`); ADH and aldosterone drivers referenced to the model's own resting osmolality/K; glucose–insulin loop and circadian cortisol settled before t = 0 (ADR-027); consciousness is full above the syncope CBF threshold (no more 25–50 % "sedation" from mild hypocapnia); upright posture lowers brain CPP by a sourced hydrostatic column; vasopressin dosed in mg (label: 530 units/mg — it had been 530× overdosed); hormone drugs with their own receptors act once (receptor), not twice; `metabolic.glycogenolysis` was dead and is now consumed (additive, insulin-independent) with the glucagon gain calibrated to the GlucaGen label (1 mg SC → 136 mg/dL); adenosine/esmolol/remifentanil/succinylcholine marked `bloodClearance`; per-effect BBB gate + label/PET overrides (caffeine, theophylline, cetirizine); the acetazolamide `resp.drive` shortcut removed. UI: HUD no longer swallows touch gestures (one-finger orbit and pinch now work on phones), drag is direct manipulation, drawer clears the MEASURED bottom bar (`--corpus-bar-actual`), phone dock wraps instead of hiding tools, 44 px touch targets for speed and close buttons. Engine is ~30 % faster (memoised `P()`, no Hill evaluation for receptors at rest).
+
+**Known outstanding / accepted limitations** (all in `docs/MODEL_LIMITATIONS.md`): central antimuscarinic arousal gain too strong (atropine 1 mg → consciousness ~0.57); glucose model's insulin brake is double-counted (glucagon gain is a model calibration); water load barely raises urine (renal water gain tiny); AV-nodal block is a rate cut even in sinus rhythm; no HPA negative feedback; acetazolamide's metabolic acidosis not modelled; psychedelic mydriasis absent (no sourced magnitude); resting H1 vascular tone overstated; circulation is reference-sized for any body mass; exercise consciousness dips slightly with hyperventilation; metabolic-alkalosis respiratory compensation deliberately weak; HIV/thyroxine act too slowly to see in one session (stated, not faked).
 
 ## Docs worth reading, when relevant
 
-`docs/DECISIONS.md` (24 ADRs — the reasoning behind every non-obvious choice) · `docs/MODEL_LIMITATIONS.md` (what the model does *not* do; §15 is the tone for any new limitation) · `docs/MISSING_CONSTANTS.md` (generated; every unsourced field and every adjudicated data disagreement) · `docs/VISUAL_AUDIT.md` (the reference frames the renderer is calibrated against).
+`docs/DECISIONS.md` (27 ADRs — the reasoning behind every non-obvious choice) · `docs/MODEL_LIMITATIONS.md` (what the model does *not* do; §15 is the tone for any new limitation) · `docs/MISSING_CONSTANTS.md` (generated; every unsourced field and every adjudicated data disagreement) · `docs/VISUAL_AUDIT.md` (the reference frames the renderer is calibrated against).

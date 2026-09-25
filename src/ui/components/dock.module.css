@@ -22,6 +22,28 @@
   display: none;
 }
 
+/*
+ * PHONE: WRAP, DON'T HIDE. The sideways-scrolling row kept the bar a fixed height, but at
+ * 360 px it hid half the tools - Administer, Body and Procedures among them - off the
+ * right edge with no scrollbar and no hint that they existed (round-2 tester). Wrapping
+ * the two clusters onto their own rows shows every tool; the drawer now clears the bar's
+ * MEASURED height (App.tsx), so a taller bar can no longer let it reach the dock, which
+ * was the only reason for the scroll.
+ */
+@media (max-width: 720px) {
+  .dock {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-x: visible;
+    row-gap: 8px;
+  }
+
+  .cluster {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
 .cluster {
   flex: none;
 }
