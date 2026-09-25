@@ -1,6 +1,6 @@
 import hormonesFile from '../../data/hormones.json';
 import type { SimState } from '../core/state';
-import { addEffect, prevEffect } from '../core/effects';
+import { addEffect, prevEffect, setEffectSource } from '../core/effects';
 
 /**
  * ENDOCRINE SYSTEM.
@@ -154,6 +154,9 @@ export function stepEndocrine(s: SimState, dt: number): void {
     const baseActivity = baseX / (baseX + e50);
     const delta = h.activity - baseActivity;
 
+    // Attributed per hormone, so the impact panel can say "cortisol +12 %" rather than
+    // an anonymous "body". Display-only; the sum on the bus is unchanged.
+    setEffectSource(`hormone:${def.id}`);
     for (const fx of def.effects) {
       addEffect(s.effects, fx.target, fx.gain * delta);
     }

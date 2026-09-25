@@ -32,3 +32,33 @@
   background: rgba(0, 0, 0, 0.12);
   color: var(--ink);
 }
+
+/*
+ * PHONE: the stage is only a third of the screen tall and the HUD owns its left
+ * two-thirds, so a centred horizontal pill sat directly on the heart-rate chip. Stacked
+ * vertically against the right edge it occupies a strip the HUD (capped at 62vw) never
+ * reaches and the centred body never crosses.
+ */
+@media (max-width: 720px) {
+  .wrap {
+    left: auto;
+    right: 8px;
+    transform: none;
+    flex-direction: column;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 14px;
+  }
+
+  .clock {
+    padding: 2px 0;
+    font-size: 11px;
+  }
+
+  .button,
+  .active {
+    padding: 4px 8px;
+    font-size: 11px;
+    min-height: 0;
+  }
+}
