@@ -535,8 +535,9 @@ computed number. The important caveats:
   hepatic output sits on top of Bergman's minimal model, whose remote insulin action
   already carries insulin's suppression of production, so insulin's brake on the liver
   is partly counted twice. Glucagon's glycogenolysis is therefore an additive term that
-  insulin does not suppress, and its receptor gain (25) was calibrated so 1 mg SC
-  reproduces the label's mean peak of 136 mg/dL; the gain describes this model, not the
+  insulin does not suppress, and its receptor gain (28) was calibrated so 1 mg SC and IM
+  reproduce the label's mean peaks (136 and 138 mg/dL), with SC/IM absorption solved from
+  the label's own plasma peaks; the gain describes this model, not the
   receptor. The two unsourced coefficients of the original code (insulin suppression
   slope 0.055 per µU/mL, counter-regulation gain 2.2) stand; clamp data put half-maximal
   suppression of glucose production at 29 µU/mL (Rizza 1981), about twice the model's.

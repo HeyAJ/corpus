@@ -302,12 +302,13 @@ export const REGISTRY_2: RegistryEntry[] = [
     effects: [
       // CALIBRATED, not textbook: 0.90 until 2026-09-25, when the target it writes was
       // finally consumed (metabolic.ts) and 1 mg of glucagon still raised glucose by only
-      // 3 mg/dL. 25 is the gain at which 1 mg SC reproduces the label's mean peak of 136
-      // mg/dL (model: ~135 at ~21 min). Its size is a statement about this glucose model,
+      // 3 mg/dL. 28 is the gain at which 1 mg reproduces the label's mean glucose peaks
+      // (SC 136, IM 138 mg/dL; model ~137 and ~136 at ~22 min) with the label's own
+      // absorption (route_presets.ts). Its size is a statement about this glucose model,
       // whose insulin feedback is stiff (see MODEL_LIMITATIONS), not about the receptor;
-      // the hepatic output it implies at the peak, about 8 mg/kg/min (three to four times
-      // basal), is inside what a pharmacological glucagon dose really produces.
-      fx('metabolic.glycogenolysis', 25, 'GLUCAGEN', 'Hepatic glycogen phosphorylase activation: the fast defence against hypoglycaemia, and useless once glycogen is gone. Gain calibrated so 1 mg SC reproduces the label glucose peak.'),
+      // the hepatic output it implies at the peak, a few times basal, is inside what a
+      // pharmacological glucagon dose really produces.
+      fx('metabolic.glycogenolysis', 28, 'GLUCAGEN', 'Hepatic glycogen phosphorylase activation: the fast defence against hypoglycaemia, and useless once glycogen is gone. Gain calibrated so 1 mg SC reproduces the label glucose peak.'),
       fx('metabolic.hepaticGlucoseOutput', 0.80, 'GH14', 'Gluconeogenesis and glycogenolysis together.'),
       fx('cardio.contractility', 0.45, 'GG14', 'Gs-coupled in myocardium, and critically it bypasses the beta receptor entirely — which is why glucagon is the antidote to beta-blocker overdose.'),
       fx('cardio.heartRate', 0.35, 'GG14', 'Same mechanism, same bypass.'),

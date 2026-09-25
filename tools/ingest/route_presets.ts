@@ -49,6 +49,38 @@ const ANAPHYLAXIS = {
 };
 
 export const ROUTE_ADDITIONS: Record<string, RouteAddition> = {
+  // GLUCAGON: no new routes or presets (both live in drug_manifest_3), only the absorption
+  // the label measured. The drug-level ka (0.05/min) and bioavailability (0.9) it had been
+  // using were uncited, and they put 1 mg SC at a plasma peak of ~17 ng/mL - twice the
+  // label's - so the glucose effect ran on for more than two hours.
+  glucagon: {
+    routes: ['SUBCUTANEOUS', 'IM'],
+    presets: [],
+    routePk: {
+      SUBCUTANEOUS: {
+        ka_min: 0.0468,
+        bioavailability: 0.40,
+        source: 'GlucaGen (glucagon) prescribing information, section 12.3: "Maximum plasma concentrations of 7.9 ng/mL were achieved approximately 20 minutes after subcutaneous administration"; volume of distribution 0.25 L/kg, half-life 8-18 min.',
+        sourceUrl: 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=789ab694-3ad8-a122-e053-2991aa0a9ab3',
+        confidence: 'derived',
+        note:
+          'Solved from the label, not measured directly: in the one-compartment model with the label\'s own ' +
+          'volume (0.25 L/kg) and a 13 min half-life, a 20 min time to peak fixes the absorption rate constant ' +
+          'at 0.0468/min, and the 7.9 ng/mL peak then fixes the fraction absorbed at 0.40. Both inherit the ' +
+          'uncertainty of the label\'s volume and half-life range.',
+      },
+      IM: {
+        ka_min: 0.1066,
+        bioavailability: 0.24,
+        source: 'GlucaGen (glucagon) prescribing information, section 12.3: "With intramuscular dosing, maximum plasma concentrations of 6.9 ng/mL were attained approximately 13 minutes after dosing."',
+        sourceUrl: 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=789ab694-3ad8-a122-e053-2991aa0a9ab3',
+        confidence: 'derived',
+        note:
+          'Solved the same way as the subcutaneous figures: a 13 min time to peak gives ka = 0.1066/min and the ' +
+          '6.9 ng/mL peak gives a fraction absorbed of 0.24 under the label\'s volume and half-life.',
+      },
+    },
+  },
   epinephrine: {
     routes: ['IM', 'SUBCUTANEOUS', 'INTRAOSSEOUS', 'NEBULISED'],
     presets: [

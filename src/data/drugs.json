@@ -14808,6 +14808,28 @@
           "label": "1 mg SC"
         }
       ],
+      "routePk": {
+        "SUBCUTANEOUS": {
+          "ka_min": 0.0468,
+          "bioavailability": 0.4,
+          "provenance": {
+            "source": "GlucaGen (glucagon) prescribing information, section 12.3: \"Maximum plasma concentrations of 7.9 ng/mL were achieved approximately 20 minutes after subcutaneous administration\"; volume of distribution 0.25 L/kg, half-life 8-18 min.",
+            "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=789ab694-3ad8-a122-e053-2991aa0a9ab3",
+            "confidence": "derived",
+            "note": "Solved from the label, not measured directly: in the one-compartment model with the label's own volume (0.25 L/kg) and a 13 min half-life, a 20 min time to peak fixes the absorption rate constant at 0.0468/min, and the 7.9 ng/mL peak then fixes the fraction absorbed at 0.40. Both inherit the uncertainty of the label's volume and half-life range."
+          }
+        },
+        "IM": {
+          "ka_min": 0.1066,
+          "bioavailability": 0.24,
+          "provenance": {
+            "source": "GlucaGen (glucagon) prescribing information, section 12.3: \"With intramuscular dosing, maximum plasma concentrations of 6.9 ng/mL were attained approximately 13 minutes after dosing.\"",
+            "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=789ab694-3ad8-a122-e053-2991aa0a9ab3",
+            "confidence": "derived",
+            "note": "Solved the same way as the subcutaneous figures: a 13 min time to peak gives ka = 0.1066/min and the 6.9 ng/mL peak gives a fraction absorbed of 0.24 under the label's volume and half-life."
+          }
+        }
+      },
       "pk": {
         "logP": -16.9,
         "bbbPenetration": 0,
@@ -14906,6 +14928,8 @@
       "sources": [
         "Computed from PubChem CID 16132283 descriptors by the polar-surface/lipophilicity/donor rule of Kelder J, et al. Polar molecular surface as a dominating determinant for oral absorption and brain penetration of drugs. Pharm Res 16(10):1514-1519, 1999. and Pajouhesh H, Lenz GR. Medicinal chemical properties of successful central nervous system drugs. NeuroRx 2(4):541-553, 2005. (https://doi.org/10.1023/A:1015040217741)",
         "FDA Structured Product Label via DailyMed — glucagon for injection (https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=glucagon%20for%20injection)",
+        "GlucaGen (glucagon) prescribing information, section 12.3: \"Maximum plasma concentrations of 7.9 ng/mL were achieved approximately 20 minutes after subcutaneous administration\"; volume of distribution 0.25 L/kg, half-life 8-18 min. (https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=789ab694-3ad8-a122-e053-2991aa0a9ab3)",
+        "GlucaGen (glucagon) prescribing information, section 12.3: \"With intramuscular dosing, maximum plasma concentrations of 6.9 ng/mL were attained approximately 13 minutes after dosing.\" (https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=789ab694-3ad8-a122-e053-2991aa0a9ab3)",
         "IUPHAR/BPS Guide to PHARMACOLOGY 2026.3 - published: 2026-09-16: glucagon at glucagon receptor, EC50 9.00 (Full agonist), PMID 4305077 (https://www.guidetopharmacology.org/GRAC/LigandDisplayForward?ligandId=1136)",
         "PubChem CID 16132283 (queried as \"Glucagon\"), XLogP3-AA (https://pubchem.ncbi.nlm.nih.gov/compound/16132283)",
         "PubChem CID 16132424 (glucagon). (https://pubchem.ncbi.nlm.nih.gov/compound/16132424)",
