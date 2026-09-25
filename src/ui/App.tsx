@@ -72,6 +72,7 @@ export function App() {
       s.endocrinePanelOpen ||
       s.labPanelOpen ||
       s.receptorPanelOpen ||
+      s.bloodPanelOpen ||
       s.tool === 'body',
   );
   const reducedMotion = useStore((s) => s.reducedMotion);
@@ -280,8 +281,9 @@ export function App() {
       </div>
 
       {/*
-        THE SHEET. At most one panel is open (store.ts), so this holds one card; the
-        blood-contents legend of the vascular overlay shows only when nothing else is.
+        THE SHEET. At most one panel is open (store.ts), so this holds one card. The
+        blood-contents legend is one of those panels now, opened from the menu, because
+        the vessels it describes are always on and it would otherwise own the sheet.
       */}
       <aside className={styles.sheet} aria-label="Panels">
         <StatusPanel />
@@ -292,7 +294,7 @@ export function App() {
         <EndocrinePanel />
         <LabPanel />
         <ReceptorPanel />
-        {!anyPanelOpen && <BloodContents />}
+        <BloodContents />
         <BodyPanel />
       </aside>
 

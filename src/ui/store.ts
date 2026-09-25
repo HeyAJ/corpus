@@ -81,9 +81,16 @@ interface UiState {
   /** Inoculate, watch and clear infections. */
   infectionPanelOpen: boolean;
   toggleInfectionPanel: () => void;
-  /** Vascular overlay: arteries, veins and what the blood is carrying. */
+  /** Blood vessels and the flow through them: on by default, the dock's drop button hides them. */
   vascularVisible: boolean;
   toggleVascular: () => void;
+  /**
+   * "In the blood": the legend of what the vessels are carrying. A panel of its own
+   * since the vessels became part of the default body - it used to appear whenever the
+   * overlay was on, and with the overlay always on it would have owned the sheet.
+   */
+  bloodPanelOpen: boolean;
+  toggleBloodPanel: () => void;
   /** "What is happening": the plain-language status of the body. */
   statusPanelOpen: boolean;
   toggleStatusPanel: () => void;
@@ -155,6 +162,7 @@ const CLOSED = {
   environmentPanelOpen: false,
   infectionPanelOpen: false,
   statusPanelOpen: false,
+  bloodPanelOpen: false,
   drawerOpen: false,
   menuOpen: false,
 } as const;
@@ -224,8 +232,10 @@ export const useStore = create<UiState>((set, get) => ({
   toggleEnvironmentPanel: () => set((s) => openOnly(s, 'environmentPanelOpen')),
   infectionPanelOpen: false,
   toggleInfectionPanel: () => set((s) => openOnly(s, 'infectionPanelOpen')),
-  vascularVisible: false,
+  vascularVisible: true,
   toggleVascular: () => set((s) => ({ vascularVisible: !s.vascularVisible })),
+  bloodPanelOpen: false,
+  toggleBloodPanel: () => set((s) => openOnly(s, 'bloodPanelOpen')),
   statusPanelOpen: false,
   toggleStatusPanel: () => set((s) => openOnly(s, 'statusPanelOpen')),
   menuOpen: false,

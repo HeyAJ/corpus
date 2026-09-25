@@ -1,8 +1,9 @@
 /*
  * BLOOD CONTENTS — the legend for the vascular overlay.
  *
- * A sheet card like the rest. It appears only while the vascular overlay is on,
- * because it is that overlay's legend and is meaningless without it.
+ * A sheet card like the rest, opened from the panels menu ("In the blood"). It used to
+ * appear whenever the vascular overlay was on; the vessels are on by default now, so it
+ * would have owned the sheet permanently.
  */
 
 .wrap {

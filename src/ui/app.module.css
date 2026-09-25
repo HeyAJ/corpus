@@ -72,6 +72,25 @@
   pointer-events: none;
   z-index: 12;
   max-width: min(44vw, 340px);
+  /*
+   * DRAWN SMALLER THAN IT IS LAID OUT. At full size the cardiac readout (rhythm, ECG,
+   * EF, pressure, EEG, detail lines) reached a third of the way down a phone and sat
+   * over the brain. Scaling the whole cluster from its top-left corner shrinks every
+   * chip, trace and gap in proportion, so nothing re-wraps and nothing has to be
+   * re-tuned per component; transforms are composited, so it costs nothing per frame.
+   * 0.86 on a desktop and 0.78 on a phone keep the smallest text (the detail line)
+   * at ~9 px and the numbers at ~14 px: smaller, still readable.
+   */
+  transform: scale(0.86);
+  transform-origin: top left;
+}
+
+@media (max-width: 720px) {
+  .hud {
+    transform: scale(0.78);
+    /* The layout box is unscaled, so give it the width the scaled cluster may use. */
+    max-width: calc(min(44vw, 340px) / 0.78);
+  }
 }
 
 /*
@@ -258,7 +277,8 @@
        header unreachable. The sheet is anchored to the bottom by `bottom` instead. */
   }
 
-  .hud { max-width: 62vw; }
+  /* 62vw once drawn: the box is laid out unscaled (see .hud), so divide by the scale. */
+  .hud { max-width: calc(62vw / 0.78); }
 
   /* One line, always: two wrapped lines of warning sat under the dock chips. */
   .disclaimer {

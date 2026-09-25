@@ -294,6 +294,8 @@ export function ToolDock() {
       toggleEndocrinePanel: s.toggleEndocrinePanel,
       labPanelOpen: s.labPanelOpen,
       toggleLabPanel: s.toggleLabPanel,
+      bloodPanelOpen: s.bloodPanelOpen,
+      toggleBloodPanel: s.toggleBloodPanel,
       receptorPanelOpen: s.receptorPanelOpen,
       toggleReceptorPanel: s.toggleReceptorPanel,
     })),
@@ -305,6 +307,7 @@ export function ToolDock() {
     { key: 'environment', label: 'Environment', hint: 'temperature, altitude, oxygen, posture', icon: <Mountain filled={st.environmentPanelOpen} />, active: st.environmentPanelOpen, onClick: st.toggleEnvironmentPanel },
     { key: 'infection', label: 'Infection', hint: 'inoculate, watch and clear', icon: <Microbe filled={st.infectionPanelOpen} />, active: st.infectionPanelOpen, onClick: st.toggleInfectionPanel },
     { key: 'endocrine', label: 'Hormones', hint: 'cortisol, ADH, glucagon and more', icon: <Flask filled={st.endocrinePanelOpen} />, active: st.endocrinePanelOpen, onClick: st.toggleEndocrinePanel },
+    { key: 'blood', label: 'In the blood', hint: 'what the vessels are carrying', icon: <BloodDrop filled={st.bloodPanelOpen} />, active: st.bloodPanelOpen, onClick: st.toggleBloodPanel },
     { key: 'lab', label: 'Laboratory', hint: 'blood gas and chemistry', icon: <Tube filled={st.labPanelOpen} />, active: st.labPanelOpen, onClick: st.toggleLabPanel },
     { key: 'receptors', label: 'Receptors', hint: 'what each drug is binding', icon: <Receptors />, active: st.receptorPanelOpen, onClick: st.toggleReceptorPanel },
   ];
@@ -342,7 +345,7 @@ export function ToolDock() {
   return (
     <nav className={styles.dock} aria-label="Tools">
       <div className={styles.cluster}>
-        <DockButton label="Vascular overlay — arteries, veins and what the blood is carrying" active={vascularOn} onClick={toggleVascular}>
+        <DockButton label={vascularOn ? "Hide blood vessels" : "Show blood vessels"} active={vascularOn} onClick={toggleVascular}>
           <BloodDrop filled={vascularOn} />
         </DockButton>
         <DockButton label="Panels" active={menuOpen || anyPanel} onClick={() => setMenuOpen(!menuOpen)}>

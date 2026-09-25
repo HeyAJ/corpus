@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import type { SimSnapshot } from '../../bridge/types';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
   buildCentrelines,
+  growFineBranches,
   radiusAt,
   sampleAt,
   saturationFor,
@@ -60,7 +62,14 @@ const PARTICLE_DENSITY = 620;
  * particles, each of which is one point sprite, so the cost is a single draw call and
  * one Float32 write per particle per frame.
  */
-const MAX_PARTICLES = 5600;
+const MAX_PARTICLES = 6400;
+
+/**
+ * Particles per metre in the fine branches. Far sparser than the named vessels: a twig
+ * is a few pixels long at body framing, and one or two particles moving along it is
+ * what reads as "blood reaches here", where the named-vessel density would be a smear.
+ */
+const FINE_PARTICLE_DENSITY = 90;
 
 /** Aortic flow that corresponds to one body-unit per second of particle travel. */
 const FLOW_REFERENCE_mL_per_s = 90;
@@ -109,6 +118,8 @@ export class VascularSystem {
   readonly root = new THREE.Group();
 
   private readonly lines: Centreline[];
+  /** The first `namedCount` lines are the anatomical segments; the rest are fine branches. */
+  private readonly namedCount: number;
   private readonly wallGroup = new THREE.Group();
   private readonly particles: Particle[] = [];
 
@@ -136,8 +147,12 @@ export class VascularSystem {
   private readonly scratch = new THREE.Vector3();
 
   constructor() {
-    this.lines = buildCentrelines();
-    this.root.visible = false;
+    const named = buildCentrelines();
+    this.namedCount = named.length;
+    this.lines = [...named, ...growFineBranches(named)];
+    // On by default since 2026-09-25: the vessels are part of the body, not an overlay
+    // you have to find. The dock's blood-drop button still hides them.
+    this.root.visible = true;
     this.root.add(this.wallGroup);
 
     // Heart-distance per line, then normalised against the deepest vessel, so the
@@ -158,15 +173,21 @@ export class VascularSystem {
     /* ----------------------------------------------------------- particles */
     let budget = 0;
     for (let i = 0; i < this.lines.length && budget < MAX_PARTICLES; i++) {
-      const n = Math.max(3, Math.round(this.lines[i].length * PARTICLE_DENSITY));
+      const n =
+        i < this.namedCount
+          ? Math.max(3, Math.round(this.lines[i].length * PARTICLE_DENSITY))
+          : Math.max(1, Math.round(this.lines[i].length * FINE_PARTICLE_DENSITY));
       for (let j = 0; j < n && budget < MAX_PARTICLES; j++) {
         this.particles.push({
           line: i,
           // Spread evenly rather than randomly: a random start clumps visibly at this
           // count, and an even one reads as continuous flow immediately.
           s: (j / n) * this.lines[i].length,
-          // A little variation so the stream does not look like a conveyor belt.
-          speedJitter: 0.82 + 0.36 * ((j * 2654435761) % 1000) / 1000,
+          // A little variation so the stream does not look like a conveyor belt. In the
+          // fine branches it runs at under half speed: flow velocity falls as a tree
+          // divides (the total cross-section grows), and a twig a few centimetres long
+          // wrapping twice a second read as flicker rather than as flow.
+          speedJitter: (i < this.namedCount ? 1 : 0.45) * (0.82 + 0.36 * ((j * 2654435761) % 1000) / 1000),
           colour: new THREE.Color(),
           base: new THREE.Color(),
           marker: -1,
@@ -237,15 +258,20 @@ export class VascularSystem {
     this.root.add(this.points);
   }
 
-  /** Tapered tubes, one per segment, in the absorption bucket. */
+  /**
+   * Tapered tubes in the absorption bucket: one mesh per named segment, and the fine
+   * branches MERGED into one mesh per blood type. Nine hundred separate twig meshes
+   * would be nine hundred draw calls every frame; merged they are a handful, which is
+   * what lets the whole tree stay on by default without costing the frame rate.
+   */
   private buildWalls(): void {
-    for (const line of this.lines) {
+    for (let i = 0; i < this.namedCount; i++) {
+      const line = this.lines[i];
       const path = new THREE.CatmullRomCurve3(line.positions, false, 'catmullrom', 0.5);
 
       // Resolution scaled to the vessel's calibre. A wide vessel earns a rounder tube;
-      // the many new small branches are a few pixels across at body framing, so they
-      // draw with a pentagonal cross-section that is invisible at that size and keeps
-      // the whole tree — sixty tubes now — well under the ~40 k-triangle budget.
+      // the small ones are a few pixels across at body framing, so they draw with a
+      // pentagonal cross-section that is invisible at that size.
       const maxRadius = Math.max(...line.radii);
       const radial = maxRadius > 0.006 ? 8 : maxRadius > 0.0018 ? 6 : 5;
       const tubular = maxRadius > 0.006 ? 22 : 16;
@@ -255,60 +281,82 @@ export class VascularSystem {
       // scaling each ring's offset from its centre. Cheaper and more controllable
       // than a custom extrusion, and it is a one-off cost at construction.
       taperTube(geometry, line);
-
-      const material = new THREE.ShaderMaterial({
-        name: 'VesselAbsorption',
-        uniforms: {
-          uTint: { value: new THREE.Color(0xc8323a) },
-          uDensity: { value: 0.16 },
-        },
-        vertexShader: /* glsl */ `
-          varying vec3 vNormalW;
-          varying vec3 vViewDirW;
-          void main() {
-            vec4 wp = modelMatrix * vec4(position, 1.0);
-            vNormalW = normalize(mat3(modelMatrix) * normal);
-            vViewDirW = cameraPosition - wp.xyz;
-            gl_Position = projectionMatrix * viewMatrix * wp;
-          }
-        `,
-        fragmentShader: /* glsl */ `
-          uniform vec3 uTint;
-          uniform float uDensity;
-          varying vec3 vNormalW;
-          varying vec3 vViewDirW;
-          void main() {
-            vec3 N = normalize(vNormalW);
-            vec3 V = normalize(vViewDirW);
-            float ndv = abs(dot(N, V));
-            // Same Beer-Lambert path-length reasoning as the organ shells: a grazing
-            // ray crosses more wall, so it absorbs more.
-            // Capped harder than the organ shells. A tube seen edge-on presents a
-            // near-infinite path through a wall that is a millimetre thick, and
-            // without the cap every vessel silhouette turned into an opaque brown
-            // outline that read as plumbing rather than as something blood is in.
-            float path = 1.0 / max(ndv, 0.34);
-            vec3 T = exp(-uDensity * path * (1.0 - uTint));
-            gl_FragColor = vec4(T, 1.0);
-          }
-        `,
-        // BUCKET 1. Multiply, and therefore order-independent with the organ shells.
-        blending: THREE.CustomBlending,
-        blendSrc: THREE.DstColorFactor,
-        blendDst: THREE.ZeroFactor,
-        depthWrite: false,
-        depthTest: true,
-        transparent: true,
-        side: THREE.DoubleSide,
-      });
-
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.renderOrder = 12;
-      mesh.frustumCulled = false;
-      this.wallGroup.add(mesh);
-      this.wallMaterials.push(material);
-      this.wallSides.push(line.side);
+      this.addWall(geometry, line.side, 0.16);
     }
+
+    const bySide = new Map<string, THREE.BufferGeometry[]>();
+    for (let i = this.namedCount; i < this.lines.length; i++) {
+      const line = this.lines[i];
+      const path = new THREE.CatmullRomCurve3(line.positions, false, 'catmullrom', 0.5);
+      // Triangular cross-section: a twig is one or two pixels wide.
+      const geometry = new THREE.TubeGeometry(path, 5, 1, 3, false);
+      taperTube(geometry, line);
+      geometry.deleteAttribute('uv');
+      const list = bySide.get(line.side) ?? [];
+      list.push(geometry);
+      bySide.set(line.side, list);
+    }
+    for (const [side, list] of bySide) {
+      const merged = mergeGeometries(list, false);
+      for (const g of list) g.dispose();
+      // A little denser than the named walls so hair-thin tubes still register.
+      if (merged) this.addWall(merged, side as Centreline['side'], 0.22);
+    }
+  }
+
+  private addWall(geometry: THREE.BufferGeometry, side: Centreline['side'], density: number): void {
+    const material = new THREE.ShaderMaterial({
+      name: 'VesselAbsorption',
+      uniforms: {
+        uTint: { value: new THREE.Color(0xc8323a) },
+        uDensity: { value: density },
+      },
+      vertexShader: /* glsl */ `
+        varying vec3 vNormalW;
+        varying vec3 vViewDirW;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vNormalW = normalize(mat3(modelMatrix) * normal);
+          vViewDirW = cameraPosition - wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: /* glsl */ `
+        uniform vec3 uTint;
+        uniform float uDensity;
+        varying vec3 vNormalW;
+        varying vec3 vViewDirW;
+        void main() {
+          vec3 N = normalize(vNormalW);
+          vec3 V = normalize(vViewDirW);
+          float ndv = abs(dot(N, V));
+          // Same Beer-Lambert path-length reasoning as the organ shells: a grazing
+          // ray crosses more wall, so it absorbs more.
+          // Capped harder than the organ shells. A tube seen edge-on presents a
+          // near-infinite path through a wall that is a millimetre thick, and
+          // without the cap every vessel silhouette turned into an opaque brown
+          // outline that read as plumbing rather than as something blood is in.
+          float path = 1.0 / max(ndv, 0.34);
+          vec3 T = exp(-uDensity * path * (1.0 - uTint));
+          gl_FragColor = vec4(T, 1.0);
+        }
+      `,
+      // BUCKET 1. Multiply, and therefore order-independent with the organ shells.
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.DstColorFactor,
+      blendDst: THREE.ZeroFactor,
+      depthWrite: false,
+      depthTest: true,
+      transparent: true,
+      side: THREE.DoubleSide,
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.renderOrder = 12;
+    mesh.frustumCulled = false;
+    this.wallGroup.add(mesh);
+    this.wallMaterials.push(material);
+    this.wallSides.push(side);
   }
 
   setVisible(on: boolean): void {
