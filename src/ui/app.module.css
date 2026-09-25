@@ -1,35 +1,27 @@
 /*
- * THE APPLICATION SHELL — a docked, tiling layout.
+ * THE APPLICATION SHELL — the body owns the whole screen.
  *
- * The old shell was a single positioning context with a dozen absolutely-placed
- * floating cards, and it worked exactly as long as only one of them was open at a
- * time. The moment two right-corner panels were open — endocrine and lab, say — the
- * later one in DOM order sat squarely on top of the earlier one, and the product had
- * a right-hand rectangle that could only ever show one of the things it claimed to
- * show. The floating model cannot express "everything at once"; it can only express
- * "the last thing you opened".
+ * History, because each layout fixed the last one's bug and created its own: the first
+ * shell floated a dozen absolutely-placed cards, so two open panels sat on top of each
+ * other. The second was a grid with a docked rail of panels beside (or, on a phone,
+ * beneath) the body, which ended the overlapping but shrank the body to whatever the
+ * rail left - a third of the width on a desktop, half the height on a phone, where the
+ * body could end up a thumbnail above a column of cards.
  *
- * So the shell is now a CSS GRID with three regions, and the panels do not position
- * themselves at all — they are plain cards that a region lays out:
+ * This one keeps what each got right. The stage (the 3D body and its HUD) fills the
+ * screen and is never resized by a panel. Panels open ONE AT A TIME (store.ts) in a
+ * single floating sheet, so they cannot overlap each other; the dock is five floating
+ * chips at the bottom; and the drawer and the sheet both clear the dock's measured
+ * height, so nothing lands on the controls.
  *
- *     ┌──────────────────────┬───────────┐
- *     │        stage         │           │
- *     │  (the 3D body + its  │   rail    │   the rail is the ONLY place a readout or
- *     │   own HUD overlays)  │ (panels)  │   control panel lives; it stacks them and
- *     │                      │           │   scrolls when there are more than fit.
- *     ├──────────────────────┴───────────┤
- *     │            bottom bar            │   dock + timeline + the permanent warning,
- *     └──────────────────────────────────┘   a reserved row nothing can cover.
- *
- * The body keeps its own column, so opening five panels narrows nothing about the
- * body except the space beside it — it never sits UNDER a panel. Panels never overlap
- * each other because a flex column cannot make two children share a line. And the
- * dock lives in its own grid row, so the "the drawer covers the dock" class of bug is
- * now structurally impossible rather than avoided by a hand-tuned pixel offset.
- *
- * The regions own the geometry; the cards own their own insides. That split is the
- * whole point, and it is why every panel module below was reduced to a card with no
- * position of its own.
+ *     ┌──────────────────────────────────┐
+ *     │ HUD            speed      tags   │
+ *     │                        ┌───────┐ │   desktop: the sheet is a card on the
+ *     │          (body)        │ sheet │ │   right; phone: a bottom sheet above the
+ *     │                        └───────┘ │   dock, at most ~45 % of the height
+ *     │ (o)(=)                (o)(o)(o)  │
+ *     │  NOT FOR CLINICAL USE            │
+ *     └──────────────────────────────────┘
  */
 
 .root {
@@ -38,13 +30,6 @@
   height: 100%;
   overflow: hidden;
   background: var(--bg-neutral);
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) var(--rail-w);
-  grid-template-rows: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'stage rail'
-    'bar   bar';
 }
 
 /* ------------------------------------------------------------------- stage */
@@ -57,14 +42,11 @@
  * centred on the body rather than on a viewport that now includes the rail.
  */
 .stage {
-  grid-area: stage;
-  position: relative;
-  min-width: 0;
-  min-height: 0;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  /* A size container so the HUD can shed its secondary lines when the stage is short
-     (a phone with the rail open), instead of having them cut off by `overflow: hidden`.
-     Safe because the stage's row is minmax(0, 1fr): its size never comes from content. */
+  /* A size container so the HUD can shed its secondary lines on a very short screen (a
+     landscape phone). Safe because the stage is sized by `inset: 0`, never by content. */
   container-type: size;
   container-name: stage;
 }
@@ -119,8 +101,13 @@
 
 /* Screen-space, not a 3D sprite: pixel-crisp and never scales with distance. */
 .organLabel {
+  /* Positioned by a transform set inline (App.tsx), not by left/top: a transform moves
+     on the compositor without re-running layout, and labels move every frame the body
+     turns. */
   position: absolute;
-  transform: translate(-50%, -50%);
+  left: 0;
+  top: 0;
+  will-change: transform;
   font-size: var(--size-label);
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -130,35 +117,36 @@
   text-shadow: 0 1px 12px rgba(246, 244, 228, 0.85);
 }
 
-/* --------------------------------------------------------------------- rail */
+/* -------------------------------------------------------------------- sheet */
 
 /*
- * The docked panels live here and only here. A vertical flex column: cards top to
- * bottom, a consistent gutter between them, and its own scrollbar once the stack is
- * taller than the viewport. Because the column cannot place two children side by side
- * or on top of each other, "no panel hides another" is a property of the container,
- * not a thing each panel has to arrange for.
- *
- * The panels bring their own translucent card backgrounds; the rail itself is just
- * the neutral page showing between them.
+ * The one place a readout or control panel appears. Only one panel is open at a time,
+ * so the sheet holds at most one card (plus the blood-contents legend when the vascular
+ * overlay is on and nothing else is). It floats over the stage and does not resize it.
+ * The container itself takes no pointer events, so the body behind its empty space can
+ * still be turned; the card inside does.
  */
-.rail {
-  grid-area: rail;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+.sheet {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  right: 16px;
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  width: min(380px, 38vw);
+  z-index: 24;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 18px 14px 14px 0;
-  z-index: 24;
+  justify-content: flex-start;
+  gap: 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   -webkit-overflow-scrolling: touch;
+  pointer-events: none;
 }
 
-/* Direct children stretch to the rail's width; the cards inside are full-width. */
-.rail > * {
+.sheet > * {
   flex: 0 0 auto;
+  pointer-events: auto;
 }
 
 /* --------------------------------------------------------------- bottom bar */
@@ -171,17 +159,22 @@
  * cannot end up in front of the controls.
  */
 .bottomBar {
-  grid-area: bar;
-  position: relative;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
-  padding: 8px var(--inset-hud) calc(env(safe-area-inset-bottom, 0px) + 2px);
-  min-height: var(--corpus-bar-h);
+  gap: 6px;
+  padding: 0 var(--inset-hud) calc(env(safe-area-inset-bottom, 0px) + 6px);
   z-index: 45;
-  background: linear-gradient(to top, rgba(240, 240, 240, 0.96), rgba(240, 240, 240, 0.72));
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  /* No band of its own: the chips float over the body, like the reference. */
+  pointer-events: none;
+}
+
+.bottomBar > * {
+  pointer-events: auto;
 }
 
 /*
@@ -249,36 +242,34 @@
 /* ===================================================================== phone */
 
 /*
- * On a phone the three columns collapse to one: the body on top, the panel stack as
- * a scrolling sheet beneath it, and the bottom bar under that. The rail is capped so
- * that more than half the body stays visible above it — the whole reason a panel is
- * worth reading is that you can read it against the thing it describes.
+ * On a phone the sheet becomes a bottom sheet above the dock, capped so the head and
+ * chest stay in view above it - a panel is worth reading because you read it against
+ * the body it describes. The body itself is never resized.
  */
 @media (max-width: 720px) {
-  .root {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr) auto auto;
-    grid-template-areas:
-      'stage'
-      'rail'
-      'bar';
-  }
-
-  .rail {
-    max-height: 52vh;
-    padding: 10px var(--inset-hud) 10px;
-    gap: 10px;
-    background: linear-gradient(to bottom, rgba(240, 240, 240, 0), rgba(240, 240, 240, 0.6) 18px);
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  .sheet {
+    top: auto;
+    left: var(--inset-hud);
+    right: var(--inset-hud);
+    width: auto;
+    max-height: 46vh;
+    /* NOT justify-content: flex-end - in a scrolling flex box that pushes the overflow
+       off the TOP, where it cannot be scrolled back to, and a tall panel opened with its
+       header unreachable. The sheet is anchored to the bottom by `bottom` instead. */
   }
 
   .hud { max-width: 62vw; }
-}
 
-/* A landscape phone: wide enough for the columns, far too short. Give the rail more
-   of the height so a two-line panel is not clipped to nothing. */
-@media (max-height: 560px) and (min-width: 721px) {
-  .root {
-    --rail-w: 320px;
+  /* One line, always: two wrapped lines of warning sat under the dock chips. */
+  .disclaimer {
+    gap: 8px;
+    font-size: 9px;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+
+  /* The limitations link moves into the panels menu on a phone (ToolDock.tsx). */
+  .disclaimer a {
+    display: none;
   }
 }

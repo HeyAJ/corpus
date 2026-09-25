@@ -94,6 +94,10 @@ New snapshot blocks: `environment, acidBase, mind, coagulation, infection, fluid
 
 **Known outstanding / accepted limitations** (all in `docs/MODEL_LIMITATIONS.md`): central antimuscarinic arousal gain too strong (atropine 1 mg → consciousness ~0.57); glucose model's insulin brake is double-counted (glucagon gain is a model calibration); water load barely raises urine (renal water gain tiny); AV-nodal block is a rate cut even in sinus rhythm; no HPA negative feedback; acetazolamide's metabolic acidosis not modelled; psychedelic mydriasis absent (no sourced magnitude); resting H1 vascular tone overstated; circulation is reference-sized for any body mass; exercise consciousness dips slightly with hyperventilation; metabolic-alkalosis respiratory compensation deliberately weak; HIV/thyroxine act too slowly to see in one session (stated, not faked).
 
+## UI layout (2026-09-25, after user review)
+
+The body owns the WHOLE screen and is never resized by a panel. The dock is five floating chips (vascular, panels menu | body, procedures, drugs); every other panel is one tap into the menu. **Only one panel is open at a time** (`openOnly` in `store.ts`) in a single floating sheet — a right-hand card on wide screens, a bottom sheet (≤46vh) on phones — so panels can never overlap each other. The drawer and sheet stop above the MEASURED bottom bar. Portrait screens pull the camera back (`OrbitRig.homeDistance`) so the whole body sits between HUD and dock. Smoothness rules: React gets snapshots at ≤10 Hz (the viewer gets all 20), the viewer sends organ labels only when they move, and render resolution adapts to hold the frame rate (touch devices start at 1.5×). Do not reintroduce a layout column that shrinks the stage.
+
 ## Docs worth reading, when relevant
 
 `docs/DECISIONS.md` (27 ADRs — the reasoning behind every non-obvious choice) · `docs/MODEL_LIMITATIONS.md` (what the model does *not* do; §15 is the tone for any new limitation) · `docs/MISSING_CONSTANTS.md` (generated; every unsourced field and every adjudicated data disagreement) · `docs/VISUAL_AUDIT.md` (the reference frames the renderer is calibrated against).

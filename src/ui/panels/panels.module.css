@@ -42,10 +42,12 @@
   .detail {
     display: none;
   }
+}
 
-  /* The speed control takes the top-right corner on a short stage (timescale.module.css). */
+/* On a phone the speed chip takes the top-right corner; the tags start below it. */
+@media (max-width: 720px) {
   .conditions {
-    top: calc(env(safe-area-inset-top, 0px) + 112px);
+    top: calc(env(safe-area-inset-top, 0px) + 70px);
   }
 }
 
@@ -84,6 +86,15 @@
   gap: 8px;
   pointer-events: none;
   max-width: 46vw;
+}
+
+/* With a panel open on a wide screen the sheet takes the top-right corner, so the tags
+   step left of it rather than sitting under the card. (On a phone the sheet is at the
+   bottom and the tags keep their corner.) */
+@media (min-width: 721px) {
+  :global([data-sheet='open']) .conditions {
+    right: calc(min(380px, 38vw) + 32px);
+  }
 }
 
 /* --- GI transit list ---------------------------------------------------- */

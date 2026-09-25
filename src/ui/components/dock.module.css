@@ -1,51 +1,19 @@
 /*
- * The tool dock, two clusters. It used to float absolutely at the bottom of the whole
- * screen, which is what let an open sheet land on top of it. It now lives in the shell's
- * reserved bottom bar as an ordinary flex row, so it has dedicated space that nothing
- * else can occupy.
+ * THE TOOL DOCK — five round chips floating over the bottom of the body.
+ *
+ * View state on the left (vascular overlay, the panels menu), intervention on the right
+ * (body, procedures, drugs), the same split the reference uses. It floats over the stage
+ * instead of owning a band of the screen, so the body keeps its full height; the chips
+ * are translucent so the pelvis shows through beneath them.
  */
 .dock {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
   width: 100%;
   pointer-events: none;
-  /* Now that there are more tools, a very narrow phone cannot show them all on one row.
-     Rather than wrap — which would grow the bottom bar and let the drawer reach the
-     dock again — the row scrolls sideways, keeping the bar a fixed, predictable height. */
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.dock::-webkit-scrollbar {
-  display: none;
-}
-
-/*
- * PHONE: WRAP, DON'T HIDE. The sideways-scrolling row kept the bar a fixed height, but at
- * 360 px it hid half the tools - Administer, Body and Procedures among them - off the
- * right edge with no scrollbar and no hint that they existed (round-2 tester). Wrapping
- * the two clusters onto their own rows shows every tool; the drawer now clears the bar's
- * MEASURED height (App.tsx), so a taller bar can no longer let it reach the dock, which
- * was the only reason for the scroll.
- */
-@media (max-width: 720px) {
-  .dock {
-    flex-wrap: wrap;
-    justify-content: center;
-    overflow-x: visible;
-    row-gap: 8px;
-  }
-
-  .cluster {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
-
-.cluster {
-  flex: none;
 }
 
 .cluster {
@@ -59,9 +27,11 @@
   align-items: center;
   justify-content: center;
   width: 46px;
-  height: 36px;
-  border-radius: var(--radius-chip);
+  height: 46px;
+  border-radius: 50%;
   background: var(--chip-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: background 140ms ease, transform 140ms ease;
 }
 
@@ -70,10 +40,135 @@
 }
 
 .button:active {
-  transform: translateY(1px);
+  transform: scale(0.94);
 }
 
 .buttonActive {
   background: var(--chip-bg-strong);
-  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.12);
+  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.14);
+}
+
+/* ------------------------------------------------------------------ launcher */
+
+/* A full-screen, invisible catch so a tap anywhere else dismisses the menu. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  border: none;
+  pointer-events: auto;
+  z-index: 60;
+  min-height: 0;
+  cursor: default;
+}
+
+/*
+ * The panels menu opens upward from the menu chip: a short list, one row per panel,
+ * each row a single tap that opens that panel in the sheet (and closes whichever was
+ * open, so two never compete for the screen).
+ */
+.launcher {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  z-index: 61;
+  width: min(320px, calc(100vw - 2 * var(--inset-hud)));
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  pointer-events: auto;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
+  animation: rise 160ms var(--ease-out, ease-out);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .launcher {
+    animation: none;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.itemActive {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.itemIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--chip-bg);
+}
+
+.itemText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.itemText strong {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.itemText small {
+  font-size: 11px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The model-limitations link lives in the footer on wider screens. */
+.phoneOnly {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .phoneOnly {
+    display: block;
+  }
+}
+
+a.item {
+  text-decoration: none;
+  color: inherit;
 }

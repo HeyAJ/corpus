@@ -1,3 +1,4 @@
+import { useShallow } from 'zustand/react/shallow';
 import { useStore, type ToolMode } from '../store';
 import styles from './dock.module.css';
 import { useVitalsAudio } from '../audio/useVitalsAudio';
@@ -222,29 +223,101 @@ function Microbe({ filled }: { filled: boolean }) {
   );
 }
 
+/** A pulse line: "what is happening" (the status panel). */
+function Pulse() {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 12h4l2-5 4 10 2-5h6" fill="none" stroke="#1a1a1a" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** Receptor grid: the receptor panel (the menu glyph now opens the launcher). */
+function Receptors() {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <g fill="none" stroke="#1a1a1a" strokeWidth="1.6">
+        <circle cx="7" cy="7" r="2.6" />
+        <circle cx="17" cy="7" r="2.6" />
+        <circle cx="7" cy="17" r="2.6" />
+        <circle cx="17" cy="17" r="2.6" />
+      </g>
+    </svg>
+  );
+}
+
+interface LauncherItem {
+  key: string;
+  label: string;
+  hint: string;
+  icon: React.ReactNode;
+  active: boolean;
+  onClick: () => void;
+}
+
+/**
+ * THE DOCK IS FIVE BUTTONS. It had grown to twelve, which on a phone either scrolled
+ * half of them out of sight or wrapped onto a second row that took height from the
+ * body. Now it is the reference's shape: view state on the left (vascular overlay, and
+ * a menu that lists every readout and control panel), intervention on the right (body,
+ * procedures, drugs). Everything else is one tap into the menu, and only one panel is
+ * ever open at a time (store.ts), so nothing can cover anything else.
+ */
 export function ToolDock() {
   const audio = useVitalsAudio();
   const tool = useStore((s) => s.tool);
   const setTool = useStore((s) => s.setTool);
   const setDrawer = useStore((s) => s.setDrawer);
-  const toggleReceptors = useStore((s) => s.toggleReceptorPanel);
-  const receptorsOpen = useStore((s) => s.receptorPanelOpen);
-  const toggleEndocrine = useStore((s) => s.toggleEndocrinePanel);
-  const endocrineOpen = useStore((s) => s.endocrinePanelOpen);
-  const toggleLab = useStore((s) => s.toggleLabPanel);
-  const togglePhysiology = useStore((s) => s.togglePhysiologyPanel);
-  const physiologyOpen = useStore((s) => s.physiologyPanelOpen);
-  const labOpen = useStore((s) => s.labPanelOpen);
-  const toggleImpact = useStore((s) => s.toggleImpactPanel);
-  const impactOpen = useStore((s) => s.impactPanelOpen);
-  const toggleEnvironment = useStore((s) => s.toggleEnvironmentPanel);
-  const environmentOpen = useStore((s) => s.environmentPanelOpen);
-  const toggleInfection = useStore((s) => s.toggleInfectionPanel);
-  const infectionOpen = useStore((s) => s.infectionPanelOpen);
-  const toggleVascular = useStore((s) => s.toggleVascular);
-  const vascularOn = useStore((s) => s.vascularVisible);
   const drawerOpen = useStore((s) => s.drawerOpen);
   const setPadStep = useStore((s) => s.setPadStep);
+  const closePanels = useStore((s) => s.closePanels);
+  const menuOpen = useStore((s) => s.menuOpen);
+  const setMenuOpen = useStore((s) => s.setMenuOpen);
+  const toggleVascular = useStore((s) => s.toggleVascular);
+  const vascularOn = useStore((s) => s.vascularVisible);
+
+  // Only the panel flags and their toggles - a bare useStore() would re-render the dock
+  // on every snapshot, twenty times a second, for nothing.
+  const st = useStore(
+    useShallow((s) => ({
+      statusPanelOpen: s.statusPanelOpen,
+      toggleStatusPanel: s.toggleStatusPanel,
+      impactPanelOpen: s.impactPanelOpen,
+      toggleImpactPanel: s.toggleImpactPanel,
+      physiologyPanelOpen: s.physiologyPanelOpen,
+      togglePhysiologyPanel: s.togglePhysiologyPanel,
+      environmentPanelOpen: s.environmentPanelOpen,
+      toggleEnvironmentPanel: s.toggleEnvironmentPanel,
+      infectionPanelOpen: s.infectionPanelOpen,
+      toggleInfectionPanel: s.toggleInfectionPanel,
+      endocrinePanelOpen: s.endocrinePanelOpen,
+      toggleEndocrinePanel: s.toggleEndocrinePanel,
+      labPanelOpen: s.labPanelOpen,
+      toggleLabPanel: s.toggleLabPanel,
+      receptorPanelOpen: s.receptorPanelOpen,
+      toggleReceptorPanel: s.toggleReceptorPanel,
+    })),
+  );
+  const items: LauncherItem[] = [
+    { key: 'status', label: 'What is happening', hint: 'the body in plain words', icon: <Pulse />, active: st.statusPanelOpen, onClick: st.toggleStatusPanel },
+    { key: 'impact', label: 'Impact', hint: 'what your actions changed', icon: <Impact filled={st.impactPanelOpen} />, active: st.impactPanelOpen, onClick: st.toggleImpactPanel },
+    { key: 'physiology', label: 'Physiology', hint: 'sleep, exercise, stress, pain, bleeding', icon: <Runner filled={st.physiologyPanelOpen} />, active: st.physiologyPanelOpen, onClick: st.togglePhysiologyPanel },
+    { key: 'environment', label: 'Environment', hint: 'temperature, altitude, oxygen, posture', icon: <Mountain filled={st.environmentPanelOpen} />, active: st.environmentPanelOpen, onClick: st.toggleEnvironmentPanel },
+    { key: 'infection', label: 'Infection', hint: 'inoculate, watch and clear', icon: <Microbe filled={st.infectionPanelOpen} />, active: st.infectionPanelOpen, onClick: st.toggleInfectionPanel },
+    { key: 'endocrine', label: 'Hormones', hint: 'cortisol, ADH, glucagon and more', icon: <Flask filled={st.endocrinePanelOpen} />, active: st.endocrinePanelOpen, onClick: st.toggleEndocrinePanel },
+    { key: 'lab', label: 'Laboratory', hint: 'blood gas and chemistry', icon: <Tube filled={st.labPanelOpen} />, active: st.labPanelOpen, onClick: st.toggleLabPanel },
+    { key: 'receptors', label: 'Receptors', hint: 'what each drug is binding', icon: <Receptors />, active: st.receptorPanelOpen, onClick: st.toggleReceptorPanel },
+  ];
+  if (audio.available) {
+    items.push({
+      key: 'sound',
+      label: audio.on ? 'Sound on' : 'Sound off',
+      hint: 'heartbeat, breathing and monitor',
+      icon: <Speaker filled={audio.on} />,
+      active: audio.on,
+      onClick: audio.toggle,
+    });
+  }
 
   const pick = (t: ToolMode) => {
     if (t === 'drugs') {
@@ -254,81 +327,31 @@ export function ToolDock() {
     }
     if (t === 'procedure') {
       const next = tool === 'procedure' ? 'none' : 'procedure';
+      closePanels();
       setTool(next);
       setPadStep(next === 'procedure' ? 'placeRight' : 'idle');
       return;
     }
-    setTool(tool === t ? 'none' : t);
+    const next = tool === t ? 'none' : t;
+    closePanels();
+    setTool(next);
   };
+
+  const anyPanel = items.some((i) => i.active && i.key !== 'sound');
 
   return (
     <nav className={styles.dock} aria-label="Tools">
       <div className={styles.cluster}>
-        {/*
-          The blood drop now drives the VASCULAR OVERLAY rather than the old circulation
-          tool mode: arteries, veins, and what the blood is carrying. It is the same
-          idea the icon always meant, finally with something behind it.
-        */}
         <DockButton label="Vascular overlay — arteries, veins and what the blood is carrying" active={vascularOn} onClick={toggleVascular}>
           <BloodDrop filled={vascularOn} />
         </DockButton>
-        <DockButton label="Receptor panel" active={receptorsOpen} onClick={toggleReceptors}>
+        <DockButton label="Panels" active={menuOpen || anyPanel} onClick={() => setMenuOpen(!menuOpen)}>
           <Menu />
         </DockButton>
-        <DockButton label="Endocrine panel" active={endocrineOpen} onClick={toggleEndocrine}>
-          <Flask filled={endocrineOpen} />
-        </DockButton>
-        <DockButton label="Laboratory panel" active={labOpen} onClick={toggleLab}>
-          <Tube filled={labOpen} />
-        </DockButton>
-        {/*
-          The impact panel: the single most useful readout for WHY a vital sign moved.
-          It sits with the readouts, because that is what it is — the effect bus, read.
-        */}
-        <DockButton label="Impact — what your actions are doing to the body" active={impactOpen} onClick={toggleImpact}>
-          <Impact filled={impactOpen} />
-        </DockButton>
-        {/*
-          Sound is OFF until asked for, and the button is the gesture that starts it:
-          browsers refuse an AudioContext without one, and a page that starts beeping at
-          you unprompted is a page you close.
-        */}
-        {audio.available && (
-          <DockButton
-            label={audio.on ? 'Mute the heartbeat, breathing and monitor' : 'Hear the heartbeat, breathing and monitor'}
-            active={audio.on}
-            onClick={audio.toggle}
-          >
-            <Speaker filled={audio.on} />
-          </DockButton>
-        )}
       </div>
 
       <div className={styles.cluster}>
-        {/*
-          Sleep, exertion, fright, stress, pain, bleeding. Sits beside the body and
-          procedure tools rather than with the readout panels, because it is a way of
-          DOING something to the body, not a way of reading one.
-        */}
-        <DockButton
-          label="Physiology — sleep, exertion, fright, stress, pain, bleeding"
-          active={physiologyOpen}
-          onClick={togglePhysiology}
-        >
-          <Runner filled={physiologyOpen} />
-        </DockButton>
-        {/*
-          Environment and infection are interventions — they change the world around the
-          body or introduce a pathogen into it — so they sit with the body, procedure and
-          syringe rather than with the readouts.
-        */}
-        <DockButton label="Environment — temperature, altitude, oxygen, posture, fluid" active={environmentOpen} onClick={toggleEnvironment}>
-          <Mountain filled={environmentOpen} />
-        </DockButton>
-        <DockButton label="Infection — inoculate, watch and clear" active={infectionOpen} onClick={toggleInfection}>
-          <Microbe filled={infectionOpen} />
-        </DockButton>
-        <DockButton label="Body configuration" active={tool === 'body'} onClick={() => pick('body')}>
+        <DockButton label="Body configuration and scenarios" active={tool === 'body'} onClick={() => pick('body')}>
           <Person filled={tool === 'body'} />
         </DockButton>
         <DockButton label="Procedures and defibrillation" active={tool === 'procedure'} onClick={() => pick('procedure')}>
@@ -338,6 +361,45 @@ export function ToolDock() {
           <Syringe filled={drawerOpen} />
         </DockButton>
       </div>
+
+      {menuOpen && (
+        <>
+          {/* Tapping anywhere outside the list closes it. */}
+          <button className={styles.scrim} aria-label="Close panels menu" onClick={() => setMenuOpen(false)} />
+          <ul className={styles.launcher} role="menu" aria-label="Panels">
+            {items.map((i) => (
+              <li key={i.key}>
+                <button
+                  role="menuitemcheckbox"
+                  aria-checked={i.active}
+                  className={`${styles.item} ${i.active ? styles.itemActive : ''}`}
+                  onClick={() => {
+                    i.onClick();
+                    setMenuOpen(false);
+                  }}
+                >
+                  <span className={styles.itemIcon}>{i.icon}</span>
+                  <span className={styles.itemText}>
+                    <strong>{i.label}</strong>
+                    <small>{i.hint}</small>
+                  </span>
+                </button>
+              </li>
+            ))}
+            <li className={styles.phoneOnly}>
+              <a className={styles.item} href="docs/MODEL_LIMITATIONS.md" target="_blank" rel="noreferrer">
+                <span className={styles.itemIcon} aria-hidden="true">
+                  !
+                </span>
+                <span className={styles.itemText}>
+                  <strong>Model limitations</strong>
+                  <small>what this simulation does not do</small>
+                </span>
+              </a>
+            </li>
+          </ul>
+        </>
+      )}
     </nav>
   );
 }

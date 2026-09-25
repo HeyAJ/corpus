@@ -39,6 +39,9 @@ import { NoticeToasts } from './components/NoticeToasts';
 
 const ORGANS = organDefs();
 
+/** Fastest the interface re-renders from snapshots, ms (the 3D view takes every one). */
+const UI_SNAPSHOT_MS = 100;
+
 export function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const bottomBarRef = useRef<HTMLDivElement | null>(null);
@@ -56,9 +59,21 @@ export function App() {
   const vascularVisible = useStore((s) => s.vascularVisible);
   const pushLog = useStore((s) => s.pushLog);
 
-  const snapshot = useStore((s) => s.snapshot);
-  const selected = useStore((s) => s.selectedOrgan);
-  const labels = useStore((s) => s.labels);
+  // The shell no longer subscribes to the snapshot or the organ labels: the HUD, the
+  // labels and the condition tags are their own components below, so a tick of the
+  // body re-renders the few things that show it rather than the whole interface.
+  const anyPanelOpen = useStore(
+    (s) =>
+      s.statusPanelOpen ||
+      s.impactPanelOpen ||
+      s.physiologyPanelOpen ||
+      s.environmentPanelOpen ||
+      s.infectionPanelOpen ||
+      s.endocrinePanelOpen ||
+      s.labPanelOpen ||
+      s.receptorPanelOpen ||
+      s.tool === 'body',
+  );
   const reducedMotion = useStore((s) => s.reducedMotion);
   const firstRunAccepted = useStore((s) => s.firstRunAccepted);
   const sharedArrayBuffer = useStore((s) => s.sharedArrayBuffer);
@@ -101,13 +116,41 @@ export function App() {
 
     const client = new SimClient();
     clientRef.current = client;
+    let lastUiSnapshot = 0;
+    let pendingSnapshot: Parameters<typeof setSnapshot>[0] | null = null;
+    let flushTimer: ReturnType<typeof setTimeout> | null = null;
 
     void client
       .init(
         0x5eed,
         (s) => {
-          setSnapshot(s);
+          // The viewer interpolates between every snapshot (20 Hz). The interface only
+          // needs numbers a person can read, so it is refreshed at most ten times a second:
+          // each refresh is a React render of every open readout, and halving them is
+          // frame time handed back to the 3D body. The LAST snapshot of any burst is
+          // always delivered, so a readout is never left showing a stale value.
           viewer.pushSnapshot(s);
+          pendingSnapshot = s;
+          const now = performance.now();
+          if (now - lastUiSnapshot >= UI_SNAPSHOT_MS) {
+            lastUiSnapshot = now;
+            setSnapshot(s);
+            pendingSnapshot = null;
+          } else if (flushTimer === null) {
+            flushTimer = setTimeout(() => {
+              flushTimer = null;
+              if (pendingSnapshot) {
+                lastUiSnapshot = performance.now();
+                setSnapshot(pendingSnapshot);
+                pendingSnapshot = null;
+              }
+            }, UI_SNAPSHOT_MS);
+          }
+
+          // Background mode follows the body's state (spec 8.1). Done here rather than in
+          // a React effect so the shell does not have to subscribe to the snapshot.
+          const arrested = s.conditions.some((c) => c.id === 'arrest' || c.id === 'vfib' || c.id === 'asystole');
+          viewer.setBackgroundMode(arrested ? 'arrest' : s.drugs.length > 0 || s.gi.digesta.length > 0 ? 'active' : 'idle');
         },
         (r) => {
           setShock({ ...r, at: Date.now() });
@@ -130,14 +173,14 @@ export function App() {
     const onResize = () => viewer.resize();
     window.addEventListener('resize', onResize);
 
-    // The canvas no longer fills the window — it fills the STAGE column, which changes
-    // width whenever the rail is toggled between the desktop and phone layouts, or when
-    // a panel opening pushes the grid around. A window `resize` event never fires for
-    // that, so observe the canvas box directly and reframe the body whenever it moves.
+    // The canvas fills the stage, which fills the screen; observing the box directly
+    // (rather than trusting window `resize`) also catches mobile address-bar collapses
+    // and orientation changes that resize the layout without a window resize event.
     const observer = new ResizeObserver(() => viewer.resize());
     observer.observe(canvas);
 
     return () => {
+      if (flushTimer !== null) clearTimeout(flushTimer);
       window.removeEventListener('resize', onResize);
       observer.disconnect();
       viewer.dispose();
@@ -155,14 +198,6 @@ export function App() {
   useEffect(() => {
     viewerRef.current?.setVascularVisible(vascularVisible);
   }, [vascularVisible]);
-
-  /* ---- background mode follows the body's state (spec 8.1) ---- */
-  useEffect(() => {
-    const viewer = viewerRef.current;
-    if (!viewer || !snapshot) return;
-    const arrested = snapshot.conditions.some((c) => c.id === 'arrest' || c.id === 'vfib' || c.id === 'asystole');
-    viewer.setBackgroundMode(arrested ? 'arrest' : snapshot.drugs.length > 0 || snapshot.gi.digesta.length > 0 ? 'active' : 'idle');
-  }, [snapshot]);
 
   /* ---------------------------------------------------------------- input */
 
@@ -205,22 +240,16 @@ export function App() {
 
   /* --------------------------------------------------------------- render */
 
-  const selectedDef = useMemo(() => ORGANS.find((o) => o.id === selected) ?? null, [selected]);
-  const Panel = selectedDef ? PANELS[selectedDef.panel] : null;
   const client = clientRef.current;
-  const channelIndex = (c: WaveformChannel) => (client ? client.channelIndex(c) : 0);
-
-  const heartDef = ORGANS.find((o) => o.id === 'heart')!;
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-sheet={anyPanelOpen ? 'open' : 'closed'}>
       {/*
         THE STAGE. The body and everything that must sit OVER the body: its own HUD,
         the screen-space labels, the condition tags, the speed control, the engine's
         toasts, the defib pad zones and the administration drawer. It is a positioning
         context of its own, so a label projected at canvas pixel (x, y) lands at (x, y)
-        here and a pad placed at 50 % is centred on the body, not on a viewport that now
-        also contains the rail.
+        here and a pad placed at 50 % is centred on the body.
       */}
       <div className={styles.stage}>
         <canvas
@@ -235,50 +264,26 @@ export function App() {
           role="img"
         />
 
-        {/* Screen-space organ labels, anchored to the projected centroid. Not 3D
-            sprites: they must stay pixel-crisp and must not scale with distance. */}
-        {labels.map((l) =>
-          l.visible ? (
-            <span key={l.id} className={styles.organLabel} style={{ left: l.x, top: l.y }} aria-hidden="true">
-              {ORGANS.find((o) => o.id === l.id)?.displayName}
-            </span>
-          ) : null,
-        )}
-
-        <div className={styles.hud} data-hud>
-          {!ready && <div className={styles.booting}>Starting body engine{'…'}</div>}
-          {ready && snapshot && (
-            <>
-              {Panel && selectedDef ? (
-                <Panel snapshot={snapshot} organ={selectedDef} ring={client?.ring ?? null} channelIndex={channelIndex} />
-              ) : (
-                <CardiacPanel snapshot={snapshot} organ={heartDef} ring={client?.ring ?? null} channelIndex={channelIndex} />
-              )}
-            </>
-          )}
-        </div>
-
-        {snapshot && <ConditionStack conditions={snapshot.conditions} />}
+        <OrganLabels />
+        <Hud ready={ready} client={client} />
+        <Conditions />
         <TimeScaleControl />
         <NoticeToasts />
 
         {/* The resuscitation flow is spatial — pads on the thorax, eyes on the chest —
-            so it stays anchored to the body rather than joining the rail. */}
+            so it stays anchored to the body rather than joining the panel sheet. */}
         <ProcedurePanel />
 
         {/* The administration drawer is a confined modal sheet: it covers the body only,
-            never the rail beside it or the dock below it. */}
+            never the dock below it. */}
         <DrugDrawer />
       </div>
 
       {/*
-        THE RAIL. Every readout and control panel is a plain card here, laid out top to
-        bottom by a flex column that scrolls once the stack outgrows the viewport. Because
-        a column cannot make two children share a line, no panel can ever hide another —
-        the whole point of the rebuild. Each panel renders null when closed, so the rail
-        holds exactly what is open, and the always-present "what is happening" leads it.
+        THE SHEET. At most one panel is open (store.ts), so this holds one card; the
+        blood-contents legend of the vascular overlay shows only when nothing else is.
       */}
-      <aside className={styles.rail} aria-label="Panels">
+      <aside className={styles.sheet} aria-label="Panels">
         <StatusPanel />
         <ImpactPanel />
         <PhysiologyPanel />
@@ -287,14 +292,15 @@ export function App() {
         <EndocrinePanel />
         <LabPanel />
         <ReceptorPanel />
-        <BloodContents />
+        {!anyPanelOpen && <BloodContents />}
         <BodyPanel />
       </aside>
 
       {/*
-        THE BOTTOM BAR. A reserved row for the timeline and its toasts, the tool dock,
-        and the permanent warning. Nothing in the stage or the rail can paint into it, so
-        "the drawer covers the dock" is now a layout impossibility rather than a bug.
+        THE BOTTOM BAR. The timeline and its toasts, the tool dock and the permanent
+        warning, floating over the bottom of the body. Its height is measured and
+        published (--corpus-bar-actual) so the drawer and the panel sheet always stop
+        above it.
       */}
       <div className={styles.bottomBar} ref={bottomBarRef}>
         <div className={styles.bottomStack}>
@@ -329,6 +335,52 @@ export function App() {
       {!firstRunAccepted && <FirstRunModal />}
     </div>
   );
+}
+
+/** Screen-space organ labels. Their own subscription, so moving labels re-render only them. */
+function OrganLabels() {
+  const labels = useStore((s) => s.labels);
+  return (
+    <>
+      {labels.map((l) =>
+        l.visible ? (
+          <span key={l.id} className={styles.organLabel} style={{ transform: `translate(${l.x}px, ${l.y}px) translate(-50%, -50%)` }} aria-hidden="true">
+            {ORGANS.find((o) => o.id === l.id)?.displayName}
+          </span>
+        ) : null,
+      )}
+    </>
+  );
+}
+
+/** The metric cluster, top-left: the selected organ's readouts, or the heart's. */
+function Hud({ ready, client }: { ready: boolean; client: SimClient | null }) {
+  const snapshot = useStore((s) => s.snapshot);
+  const selected = useStore((s) => s.selectedOrgan);
+  const selectedDef = useMemo(() => ORGANS.find((o) => o.id === selected) ?? null, [selected]);
+  const Panel = selectedDef ? PANELS[selectedDef.panel] : null;
+  const channelIndex = (c: WaveformChannel) => (client ? client.channelIndex(c) : 0);
+  const heartDef = ORGANS.find((o) => o.id === 'heart')!;
+  return (
+    <div className={styles.hud} data-hud>
+      {!ready && <div className={styles.booting}>Starting body engine{'…'}</div>}
+      {ready && snapshot && (
+        <>
+          {Panel && selectedDef ? (
+            <Panel snapshot={snapshot} organ={selectedDef} ring={client?.ring ?? null} channelIndex={channelIndex} />
+          ) : (
+            <CardiacPanel snapshot={snapshot} organ={heartDef} ring={client?.ring ?? null} channelIndex={channelIndex} />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Condition tags, top-right. */
+function Conditions() {
+  const conditions = useStore((s) => s.snapshot?.conditions);
+  return conditions ? <ConditionStack conditions={conditions} /> : null;
 }
 
 export type { OrganId };

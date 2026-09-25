@@ -1,17 +1,21 @@
 /*
  * ADMINISTRATION DRAWER — a modal bottom sheet, snap points at roughly 46 % and 82 %.
  *
- * It is the one panel that does NOT join the rail: it is a task surface you open, act
+ * It is the one panel that does NOT join the panel sheet: it is a task surface you open, act
  * in, and close, not a readout you keep on screen, and it wants the width while it is
  * up. So it stays a bottom sheet, but a confined one — it covers the STAGE (the body)
- * only, never the rail beside it, and it is anchored above the reserved bottom bar so
+ * only, never the dock beside it, and it is anchored above the reserved bottom bar so
  * it can no longer sit on top of the tool dock, which was the reported bug. On a phone
  * responsive.css lets it span the full gutter width.
  */
 .sheet {
   position: fixed;
+  /* Centred and capped: with no rail beside the body any more, a full-width sheet on a
+     desktop would be a metre of empty glass. */
   left: var(--inset-hud);
-  right: calc(var(--rail-w) + var(--inset-hud));
+  right: var(--inset-hud);
+  max-width: 760px;
+  margin: 0 auto;
   /* The MEASURED bar height (App.tsx publishes it), falling back to the nominal token.
      The nominal value assumed 36 px dock buttons, but on a touch screen the 44 px target
      rule makes the bar taller, and the sheet then sat 6-14 px over the dock it exists

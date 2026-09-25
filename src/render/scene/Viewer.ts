@@ -101,6 +101,25 @@ export class Viewer {
 
   frameTimes: number[] = [];
 
+  /*
+   * ADAPTIVE RESOLUTION. The body renders through a composer (bloom, dither) at the
+   * device pixel ratio, and on a phone at 2x or 3x that is several times the pixels of
+   * the screen's CSS size for a picture whose whole look is soft translucent shells. So
+   * a touch device starts at 1.5x rather than 2x, and every second the loop checks its
+   * own frame times: sustained frames slower than ~24 ms step the ratio down by a
+   * quarter (never below 1), and a device comfortably holding its refresh rate steps
+   * back up. Smooth motion is worth more here than the last few percent of sharpness.
+   */
+  private maxDpr = Math.min(
+    typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1,
+    typeof window !== 'undefined' && window.matchMedia?.('(pointer: coarse)').matches ? 1.5 : 2,
+  );
+  private dpr = this.maxDpr;
+  private framesSinceCheck = 0;
+  private lastDprChange = 0;
+  /** Rounded label positions last sent to React, so an unmoving body sends nothing. */
+  private lastLabelKey = '';
+
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({
       canvas,
@@ -108,7 +127,7 @@ export class Viewer {
       alpha: false,
       powerPreference: 'high-performance',
     });
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(this.dpr);
     this.renderer.setSize(canvas.clientWidth || 1, canvas.clientHeight || 1, false);
     // Tone mapping happens in the dither/grade pass, not here: the dither must be
     // applied after tone mapping or the pattern stops being uniform across the
@@ -393,6 +412,7 @@ export class Viewer {
 
     this.frameTimes.push(dtMs);
     if (this.frameTimes.length > 240) this.frameTimes.shift();
+    this.adaptResolution(now);
 
     this.backgroundColor.lerp(this.targetBackground, Math.min(1, dtMs / 400));
 
@@ -469,14 +489,39 @@ export class Viewer {
         visible: this.projected.z < 1 && x > 0 && x < width && y > 0 && y < height,
       });
     }
-    this.callbacks.onLabels(this.labelBuffer);
+    // ONLY WHEN SOMETHING MOVED. This ran every animation frame and handed React a new
+    // label list sixty times a second, and every hand-off re-rendered the interface -
+    // the largest single source of dropped frames on a phone. A still body now sends
+    // nothing; a turning one sends positions rounded to whole pixels.
+    let key = '';
+    for (const l of this.labelBuffer) key += `${l.id}:${Math.round(l.x)},${Math.round(l.y)},${l.visible ? 1 : 0};`;
+    if (key === this.lastLabelKey) return;
+    this.lastLabelKey = key;
+    this.callbacks.onLabels(this.labelBuffer.slice());
+  }
+
+  /** See `maxDpr`: step the render resolution to hold the frame rate. */
+  private adaptResolution(now: number): void {
+    if (++this.framesSinceCheck < 60) return;
+    this.framesSinceCheck = 0;
+    const recent = this.frameTimes.slice(-60);
+    const mean = recent.reduce((a, b) => a + b, 0) / recent.length;
+    if (mean > 24 && this.dpr > 1 && now - this.lastDprChange > 2000) {
+      this.dpr = Math.max(1, this.dpr - 0.25);
+      this.lastDprChange = now;
+      this.resize();
+    } else if (mean < 18 && this.dpr < this.maxDpr && now - this.lastDprChange > 6000) {
+      this.dpr = Math.min(this.maxDpr, this.dpr + 0.25);
+      this.lastDprChange = now;
+      this.resize();
+    }
   }
 
   resize(): void {
     const canvas = this.renderer.domElement;
     const width = canvas.clientWidth || 1;
     const height = canvas.clientHeight || 1;
-    const dpr = Math.min(window.devicePixelRatio, 2);
+    const dpr = this.dpr;
 
     this.renderer.setPixelRatio(dpr);
     this.renderer.setSize(width, height, false);

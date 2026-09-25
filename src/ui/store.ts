@@ -84,6 +84,14 @@ interface UiState {
   /** Vascular overlay: arteries, veins and what the blood is carrying. */
   vascularVisible: boolean;
   toggleVascular: () => void;
+  /** "What is happening": the plain-language status of the body. */
+  statusPanelOpen: boolean;
+  toggleStatusPanel: () => void;
+  /** The launcher that lists every panel behind the dock's menu button. */
+  menuOpen: boolean;
+  setMenuOpen: (open: boolean) => void;
+  /** Close every panel, the drawer and the launcher (the body gets the whole screen). */
+  closePanels: () => void;
 
   /* ---- defibrillation flow ---- */
   padStep: 'idle' | 'placeRight' | 'placeLeft' | 'ready' | 'charged';
@@ -138,6 +146,32 @@ let eventId = 1;
 /** The longest history worth keeping; older entries fall off the front. */
 const MAX_EVENTS = 300;
 
+const CLOSED = {
+  receptorPanelOpen: false,
+  endocrinePanelOpen: false,
+  labPanelOpen: false,
+  physiologyPanelOpen: false,
+  impactPanelOpen: false,
+  environmentPanelOpen: false,
+  infectionPanelOpen: false,
+  statusPanelOpen: false,
+  drawerOpen: false,
+  menuOpen: false,
+} as const;
+
+/*
+ * ONE PANEL AT A TIME. The panels used to stack in a docked rail that took a third of
+ * the screen from the body on a desktop and half of it on a phone, and the body shrank
+ * to fit whatever was left. Now the body always owns the whole screen and a single
+ * floating sheet holds whichever panel is open; opening another replaces it. So panels
+ * can never overlap each other, and the body is never resized by one. The body panel
+ * and the procedure flow are tool modes, so opening a panel leaves the procedure tool
+ * alone (its pads live on the chest) but closes the body panel, which shares the sheet.
+ */
+function openOnly<K extends keyof typeof CLOSED>(s: { tool: ToolMode } & Record<K, boolean>, key: K) {
+  return { ...CLOSED, tool: s.tool === 'body' || s.tool === 'drugs' ? ('none' as ToolMode) : s.tool, [key]: !s[key] };
+}
+
 export const useStore = create<UiState>((set, get) => ({
   snapshot: null,
   connected: false,
@@ -173,25 +207,30 @@ export const useStore = create<UiState>((set, get) => ({
   drawerOpen: false,
   drawerTab: 'drugs',
   drawerSnap: 0,
-  setDrawer: (open, tab) => set((s) => ({ drawerOpen: open, drawerTab: tab ?? s.drawerTab })),
+  setDrawer: (open, tab) => set((s) => (open ? { ...CLOSED, drawerOpen: true, drawerTab: tab ?? s.drawerTab } : { drawerOpen: false })),
   setDrawerSnap: (s) => set({ drawerSnap: s }),
 
   receptorPanelOpen: false,
-  toggleReceptorPanel: () => set((s) => ({ receptorPanelOpen: !s.receptorPanelOpen })),
+  toggleReceptorPanel: () => set((s) => openOnly(s, 'receptorPanelOpen')),
   endocrinePanelOpen: false,
-  toggleEndocrinePanel: () => set((s) => ({ endocrinePanelOpen: !s.endocrinePanelOpen })),
+  toggleEndocrinePanel: () => set((s) => openOnly(s, 'endocrinePanelOpen')),
   labPanelOpen: false,
-  toggleLabPanel: () => set((s) => ({ labPanelOpen: !s.labPanelOpen })),
+  toggleLabPanel: () => set((s) => openOnly(s, 'labPanelOpen')),
   physiologyPanelOpen: false,
-  togglePhysiologyPanel: () => set((s) => ({ physiologyPanelOpen: !s.physiologyPanelOpen })),
+  togglePhysiologyPanel: () => set((s) => openOnly(s, 'physiologyPanelOpen')),
   impactPanelOpen: false,
-  toggleImpactPanel: () => set((s) => ({ impactPanelOpen: !s.impactPanelOpen })),
+  toggleImpactPanel: () => set((s) => openOnly(s, 'impactPanelOpen')),
   environmentPanelOpen: false,
-  toggleEnvironmentPanel: () => set((s) => ({ environmentPanelOpen: !s.environmentPanelOpen })),
+  toggleEnvironmentPanel: () => set((s) => openOnly(s, 'environmentPanelOpen')),
   infectionPanelOpen: false,
-  toggleInfectionPanel: () => set((s) => ({ infectionPanelOpen: !s.infectionPanelOpen })),
+  toggleInfectionPanel: () => set((s) => openOnly(s, 'infectionPanelOpen')),
   vascularVisible: false,
   toggleVascular: () => set((s) => ({ vascularVisible: !s.vascularVisible })),
+  statusPanelOpen: false,
+  toggleStatusPanel: () => set((s) => openOnly(s, 'statusPanelOpen')),
+  menuOpen: false,
+  setMenuOpen: (open) => set({ menuOpen: open }),
+  closePanels: () => set((s) => ({ ...CLOSED, tool: s.tool === 'body' || s.tool === 'drugs' ? 'none' : s.tool })),
 
   padStep: 'idle',
   defibEnergy: 200,

@@ -33,68 +33,45 @@
   color: var(--ink);
 }
 
+/* The single tap-to-cycle chip; only shown on a phone. */
+.compact {
+  display: none;
+}
+
 /*
- * PHONE: a horizontal pill at the BOTTOM CENTRE of the stage. It used to be stacked
- * vertically against the right edge, which was clear of the HUD but shared the top-right
- * corner with the condition tags, and it set `min-height: 0` - a class rule, so it beat
- * the global 44 px touch-target rule and left the four speed buttons 21 px tall on the
- * one breakpoint guaranteed to be driven by a finger (round-2 tester). The bottom centre
- * is the one place on a phone stage that neither the HUD (top left), the tags (top
- * right) nor the drawer's own controls use.
+ * PHONE: the pill is replaced by one chip in the top-right corner (the condition tags
+ * step down beneath it, panels.module.css). Earlier attempts put a four-button pill at
+ * the right edge (collided with the tags), then at the bottom centre (collided with the
+ * warning once the dock floated over the body).
  */
 @media (max-width: 720px) {
   .wrap {
-    top: auto;
-    bottom: 8px;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    flex-direction: row;
-    gap: 2px;
-    padding: 3px 4px;
-  }
-
-  .clock {
-    padding: 0 6px 0 4px;
-    font-size: 11px;
-  }
-
-  .button,
-  .active {
-    padding: 4px 9px;
-    font-size: 11px;
-  }
-}
-
-/* Only a fine pointer may shrink them below the touch minimum. */
-@media (max-width: 720px) and (pointer: fine) {
-  .button,
-  .active {
-    min-height: 0;
-  }
-}
-
-/*
- * A SHORT STAGE (a phone with rail panels open, stage under ~380 px): at the bottom
- * centre the pill landed on the HUD's heart-rate and ECG rows. It moves to the top-right
- * corner instead, and the condition tags step down beneath it (panels.module.css).
- */
-@container stage (max-height: 380px) {
-  .wrap {
-    top: calc(env(safe-area-inset-top, 0px) + 8px);
-    bottom: auto;
-    left: auto;
-    right: 8px;
-    transform: none;
-    /* A 2 x 2 block fits the strip right of the HUD's rows even at 360 px, where a
-       single row of four did not. */
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    padding: 3px;
-    border-radius: 14px;
-  }
-
-  .clock {
     display: none;
+  }
+
+  .compact {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 22px);
+    right: var(--inset-hud);
+    z-index: 15;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 44px;
+    min-height: 36px;
+    padding: 4px 12px;
+    border: none;
+    border-radius: var(--radius-pill);
+    background: var(--chip-bg);
+    font-size: 13px;
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  .compactClock {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-dim);
+    font-variant-numeric: tabular-nums;
   }
 }

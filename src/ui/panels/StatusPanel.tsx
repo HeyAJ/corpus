@@ -37,9 +37,12 @@ const SEVERITY_WORD: Record<string, string> = {
 
 export function StatusPanel() {
   const snapshot = useStore((s) => s.snapshot);
+  const panelOpen = useStore((s) => s.statusPanelOpen);
   const [open, setOpen] = useState(true);
 
-  if (!snapshot) return null;
+  // Behind the dock's menu now, like every other panel: the conditions it explains are
+  // already tagged on the stage, so it no longer needs to hold screen space by default.
+  if (!snapshot || !panelOpen) return null;
 
   const conditions = [...snapshot.conditions].sort(
     (a, b) => (SEVERITY_RANK[a.severity] ?? 3) - (SEVERITY_RANK[b.severity] ?? 3),
