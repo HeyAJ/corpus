@@ -28,6 +28,11 @@
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.16);
   transition: height var(--tween-state) var(--ease-out);
   z-index: 30;
+  /* A width container, so the header can re-flow by the drawer's own width (which the
+     rail and the viewport both change) rather than guessing it from the viewport. Safe:
+     the sheet's width comes from left/right, never from its content. */
+  container-type: inline-size;
+  container-name: drawer;
 }
 
 .sheetFull {
@@ -325,6 +330,39 @@
   font: inherit;
   font-size: 13px;
   color: var(--ink);
+}
+
+/*
+ * NARROW DRAWER: the header row held three tabs, a search box fixed at min(320px, 40vw)
+ * and the close button with no wrapping, so below about 720 px of drawer width it was
+ * 145-180 px wider than the sheet and the close button sat entirely off-screen - on every
+ * phone, where it was supposed to be the 44 px target (round-4 verifier). Here the close
+ * button stays on the tab row and the search takes a full-width row of its own.
+ */
+@container drawer (max-width: 720px) {
+  .tabs {
+    flex-wrap: wrap;
+    row-gap: 8px;
+    gap: 14px;
+    padding: 6px 12px 10px 16px;
+  }
+
+  .close {
+    order: 2;
+  }
+
+  .search {
+    order: 3;
+    flex: 1 1 100%;
+    margin-left: 0;
+    min-width: 0;
+  }
+
+  .search input {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+  }
 }
 
 .search input::placeholder {
