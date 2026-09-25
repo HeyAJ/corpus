@@ -9,8 +9,9 @@ import type {
 } from '../../src/data/pharma-types';
 import { MANIFEST, type ManifestEntry } from './drug_manifest';
 import { ROUTE_ADDITIONS } from './route_presets';
-import { PK_BY_ID, type PkLiteratureEntry } from './pk_literature';
+import { BLOOD_CLEARED, PK_BY_ID, type PkLiteratureEntry } from './pk_literature';
 import { REGISTRY, SOURCES as REGISTRY_SOURCES } from './receptor_registry';
+import { isCentralEffect } from './central_effects';
 import {
   GTOPDB_ATTRIBUTION,
   cleanName,
@@ -171,7 +172,10 @@ function buildReceptors(gtopdb: GtopdbData): Receptor[] {
       centralFraction: r.centralFraction,
       ec50Occupancy: r.ec50Occupancy,
       hill: r.hill,
-      effects: r.effects,
+      // Each effect says whether it happens behind the blood-brain barrier, which is
+      // what pd.ts gates on a drug's penetration. See central_effects.ts for why the
+      // old per-receptor blend (centralFraction) was replaced.
+      effects: r.effects.map((e) => ({ ...e, central: isCentralEffect(r.id, e.target) })),
       gtopdbTargetId: id ?? null,
       notes: r.notes,
     };
@@ -221,7 +225,9 @@ function buildDrug(
     ? buildTargets(m, gtopdb, receptorKeys, unmapped)
     : [];
 
-  if (m.gtopdbLigand && targets.length === 0) {
+  appendLiteratureTargets(m, targets);
+
+  if (m.gtopdbLigand && targets.length === 0 && (m.literatureTargets?.length ?? 0) === 0) {
     // An empty target list has two very different causes, and reporting them
     // identically made a deliberate modelling decision look like a pipeline failure.
     // Distinguish them: GtoPdb having nothing to say is an upstream gap; the
@@ -304,6 +310,8 @@ function buildDrug(
       sourceUrl: d.sourceUrl,
     })),
     ...(m.payload ? { payload: m.payload } : {}),
+    ...(m.hormoneAnalogue ? { hormoneAnalogue: m.hormoneAnalogue } : {}),
+    ...(m.antimicrobial ? { antimicrobial: m.antimicrobial } : {}),
     notes: m.notes,
     sources: [...sources].sort(),
   };
@@ -431,6 +439,39 @@ function buildTargets(
   return out;
 }
 
+/** Set of receptor ids the registry actually carries; a literature target for anything else is a mistake. */
+const KNOWN_RECEPTOR_IDS = new Set(REGISTRY.map((r) => r.id));
+
+/**
+ * Append CITED LITERATURE affinities for targets GtoPdb has no human row for. A GtoPdb
+ * row always wins: a literature target for a receptor already built from GtoPdb is
+ * dropped, never duplicated, so the automatic source stays authoritative wherever it
+ * has something to say. See ManifestEntry.literatureTargets.
+ */
+function appendLiteratureTargets(m: ManifestEntry, targets: DrugTarget[]): void {
+  if (!m.literatureTargets?.length) return;
+  const present = new Set(targets.map((t) => t.receptorId));
+  for (const lt of m.literatureTargets) {
+    if (!KNOWN_RECEPTOR_IDS.has(lt.receptorId)) {
+      throw new Error(`${m.id}: literatureTarget names receptor "${lt.receptorId}", which the registry does not carry.`);
+    }
+    if (present.has(lt.receptorId)) continue; // GtoPdb already covered it; do not double-count.
+    if (!(lt.Ki_nM > 0)) throw new Error(`${m.id}: literatureTarget for ${lt.receptorId} has no positive Ki.`);
+    targets.push({
+      receptorId: lt.receptorId,
+      Ki_nM: lt.Ki_nM,
+      intrinsicActivity: lt.intrinsicActivity,
+      kon: null,
+      koff: null,
+      source: `Curated literature affinity (NOT from GtoPdb, which has no human row for this pair): ${lt.source}. ${lt.note}`,
+      sourceUrl: lt.sourceUrl,
+      confidence: lt.confidence ?? 'measured',
+    });
+    present.add(lt.receptorId);
+  }
+  targets.sort((a, b) => (a.Ki_nM ?? Infinity) - (b.Ki_nM ?? Infinity));
+}
+
 function buildPk(
   m: ManifestEntry,
   lit: PkLiteratureEntry | undefined,
@@ -451,6 +492,7 @@ function buildPk(
     k10_min: null, k12_min: null, k21_min: null, k13_min: null, k31_min: null,
     renalFraction: null, proteinBound: null, MW_gmol: null,
     ka_min: null, lagTime_min: null, bioavailability: null, hepaticExtraction: null,
+    bloodClearance: null,
     vmax_mg_per_min: null, km_mg_per_L: null,
     provenance,
   };
@@ -520,6 +562,15 @@ function buildPk(
     missing.push({ drugId: m.id, field: 'bbbPenetration', reason: 'No physicochemical descriptors in PubChem or the Pulse substance table, so central versus peripheral receptor access cannot be distinguished. Central effects are applied in full, which may overstate the central action of a hydrophilic drug.' });
   }
 
+  // A CITED override of the computed penetration, for a drug the passive-permeability
+  // rule scores wrongly because it cannot see active efflux or a permanent charge.
+  // Applied last so it beats whatever PubChem or Pulse produced above, and it carries
+  // its own citation. See ManifestEntry.bbbPenetration.
+  if (m.bbbPenetration) {
+    pk.bbbPenetration = m.bbbPenetration.value;
+    cite('bbbPenetration', m.bbbPenetration.source, m.bbbPenetration.sourceUrl, 'derived', m.bbbPenetration.note);
+  }
+
   /* --- protein binding ----------------------------------------------------- */
   const pulseFu = pulseNumber(sub, 'FractionUnboundInPlasma');
   if (lit?.proteinBound !== undefined) {
@@ -559,6 +610,11 @@ function buildPk(
   if (lit?.hepaticExtraction !== undefined) {
     pk.hepaticExtraction = lit.hepaticExtraction;
     cite('hepaticExtraction', lit.citations[0].source, lit.citations[0].url, 'derived');
+  }
+  const blood = BLOOD_CLEARED[m.id];
+  if (blood) {
+    pk.bloodClearance = true;
+    cite('bloodClearance', blood.source, blood.url, 'measured', blood.note);
   }
   if (lit?.vmax_mg_per_min !== undefined) {
     pk.vmax_mg_per_min = lit.vmax_mg_per_min;

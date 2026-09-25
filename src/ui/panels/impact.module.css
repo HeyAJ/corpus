@@ -1,0 +1,316 @@
+/*
+ * IMPACT PANEL.
+ *
+ * A reading instrument for the effect bus: dense enough to hold every active target at
+ * once, but with a diverging bar on each so the sign and size of a modifier read before
+ * the number does. Green is a push up, red a push down — the app's severity family,
+ * used here for direction rather than danger.
+ */
+
+.panel {
+  width: 100%;
+  max-height: min(72vh, 680px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--size-tag);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.count {
+  font-size: 11px;
+  color: var(--ink-dim);
+  padding: 1px 7px;
+  background: var(--chip-bg-strong);
+  border-radius: var(--radius-pill);
+}
+
+.close {
+  margin-left: auto;
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.lede {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+.scroll {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 2px;
+}
+
+.empty {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.rows,
+.hormones {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.rowHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rowName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rowValue {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.up {
+  color: #1f7a4d;
+}
+
+.down {
+  color: var(--severity-warn-ink);
+}
+
+/* --- the diverging bar --------------------------------------------------- */
+
+.bar {
+  position: relative;
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+/* The zero line down the middle: everything reads as a departure from it. */
+.barAxis {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  margin-left: -0.5px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.barFill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transition: width var(--tween-state) var(--ease-out);
+}
+
+.barPos {
+  background: linear-gradient(90deg, rgba(47, 125, 79, 0.55), #2f9d63);
+  border-radius: 0 4px 4px 0;
+}
+
+.barNeg {
+  background: linear-gradient(90deg, #c8433a, rgba(200, 67, 58, 0.55));
+  border-radius: 4px 0 0 4px;
+}
+
+/* --- who is pushing ------------------------------------------------------ */
+
+.sources {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.source {
+  white-space: nowrap;
+}
+
+.sourceName {
+  color: var(--ink-mid);
+  font-weight: 600;
+}
+
+.sourceSep {
+  color: var(--ink-faint);
+  padding: 0 5px;
+}
+
+/* --- hormones ------------------------------------------------------------ */
+
+.hRow {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.hHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.hName {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hValue {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.hUnit {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--ink-faint);
+}
+
+.hBadge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.hNormal {
+  background: rgba(127, 214, 238, 0.3);
+  color: #29616f;
+}
+
+.hLow,
+.hHigh {
+  background: var(--severity-warn-bg);
+  color: var(--severity-warn-ink);
+}
+
+.hVeryLow,
+.hVeryHigh {
+  background: var(--severity-critical-bg);
+  color: var(--severity-critical-ink);
+  font-weight: 700;
+}
+
+.hBar {
+  position: relative;
+  height: 7px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.hBand {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(127, 214, 238, 0.45);
+}
+
+.hNeedle {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: left var(--tween-state) var(--ease-out);
+}
+
+.hNeedle.hLow,
+.hNeedle.hHigh {
+  background: var(--severity-warn-ink);
+}
+
+.hNeedle.hVeryLow,
+.hNeedle.hVeryHigh {
+  background: var(--severity-critical-bg);
+}
+
+.footnote {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barFill,
+  .hNeedle {
+    transition: none;
+  }
+}

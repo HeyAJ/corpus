@@ -50,12 +50,18 @@
   50% { background: rgba(180, 52, 44, 0.16); }
 }
 
+/*
+ * The resuscitation controls stay ANCHORED TO THE BODY rather than joining the rail:
+ * the CPR-and-shock flow is spatial (you place pads on the thorax, you watch the
+ * chest), so the panel lives at the bottom of the stage, over the body it is acting
+ * on, and above the reserved bottom bar so it never touches the dock.
+ */
 .panel {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 74px);
-  width: min(340px, calc(100vw - 32px));
+  bottom: 16px;
+  width: min(340px, calc(100% - 24px));
   background: var(--sheet-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);

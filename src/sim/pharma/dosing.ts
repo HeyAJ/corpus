@@ -5,6 +5,7 @@ import { addVolume } from '../systems/cardio';
 import { swallow } from '../systems/gi';
 import { depotParamsFor, routeSpec } from './routes';
 import { P } from '../core/constants';
+import { addBicarbonate } from '../systems/acidbase';
 
 /**
  * ROUTES OF ADMINISTRATION (spec 5.1).
@@ -248,20 +249,47 @@ function applyPayload(s: SimState, drug: Drug, dose_mg: number): void {
   if (p.k_mEq) s.chem.k += (p.k_mEq * scale) / ecfVolume_L;
   if (p.cl_mEq) s.chem.cl += (p.cl_mEq * scale) / ecfVolume_L;
   if (p.ca_mmol) s.chem.ca += (p.ca_mmol * scale) / Math.max(1, plasmaVolume_L * 3);
+
+  // Dextrose lands in the glucose distribution volume the Bergman model uses, as a
+  // concentration rise in mg/dL: grams x 1000 mg/g over the distribution volume in dL.
+  // That is why 25 g of 50% dextrose lifts a hypoglycaemic adult by roughly 40 mg/dL,
+  // and why the insulin response then follows on its own.
+  if (p.glucose_g) s.metabolic.G += (p.glucose_g * scale * 1000) / P('metabolic.glucoseDistributionVolume_dL');
+
+  // Sodium bicarbonate raises the metabolic bicarbonate pool (and the sodium that came
+  // with it). The acid-base system turns that into a pH change through Henderson-
+  // Hasselbalch, and the chemoreflex answers - which is why a bolus given to a patient
+  // who cannot increase their ventilation can paradoxically worsen the intracellular
+  // acidosis, a lesson the coupled model can show.
+  if (p.hco3_mEq) addBicarbonate(s, p.hco3_mEq * scale);
+
+  // Iron replaces a deficit over WEEKS - it is incorporated into new red cells on the
+  // marrow's timescale, not the session's - so there is deliberately no acute effect to
+  // apply here. Recording the mass keeps the dose auditable and lets a future
+  // erythropoiesis model draw on it; applying an acute haematocrit rise would be a lie.
+  void p.iron_mg;
 }
 
 /** Dilution of every electrolyte when circulating volume changes. */
 export function rebalanceElectrolytes(s: SimState, previousVolume: number): void {
   const now = s.cardio.bloodVolume;
-  if (previousVolume <= 0 || now <= 0) return;
-  const ratio = previousVolume / now;
+  // The ISOTONIC part of this tick's volume change (whole blood, saline) carried its
+  // solutes with it and must not concentrate anything. Only the free-water part does.
+  const isotonic = s.cardio.isotonicDelta_mL;
+  s.cardio.isotonicDelta_mL = 0;
+  const effectiveNow = now - isotonic;
+  if (previousVolume <= 0 || effectiveNow <= 0) return;
+  const ratio = previousVolume / effectiveNow;
+  if (!Number.isFinite(ratio) || Math.abs(ratio - 1) < 1e-9) return;
   // Only the intravascular share dilutes immediately; the ECF equilibrates over
-  // minutes, so the effective ratio is damped.
+  // minutes, so the effective ratio is damped. Hct and albumin are intravascular, so
+  // they take the full ratio - which is why transcapillary refill after a bleed lowers
+  // them (haemodilution) while the bleed itself, being isotonic, does not.
   const damped = 1 + (ratio - 1) * 0.35;
   s.chem.na *= damped;
   s.chem.k *= damped;
   s.chem.cl *= damped;
   s.chem.ca *= damped;
-  s.chem.hct *= damped;
-  s.chem.albumin *= damped;
+  s.chem.hct *= ratio;
+  s.chem.albumin *= ratio;
 }

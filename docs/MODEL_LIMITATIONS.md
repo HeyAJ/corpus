@@ -18,10 +18,10 @@ choices; that one covers the *data* gaps.
 
 | Limitation | Consequence |
 |---|---|
-| **One body.** A 70 kg, 1.73 m reference adult. | Age, sex, ethnicity, comorbidity and genetics do not change any parameter. Changing mass in the body panel rescales body surface area and heat capacity only. |
+| **One body, partly resizable.** A 70 kg, 1.73 m reference adult. Mass now scales drug disposition allometrically (volumes x mass, clearances x mass^0.75, `core/body.ts`), and age sets the exercise heart-rate ceiling. | The CIRCULATION stays reference-sized: blood volume, compliances and chamber elastances are sourced for the 70 kg adult, and pouring a different volume into the same vessels is a haemorrhage or an overload rather than a different-sized person (the first attempt did exactly that). Sex, ethnicity, comorbidity and genetics change nothing. |
 | **No disease states.** There is no heart failure, no COPD, no cirrhosis, no renal impairment as a *condition* — only as a consequence of something you did. | You cannot set up a patient; you can only perturb a healthy one. |
-| **No autonomic adaptation.** The baroreflex has no resetting, no long-term gain adaptation and no circadian variation. | A sustained pressor produces a sustained reflex response; in reality the reflex resets over hours. |
-| **No pain, no anxiety, no exercise.** | There is no sympathetic drive except through the baroreflex and drugs. |
+| **Little autonomic adaptation.** The baroreflex resets its operating pressure during exercise (central command), but has no long-term resetting or gain adaptation. | A sustained pressor produces a sustained reflex response; in reality the reflex resets over hours. |
+| **Pain, fright, stress, low mood, sleep and exercise are single scalars.** | Each drives the sympathetic and HPA axes through the effect bus, but there is no personality, habituation or learning: the tenth fright is as large as the first. |
 | **Compartment mixing is instantaneous.** A drug injected into the central compartment is uniformly distributed within it in one tick. | Very early distribution kinetics (the first 10–20 s after a bolus) are faster than reality. |
 
 ---
@@ -52,6 +52,10 @@ choices; that one covers the *data* gaps.
 - **Systemic vascular resistance has one value.** There is no separate arteriolar,
   capillary and venular resistance, so a drug cannot redistribute flow between beds
   except through the explicit `renal.vascularResistance` target.
+- **AV-nodal block is a proportional cut in ventricular rate.** There are no separate
+  atrial and ventricular clocks, so a drug's AV-nodal effect lowers the rate even in
+  sinus rhythm, where the real effect is a longer PR interval. Digoxin's rate effect in
+  sinus rhythm is overstated for this reason.
 
 ---
 
@@ -81,20 +85,28 @@ choices; that one covers the *data* gaps.
 
 ## 4. Respiratory
 
-- **A single alveolar compartment.** There is no ventilation–perfusion mismatch as a
-  distribution, no dead-space disease, no diffusion limitation and no shunt fraction
-  as an independent variable. Low cardiac output widens an *effective* shunt through
-  a fitted term.
+- **A single alveolar compartment with a shunt fraction.** Shunt is now an explicit
+  variable (the shunt equation; pneumonia and anaphylaxis write it), but there is still
+  no ventilation–perfusion distribution, no dead-space disease and no diffusion
+  limitation, so a V/Q-mismatch hypoxaemia that oxygen corrects fully cannot be told
+  apart from a shunt that it does not.
 - **No airway mechanics.** No resistance, no compliance, no work of breathing. Tidal
   volume is set by drive, not by muscle against a load.
 - **Intubation is a switch.** It sets a fixed rate, tidal volume and FiO₂ 1.0. There
   is no ventilator mode, no PEEP and no auto-PEEP.
-- **Carbon dioxide stores are one time constant.** The 35 s constant reproduces the
-  observed speed of PaCO₂ change, but the body's real CO₂ buffering is a
-  multi-compartment system with very different fast and slow components.
-- **The acid–base model is incomplete.** Bicarbonate and pH are carried as state but
-  are not integrated against CO₂ and lactate through the Henderson–Hasselbalch
-  relation. Respiratory acidosis does not change the reported pH.
+- **Carbon dioxide is one store.** A rise is limited by mass balance against a
+  whole-body capacitance (3.4 mmHg/min in complete apnoea, Stock 1989); a fall by lung
+  washout. The real store is multi-compartment, and the ~12 mmHg first-minute jump of
+  an apnoea with a circulation (lung and blood equilibrating with mixed venous gas) is
+  not reproduced.
+- **Acid–base is Henderson–Hasselbalch on bicarbonate, not a strong-ion model.**
+  pH follows the live PaCO₂, lactate and ketoacids (buffered 1:1) and a renal
+  compensation on a one-day clock (`systems/acidbase.ts`). There is no chloride or
+  albumin arithmetic of Stewart's kind, metabolic-alkalosis respiratory compensation is
+  deliberately weak, and acetazolamide's bicarbonate diuresis does NOT produce its
+  metabolic acidosis - so its altitude benefit is absent. (A `resp.drive` shortcut that
+  stood in for it was removed on 2026-09-25: it acted within minutes where the real
+  acidosis takes hours.)
 - **Agonal respiration plateaus instead of ceasing.** After a cardiac arrest the model
   settles at roughly 1.7 breaths a minute at about 100 mL and stays there. Real agonal
   gasping fades over a few minutes and stops. The recognition cue is right - this is
@@ -426,6 +438,32 @@ computed number. The important caveats:
 
 ---
 
+## 7g. Infection, environment and the wider body (2026-09-24)
+
+- **A pathogen is a logistic burden, not an organism.** Ten cited pathogens grow toward
+  a carrying capacity and are checked by one innate and one adaptive term. There is no
+  site of infection beyond what each pathogen writes onto the bus (shunt, leak, fever,
+  diarrhoea, haemolysis), no source control, no abscess and no resistance emerging under
+  treatment.
+- **Antimicrobial kill is an Emax on free concentration against one MIC per pathogen.**
+  Wild-type MICs (EUCAST) are used; acquired resistance is not modelled, so an
+  in-spectrum drug always works. Antivirals use a cell-culture EC50 in place of an MIC,
+  which the source notes say can vary several-fold with the assay.
+- **Some things are too slow to watch.** HIV suppression and thyroxine's metabolic
+  effect take weeks in reality; they run on their real clocks here and are stated rather
+  than sped up.
+- **The environment is acute.** Altitude, FiO₂ and ambient temperature act at once;
+  there is no acclimatisation beyond the kidney's slow bicarbonate compensation (no
+  2,3-DPG shift, no rise in haematocrit over days, no heat acclimatisation).
+- **Anaphylaxis is two mediator pools.** Histamine (which an antihistamine competes for)
+  and a lumped non-histamine pool (which it cannot touch); there is no biphasic
+  reaction and no tryptase readout.
+- **Unit-dosed biologics are carried in milligrams** by their labels' conversions
+  (insulin 1 IU = 0.0347 mg, heparin 180 USP units/mg, vasopressin 530 units/mg), because
+  the engine's pharmacokinetics are mass-based. The unit label is kept on each preset.
+
+---
+
 ## 8. Pharmacodynamics
 
 - **Receptor effect gains are calibrated, not measured.** Their sign and relative
@@ -434,11 +472,30 @@ computed number. The important caveats:
   and this caveat.
 - **`ec50Occupancy` encodes receptor reserve** rather than being measured. See
   `DECISIONS.md` ADR-007 for why a value of 0.5 would be wrong.
-- **Blood–brain barrier access is a coarse function of logP.**
-  `penetration = clamp((logP + 1) / 4)` is a monotone rule, not a permeability
-  measurement. Active transport, efflux pumps and protein binding all matter in
-  reality and none is modelled. A drug with no logP gets *full* central access,
-  which may overstate the central action of a hydrophilic drug.
+- **Blood–brain barrier access is a coarse physicochemical rule, overridden where it
+  is known to be wrong.** The rule cannot see efflux pumps, permanent charge or small
+  polar molecules that cross freely, so it is overridden from labels or measurements
+  for ipratropium, glycopyrrolate, loratadine, cetirizine (PET brain H1 occupancy),
+  caffeine and theophylline (both label "CSF approximates plasma"). A drug with no
+  value gets full central access. Since 2026-09-25 penetration gates each receptor's
+  CENTRAL effects only (per-effect flag, `tools/ingest/central_effects.ts`) and a drug
+  reaches peripheral effects fully; before that one blended factor let barrier-excluded
+  drugs keep a quarter of the central action.
+- **Central antimuscarinic action is too strong.** Full central muscarinic blockade
+  reads as roughly a 40 % loss of consciousness, so atropine 1 mg (which crosses the
+  barrier) scores about 0.57. Volunteers given 0.5-4 mg show dose-dependent psychomotor
+  slowing, not obtundation (Ellinwood 1990); no quantitative source was found to
+  recalibrate the M1/M4/M5 arousal gains, so they stand, and this is the caveat.
+- **Inverse agonism is not distinguished from neutral antagonism.** A bound receptor
+  signals between nothing and full, so an inverse agonist silences the receptors it
+  holds exactly as a neutral antagonist does. There is no separate constitutive-activity
+  term for it to suppress below that. (Treating IA = -1 as a negative full-agonist unit,
+  as the engine did until 2026-09-25, let 12 % brain H1 occupancy by cetirizine remove
+  80 % of histaminergic tone.)
+- **Resting histaminergic vascular tone is overstated.** H1 carries one resting tone for
+  all its effects, so blocking it raises systemic resistance by ~20 % in a healthy body
+  and the baroreflex slows the heart a few beats - antihistamines do nothing measurable
+  to a resting pressure in reality.
 - **One receptor per family.** α1A/B/D are one receptor; so are α2A/B/C, the
   muscarinic subtypes beyond M2 and M3, and the NMDA subunit combinations. No drug
   in the shipped set discriminates them meaningfully, but one could.
@@ -453,6 +510,14 @@ computed number. The important caveats:
   to contractility. That translation is an interpretation.
 - **Endogenous ligands are a scalar tone, not molecules.** There is no circulating
   noradrenaline concentration; β1 tone is a number driven by the reflex limb.
+- **There is no effect-site delay.** Binding equilibrates with plasma, so a drug whose
+  effect lags its plasma level (digoxin over hours, atropine's central action, thyroxine
+  over days) acts on the plasma clock.
+- **Hormone drugs act once.** A drug that is a hormone and binds that hormone's receptor
+  (vasopressin, hydrocortisone, glucagon) acts through the receptor and only adds to the
+  hormone's MEASURED level; levothyroxine, which has no receptor here, acts through the
+  hormone pool. Until 2026-09-25 the first three acted through both and were counted
+  twice.
 
 ---
 
@@ -462,14 +527,28 @@ computed number. The important caveats:
   `γ(G−h)⁺·t` is only defined for a single intravenous glucose tolerance test and is
   meaningless for a body that eats repeatedly. A first-order secretion rate is used
   instead, calibrated so a post-prandial glucose of 140 mg/dL gives about 60 µU/mL.
-- **No glucagon as a molecule**, only a drive term. No cortisol, no growth hormone,
-  no thyroid axis.
+- **Six hormones as first-order pools** (cortisol with a circadian rhythm, aldosterone,
+  ADH, thyroxine, glucagon, erythropoietin). There is no growth hormone, no pituitary
+  (TSH is a constant, so thyroxine sits at its set point) and NO NEGATIVE FEEDBACK by
+  hormone level: a hydrocortisone course does not suppress the adrenal's own output.
+- **The glucose model's insulin feedback is stiff.** The explicit, insulin-suppressed
+  hepatic output sits on top of Bergman's minimal model, whose remote insulin action
+  already carries insulin's suppression of production, so insulin's brake on the liver
+  is partly counted twice. Glucagon's glycogenolysis is therefore an additive term that
+  insulin does not suppress, and its receptor gain (28) was calibrated so 1 mg SC and IM
+  reproduce the label's mean peaks (136 and 138 mg/dL), with SC/IM absorption solved from
+  the label's own plasma peaks; the gain describes this model, not the
+  receptor. The two unsourced coefficients of the original code (insulin suppression
+  slope 0.055 per µU/mL, counter-regulation gain 2.2) stand; clamp data put half-maximal
+  suppression of glucose production at 29 µU/mL (Rizza 1981), about twice the model's.
+  Replacing the model with one that separates production from uptake is the real fix.
 - **Lactate is produced from an oxygen-delivery deficit** against a fixed critical
   threshold. There is no aerobic glycolysis, no exercise lactate, and clearance is a
   single first-order term standing in for hepatic and renal Cori-cycle activity.
-- **Temperature is one well-mixed body.** No core-to-shell gradient, no shivering
-  threshold, no sweating capacity limit. Thermoregulation is a proportional gain on
-  heat loss.
+- **Temperature is one well-mixed body.** No core-to-shell gradient. Shivering and
+  sweating (capped at 1 L/h, Sawka 2007) respond proportionally from the set point with
+  no interthreshold band, so the smallest heat load sweats a little. There is no
+  circadian temperature rhythm.
 
 ---
 
@@ -478,8 +557,17 @@ computed number. The important caveats:
 - **The EEG is a descriptive band model**, not a neural-mass model. Five oscillators
   whose relative power is set by consciousness and sedative occupancy. Burst
   suppression is a scripted envelope above 80 % sedation.
-- **Consciousness is one number.** There is no Glasgow Coma Scale, no pupillary
-  response beyond what Pulse's modifiers describe, and no seizure activity.
+- **Consciousness is one number.** There is no Glasgow Coma Scale. It is full above
+  the syncope threshold of cerebral flow and graded to nothing at no flow (the same gate
+  the brainstem's drive uses), so between about 0.3 and 0.55 of resting flow - where the
+  real cortex has already failed - it reads a little too awake. Pupils and seizures
+  exist (`systems/mind.ts`); the psychedelic mydriasis that 5-HT2A mediates does not,
+  because no source gave its size.
+- **Posture changes brain perfusion by a fixed column.** Upright, cerebral perfusion
+  pressure is heart-level MAP minus 22 mmHg of hydrostatic column (30 cm, Rao 2013) plus
+  the measured fall of intracranial pressure to -2.4 mmHg (Petersen 2016). Stature does
+  not change the column, and there is no falling down: a body that greys out standing
+  stays standing.
 - **Cerebral autoregulation is a static curve with CO₂ reactivity.** No intracranial
   pressure, no cerebral oedema, no Cushing reflex.
 
@@ -490,6 +578,11 @@ computed number. The important caveats:
 - **The body drinks to thirst rather than on a schedule.** Obligate intake is a
   constant that balances obligate output at baseline. It does not respond to
   osmolality, hypovolaemia or the thirst that a real dehydrated body would feel.
+- **A water load barely raises urine output.** ADH now falls when plasma is dilute, but
+  the kidney scales water reabsorption with a very small gain, so even no ADH at all
+  raises urine flow by about a fifth where a real water diuresis reaches ten times
+  basal. Modelling urine as osmolar excretion over an ADH-set urine osmolality (50-1200
+  mOsm/kg) is the fix.
 - **The interstitium will not drain below half its baseline volume.** Past that point
   a real body is in profound shock and this model has nothing useful left to say.
 - **Electrolytes redistribute by a damped dilution factor**, not by osmotic

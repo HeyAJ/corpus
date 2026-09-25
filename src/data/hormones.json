@@ -33,7 +33,7 @@
       "effects": [
         { "target": "metabolic.hepaticGlucoseOutput", "gain": 0.5, "note": "Gluconeogenesis from amino acids; the reason a stressed body runs hyperglycaemic." },
         { "target": "metabolic.proteinCatabolism", "gain": 0.6, "note": "Skeletal muscle breakdown supplying gluconeogenic substrate." },
-        { "target": "immune.inflammation", "gain": -0.8, "note": "Broad suppression of inflammatory signalling; the basis of every glucocorticoid drug." },
+        { "target": "immune.inflammation", "gain": -0.8, "aboveBaselineOnly": true, "note": "Broad suppression of inflammatory signalling; the basis of every glucocorticoid drug. Applied only ABOVE the baseline: cortisol in excess suppresses inflammation, but the normal evening trough is not an inflammatory stimulus. Applied symmetrically, the circadian dip wrote a positive value onto immune.inflammation every afternoon, pathology read it as a SIRS drive, and a resting body ran a low fever, sweated and leaked 600 mL of plasma by 21:00 (found by the 24 h homeostasis test, 2026-09-25)." },
         { "target": "cardio.systemicResistance", "gain": 0.2, "note": "Permissive effect: catecholamines act poorly on a cortisol-deficient vasculature." }
       ],
       "source": "GH14",

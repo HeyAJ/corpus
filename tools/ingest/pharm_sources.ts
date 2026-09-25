@@ -25,6 +25,10 @@ export const SOURCES = {
     label: 'Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.',
     url: 'https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8',
   },
+  GLUCAGEN: {
+    label: 'GlucaGen (glucagon) prescribing information, section 12.2: "In a study of 25 volunteers, a subcutaneous dose of 1 mg glucagon resulted in a mean peak glucose concentration of 136 mg/dL 30 minutes after injection"; IM mean peak 138 mg/dL at 26 minutes.',
+    url: 'https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=789ab694-3ad8-a122-e053-2991aa0a9ab3',
+  },
 } as const;
 
 export type SourceKey = keyof typeof SOURCES;

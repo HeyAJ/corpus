@@ -9,14 +9,25 @@ import * as THREE from 'three';
  * thorax reads as the same size as it would at chest height. A default 50 deg FOV
  * looks immediately wrong and no amount of shader work rescues it.
  *
- * The polar range is constrained to the front hemisphere (+/-35 deg). That is not a
- * usability compromise: the flat, unlit material and the exploded stack only read
- * correctly from the front, and letting the user get underneath the body would show
- * them the inside of a hollow shell.
+ * AZIMUTH IS NOW FREE, 360 degrees. The rig was originally penned into a +/-35 deg
+ * front arc on the argument that the flat, unlit material only reads correctly from
+ * the front. That is true — from directly behind, the exploded stack of hollow shells
+ * is plainly a set of hollow shells — but it was the wrong trade: people reach for a
+ * 3D body expecting to turn it over, and a body that refuses to rotate reads as broken
+ * long before it reads as tastefully constrained. So azimuth WRAPS rather than clamps:
+ * you can spin all the way round and keep going, with no wall to hit at the back. The
+ * back view being less flattering than the front is an accepted cost of that freedom.
+ *
+ * POLAR IS OPENED to a generous 15..165 deg — nearly pole to pole — so you can look
+ * down onto the shoulders or up from below the pelvis, while still stopping short of
+ * the singularities at 0 and 180 where the up-vector flips and the camera rolls. That
+ * band is the one real constraint left, and it is a numerical one, not an aesthetic one.
  *
  * Damped orbit is hand-rolled rather than three's OrbitControls because the focus
  * animation needs to drive the same target the user is dragging, and fighting
- * OrbitControls for ownership of that is more code than owning it outright.
+ * OrbitControls for ownership of that is more code than owning it outright. The same
+ * damped path serves the mouse and the touch handlers in Viewer, so a one-finger drag
+ * and a click-drag feel identical.
  */
 
 export interface OrbitLimits {
@@ -30,15 +41,32 @@ export interface OrbitLimits {
 
 const DEG = Math.PI / 180;
 
+/** Radians of azimuth per normalised unit of drag: the canvas is 2 units wide, so a full-width drag is one turn. */
+const AZIMUTH_PER_UNIT = Math.PI;
+/** Radians of polar per normalised unit of drag: a full-height drag sweeps about the 150 deg polar band. */
+const POLAR_PER_UNIT = (75 * Math.PI) / 180;
+/**
+ * Residual velocity as a multiple of each step's angle per second. With the 9/s decay
+ * every step coasts on by FLING/9 of itself, and that happens during the drag as well
+ * as after it, so the value is kept small: 1.5 makes a drag about a sixth longer than
+ * the finger's travel and leaves a short, soft settle on release.
+ */
+const FLING = 1.5;
+
 /** Half-height of the whole exploded body, metres: brain crown to pelvic floor. */
 export const BODY_FRAMING_RADIUS = 0.40;
 
 export const DEFAULT_LIMITS: OrbitLimits = {
-  minAzimuth: -35 * DEG,
-  maxAzimuth: 35 * DEG,
-  // Polar measured from +Y. 90 deg is level with the target.
-  minPolar: 58 * DEG,
-  maxPolar: 122 * DEG,
+  // Azimuth is WRAPPED, not clamped (see the header and update()), so these bounds
+  // describe the full turn rather than a fence. They are kept in the struct so the
+  // interface stays uniform and a future caller could re-fence a single axis.
+  minAzimuth: -Math.PI,
+  maxAzimuth: Math.PI,
+  // Polar measured from +Y. 90 deg is level with the target. Opened almost pole to
+  // pole; the 15 deg margin at each end keeps the camera clear of the gimbal
+  // singularity where lookAt's up-vector flips and the view rolls.
+  minPolar: 15 * DEG,
+  maxPolar: 165 * DEG,
   minDistance: 0.45,
   maxDistance: 3.6,
 };
@@ -75,15 +103,42 @@ export class OrbitRig {
     this.camera.updateProjectionMatrix();
   }
 
-  /** Pointer drag, in normalised screen units. */
+  /**
+   * Pointer drag, in normalised screen units (the canvas spans -1..1 on each axis).
+   *
+   * DIRECT MANIPULATION, with a little fling on release. The drag used to add only
+   * VELOCITY (2.4 x dx), which then decayed at 9 per second, so the angle a drag could
+   * produce was a ninth of that: a whole canvas-width drag turned the body about thirty
+   * degrees, and a 300 px drag a few degrees - moving, but not visibly, which the round-2
+   * tester (rightly) reported as "does not rotate at all". On a slow frame rate it was
+   * worse, because the integrator clamps each step to 50 ms. Now the angle follows the
+   * finger one-to-one - a full canvas-width drag is one full turn, a full-height drag
+   * sweeps the polar band - and only a small residual velocity carries on after release,
+   * so the weighty feel survives without the drag feeling disconnected.
+   */
   orbit(dx: number, dy: number): void {
-    this.azimuthVel += dx * 2.4;
-    this.polarVel += dy * 1.8;
+    this.azimuth += dx * AZIMUTH_PER_UNIT;
+    this.polar += dy * POLAR_PER_UNIT;
+    this.azimuthVel = dx * AZIMUTH_PER_UNIT * FLING;
+    this.polarVel = dy * POLAR_PER_UNIT * FLING;
     this.focusT = 1; // a manual drag cancels any running focus animation
   }
 
   dolly(delta: number): void {
     this.distanceVel += delta * 0.9;
+    this.focusT = 1; // likewise: a running focus animation would overwrite the distance
+  }
+
+  /**
+   * Pinch: scale the viewing distance by the change in finger spread (fingers apart =
+   * closer). Direct, like the drag, and it cancels a running focus animation - which
+   * sets `distance` itself every frame and so silently undid a pinch made during it.
+   */
+  zoomBy(spreadRatio: number): void {
+    if (!(spreadRatio > 0) || !Number.isFinite(spreadRatio)) return;
+    this.distance = THREE.MathUtils.clamp(this.distance / spreadRatio, this.limits.minDistance, this.limits.maxDistance);
+    this.distanceVel = 0;
+    this.focusT = 1;
   }
 
   /**
@@ -130,7 +185,9 @@ export class OrbitRig {
     this.polarVel *= decay;
     this.distanceVel *= decay;
 
-    this.azimuth = THREE.MathUtils.clamp(this.azimuth, this.limits.minAzimuth, this.limits.maxAzimuth);
+    // Azimuth WRAPS into (-pi, pi] so the body turns all the way round with no wall at
+    // the back; polar and distance still clamp, because those bounds are real.
+    this.azimuth = ((this.azimuth + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
     this.polar = THREE.MathUtils.clamp(this.polar, this.limits.minPolar, this.limits.maxPolar);
     this.distance = THREE.MathUtils.clamp(this.distance, this.limits.minDistance, this.limits.maxDistance);
 

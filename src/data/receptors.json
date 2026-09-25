@@ -7,7 +7,7 @@
     "Pulse Physiology Engine (Kitware Inc.), Apache License 2.0 — https://pulse.kitware.com",
     "PubChem (Kim S, et al. Nucleic Acids Res 2023;51:D1373-D1380). Computed molecular descriptors, US National Library of Medicine, public domain.",
     "Data from openFDA (api.fda.gov). openFDA is a research tool. Its data has not been validated for clinical or production use. It does not constitute FDA endorsement, and should not be used to make decisions about medical care.",
-    "Receptor effect vectors are curated from: Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023. | Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023. | Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023. | Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021."
+    "Receptor effect vectors are curated from: Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023. | Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023. | Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023. | Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021. | GlucaGen (glucagon) prescribing information, section 12.2: \"In a study of 25 volunteers, a subcutaneous dose of 1 mg glucagon resulted in a mean peak glucose concentration of 136 mg/dL 30 minutes after injection\"; IM mean peak 138 mg/dL at 26 minutes."
   ],
   "defaultKon": {
     "value": 0.6,
@@ -40,35 +40,48 @@
           "gain": 1.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Arteriolar smooth-muscle contraction; the dominant pressor mechanism of phenylephrine and of high-dose noradrenaline."
+          "note": "Arteriolar smooth-muscle contraction; the dominant pressor mechanism of phenylephrine and of high-dose noradrenaline.",
+          "central": false
         },
         {
           "target": "vascular.tone",
           "gain": 1,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Venoconstriction raises mean systemic filling pressure and therefore preload."
+          "note": "Venoconstriction raises mean systemic filling pressure and therefore preload.",
+          "central": false
         },
         {
           "target": "renal.vascularResistance",
           "gain": 0.55,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Afferent arteriolar constriction; enough of it drops renal plasma flow."
+          "note": "Afferent arteriolar constriction; enough of it drops renal plasma flow.",
+          "central": false
         },
         {
           "target": "cardio.contractility",
           "gain": 0.15,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Weak positive inotropy in human myocardium; minor next to beta-1."
+          "note": "Weak positive inotropy in human myocardium; minor next to beta-1.",
+          "central": false
         },
         {
           "target": "gi.motility",
           "gain": -0.25,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Sphincter contraction with reduced propulsive activity."
+          "note": "Sphincter contraction with reduced propulsive activity.",
+          "central": false
+        },
+        {
+          "target": "neuro.pupilDiameter",
+          "gain": 0.4,
+          "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+          "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+          "note": "Radial dilator pupillae contraction: sympathetic mydriasis. Why a sympathomimetic toxidrome has wide pupils and why phenylephrine is used to dilate them.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 22,
@@ -95,28 +108,32 @@
           "gain": -0.55,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Presynaptic autoreceptor: central sympatholysis dominates over the peripheral α2B vasoconstriction."
+          "note": "Presynaptic autoreceptor: central sympatholysis dominates over the peripheral α2B vasoconstriction.",
+          "central": true
         },
         {
           "target": "cardio.heartRate",
           "gain": -0.3,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Reduced central sympathetic outflow plus increased vagal tone."
+          "note": "Reduced central sympathetic outflow plus increased vagal tone.",
+          "central": true
         },
         {
           "target": "neuro.sedation",
           "gain": 0.55,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Locus coeruleus α2A agonism; the basis of dexmedetomidine sedation."
+          "note": "Locus coeruleus α2A agonism; the basis of dexmedetomidine sedation.",
+          "central": true
         },
         {
           "target": "metabolic.insulinSecretion",
           "gain": -0.3,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "α2 on the beta cell inhibits insulin release."
+          "note": "α2 on the beta cell inhibits insulin release.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 25,
@@ -142,28 +159,32 @@
           "gain": 1.6,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Gs -> cAMP -> PKA -> increased L-type calcium current and SERCA activity. Gain calibrated so a 1 mg intravenous adrenaline bolus roughly doubles contractility, as the textbook describes."
+          "note": "Gs -> cAMP -> PKA -> increased L-type calcium current and SERCA activity. Gain calibrated so a 1 mg intravenous adrenaline bolus roughly doubles contractility, as the textbook describes.",
+          "central": false
         },
         {
           "target": "cardio.heartRate",
           "gain": 1.7,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Increased If and Ica in the sinoatrial node. Calibrated so direct beta-1 chronotropy OUTWEIGHS the reflex bradycardia that the simultaneous pressor response provokes: adrenaline causes net tachycardia, and a smaller gain made the model produce the opposite."
+          "note": "Increased If and Ica in the sinoatrial node. Calibrated so direct beta-1 chronotropy OUTWEIGHS the reflex bradycardia that the simultaneous pressor response provokes: adrenaline causes net tachycardia, and a smaller gain made the model produce the opposite.",
+          "central": false
         },
         {
           "target": "renal.reninRelease",
           "gain": 0.6,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Juxtaglomerular β1 is the direct sympathetic route to renin release."
+          "note": "Juxtaglomerular β1 is the direct sympathetic route to renin release.",
+          "central": false
         },
         {
           "target": "cardio.arrhythmogenicity",
           "gain": 0.7,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Calcium loading and shortened refractoriness; why catecholamines lower the fibrillation threshold."
+          "note": "Calcium loading and shortened refractoriness; why catecholamines lower the fibrillation threshold.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 28,
@@ -191,28 +212,32 @@
           "gain": -0.7,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Skeletal-muscle arteriolar dilation; why low-dose adrenaline can lower diastolic pressure."
+          "note": "Skeletal-muscle arteriolar dilation; why low-dose adrenaline can lower diastolic pressure.",
+          "central": false
         },
         {
           "target": "resp.tidalVolume",
           "gain": 0.35,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Bronchial smooth-muscle relaxation lowers airway resistance."
+          "note": "Bronchial smooth-muscle relaxation lowers airway resistance.",
+          "central": false
         },
         {
           "target": "metabolic.hepaticGlucoseOutput",
           "gain": 0.45,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Glycogenolysis and gluconeogenesis; the hyperglycaemia of a catecholamine surge."
+          "note": "Glycogenolysis and gluconeogenesis; the hyperglycaemia of a catecholamine surge.",
+          "central": false
         },
         {
           "target": "cardio.contractility",
           "gain": 0.25,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Human ventricle carries roughly 20-30% β2."
+          "note": "Human ventricle carries roughly 20-30% β2.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 29,
@@ -239,7 +264,8 @@
           "gain": 0.6,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Lipolysis and adaptive thermogenesis in adipose tissue."
+          "note": "Lipolysis and adaptive thermogenesis in adipose tissue.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 30,
@@ -266,21 +292,24 @@
           "gain": -0.65,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Renal and splanchnic vasodilation; the classical \"renal dose\" dopamine effect."
+          "note": "Renal and splanchnic vasodilation; the classical \"renal dose\" dopamine effect.",
+          "central": false
         },
         {
           "target": "cardio.systemicResistance",
           "gain": -0.2,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Splanchnic bed dilation contributes a modest systemic fall."
+          "note": "Splanchnic bed dilation contributes a modest systemic fall.",
+          "central": false
         },
         {
           "target": "neuro.arousal",
           "gain": 0.35,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Striatal and cortical D1 signalling."
+          "note": "Striatal and cortical D1 signalling.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 214,
@@ -307,14 +336,16 @@
           "gain": 0.45,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Mesolimbic and nigrostriatal signalling."
+          "note": "Mesolimbic and nigrostriatal signalling.",
+          "central": true
         },
         {
           "target": "gi.motility",
           "gain": -0.3,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "D2 on the myenteric plexus inhibits acetylcholine release; blockade is why metoclopramide is prokinetic."
+          "note": "D2 on the myenteric plexus inhibits acetylcholine release; blockade is why metoclopramide is prokinetic.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 215,
@@ -341,14 +372,16 @@
           "gain": 0.55,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Cortical and hippocampal M1 underpins attention and memory; blockade is the mechanism of antimuscarinic delirium, which is the effect that distinguishes atropine from glycopyrrolate."
+          "note": "Cortical and hippocampal M1 underpins attention and memory; blockade is the mechanism of antimuscarinic delirium, which is the effect that distinguishes atropine from glycopyrrolate.",
+          "central": true
         },
         {
           "target": "gi.acidSecretion",
           "gain": 0.4,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Ganglionic and ECL-cell M1 amplifies vagally-driven acid secretion."
+          "note": "Ganglionic and ECL-cell M1 amplifies vagally-driven acid secretion.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 13,
@@ -373,21 +406,24 @@
           "gain": -0.95,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Gi -> GIRK opening in the sinoatrial node; the fastest reflex effector in the body."
+          "note": "Gi -> GIRK opening in the sinoatrial node; the fastest reflex effector in the body.",
+          "central": false
         },
         {
           "target": "cardio.avNodalBlock",
           "gain": 0.8,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Slowed atrioventricular conduction."
+          "note": "Slowed atrioventricular conduction.",
+          "central": false
         },
         {
           "target": "cardio.contractility",
           "gain": -0.2,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Mostly atrial; ventricular vagal innervation is sparse."
+          "note": "Mostly atrial; ventricular vagal innervation is sparse.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 14,
@@ -415,21 +451,32 @@
           "gain": 0.7,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Smooth-muscle contraction and propulsive peristalsis."
+          "note": "Smooth-muscle contraction and propulsive peristalsis.",
+          "central": false
         },
         {
           "target": "gi.acidSecretion",
           "gain": 0.65,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Direct parietal-cell stimulation plus ECL histamine release."
+          "note": "Direct parietal-cell stimulation plus ECL histamine release.",
+          "central": false
         },
         {
           "target": "resp.tidalVolume",
           "gain": -0.3,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Bronchoconstriction raises airway resistance."
+          "note": "Bronchoconstriction raises airway resistance.",
+          "central": false
+        },
+        {
+          "target": "neuro.pupilDiameter",
+          "gain": -0.8,
+          "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+          "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+          "note": "Circular sphincter pupillae contraction under parasympathetic (oculomotor) tone. Written for the ACTIVATED receptor, so blockade removes the resting tone and the pupil DILATES: the mydriasis of atropine and of the anticholinergic toxidrome.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 15,
@@ -455,14 +502,16 @@
           "gain": 0.25,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Striatal M4 autoreceptors restrain cholinergic interneuron firing and modulate dopamine release."
+          "note": "Striatal M4 autoreceptors restrain cholinergic interneuron firing and modulate dopamine release.",
+          "central": true
         },
         {
           "target": "neuro.sedation",
           "gain": -0.15,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Net arousing through the same striatal circuit."
+          "note": "Net arousing through the same striatal circuit.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 16,
@@ -488,14 +537,16 @@
           "gain": -0.1,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Cerebral arteriolar dilation. Small at the systemic level, because the cerebral bed is a few per cent of total peripheral resistance."
+          "note": "Cerebral arteriolar dilation. Small at the systemic level, because the cerebral bed is a few per cent of total peripheral resistance.",
+          "central": false
         },
         {
           "target": "neuro.arousal",
           "gain": 0.15,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Modulation of midbrain dopaminergic tone."
+          "note": "Modulation of midbrain dopaminergic tone.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 17,
@@ -523,14 +574,16 @@
           "gain": 0.35,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Ganglionic and adrenal-medullary activation; the net cardiovascular effect of nicotine is sympathetic."
+          "note": "Ganglionic and adrenal-medullary activation; the net cardiovascular effect of nicotine is sympathetic.",
+          "central": false
         },
         {
           "target": "neuro.arousal",
           "gain": 0.4,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Cortical and thalamic α4β2 signalling."
+          "note": "Cortical and thalamic α4β2 signalling.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 462,
@@ -555,21 +608,24 @@
           "gain": -0.35,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Somatodendritic autoreceptor activation produces hypothermia in humans."
+          "note": "Somatodendritic autoreceptor activation produces hypothermia in humans.",
+          "central": false
         },
         {
           "target": "neuro.sedation",
           "gain": 0.25,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Reduced raphe firing."
+          "note": "Reduced raphe firing.",
+          "central": true
         },
         {
           "target": "cardio.heartRate",
           "gain": -0.15,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Central sympathoinhibition slows the sinus node modestly."
+          "note": "Central sympathoinhibition slows the sinus node modestly.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 1,
@@ -596,25 +652,28 @@
           "gain": 0.4,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Direct vascular smooth-muscle contraction."
+          "note": "Direct vascular smooth-muscle contraction.",
+          "central": false
         },
         {
           "target": "thermal.heatProduction",
           "gain": 0.55,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Central 5-HT2A drives hyperthermia; the mechanism behind serotonin-toxicity temperature rise."
+          "note": "Central 5-HT2A drives hyperthermia; the mechanism behind serotonin-toxicity temperature rise.",
+          "central": false
         },
         {
           "target": "neuro.arousal",
           "gain": 0.5,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Cortical layer V pyramidal excitation."
+          "note": "Cortical layer V pyramidal excitation.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 6,
-      "notes": "Gq-coupled. This entry exists because the reference app foregrounds it; no drug in the shipped set is a 5-HT2A agonist."
+      "notes": "Gq-coupled. The primary target of the classical psychedelics, which the drug set now contains as agonists, and of the atypical antipsychotics as antagonists. Psychedelic mydriasis is also 5-HT2A-mediated (ketanserin reduces it; Becker 2023), but no source in hand gives its size, so no pupil effect is carried here - MODEL_LIMITATIONS records the gap rather than a guessed gain."
     },
     {
       "id": "ht2c",
@@ -636,14 +695,16 @@
           "gain": -0.2,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Net inhibitory through increased GABAergic and dopaminergic modulation."
+          "note": "Net inhibitory through increased GABAergic and dopaminergic modulation.",
+          "central": true
         },
         {
           "target": "metabolic.glucoseUptake",
           "gain": 0.15,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Hypothalamic appetite and energy-balance signalling."
+          "note": "Hypothalamic appetite and energy-balance signalling.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 8,
@@ -670,7 +731,8 @@
           "gain": 0.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Enteric 5-HT3 drives propulsive reflexes; blockade is constipating."
+          "note": "Enteric 5-HT3 drives propulsive reflexes; blockade is constipating.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 373,
@@ -697,21 +759,24 @@
           "gain": 1.5,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Tuberomammillary histaminergic tone maintains wakefulness; blockade is why first-generation antihistamines sedate."
+          "note": "Tuberomammillary histaminergic tone maintains wakefulness; blockade is why first-generation antihistamines sedate.",
+          "central": true
         },
         {
           "target": "cardio.systemicResistance",
           "gain": -0.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Endothelial NO release and direct vasodilation."
+          "note": "Endothelial NO release and direct vasodilation.",
+          "central": false
         },
         {
           "target": "resp.tidalVolume",
           "gain": -0.2,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Histamine-mediated bronchoconstriction raises airway resistance."
+          "note": "Histamine-mediated bronchoconstriction raises airway resistance.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 262,
@@ -737,14 +802,16 @@
           "gain": 0.85,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "The final common path for parietal-cell acid secretion; blockade is how H2 antagonists work."
+          "note": "The final common path for parietal-cell acid secretion; blockade is how H2 antagonists work.",
+          "central": false
         },
         {
           "target": "cardio.heartRate",
           "gain": 0.25,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Positive chronotropy at the sinoatrial node."
+          "note": "Positive chronotropy at the sinoatrial node.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 263,
@@ -771,35 +838,48 @@
           "gain": 1,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Spinal and supraspinal antinociception."
+          "note": "Spinal and supraspinal antinociception.",
+          "central": true
         },
         {
           "target": "resp.drive",
-          "gain": -0.85,
-          "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
-          "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Reduced sensitivity of the medullary chemoreceptors to CO2 — the mechanism of opioid death."
+          "gain": -1,
+          "source": "Pattinson KTS. Opioids and the control of respiration. Br J Anaesth 100(6):747-758, 2008.",
+          "sourceUrl": "https://doi.org/10.1093/bja/aen094",
+          "note": "Reduced sensitivity of the medullary chemoreceptors to CO2 AND depression of the pre-Botzinger rhythm generator: at full occupancy the two together abolish respiratory rhythm, which is the mechanism of opioid death and must be reachable, not merely approached.",
+          "central": true
         },
         {
           "target": "neuro.sedation",
           "gain": 0.55,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Dose-dependent depression of consciousness."
+          "note": "Dose-dependent depression of consciousness.",
+          "central": true
+        },
+        {
+          "target": "neuro.pupilDiameter",
+          "gain": -0.55,
+          "source": "Knaggs RD, Crighton IM, Cobby TF, Fletcher AJ, Hobbs GJ. The pupillary effects of intravenous morphine, codeine, and tramadol in volunteers. Anesth Analg 99(1):108-112, 2004.",
+          "sourceUrl": "https://doi.org/10.1213/01.ANE.0000116924.16535.BA",
+          "note": "Miosis via disinhibition of the Edinger-Westphal nucleus: mu agonism removes the GABAergic brake on the parasympathetic pupilloconstrictor outflow. Tolerance to it develops little, which is why it persists as a sign in chronic users.",
+          "central": true
         },
         {
           "target": "gi.motility",
           "gain": -0.75,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Enteric μ receptors suppress propulsive peristalsis."
+          "note": "Enteric μ receptors suppress propulsive peristalsis.",
+          "central": false
         },
         {
           "target": "cardio.heartRate",
           "gain": -0.2,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Central vagal predominance."
+          "note": "Central vagal predominance.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 319,
@@ -825,21 +905,24 @@
           "gain": 0.6,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Predominantly spinal antinociception."
+          "note": "Predominantly spinal antinociception.",
+          "central": true
         },
         {
           "target": "neuro.sedation",
           "gain": 0.35,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Sedation and dysphoria without meaningful respiratory depression."
+          "note": "Sedation and dysphoria without meaningful respiratory depression.",
+          "central": true
         },
         {
           "target": "renal.waterReabsorption",
           "gain": -0.35,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Inhibition of vasopressin release causes a water diuresis."
+          "note": "Inhibition of vasopressin release causes a water diuresis.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 318,
@@ -866,21 +949,24 @@
           "gain": 0.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Spinal and supraspinal antinociception, weaker than mu at equivalent occupancy."
+          "note": "Spinal and supraspinal antinociception, weaker than mu at equivalent occupancy.",
+          "central": true
         },
         {
           "target": "neuro.sedation",
           "gain": 0.15,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Modest contribution to the overall depressant effect."
+          "note": "Modest contribution to the overall depressant effect.",
+          "central": true
         },
         {
           "target": "gi.motility",
           "gain": -0.25,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Enteric delta receptors add to the mu-mediated slowing of transit."
+          "note": "Enteric delta receptors add to the mu-mediated slowing of transit.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 317,
@@ -905,21 +991,24 @@
           "gain": 1,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Chloride conductance hyperpolarises cortical and thalamic neurons; the basis of every intravenous sedative-hypnotic in use."
+          "note": "Chloride conductance hyperpolarises cortical and thalamic neurons; the basis of every intravenous sedative-hypnotic in use.",
+          "central": true
         },
         {
           "target": "resp.drive",
           "gain": -0.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Central depression of respiratory rhythm generation, additive with μ-opioid."
+          "note": "Central depression of respiratory rhythm generation, additive with μ-opioid.",
+          "central": true
         },
         {
           "target": "cardio.systemicResistance",
           "gain": -0.35,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Reduced central sympathetic outflow; the reason propofol drops blood pressure."
+          "note": "Reduced central sympathetic outflow; the reason propofol drops blood pressure.",
+          "central": false
         }
       ],
       "gtopdbTargetId": null,
@@ -944,14 +1033,16 @@
           "gain": 0.7,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Glutamatergic cortical excitation; channel blockade produces dissociative anaesthesia."
+          "note": "Glutamatergic cortical excitation; channel blockade produces dissociative anaesthesia.",
+          "central": true
         },
         {
           "target": "cardio.systemicResistance",
           "gain": 0.2,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Blockade paradoxically raises pressure via central sympathetic activation — modelled as a negative on this positive gain."
+          "note": "Blockade paradoxically raises pressure via central sympathetic activation — modelled as a negative on this positive gain.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 456,
@@ -977,21 +1068,24 @@
           "gain": 0.4,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Retrograde endocannabinoid signalling suppresses neurotransmitter release."
+          "note": "Retrograde endocannabinoid signalling suppresses neurotransmitter release.",
+          "central": true
         },
         {
           "target": "gi.motility",
           "gain": -0.4,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Enteric CB1 slows transit."
+          "note": "Enteric CB1 slows transit.",
+          "central": false
         },
         {
           "target": "cardio.heartRate",
           "gain": 0.3,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Acute tachycardia from reduced vagal tone."
+          "note": "Acute tachycardia from reduced vagal tone.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 56,
@@ -1016,21 +1110,24 @@
           "gain": 0.85,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Raised synaptic dopamine in mesolimbic and striatal terminals."
+          "note": "Raised synaptic dopamine in mesolimbic and striatal terminals.",
+          "central": true
         },
         {
           "target": "cardio.heartRate",
           "gain": 0.2,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Indirect sympathomimetic effect."
+          "note": "Indirect sympathomimetic effect.",
+          "central": false
         },
         {
           "target": "thermal.heatProduction",
           "gain": 0.3,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Contributes to stimulant hyperthermia."
+          "note": "Contributes to stimulant hyperthermia.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 927,
@@ -1056,21 +1153,32 @@
           "gain": 0.55,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Raised synaptic noradrenaline at cardiac sympathetic terminals."
+          "note": "Raised synaptic noradrenaline at cardiac sympathetic terminals.",
+          "central": false
         },
         {
           "target": "cardio.systemicResistance",
           "gain": 0.5,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Raised noradrenaline at vascular α1."
+          "note": "Raised noradrenaline at vascular α1.",
+          "central": false
         },
         {
           "target": "neuro.arousal",
           "gain": 0.45,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Cortical noradrenergic tone."
+          "note": "Cortical noradrenergic tone.",
+          "central": true
+        },
+        {
+          "target": "neuro.pupilDiameter",
+          "gain": 0.35,
+          "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+          "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+          "note": "Raised noradrenaline at the iris dilator: the wide pupils of the sympathomimetic toxidrome (cocaine, amfetamines), the sign that separates it from the pinpoint pupils of opioid toxicity.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 926,
@@ -1097,21 +1205,24 @@
           "gain": 0.4,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Raised mucosal serotonin drives enteric reflexes; the reason SSRIs commonly cause nausea and loose stool."
+          "note": "Raised mucosal serotonin drives enteric reflexes; the reason SSRIs commonly cause nausea and loose stool.",
+          "central": false
         },
         {
           "target": "thermal.heatProduction",
           "gain": 0.35,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Contributes to serotonin-toxicity hyperthermia."
+          "note": "Contributes to serotonin-toxicity hyperthermia.",
+          "central": false
         },
         {
           "target": "neuro.arousal",
           "gain": 0.15,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Modest direct arousal effect."
+          "note": "Modest direct arousal effect.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 928,
@@ -1136,21 +1247,24 @@
           "gain": 0.55,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Trace-amine signalling modulates monoamine neuron firing."
+          "note": "Trace-amine signalling modulates monoamine neuron firing.",
+          "central": true
         },
         {
           "target": "thermal.heatProduction",
           "gain": 0.45,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Contributes to amphetamine-type hyperthermia."
+          "note": "Contributes to amphetamine-type hyperthermia.",
+          "central": false
         },
         {
           "target": "cardio.heartRate",
           "gain": 0.2,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Indirect sympathomimetic effect."
+          "note": "Indirect sympathomimetic effect.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 364,
@@ -1175,7 +1289,8 @@
           "gain": 0.9,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Vasopressin-mediated vasoconstriction, independent of the adrenergic system — which is why it still works in acidosis."
+          "note": "Vasopressin-mediated vasoconstriction, independent of the adrenergic system — which is why it still works in acidosis.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 366,
@@ -1202,21 +1317,24 @@
           "gain": 0.8,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Direct arteriolar constriction by angiotensin II."
+          "note": "Direct arteriolar constriction by angiotensin II.",
+          "central": false
         },
         {
           "target": "renal.vascularResistance",
           "gain": 0.55,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Preferential efferent arteriolar constriction maintains filtration fraction."
+          "note": "Preferential efferent arteriolar constriction maintains filtration fraction.",
+          "central": false
         },
         {
           "target": "renal.waterReabsorption",
           "gain": 0.5,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Aldosterone release and direct proximal tubular sodium reabsorption."
+          "note": "Aldosterone release and direct proximal tubular sodium reabsorption.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 34,
@@ -1243,14 +1361,16 @@
           "gain": 1,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "GLUT4 translocation in muscle and adipose tissue."
+          "note": "GLUT4 translocation in muscle and adipose tissue.",
+          "central": false
         },
         {
           "target": "metabolic.hepaticGlucoseOutput",
           "gain": -0.75,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Suppression of gluconeogenesis and glycogenolysis."
+          "note": "Suppression of gluconeogenesis and glycogenolysis.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 1800,
@@ -1294,14 +1414,16 @@
           "gain": 1,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Adenosine A1 opens GIRK in nodal tissue, producing transient complete atrioventricular block — the mechanism that terminates re-entrant SVT."
+          "note": "Adenosine A1 opens GIRK in nodal tissue, producing transient complete atrioventricular block — the mechanism that terminates re-entrant SVT.",
+          "central": false
         },
         {
           "target": "cardio.heartRate",
           "gain": -0.9,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Profound sinoatrial slowing."
+          "note": "Profound sinoatrial slowing.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 18,
@@ -1327,14 +1449,16 @@
           "gain": -0.55,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Coronary and systemic vasodilation; the flushing and chest discomfort of an adenosine push."
+          "note": "Coronary and systemic vasodilation; the flushing and chest discomfort of an adenosine push.",
+          "central": false
         },
         {
           "target": "neuro.arousal",
           "gain": -0.3,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Sleep-promoting; the target caffeine antagonises."
+          "note": "Sleep-promoting; the target caffeine antagonises.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 19,
@@ -1360,14 +1484,16 @@
           "gain": 0.25,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Cranial vasoconstriction; the mechanism by which triptans abort a migraine, and the reason they are contraindicated in coronary disease."
+          "note": "Cranial vasoconstriction; the mechanism by which triptans abort a migraine, and the reason they are contraindicated in coronary disease.",
+          "central": false
         },
         {
           "target": "neuro.anxiety",
           "gain": -0.2,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Terminal autoreceptor: reduces serotonin release, with a net anxiolytic effect at steady state."
+          "note": "Terminal autoreceptor: reduces serotonin release, with a net anxiolytic effect at steady state.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 2,
@@ -1393,7 +1519,8 @@
           "gain": -0.25,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Gs-coupled and almost entirely striatal; blockade is procognitive, which is why it is an antipsychotic target."
+          "note": "Gs-coupled and almost entirely striatal; blockade is procognitive, which is why it is an antipsychotic target.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 11,
@@ -1420,14 +1547,16 @@
           "gain": -0.3,
           "source": "Alexander SPH, et al. THE CONCISE GUIDE TO PHARMACOLOGY 2023/24. Br J Pharmacol 180(S2), 2023.",
           "sourceUrl": "https://doi.org/10.1111/bph.16177",
-          "note": "Smooth-muscle relaxation; contributes to the hypotension of several antipsychotics."
+          "note": "Smooth-muscle relaxation; contributes to the hypotension of several antipsychotics.",
+          "central": false
         },
         {
           "target": "neuro.sedation",
           "gain": 0.25,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Suprachiasmatic signalling; involved in sleep architecture and circadian phase."
+          "note": "Suprachiasmatic signalling; involved in sleep architecture and circadian phase.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 12,
@@ -1453,14 +1582,16 @@
           "gain": 0.35,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Limbic D3/D4; the preferential limbic distribution is the usual explanation for why some antipsychotics are less extrapyramidal."
+          "note": "Limbic D3/D4; the preferential limbic distribution is the usual explanation for why some antipsychotics are less extrapyramidal.",
+          "central": true
         },
         {
           "target": "neuro.dependence",
           "gain": 0.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Mesolimbic reward signalling."
+          "note": "Mesolimbic reward signalling.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 216,
@@ -1487,21 +1618,24 @@
           "gain": -0.85,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Platelet thromboxane A2 synthesis. Platelets have no nucleus and cannot resynthesise the enzyme, which is why aspirin lasts the platelet lifespan and ibuprofen does not."
+          "note": "Platelet thromboxane A2 synthesis. Platelets have no nucleus and cannot resynthesise the enzyme, which is why aspirin lasts the platelet lifespan and ibuprofen does not.",
+          "central": false
         },
         {
           "target": "gi.acidSecretion",
           "gain": 0.35,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Loss of the protective prostaglandins that restrain acid and maintain mucus; the mechanism of NSAID ulceration."
+          "note": "Loss of the protective prostaglandins that restrain acid and maintain mucus; the mechanism of NSAID ulceration.",
+          "central": false
         },
         {
           "target": "renal.vascularResistance",
           "gain": 0.3,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Loss of prostaglandin-mediated afferent dilation. Harmless in a well-perfused kidney and dangerous in a hypovolaemic one, which is the whole clinical point."
+          "note": "Loss of prostaglandin-mediated afferent dilation. Harmless in a well-perfused kidney and dangerous in a hypovolaemic one, which is the whole clinical point.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 1375,
@@ -1528,21 +1662,24 @@
           "gain": -0.8,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Inducible isoform: the prostaglandins of inflammation. This is the therapeutic target of every NSAID."
+          "note": "Inducible isoform: the prostaglandins of inflammation. This is the therapeutic target of every NSAID.",
+          "central": false
         },
         {
           "target": "neuro.analgesia",
           "gain": 0.55,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Peripheral and central sensitisation both fall when prostaglandin E2 does."
+          "note": "Peripheral and central sensitisation both fall when prostaglandin E2 does.",
+          "central": false
         },
         {
           "target": "thermal.setPoint",
           "gain": -0.7,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Hypothalamic PGE2 sets the febrile temperature; blocking it is exactly what an antipyretic does."
+          "note": "Hypothalamic PGE2 sets the febrile temperature; blocking it is exactly what an antipyretic does.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 1376,
@@ -1567,7 +1704,8 @@
           "gain": -0.9,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "The rate-limiting step of hepatic cholesterol synthesis. Inhibiting it upregulates the LDL receptor, and that upregulation — not the synthesis block itself — is what lowers plasma LDL."
+          "note": "The rate-limiting step of hepatic cholesterol synthesis. Inhibiting it upregulates the LDL receptor, and that upregulation — not the synthesis block itself — is what lowers plasma LDL.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 639,
@@ -1595,21 +1733,16 @@
           "gain": -0.55,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Proximal tubular bicarbonate reabsorption depends on it; inhibition produces a bicarbonate diuresis and a metabolic acidosis."
+          "note": "Proximal tubular bicarbonate reabsorption depends on it; inhibition produces a bicarbonate diuresis and a metabolic acidosis.",
+          "central": false
         },
         {
           "target": "renal.waterReabsorption",
           "gain": -0.3,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Water follows the unreabsorbed solute."
-        },
-        {
-          "target": "resp.drive",
-          "gain": 0.4,
-          "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
-          "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "The induced acidosis stimulates ventilation, which is why acetazolamide is used for altitude acclimatisation."
+          "note": "Water follows the unreabsorbed solute.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 3092,
@@ -1636,21 +1769,24 @@
           "gain": 0.95,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Inhibition raises cardiac cAMP without touching a beta receptor. That is why an inodilator still works in a heart that is beta-blocked or beta-downregulated — the classic reason to reach for milrinone."
+          "note": "Inhibition raises cardiac cAMP without touching a beta receptor. That is why an inodilator still works in a heart that is beta-blocked or beta-downregulated — the classic reason to reach for milrinone.",
+          "central": false
         },
         {
           "target": "cardio.systemicResistance",
           "gain": -0.65,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "The same raised cAMP relaxes vascular smooth muscle, so the inotropy comes with vasodilation. Inodilator, not inotrope."
+          "note": "The same raised cAMP relaxes vascular smooth muscle, so the inotropy comes with vasodilation. Inodilator, not inotrope.",
+          "central": false
         },
         {
           "target": "cardio.arrhythmogenicity",
           "gain": 0.4,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Raised cAMP loads the cell with calcium by the same route a catecholamine does, with the same arrhythmic cost."
+          "note": "Raised cAMP loads the cell with calcium by the same route a catecholamine does, with the same arrhythmic cost.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 1298,
@@ -1678,35 +1814,40 @@
           "gain": -0.95,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Transrepression of NF-kB and AP-1. The broadest anti-inflammatory mechanism in medicine."
+          "note": "Transrepression of NF-kB and AP-1. The broadest anti-inflammatory mechanism in medicine.",
+          "central": false
         },
         {
           "target": "metabolic.hepaticGlucoseOutput",
           "gain": 0.55,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Gluconeogenesis from amino acids; the reason steroids raise blood sugar."
+          "note": "Gluconeogenesis from amino acids; the reason steroids raise blood sugar.",
+          "central": false
         },
         {
           "target": "metabolic.proteinCatabolism",
           "gain": 0.6,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Skeletal muscle breakdown supplying the substrate."
+          "note": "Skeletal muscle breakdown supplying the substrate.",
+          "central": false
         },
         {
           "target": "cardio.systemicResistance",
           "gain": 0.25,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Permissive: catecholamines act poorly on a glucocorticoid-deficient vasculature, which is what makes an adrenal crisis a vasoplegic shock."
+          "note": "Permissive: catecholamines act poorly on a glucocorticoid-deficient vasculature, which is what makes an adrenal crisis a vasoplegic shock.",
+          "central": false
         },
         {
           "target": "resp.bronchodilation",
           "gain": 0.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Not direct relaxation — restored beta-2 responsiveness and reduced airway inflammation over hours."
+          "note": "Not direct relaxation — restored beta-2 responsiveness and reduced airway inflammation over hours.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 625,
@@ -1733,21 +1874,24 @@
           "gain": 0.85,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "The aldosterone receptor. Collecting-duct ENaC and Na/K-ATPase."
+          "note": "The aldosterone receptor. Collecting-duct ENaC and Na/K-ATPase.",
+          "central": false
         },
         {
           "target": "renal.potassiumExcretion",
           "gain": 0.75,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "The other half of the same exchange, and the reason an antagonist causes hyperkalaemia."
+          "note": "The other half of the same exchange, and the reason an antagonist causes hyperkalaemia.",
+          "central": false
         },
         {
           "target": "renal.waterReabsorption",
           "gain": 0.35,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Water follows the reabsorbed sodium."
+          "note": "Water follows the reabsorbed sodium.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 626,
@@ -1774,28 +1918,32 @@
           "gain": -0.8,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Phase-0 upstroke velocity falls, so conduction slows and the QRS widens. The class I antiarrhythmic action, and the toxicity of a local anaesthetic that reaches the circulation."
+          "note": "Phase-0 upstroke velocity falls, so conduction slows and the QRS widens. The class I antiarrhythmic action, and the toxicity of a local anaesthetic that reaches the circulation.",
+          "central": false
         },
         {
           "target": "cardio.contractility",
           "gain": -0.3,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Indirect, through reduced sodium-calcium exchange."
+          "note": "Indirect, through reduced sodium-calcium exchange.",
+          "central": false
         },
         {
           "target": "neuro.seizureThreshold",
           "gain": 0.55,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Use-dependent block of repetitive firing; the mechanism of phenytoin, carbamazepine and lamotrigine."
+          "note": "Use-dependent block of repetitive firing; the mechanism of phenytoin, carbamazepine and lamotrigine.",
+          "central": true
         },
         {
           "target": "neuro.analgesia",
           "gain": 0.4,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Blocking propagation in a peripheral nerve is what local anaesthesia is."
+          "note": "Blocking propagation in a peripheral nerve is what local anaesthesia is.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 582,
@@ -1821,28 +1969,32 @@
           "gain": -0.85,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Arteriolar smooth-muscle relaxation. The dihydropyridines are nearly pure vasodilators because vascular Cav1.2 is in a state they bind preferentially."
+          "note": "Arteriolar smooth-muscle relaxation. The dihydropyridines are nearly pure vasodilators because vascular Cav1.2 is in a state they bind preferentially.",
+          "central": false
         },
         {
           "target": "cardio.contractility",
           "gain": -0.55,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Reduced calcium entry during the plateau. Pronounced for verapamil and diltiazem, minimal for the dihydropyridines."
+          "note": "Reduced calcium entry during the plateau. Pronounced for verapamil and diltiazem, minimal for the dihydropyridines.",
+          "central": false
         },
         {
           "target": "cardio.heartRate",
           "gain": -0.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Sinoatrial depolarisation is a calcium current, so a rate-limiting calcium blocker slows it directly."
+          "note": "Sinoatrial depolarisation is a calcium current, so a rate-limiting calcium blocker slows it directly.",
+          "central": false
         },
         {
           "target": "cardio.avNodalBlock",
           "gain": 0.7,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Atrioventricular conduction is calcium-dependent too, which is why verapamil terminates a re-entrant SVT."
+          "note": "Atrioventricular conduction is calcium-dependent too, which is why verapamil terminates a re-entrant SVT.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 529,
@@ -1867,14 +2019,16 @@
           "gain": 0.9,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "The rapid delayed-rectifier potassium current repolarises the ventricle. Block it and repolarisation is delayed, which is QT prolongation."
+          "note": "The rapid delayed-rectifier potassium current repolarises the ventricle. Block it and repolarisation is delayed, which is QT prolongation.",
+          "central": false
         },
         {
           "target": "cardio.arrhythmogenicity",
           "gain": 0.65,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "A prolonged repolarisation invites early afterdepolarisations and torsades de pointes. This channel is the reason a drug can be withdrawn for an electrocardiographic finding alone."
+          "note": "A prolonged repolarisation invites early afterdepolarisations and torsades de pointes. This channel is the reason a drug can be withdrawn for an electrocardiographic finding alone.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 572,
@@ -1899,7 +2053,8 @@
           "gain": 0.9,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "ADP-driven amplification of platelet activation. Blocking it is the second antiplatelet pathway, independent of thromboxane, which is why dual therapy is additive."
+          "note": "ADP-driven amplification of platelet activation. Blocking it is the second antiplatelet pathway, independent of thromboxane, which is why dual therapy is additive.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 328,
@@ -1925,21 +2080,24 @@
           "gain": -0.6,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Cysteinyl leukotrienes are among the most potent bronchoconstrictors known; antagonism relieves it."
+          "note": "Cysteinyl leukotrienes are among the most potent bronchoconstrictors known; antagonism relieves it.",
+          "central": false
         },
         {
           "target": "immune.inflammation",
           "gain": 0.4,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Eosinophil recruitment and mucus secretion."
+          "note": "Eosinophil recruitment and mucus secretion.",
+          "central": false
         },
         {
           "target": "vascular.permeability",
           "gain": 0.35,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Leukotriene-mediated oedema."
+          "note": "Leukotriene-mediated oedema.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 269,
@@ -1964,7 +2122,8 @@
           "gain": 0.9,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Aquaporin-2 insertion into the collecting-duct apical membrane. This is the antidiuretic action proper; the V1A vasoconstriction is a separate receptor."
+          "note": "Aquaporin-2 insertion into the collecting-duct apical membrane. This is the antidiuretic action proper; the V1A vasoconstriction is a separate receptor.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 368,
@@ -1986,31 +2145,35 @@
       "effects": [
         {
           "target": "metabolic.glycogenolysis",
-          "gain": 0.9,
-          "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
-          "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Hepatic glycogen phosphorylase activation: the fast defence against hypoglycaemia, and useless once glycogen is gone."
+          "gain": 28,
+          "source": "GlucaGen (glucagon) prescribing information, section 12.2: \"In a study of 25 volunteers, a subcutaneous dose of 1 mg glucagon resulted in a mean peak glucose concentration of 136 mg/dL 30 minutes after injection\"; IM mean peak 138 mg/dL at 26 minutes.",
+          "sourceUrl": "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=789ab694-3ad8-a122-e053-2991aa0a9ab3",
+          "note": "Hepatic glycogen phosphorylase activation: the fast defence against hypoglycaemia, and useless once glycogen is gone. Gain calibrated so 1 mg SC reproduces the label glucose peak.",
+          "central": false
         },
         {
           "target": "metabolic.hepaticGlucoseOutput",
           "gain": 0.8,
           "source": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
           "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
-          "note": "Gluconeogenesis and glycogenolysis together."
+          "note": "Gluconeogenesis and glycogenolysis together.",
+          "central": false
         },
         {
           "target": "cardio.contractility",
           "gain": 0.45,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Gs-coupled in myocardium, and critically it bypasses the beta receptor entirely — which is why glucagon is the antidote to beta-blocker overdose."
+          "note": "Gs-coupled in myocardium, and critically it bypasses the beta receptor entirely — which is why glucagon is the antidote to beta-blocker overdose.",
+          "central": false
         },
         {
           "target": "cardio.heartRate",
           "gain": 0.35,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Same mechanism, same bypass."
+          "note": "Same mechanism, same bypass.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 251,
@@ -2037,21 +2200,24 @@
           "gain": 0.75,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Glucose-DEPENDENT insulin secretion, which is why a GLP-1 agonist alone essentially does not cause hypoglycaemia."
+          "note": "Glucose-DEPENDENT insulin secretion, which is why a GLP-1 agonist alone essentially does not cause hypoglycaemia.",
+          "central": false
         },
         {
           "target": "gi.motility",
           "gain": -0.5,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Marked slowing of gastric emptying, which blunts the post-prandial glucose excursion and causes most of the nausea."
+          "note": "Marked slowing of gastric emptying, which blunts the post-prandial glucose excursion and causes most of the nausea.",
+          "central": false
         },
         {
           "target": "gi.appetite",
           "gain": -0.65,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Hypothalamic and brainstem signalling; the mechanism behind the weight effect."
+          "note": "Hypothalamic and brainstem signalling; the mechanism behind the weight effect.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 249,
@@ -2077,7 +2243,8 @@
           "gain": -0.85,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "The final two steps of purine catabolism, hypoxanthine to xanthine to urate. Inhibiting it is the only way to lower urate production rather than merely excrete more of it."
+          "note": "The final two steps of purine catabolism, hypoxanthine to xanthine to urate. Inhibiting it is the only way to lower urate production rather than merely excrete more of it.",
+          "central": false
         }
       ],
       "gtopdbTargetId": 2646,
@@ -2102,35 +2269,40 @@
           "gain": 0.95,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Chloride conductance hyperpolarises cortical and thalamic neurons."
+          "note": "Chloride conductance hyperpolarises cortical and thalamic neurons.",
+          "central": true
         },
         {
           "target": "resp.drive",
           "gain": -0.4,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Central depression of respiratory rhythm generation, additive with mu-opioid — which is why the combination kills at doses neither reaches alone."
+          "note": "Central depression of respiratory rhythm generation, additive with mu-opioid — which is why the combination kills at doses neither reaches alone.",
+          "central": true
         },
         {
           "target": "neuro.anxiety",
           "gain": -0.8,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Limbic alpha-2 subunit; the anxiolytic action, separable in principle from the sedative alpha-1 one."
+          "note": "Limbic alpha-2 subunit; the anxiolytic action, separable in principle from the sedative alpha-1 one.",
+          "central": true
         },
         {
           "target": "neuro.muscleTone",
           "gain": -0.55,
           "source": "Ritter JM, Flower R, Henderson G, et al. Rang & Dale's Pharmacology, 10th ed. Elsevier, 2023.",
           "sourceUrl": "https://www.elsevier.com/books/rang-and-dales-pharmacology/ritter/978-0-323-87395-5",
-          "note": "Spinal alpha-2/alpha-3; the muscle-relaxant action."
+          "note": "Spinal alpha-2/alpha-3; the muscle-relaxant action.",
+          "central": true
         },
         {
           "target": "neuro.seizureThreshold",
           "gain": 0.85,
           "source": "Brunton LL, Knollmann BC (eds). Goodman & Gilman's The Pharmacological Basis of Therapeutics, 14th ed. McGraw Hill, 2023.",
           "sourceUrl": "https://www.accesspharmacy.mhmedical.com/book.aspx?bookid=3191",
-          "note": "Raising the seizure threshold is why a benzodiazepine is first-line for status epilepticus."
+          "note": "Raising the seizure threshold is why a benzodiazepine is first-line for status epilepticus.",
+          "central": true
         }
       ],
       "gtopdbTargetId": 404,

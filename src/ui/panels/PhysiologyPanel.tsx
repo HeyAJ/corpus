@@ -64,13 +64,25 @@ function Slider({ label, hint, value, onChange, actual, max = 1, step = 0.05, un
 }
 
 export function PhysiologyPanel() {
+  const open = useStore((s) => s.physiologyPanelOpen);
   const dispatch = useStore((s) => s.dispatch);
   const snapshot = useStore((s) => s.snapshot);
-  if (!snapshot) return null;
+  if (!open || !snapshot) return null;
 
   const b = snapshot.behaviour;
   const p = snapshot.pathology;
+  const mind = snapshot.mind;
   const asleep = b.sleepDepth > 0.01;
+
+  // The subjective and neurological readouts that only exist once something is acting:
+  // shown when they are away from their resting value, so the group stays quiet on a
+  // resting body and fills in as a drug or a state reaches the mind.
+  const experiences = [
+    { key: 'euphoria', label: 'Euphoria', value: mind.euphoria },
+    { key: 'anxiety', label: 'Anxiety', value: mind.anxiety },
+    { key: 'psychedelia', label: 'Psychedelia', value: mind.psychedelia },
+    { key: 'dependence', label: 'Dependence drive', value: mind.dependence },
+  ].filter((e) => e.value > 0.01);
 
   return (
     <section className={styles.panel} data-panel="physiology" aria-label="Physiology and pathology">
@@ -193,6 +205,55 @@ export function PhysiologyPanel() {
         {p.inflammation > 0.01 && (
           <p className={styles.debt}>Inflammation {p.inflammation.toFixed(2)}</p>
         )}
+      </div>
+
+      {/*
+        MIND AND SIGNS. Readouts, not controls — these are what the effect bus has DONE
+        to the body, the things a clinician would see (pupils, tone, a seizure) and the
+        things the patient would report (nausea). They live in the physiology panel
+        because that is where the non-drug body already is, and they read back the same
+        way the rest of it does.
+      */}
+      <div className={styles.group}>
+        <h3 className={styles.groupTitle}>Mind and signs</h3>
+
+        {mind.seizing && <p className={styles.alarm}>SEIZING</p>}
+        {mind.vomiting && <p className={styles.alarm}>Vomiting{mind.vomitus_mL > 1 ? ` — ${mind.vomitus_mL.toFixed(0)} mL` : ''}</p>}
+
+        <dl className={styles.signs}>
+          <div>
+            <dt>Pupil</dt>
+            <dd>{mind.pupil_mm.toFixed(1)} mm</dd>
+          </div>
+          <div>
+            <dt>Muscle tone</dt>
+            <dd>{mind.muscleTone > 0 ? '+' : ''}{mind.muscleTone.toFixed(2)}</dd>
+          </div>
+          <div>
+            <dt>Seizure margin</dt>
+            <dd className={mind.seizureMargin < 0.35 ? styles.signWarn : undefined}>
+              {(mind.seizureMargin * 100).toFixed(0)}%
+            </dd>
+          </div>
+          <div>
+            <dt>Nausea</dt>
+            <dd className={mind.nausea > 0.4 ? styles.signWarn : undefined}>{mind.nausea.toFixed(2)}</dd>
+          </div>
+        </dl>
+
+        {experiences.length > 0 && (
+          <div className={styles.chips}>
+            {experiences.map((e) => (
+              <span key={e.key} className={styles.experience}>
+                {e.label} {e.value.toFixed(2)}
+              </span>
+            ))}
+          </div>
+        )}
+        <p className={styles.hint}>
+          Signs, not settings: pupil size, muscle tone, the margin before a seizure and the felt
+          experiences are what drugs and states have done here, read back off the effect bus.
+        </p>
       </div>
     </section>
   );

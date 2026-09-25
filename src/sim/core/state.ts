@@ -92,6 +92,8 @@ export interface CardioState {
   /** Total circulating volume, mL. Falls with haemorrhage, rises with fluids. */
   bloodVolume: number;
   targetBloodVolume: number;
+  /** Isotonic volume moved this tick (blood, saline); excluded from electrolyte concentration. */
+  isotonicDelta_mL: number;
 
   /** CPR compression impulse, decays over ~1.2 s (spec 9). */
   cprImpulse: number;
@@ -149,6 +151,19 @@ export interface RespState {
   driveScale: number;
   intubated: boolean;
   apnoeic: boolean;
+  /**
+   * Oxygen contents, mL O2 per 100 mL blood. Held as STATE, because the body's oxygen
+   * stores are what decide how long a stopped breath takes to kill: lung gas at FRC
+   * plus the oxygen in five litres of blood, drawn down at the metabolic rate. When
+   * PaO2 was computed algebraically from PaCO2 there were no stores at all, and an
+   * apnoeic body's saturation froze wherever the CO2 happened to be.
+   */
+  arterialO2Content: number;
+  venousO2Content: number;
+  /** Fraction of pulmonary flow bypassing ventilated alveoli, as used this tick. */
+  shuntFraction: number;
+  /** Airway narrowing left after bronchodilators, 0..1, as used this tick. */
+  bronchoconstriction: number;
 }
 
 export interface FluidState {
@@ -157,6 +172,8 @@ export interface FluidState {
   /** Running net balance since the run began, mL. Positive is a gain. */
   balance_mL: number;
 }
+
+/** Convenience top-level scratch the fluid system owns; declared here for the type. */
 
 export interface RenalState {
   gfr: number;
@@ -226,6 +243,10 @@ export interface MetabolicState {
   coreTemp: number;
   /** Additive heat load, W, from thermogenic drug effects. */
   heatOffset: number;
+  /** Sweat production right now, mL/min. Sets the evaporative heat loss and a fluid loss. */
+  sweatRate_mL_per_min: number;
+  /** Injected insulin present now, uU/mL, on top of the pancreas's own. Set by the engine. */
+  exogenousInsulin_uU_per_mL: number;
 }
 
 export interface NeuroState {
@@ -365,6 +386,26 @@ export interface EndocrineState {
   stressAxis: number;
   /** Simulated hour of day, 0..24, for the circadian terms several hormones carry. */
   clockHour: number;
+  /**
+   * Exogenous hormone added by a drug that IS that hormone and has NO receptor of its own
+   * in this model (levothyroxine), in each hormone's own unit. It ACTS through the
+   * pool: the endocrine system adds it to the secreted level before the Hill transform,
+   * so the drug reaches physiology by the path the gland's own output uses.
+   * Kept separate from the secreted `level` because the drug's pharmacokinetics already
+   * govern its rise and fall - folding it into the integrated pool would decay it twice.
+   * Keyed by hormone id. (Insulin has its own home, metabolic.exogenousInsulin_uU_per_mL.)
+   */
+  exogenous: Record<string, number>;
+  /**
+   * EVERY exogenous contribution to a hormone's measured level, including drugs that act
+   * through their own receptors (vasopressin at V1a/V2, hydrocortisone at GR/MR, glucagon
+   * at its receptor). Those drugs must not ALSO act through the pool - the receptor gains
+   * and the hormone's effect gains describe the same action, and applying both counted
+   * it twice (found 2026-09-25: a vasopressin bolus pushed systemic resistance through
+   * V1a and again through the ADH pool). But an assay cannot tell a drug molecule from
+   * the gland's, so the lab readout still sees all of it. Display only.
+   */
+  exogenousMeasured: Record<string, number>;
 }
 
 /**
@@ -448,12 +489,26 @@ export interface PathologyState {
 /** One pathogen currently in the body. */
 export interface PathogenBurden {
   pathogenId: string;
-  /** Burden as log10 copies (or CFU) per mL. */
+  /**
+   * log10 of the burden relative to the INOCULUM. Kept for continuity with the intent
+   * that seeds it (`dose_log10`) and for the growth readout; the dynamics run on
+   * `burden`, which is normalised to the pathogen's own untreated peak.
+   */
   load_log10: number;
+  /** Burden relative to this pathogen's untreated peak, 0..1 (can exceed 1 briefly). */
+  burden: number;
   /** Seconds since inoculation. */
   t: number;
   /** Incubation is over and the illness is declared. */
   symptomatic: boolean;
+  /** Pathogen-specific adaptive immunity, 0..1. Builds after symptom onset. */
+  adaptive: number;
+  /** Antimicrobial kill applied last tick, per hour, for the readout. */
+  drugKill_per_h: number;
+  /** Cleared: burden fell below the extinction floor. Kept for the record. */
+  cleared: boolean;
+  /** Seconds since the burden peaked, or -1 before the peak. */
+  sincePeak: number;
 }
 
 /** What the body is FIGHTING. */
@@ -463,6 +518,109 @@ export interface InfectionState {
   immuneActivation: number;
   /** CD4+ T cells per microlitre. Falls in untreated HIV; the number that defines AIDS. */
   cd4_per_uL: number;
+  /** White cell count, x10^9/L. Follows immune activation with a lag. */
+  wbc: number;
+  /** C-reactive protein, mg/L. Hepatic acute-phase output, lags by a day. */
+  crp: number;
+  /** Red cells destroyed by a haemolytic pathogen since the run began, fraction of Hct. */
+  haemolysed: number;
+}
+
+/**
+ * WHERE THE BODY IS.
+ *
+ * Operator-set, like the scenario sliders: the ambient temperature, the altitude and
+ * the gas being breathed are facts about the room, not about the patient, and every
+ * physiological consequence of changing them is computed downstream.
+ */
+export interface EnvironmentState {
+  ambientTemp_C: number;
+  altitude_m: number;
+  /** Inspired oxygen fraction delivered. 0.2095 is room air. */
+  fio2: number;
+  posture: 'supine' | 'sitting' | 'standing';
+  /** Blood currently pooled in the dependent veins by gravity, mL. */
+  pooled_mL: number;
+}
+
+/**
+ * THE METABOLIC HALF OF ACID-BASE.
+ *
+ * pH is not stored; it is Henderson-Hasselbalch on the live PaCO2 and the bicarbonate
+ * computed from these terms every tick. `metabolicHco3` is the bicarbonate the body
+ * would have at a PaCO2 of 40 - the part fixed acids, lactate, vomiting and bicarbonate
+ * infusions move - and `renalCompensation` is the slow renal answer to a sustained
+ * PaCO2 change, which takes days.
+ */
+export interface AcidBaseState {
+  /**
+   * Bicarbonate before organic acids are counted, mEq/L. Moved by fixed-acid and alkali
+   * loads (a bicarbonate infusion, vomited acid, diarrhoeal bicarbonate) and returned
+   * toward normal by the kidney over days. Lactate and ketoacids are subtracted from it
+   * 1:1 at the point of use rather than integrated into it, so clearing lactate gives
+   * the bicarbonate back automatically - which is what metabolising lactate does.
+   */
+  metabolicHco3: number;
+  /** The slow renal answer to a sustained PaCO2 change, mEq/L. */
+  renalCompensation: number;
+  /** Ketoacids, mmol/L. */
+  ketones: number;
+}
+
+/**
+ * THE HEART'S OWN OXYGEN SUPPLY.
+ *
+ * The missing link between the lungs and the heart. Until this existed nothing in the
+ * cardiac model read oxygen at all: a body could stop breathing, saturate at 20 %, and
+ * keep a normal sinus rhythm for ever.
+ */
+export interface MyocardiumState {
+  /** Oxygen supply as a fraction of demand, low-pass filtered. >= 1 is adequate. */
+  supplyRatio: number;
+  /** 0 = well oxygenated, 1 = no aerobic reserve left. */
+  hypoxia: number;
+  /** Seconds the myocardium has spent profoundly hypoxic. Drives PEA and asystole. */
+  hypoxicTime: number;
+  /** Seconds of adequate oxygenation during an arrest. Drives ROSC. */
+  recoveryTime: number;
+}
+
+/** Signs and experiences carried on the bus, integrated where they need a time course. */
+export interface MindState {
+  pupil_mm: number;
+  nausea: number;
+  vomiting: boolean;
+  /** Seconds until the current vomiting episode ends, or until the next may start. */
+  vomitTimer: number;
+  vomitus_mL: number;
+  seizing: boolean;
+  seizureT: number;
+  /** Refractory time after a seizure ends, s. */
+  postictal: number;
+  muscleTone: number;
+}
+
+/** Blood clotting state. */
+export interface CoagulationState {
+  /** Clotting-factor capacity relative to normal, 0..1+. */
+  factorActivity: number;
+  /** Platelet aggregation relative to normal, 0..1+. */
+  plateletFunction: number;
+  platelets: number;
+  /** 0..1, how much of the current bleed is being held by clot. */
+  haemostasis: number;
+}
+
+/** Airway and mast-cell state. */
+export interface AirwayState {
+  /** Intrinsic airway narrowing (asthma), 0..1. Operator-set. */
+  asthma: number;
+  /** Circulating mast-cell mediator activity, 0..1. Decays after an exposure. */
+  histamine: number;
+  /** Net narrowing after bronchodilators, 0..1. */
+  constriction: number;
+  /** Mast-cell release still to come from the last exposure, 0..1. */
+  releaseRemaining: number;
 }
 
 export interface SimState {
@@ -492,6 +650,15 @@ export interface SimState {
   affect: AffectState;
   pathology: PathologyState;
   infection: InfectionState;
+  environment: EnvironmentState;
+  acidBase: AcidBaseState;
+  myocardium: MyocardiumState;
+  mind: MindState;
+  coagulation: CoagulationState;
+  airway: AirwayState;
+
+  /** Non-urine fluid loss right now (diarrhoea + sweat), mL/min. Readout. */
+  fluidLossRate_mL_per_min: number;
 
   effects: EffectAccumulator;
   /**
@@ -584,6 +751,7 @@ export function createInitialState(seed: number): SimState {
 
     bloodVolume: bv,
     targetBloodVolume: bv,
+    isotonicDelta_mL: 0,
 
     cprImpulse: 0,
     fibAmplitude: 0,
@@ -623,6 +791,10 @@ export function createInitialState(seed: number): SimState {
     driveScale: 1,
     intubated: false,
     apnoeic: false,
+    arterialO2Content: 19.8,
+    venousO2Content: 14.8,
+    shuntFraction: 0.03,
+    bronchoconstriction: 0,
   };
 
   const renal: RenalState = {
@@ -658,6 +830,8 @@ export function createInitialState(seed: number): SimState {
     glucagonDrive: 0,
     coreTemp: P('thermal.coreTemp_C'),
     heatOffset: 0,
+    sweatRate_mL_per_min: 0,
+    exogenousInsulin_uU_per_mL: 0,
   };
 
   // Hormone levels are seeded from src/data/hormones.json by systems/endocrine.ts on
@@ -667,6 +841,8 @@ export function createInitialState(seed: number): SimState {
     hormones: {},
     stressAxis: 0,
     clockHour: 8,
+    exogenous: {},
+    exogenousMeasured: {},
   };
 
   const neuro: NeuroState = {
@@ -736,7 +912,47 @@ export function createInitialState(seed: number): SimState {
       bloodLost_mL: 0,
       vertigo: 0,
     },
-    infection: { active: [], immuneActivation: 0, cd4_per_uL: P('immune.cd4Baseline_per_uL') },
+    infection: {
+      active: [],
+      immuneActivation: 0,
+      cd4_per_uL: P('immune.cd4Baseline_per_uL'),
+      wbc: P('immune.wbcBaseline_10e9_per_L'),
+      crp: P('immune.crpBaseline_mg_per_L'),
+      haemolysed: 0,
+    },
+    environment: {
+      ambientTemp_C: P('thermal.ambientTemp_C'),
+      altitude_m: 0,
+      fio2: P('resp.fio2RoomAir'),
+      posture: 'supine',
+      pooled_mL: 0,
+    },
+    acidBase: {
+      metabolicHco3: P('blood.hco3_mEq_per_L'),
+      renalCompensation: 0,
+      ketones: P('blood.ketones_mmol_per_L'),
+    },
+    myocardium: { supplyRatio: 2, hypoxia: 0, hypoxicTime: 0, recoveryTime: 0 },
+    mind: {
+      pupil_mm: P('neuro.pupilBaseline_mm'),
+      nausea: 0,
+      vomiting: false,
+      vomitTimer: 0,
+      vomitus_mL: 0,
+      seizing: false,
+      seizureT: 0,
+      postictal: 0,
+      muscleTone: 0,
+    },
+    coagulation: {
+      factorActivity: 1,
+      plateletFunction: 1,
+      platelets: P('blood.platelets_10e9_per_L'),
+      haemostasis: 0,
+    },
+    airway: { asthma: 0, histamine: 0, constriction: 0, releaseRemaining: 0 },
+
+    fluidLossRate_mL_per_min: 0,
 
     effects: {},
     prevEffects: {},

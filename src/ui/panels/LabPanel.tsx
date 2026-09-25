@@ -47,6 +47,8 @@ interface Section {
   title: string;
   source: string;
   rows: Row[];
+  /** A plain-language line the engine computed, shown under the title (e.g. the ABG read). */
+  caption?: string;
 }
 
 function band(r: Row): Band {
@@ -86,6 +88,10 @@ function buildSections(s: SimSnapshot): Section[] {
   const r = s.resp;
   const k = s.renal;
   const m = s.metabolic;
+  const ab = s.acidBase;
+  const coag = s.coagulation;
+  const inf = s.infection;
+  const fl = s.fluids;
 
   // --- derived quantities, computed here from snapshot values only ----------
   // Anion gap: Na - (Cl + HCO3). The classic discriminator for a metabolic acidosis.
@@ -161,6 +167,56 @@ function buildSections(s: SimSnapshot): Section[] {
         { id: 'alb', label: 'Albumin', value: c.albumin_g_per_dL, unit: 'g/dL', low: 3.5, high: 5.0, digits: 1 },
       ],
     },
+    {
+      // The engine integrates the acid-base state directly (Henderson-Hasselbalch on the
+      // live PaCO2 and bicarbonate), so these are ITS numbers, not this panel's — and its
+      // own plain-language read of them travels with the section as the caption.
+      title: 'Acid–base',
+      source: 'Base excess and interpretation computed by the engine; standard base excess after Siggaard-Andersen.',
+      caption: ab.interpretation,
+      rows: [
+        { id: 'be', label: 'Base excess', value: ab.baseExcess_mEq_per_L, unit: 'mEq/L', low: -2, high: 2, criticalLow: -10, criticalHigh: 10, digits: 1 },
+        { id: 'agap', label: 'Anion gap', value: ab.anionGap_mEq_per_L, unit: 'mEq/L', low: 8, high: 16, criticalHigh: 25, digits: 0 },
+        { id: 'ket', label: 'Ketones (β-OHB)', value: ab.ketones_mmol_per_L, unit: 'mmol/L', low: 0, high: 0.6, criticalHigh: 3.0, digits: 2 },
+      ],
+    },
+    {
+      title: 'Coagulation',
+      source: 'Reference intervals: Kratz A, et al. N Engl J Med 351:1548-1563, 2004. INR and aPTT are engine outputs of the clotting state.',
+      rows: [
+        { id: 'inr', label: 'INR', value: coag.inr, unit: '', low: 0.8, high: 1.2, criticalHigh: 4.5, digits: 2 },
+        { id: 'aptt', label: 'aPTT', value: coag.aptt_s, unit: 's', low: 25, high: 38, criticalHigh: 100, digits: 0 },
+        { id: 'plt', label: 'Platelets', value: coag.platelets_10e9_per_L, unit: '×10⁹/L', low: 150, high: 400, criticalLow: 50, digits: 0 },
+        {
+          id: 'pltf', label: 'Platelet function', value: coag.plateletFunction, unit: '', low: 0.8, high: 1.2, criticalLow: 0.3, digits: 2,
+          note: 'Aggregation relative to normal. Aspirin and clopidogrel lower it without touching the count.',
+        },
+      ],
+    },
+    {
+      title: 'Infection markers',
+      source: 'Reference intervals: Kratz A, et al. N Engl J Med 351:1548-1563, 2004; CD4 after WHO HIV staging.',
+      rows: [
+        { id: 'wbc', label: 'White cells', value: inf.wbc_10e9_per_L, unit: '×10⁹/L', low: 4, high: 11, criticalLow: 2, criticalHigh: 25, digits: 1 },
+        { id: 'crp', label: 'C-reactive protein', value: inf.crp_mg_per_L, unit: 'mg/L', low: 0, high: 5, criticalHigh: 100, digits: 0 },
+        { id: 'cd4', label: 'CD4+ count', value: inf.cd4_per_uL, unit: '/µL', low: 500, high: 1500, criticalLow: 200, digits: 0 },
+      ],
+    },
+    {
+      title: 'Fluid and osmolality',
+      source: 'Osmolality integrated by the engine (2·Na + glucose/18 + urea/2.8); balance is net since the run began.',
+      rows: [
+        { id: 'osm-eng', label: 'Osmolality', value: fl.osmolality_mOsm_per_kg, unit: 'mOsm/kg', low: 275, high: 295, criticalLow: 250, criticalHigh: 320, digits: 0 },
+        {
+          id: 'bal', label: 'Fluid balance', value: fl.balance_mL, unit: 'mL', low: -1000, high: 1000, digits: 0,
+          note: 'Net gain (+) or loss (−) since the run began: intake minus urine and every extra loss.',
+        },
+        {
+          id: 'loss', label: 'Extra losses', value: fl.extraLosses_mL_per_min, unit: 'mL/min', low: 0, high: 0.5, criticalHigh: 5, digits: 2,
+          note: 'Diarrhoea, vomiting, sweat and capillary leak — everything leaving that is not urine.',
+        },
+      ],
+    },
   ];
 }
 
@@ -200,6 +256,7 @@ export function LabPanel() {
         {sections.map((section) => (
           <section key={section.title} className={styles.section}>
             <h3 className={styles.sectionTitle}>{section.title}</h3>
+            {section.caption && <p className={styles.sectionCaption}>{section.caption}</p>}
             <table className={styles.table}>
               <tbody>
                 {section.rows.map((row) => {

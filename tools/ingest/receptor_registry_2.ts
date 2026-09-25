@@ -140,7 +140,15 @@ export const REGISTRY_2: RegistryEntry[] = [
     effects: [
       fx('renal.sodiumReabsorption', -0.55, 'GH14', 'Proximal tubular bicarbonate reabsorption depends on it; inhibition produces a bicarbonate diuresis and a metabolic acidosis.'),
       fx('renal.waterReabsorption', -0.30, 'GH14', 'Water follows the unreabsorbed solute.'),
-      fx('resp.drive', 0.40, 'GG14', 'The induced acidosis stimulates ventilation, which is why acetazolamide is used for altitude acclimatisation.'),
+      // A `resp.drive +0.40` effect stood here until 2026-09-25, as a stand-in for the
+      // metabolic acidosis the bicarbonate diuresis causes. It was removed because it
+      // put the consequence on the wrong clock: a receptor effect acts as fast as the
+      // drug binds, so a 250 mg tablet dropped PaCO2 by 7.7 mmHg within three minutes,
+      // where the real ventilatory stimulation follows the acidosis over hours to a day.
+      // It was also not a receptor action at all, so no blood-brain barrier rule could
+      // gate it correctly. The acidosis itself (and so acetazolamide's altitude benefit)
+      // is not modelled; MODEL_LIMITATIONS records it rather than keeping a shortcut
+      // that is right in direction and wrong in time.
     ],
     notes: 'Modelled as the isoform family, which no drug in this set discriminates. Constitutively active, so the resting tone is high and an inhibitor acts immediately.',
   },
@@ -292,7 +300,15 @@ export const REGISTRY_2: RegistryEntry[] = [
     baselineTone: 0.20, endogenousDriver: 'none', centralFraction: 0.00, ec50Occupancy: 0.30, hill: 1.0,
     activationModel: 'endogenous-agonist',
     effects: [
-      fx('metabolic.glycogenolysis', 0.90, 'GH14', 'Hepatic glycogen phosphorylase activation: the fast defence against hypoglycaemia, and useless once glycogen is gone.'),
+      // CALIBRATED, not textbook: 0.90 until 2026-09-25, when the target it writes was
+      // finally consumed (metabolic.ts) and 1 mg of glucagon still raised glucose by only
+      // 3 mg/dL. 28 is the gain at which 1 mg reproduces the label's mean glucose peaks
+      // (SC 136, IM 138 mg/dL; model ~137 and ~136 at ~22 min) with the label's own
+      // absorption (route_presets.ts). Its size is a statement about this glucose model,
+      // whose insulin feedback is stiff (see MODEL_LIMITATIONS), not about the receptor;
+      // the hepatic output it implies at the peak, a few times basal, is inside what a
+      // pharmacological glucagon dose really produces.
+      fx('metabolic.glycogenolysis', 28, 'GLUCAGEN', 'Hepatic glycogen phosphorylase activation: the fast defence against hypoglycaemia, and useless once glycogen is gone. Gain calibrated so 1 mg SC reproduces the label glucose peak.'),
       fx('metabolic.hepaticGlucoseOutput', 0.80, 'GH14', 'Gluconeogenesis and glycogenolysis together.'),
       fx('cardio.contractility', 0.45, 'GG14', 'Gs-coupled in myocardium, and critically it bypasses the beta receptor entirely — which is why glucagon is the antidote to beta-blocker overdose.'),
       fx('cardio.heartRate', 0.35, 'GG14', 'Same mechanism, same bypass.'),

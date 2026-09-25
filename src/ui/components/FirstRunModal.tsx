@@ -18,6 +18,15 @@ export function FirstRunModal() {
   return (
     <div className={styles.backdrop} role="dialog" aria-modal="true" aria-labelledby="firstrun-title">
       <div className={styles.card}>
+        {/*
+          The scrollable body and the accept button are now SIBLINGS, not nested. When
+          the whole card scrolled, a viewport shorter than the content (a laptop under
+          ~984px tall) pushed "I understand" below the fold with no affordance that it
+          was there, and the user could not dismiss the modal at all. The button is
+          pinned as a footer outside the scroll region, always in view; the scroll shadow
+          on the footer's top edge is the affordance that says there is more above it.
+        */}
+        <div className={styles.scroll}>
         <h1 id="firstrun-title" className={styles.title}>
           CORPUS
         </h1>
@@ -70,10 +79,13 @@ export function FirstRunModal() {
           The full list, including every approximation and every place the model diverges from real
           physiology, is in <code>docs/MODEL_LIMITATIONS.md</code>.
         </p>
+        </div>
 
-        <button className={styles.accept} onClick={accept}>
-          I understand
-        </button>
+        <div className={styles.footer}>
+          <button className={styles.accept} onClick={accept}>
+            I understand
+          </button>
+        </div>
       </div>
     </div>
   );

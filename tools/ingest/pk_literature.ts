@@ -537,7 +537,44 @@ export const PK_LITERATURE: PkLiteratureEntry[] = [
  * volume and clearance could not both be sourced is not in it.
  */
 import { PK_LITERATURE_2 } from './pk_literature_2';
+import { PK_LITERATURE_3 } from './pk_literature_3';
 
 PK_LITERATURE.push(...PK_LITERATURE_2);
+PK_LITERATURE.push(...PK_LITERATURE_3);
 
 export const PK_BY_ID = new Map(PK_LITERATURE.map((e) => [e.drugId, e]));
+
+/**
+ * DRUGS ELIMINATED IN THE BLOOD ITSELF.
+ *
+ * The engine scales every non-renal clearance with cardiac output, which is right for a
+ * drug the liver clears (hepatic blood flow follows output) and wrong for one destroyed
+ * in the circulation. Adenosine is the case that exposed it: its own AV block drops
+ * cardiac output, the output-scaled clearance slowed, and a drug whose label half-life is
+ * under ten seconds persisted for over a minute, prolonging the very block that slowed
+ * it (tests/pharma/pharmacology.test.ts, "adenosine is gone within a minute"). Each entry
+ * here names the mechanism and cites it; for these the clearance is taken as independent
+ * of organ blood flow.
+ */
+export const BLOOD_CLEARED: Record<string, { source: string; url: string; note: string }> = {
+  adenosine: {
+    source: FDA('Adenocard (adenosine) injection', 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=adenosine').source,
+    url: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=adenosine',
+    note: 'Section 12.3: rapidly taken up by erythrocytes and vascular endothelial cells and metabolised by adenosine deaminase and adenosine kinase in the circulation, with a half-life under 10 seconds. Clearance is therefore not limited by hepatic blood flow.',
+  },
+  esmolol: {
+    source: FDA('Brevibloc (esmolol hydrochloride) injection', 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=esmolol').source,
+    url: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=esmolol',
+    note: 'Section 12.3: hydrolysed by esterases in the cytosol of red blood cells, not by plasma cholinesterase or the liver; elimination half-life about 9 minutes, independent of hepatic flow.',
+  },
+  remifentanil: {
+    source: FDA('Ultiva (remifentanil hydrochloride) for injection', 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=remifentanil').source,
+    url: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=remifentanil',
+    note: 'Section 12.3: metabolised by non-specific blood and tissue esterases; its clearance is not affected by hepatic or renal impairment.',
+  },
+  succinylcholine: {
+    source: FDA('Anectine (succinylcholine chloride) injection', 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=succinylcholine').source,
+    url: 'https://dailymed.nlm.nih.gov/dailymed/search.cfm?labeltype=all&query=succinylcholine',
+    note: 'Section 12.3: rapidly hydrolysed by plasma cholinesterase (pseudocholinesterase) in the circulation, so its short action does not depend on liver blood flow.',
+  },
+};

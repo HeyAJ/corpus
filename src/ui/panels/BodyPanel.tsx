@@ -1,5 +1,6 @@
 import { useStore } from '../store';
 import { clearTrends } from '../trends';
+import { SCENARIOS, type Scenario } from '../scenarios';
 import styles from './body.module.css';
 
 /**
@@ -28,10 +29,32 @@ export function BodyPanel() {
   const pushLog = useStore((s) => s.pushLog);
   const pushEvent = useStore((s) => s.pushEvent);
   const clearEvents = useStore((s) => s.clearEvents);
+  const resetUiState = useStore((s) => s.resetUiState);
   const reduced = useStore((s) => s.reducedMotion);
   const setReduced = useStore((s) => s.setReducedMotion);
+  const setTimeScale = useStore((s) => s.setTimeScale);
 
   if (tool !== 'body' || !snapshot) return null;
+
+  const body = snapshot.body;
+
+  /**
+   * Run a scenario from a clean body. The subject's size, age and sex survive the reset,
+   * because they describe WHO is being simulated rather than what has happened to them,
+   * and a scenario run on a 50 kg subject should stay a 50 kg scenario.
+   */
+  const runScenario = (sc: Scenario) => {
+    dispatch({ type: 'RESET' });
+    clearEvents();
+    clearTrends();
+    resetUiState();
+    dispatch({ type: 'SET_BODY', mass_kg: body.mass_kg, height_m: body.height_m, age_y: body.age_y, sex: body.sex });
+    dispatch({ type: 'IV_ACCESS', on: true });
+    for (const intent of sc.intents()) dispatch(intent);
+    setTimeScale(sc.timeScale ?? 1);
+    pushLog(`Scenario: ${sc.label}`, 'warn');
+    pushEvent({ kind: 'state', label: `Scenario: ${sc.label}`, detail: sc.description, tone: 'warn' });
+  };
 
   return (
     <div className={styles.panel} role="region" aria-label="Body and scenario"
@@ -65,7 +88,58 @@ export function BodyPanel() {
         </div>
       </dl>
 
-      <h3 className={styles.subtitle}>Scenario</h3>
+      <h3 className={styles.subtitle}>Subject</h3>
+      <p className={styles.note}>
+        Who is being simulated. Body mass changes how a dose distributes and clears
+        (volumes scale with mass, clearance with mass^0.75), so the same milligrams are a
+        larger exposure for a smaller body. Age sets the maximal exercise heart rate. The
+        circulation itself is modelled at reference-adult size.
+      </p>
+      <div className={styles.fields}>
+        <label className={styles.field}>
+          <span>Mass <b>{body.mass_kg.toFixed(0)} kg</b></span>
+          <input type="range" min={40} max={150} step={1} value={body.mass_kg}
+            onChange={(e) => dispatch({ type: 'SET_BODY', mass_kg: Number(e.target.value) })} aria-label="Body mass" />
+        </label>
+        <label className={styles.field}>
+          <span>Height <b>{body.height_m.toFixed(2)} m</b></span>
+          <input type="range" min={1.4} max={2.1} step={0.01} value={body.height_m}
+            onChange={(e) => dispatch({ type: 'SET_BODY', height_m: Number(e.target.value) })} aria-label="Height" />
+        </label>
+        <label className={styles.field}>
+          <span>Age <b>{body.age_y.toFixed(0)} y</b></span>
+          <input type="range" min={18} max={90} step={1} value={body.age_y}
+            onChange={(e) => dispatch({ type: 'SET_BODY', age_y: Number(e.target.value) })} aria-label="Age" />
+        </label>
+        <div className={styles.field}>
+          <span>Sex</span>
+          <div className={styles.buttons}>
+            {(['male', 'female'] as const).map((sx) => (
+              <button key={sx} className={body.sex === sx ? styles.active : undefined}
+                onClick={() => dispatch({ type: 'SET_BODY', sex: sx })}>
+                {sx === 'male' ? 'Male' : 'Female'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className={styles.note}>BSA {body.bsa_m2.toFixed(2)} m² (DuBois)</p>
+      </div>
+
+      <h3 className={styles.subtitle}>Scenarios</h3>
+      <p className={styles.note}>
+        Starting points, not treatments: each resets the body, keeps the subject above,
+        and sets up an insult to explore. Doses come from the cited presets.
+      </p>
+      <div className={styles.scenarios}>
+        {SCENARIOS.map((sc) => (
+          <button key={sc.id} className={styles.scenario} onClick={() => runScenario(sc)} title={sc.description}>
+            <strong>{sc.label}</strong>
+            <span>{sc.description}</span>
+          </button>
+        ))}
+      </div>
+
+      <h3 className={styles.subtitle}>Quick insults</h3>
       <div className={styles.buttons}>
         <button
           onClick={() => {
@@ -140,6 +214,12 @@ export function BodyPanel() {
           // buffers with it rather than plotting across the discontinuity.
           clearEvents();
           clearTrends();
+          // The defibrillator's charge and the last shock's verdict are interface state,
+          // not simulation state, so the RESET intent does not reach them. A body that
+          // has just been reset to a resting baseline must not still be showing "Charged
+          // 200 J" or "No conversion" from the arrest that no longer happened — so clear
+          // those here, on the same path.
+          resetUiState();
           pushLog('Simulation reset', 'info');
           pushEvent({ kind: 'state', label: 'Simulation reset', tone: 'info' });
         }}

@@ -1,0 +1,284 @@
+/*
+ * INFECTION PANEL.
+ *
+ * A card with the whole-body markers pinned at the top and two scrolling sections
+ * under them: what is running now, and what can be started. Burden reads as a bar
+ * because "how far toward the untreated peak" is a fraction, and a fraction is a length.
+ */
+
+.panel {
+  width: 100%;
+  max-height: min(72vh, 660px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--size-tag);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.sepsis {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--severity-critical-bg);
+  color: #fff;
+}
+
+.close {
+  margin-left: auto;
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.markers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+  background: var(--chip-bg);
+  border-radius: var(--radius-chip);
+}
+
+.markers b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.scroll {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.clearAll {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--severity-warn-ink);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--severity-warn-bg);
+}
+
+/* --- an active infection ------------------------------------------------- */
+
+.active {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border-radius: var(--radius-chip);
+  background: var(--chip-bg);
+}
+
+.activeHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.activeName {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  flex: 1;
+  min-width: 0;
+}
+
+.phase {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.phaseIncubating { background: var(--severity-watch-bg); color: var(--severity-watch-ink); }
+.phaseSymptomatic { background: var(--severity-warn-bg); color: var(--severity-warn-ink); }
+.phaseResolving { background: rgba(127, 214, 238, 0.3); color: #29616f; }
+.phaseCleared { background: rgba(47, 125, 79, 0.15); color: #1f5c39; }
+
+.clearOne {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-mid);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--chip-bg-strong);
+}
+
+.burdenBar {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+
+.burdenFill {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f0a93b, #c8433a);
+  transition: width var(--tween-state) var(--ease-out);
+}
+
+.burdenOver {
+  background: var(--severity-critical-bg);
+}
+
+.activeStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+}
+
+.killOn {
+  color: #1f7a4d;
+  font-weight: 700;
+}
+
+.killOff {
+  color: var(--ink-faint);
+}
+
+/* --- the catalogue ------------------------------------------------------- */
+
+.catalogue {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.cat:first-child {
+  border-top: none;
+}
+
+.catText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.catName {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.catMeta {
+  font-size: 10px;
+  color: var(--ink-faint);
+  text-transform: lowercase;
+}
+
+.inoculate {
+  flex: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: var(--radius-chip);
+  background: var(--chip-bg-strong);
+}
+
+.inoculate:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.14);
+}
+
+.inoculate:disabled {
+  opacity: 0.5;
+  cursor: default;
+  color: var(--ink-faint);
+  background: var(--chip-bg);
+}
+
+.footnote {
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: 10px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+.footnote code {
+  background: var(--chip-bg);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burdenFill {
+    transition: none;
+  }
+}

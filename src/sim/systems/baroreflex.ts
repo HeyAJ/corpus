@@ -1,6 +1,7 @@
 import { P } from '../core/constants';
 import type { SimState } from '../core/state';
 import { addEffect } from '../core/effects';
+import { B } from './activity';
 
 /**
  * ARTERIAL BAROREFLEX — Ursino-style two-limb reflex (spec 4.2).
@@ -32,7 +33,12 @@ export function stepBaroreflex(s: SimState, dt: number): void {
   // --- afferent ------------------------------------------------------------
   r.sensedPressure += ((c.aorta.P - r.sensedPressure) * dt) / SENSE_TAU_S;
 
-  const pn = P('baroreflex.setpoint_mmHg');
+  // EXERCISE RESETS THE OPERATING POINT UPWARD. Central command and the exercise pressor
+  // reflex carry the baroreflex to a higher defended pressure, so the reflex sits near
+  // neutral at the raised exercising pressure instead of reading the intended vasodilation
+  // as hypotension and cranking heart rate to fight it (see activity.ts). Proportional to
+  // actual exertion, so it fades out with recovery exactly as the tachycardia does.
+  const pn = P('baroreflex.setpoint_mmHg') + B('exercise.baroreflexResetting') * s.activity.exertion;
   const ka = P('baroreflex.sigmoidWidth_mmHg');
   const fMin = P('baroreflex.afferentMin_Hz');
   const fMax = P('baroreflex.afferentMax_Hz');

@@ -452,7 +452,7 @@ export const PANELS = {
 
 export function ConditionStack({ conditions }: { conditions: SimSnapshot['conditions'] }) {
   return (
-    <div className={styles.conditions}>
+    <div className={styles.conditions} data-conditions>
       {conditions.map((c) => (
         <ConditionTag key={c.id} tag={c} />
       ))}

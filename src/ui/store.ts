@@ -72,6 +72,15 @@ interface UiState {
   toggleLabPanel: () => void;
   physiologyPanelOpen: boolean;
   togglePhysiologyPanel: () => void;
+  /** The teaching centrepiece: what every action is doing to the body, by target. */
+  impactPanelOpen: boolean;
+  toggleImpactPanel: () => void;
+  /** Where the body is: temperature, altitude, oxygen, posture, water, allergen. */
+  environmentPanelOpen: boolean;
+  toggleEnvironmentPanel: () => void;
+  /** Inoculate, watch and clear infections. */
+  infectionPanelOpen: boolean;
+  toggleInfectionPanel: () => void;
   /** Vascular overlay: arteries, veins and what the blood is carrying. */
   vascularVisible: boolean;
   toggleVascular: () => void;
@@ -83,6 +92,14 @@ interface UiState {
   setDefibEnergy: (j: number) => void;
   shock: ShockOutcome | null;
   setShock: (o: ShockOutcome | null) => void;
+  /**
+   * Clear the transient interface state that a body reset must not outlive. The shock
+   * outcome and the pad-placement step are UI-only — they live here, not in the
+   * snapshot, so a `RESET` intent that restarts the engine does not touch them, and a
+   * stale "charged" or a shock verdict from the old run would otherwise sit there
+   * describing a body that no longer exists. The reset path calls this so it does not.
+   */
+  resetUiState: () => void;
 
   /* ---- presentation ---- */
   timeScale: number;
@@ -167,6 +184,12 @@ export const useStore = create<UiState>((set, get) => ({
   toggleLabPanel: () => set((s) => ({ labPanelOpen: !s.labPanelOpen })),
   physiologyPanelOpen: false,
   togglePhysiologyPanel: () => set((s) => ({ physiologyPanelOpen: !s.physiologyPanelOpen })),
+  impactPanelOpen: false,
+  toggleImpactPanel: () => set((s) => ({ impactPanelOpen: !s.impactPanelOpen })),
+  environmentPanelOpen: false,
+  toggleEnvironmentPanel: () => set((s) => ({ environmentPanelOpen: !s.environmentPanelOpen })),
+  infectionPanelOpen: false,
+  toggleInfectionPanel: () => set((s) => ({ infectionPanelOpen: !s.infectionPanelOpen })),
   vascularVisible: false,
   toggleVascular: () => set((s) => ({ vascularVisible: !s.vascularVisible })),
 
@@ -176,6 +199,7 @@ export const useStore = create<UiState>((set, get) => ({
   setDefibEnergy: (j) => set({ defibEnergy: j }),
   shock: null,
   setShock: (o) => set({ shock: o }),
+  resetUiState: () => set({ shock: null, padStep: 'idle' }),
 
   timeScale: 1,
   setTimeScale: (x) => {

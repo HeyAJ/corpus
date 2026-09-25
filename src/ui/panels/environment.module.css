@@ -1,0 +1,154 @@
+/*
+ * ENVIRONMENT PANEL.
+ *
+ * A control surface, styled like the physiology panel it is a sibling of: sliders and
+ * buttons, prose under each, and readouts set apart from the controls so the value the
+ * body reached is never mistaken for the value you set.
+ */
+
+.panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--size-tag);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.close {
+  margin-left: auto;
+  border: none;
+  background: none;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ink-dim);
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 13px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.group:first-of-type {
+  padding-top: 0;
+  border-top: none;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.value {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mid);
+}
+
+.slider {
+  width: 100%;
+  accent-color: var(--accent-cool);
+  cursor: pointer;
+}
+
+.hint {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+/* Engine readbacks: what the body reached, kept visually apart from the controls. */
+.readouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mid);
+  background: var(--chip-bg);
+  border-radius: var(--radius-chip);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toggle,
+.toggleOn {
+  flex: 1 1 auto;
+  min-width: 84px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+  text-align: center;
+}
+
+.toggle {
+  color: var(--ink);
+  background: var(--chip-bg);
+}
+
+.toggle:hover {
+  background: var(--chip-bg-strong);
+}
+
+.toggleOn {
+  background: var(--accent-cool);
+  color: #08323d;
+}

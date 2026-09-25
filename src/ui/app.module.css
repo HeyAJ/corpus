@@ -1,9 +1,72 @@
+/*
+ * THE APPLICATION SHELL — a docked, tiling layout.
+ *
+ * The old shell was a single positioning context with a dozen absolutely-placed
+ * floating cards, and it worked exactly as long as only one of them was open at a
+ * time. The moment two right-corner panels were open — endocrine and lab, say — the
+ * later one in DOM order sat squarely on top of the earlier one, and the product had
+ * a right-hand rectangle that could only ever show one of the things it claimed to
+ * show. The floating model cannot express "everything at once"; it can only express
+ * "the last thing you opened".
+ *
+ * So the shell is now a CSS GRID with three regions, and the panels do not position
+ * themselves at all — they are plain cards that a region lays out:
+ *
+ *     ┌──────────────────────┬───────────┐
+ *     │        stage         │           │
+ *     │  (the 3D body + its  │   rail    │   the rail is the ONLY place a readout or
+ *     │   own HUD overlays)  │ (panels)  │   control panel lives; it stacks them and
+ *     │                      │           │   scrolls when there are more than fit.
+ *     ├──────────────────────┴───────────┤
+ *     │            bottom bar            │   dock + timeline + the permanent warning,
+ *     └──────────────────────────────────┘   a reserved row nothing can cover.
+ *
+ * The body keeps its own column, so opening five panels narrows nothing about the
+ * body except the space beside it — it never sits UNDER a panel. Panels never overlap
+ * each other because a flex column cannot make two children share a line. And the
+ * dock lives in its own grid row, so the "the drawer covers the dock" class of bug is
+ * now structurally impossible rather than avoided by a hand-tuned pixel offset.
+ *
+ * The regions own the geometry; the cards own their own insides. That split is the
+ * whole point, and it is why every panel module below was reduced to a card with no
+ * position of its own.
+ */
+
 .root {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   background: var(--bg-neutral);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--rail-w);
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'stage rail'
+    'bar   bar';
+}
+
+/* ------------------------------------------------------------------- stage */
+
+/*
+ * The body and everything that must sit OVER the body: the HUD metric cluster, the
+ * screen-space organ labels, the condition tags, the speed control, the defib pad
+ * zones and the drug drawer. It is its own positioning context, so a label projected
+ * at canvas-pixel (x, y) lands at (x, y) inside here, and a pad placed at 50 % is
+ * centred on the body rather than on a viewport that now includes the rail.
+ */
+.stage {
+  grid-area: stage;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  /* A size container so the HUD can shed its secondary lines when the stage is short
+     (a phone with the rail open), instead of having them cut off by `overflow: hidden`.
+     Safe because the stage's row is minmax(0, 1fr): its size never comes from content. */
+  container-type: size;
+  container-name: stage;
 }
 
 .canvas {
@@ -15,7 +78,7 @@
   touch-action: none;
 }
 
-/* HUD metric cluster: top-left, vertical, left-aligned, never over the body. */
+/* HUD metric cluster: top-left of the stage, vertical, never over the body's centre. */
 .hud {
   position: absolute;
   top: calc(env(safe-area-inset-top, 0px) + 22px);
@@ -26,10 +89,25 @@
   gap: var(--gap-hud);
   pointer-events: none;
   z-index: 12;
-  max-width: 44vw;
+  max-width: min(44vw, 340px);
 }
 
-.hud > * {
+/*
+ * THE HUD IS A READOUT, NOT A CONTROL. On a touch screen it overlays the body - on a
+ * phone its detail lines reach past the middle of the stage - and it used to take pointer
+ * events on every child, so a finger landing on it never reached the canvas: one-finger
+ * orbit and two-finger pinch both did nothing, while a desktop mouse (whose drags start
+ * clear of the HUD) worked, which is why it was missed (round-2 tester). Now only real
+ * controls inside it take events on a touch screen; with a mouse the readouts keep them
+ * too, so their hover tooltips still work.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .hud > * {
+    pointer-events: auto;
+  }
+}
+
+.hud :is(button, a, input, select, summary, [role='button']) {
   pointer-events: auto;
 }
 
@@ -52,23 +130,72 @@
   text-shadow: 0 1px 12px rgba(246, 244, 228, 0.85);
 }
 
+/* --------------------------------------------------------------------- rail */
+
 /*
- * One bottom-anchored column holding the toast and the timeline, so they can never
- * overlap however tall either becomes. It does not take pointer events itself — the
- * canvas beneath it must stay draggable — and hands them back to the timeline, which
- * is the only thing in here you can click.
+ * The docked panels live here and only here. A vertical flex column: cards top to
+ * bottom, a consistent gutter between them, and its own scrollbar once the stack is
+ * taller than the viewport. Because the column cannot place two children side by side
+ * or on top of each other, "no panel hides another" is a property of the container,
+ * not a thing each panel has to arrange for.
+ *
+ * The panels bring their own translucent card backgrounds; the rail itself is just
+ * the neutral page showing between them.
+ */
+.rail {
+  grid-area: rail;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 14px 14px 0;
+  z-index: 24;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Direct children stretch to the rail's width; the cards inside are full-width. */
+.rail > * {
+  flex: 0 0 auto;
+}
+
+/* --------------------------------------------------------------- bottom bar */
+
+/*
+ * A reserved row: the timeline and its toasts on top, the tool dock in the middle,
+ * and the permanent NOT-FOR-CLINICAL-USE warning at the very bottom. It sits in its
+ * own grid track, so nothing in the stage or the rail can ever paint into it, and it
+ * carries the highest z-index in the shell so that even a mis-measured neighbour
+ * cannot end up in front of the controls.
+ */
+.bottomBar {
+  grid-area: bar;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 8px var(--inset-hud) calc(env(safe-area-inset-bottom, 0px) + 2px);
+  min-height: var(--corpus-bar-h);
+  z-index: 45;
+  background: linear-gradient(to top, rgba(240, 240, 240, 0.96), rgba(240, 240, 240, 0.72));
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/*
+ * The toast and the timeline are the same conversation — "this just happened" and
+ * "here is everything that happened" — so they share one centred column. It does not
+ * take pointer events itself and hands them back to the timeline, the one thing in
+ * here you can click.
  */
 .bottomStack {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
   pointer-events: none;
-  z-index: 22;
 }
 
 .log {
@@ -95,21 +222,15 @@
 
 /* Permanently visible, not dismissible (spec 10.1). */
 .disclaimer {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 4px 12px calc(env(safe-area-inset-bottom, 0px) + 3px);
+  padding: 2px 8px;
   font-size: 10px;
   letter-spacing: 0.05em;
   color: var(--ink-faint);
-  background: linear-gradient(to top, rgba(240, 240, 240, 0.9), rgba(240, 240, 240, 0));
   pointer-events: none;
-  z-index: 40;
 }
 
 .disclaimer strong {
@@ -125,7 +246,39 @@
   color: var(--severity-warn-ink);
 }
 
-@media (max-width: 520px) {
+/* ===================================================================== phone */
+
+/*
+ * On a phone the three columns collapse to one: the body on top, the panel stack as
+ * a scrolling sheet beneath it, and the bottom bar under that. The rail is capped so
+ * that more than half the body stays visible above it — the whole reason a panel is
+ * worth reading is that you can read it against the thing it describes.
+ */
+@media (max-width: 720px) {
+  .root {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'stage'
+      'rail'
+      'bar';
+  }
+
+  .rail {
+    max-height: 52vh;
+    padding: 10px var(--inset-hud) 10px;
+    gap: 10px;
+    background: linear-gradient(to bottom, rgba(240, 240, 240, 0), rgba(240, 240, 240, 0.6) 18px);
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
   .hud { max-width: 62vw; }
-  .organLabel { font-size: 24px; }
+}
+
+/* A landscape phone: wide enough for the columns, far too short. Give the rail more
+   of the height so a two-line panel is not clipped to nothing. */
+@media (max-height: 560px) and (min-width: 721px) {
+  .root {
+    --rail-w: 320px;
+  }
 }

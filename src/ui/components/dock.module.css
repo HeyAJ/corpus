@@ -1,15 +1,51 @@
-/* Bottom dock, two clusters, respecting the safe area (spec 8.3). */
-
+/*
+ * The tool dock, two clusters. It used to float absolutely at the bottom of the whole
+ * screen, which is what let an open sheet land on top of it. It now lives in the shell's
+ * reserved bottom bar as an ordinary flex row, so it has dedicated space that nothing
+ * else can occupy.
+ */
 .dock {
-  position: absolute;
-  left: var(--inset-hud);
-  right: var(--inset-hud);
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  width: 100%;
   pointer-events: none;
-  z-index: 20;
+  /* Now that there are more tools, a very narrow phone cannot show them all on one row.
+     Rather than wrap — which would grow the bottom bar and let the drawer reach the
+     dock again — the row scrolls sideways, keeping the bar a fixed, predictable height. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.dock::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+ * PHONE: WRAP, DON'T HIDE. The sideways-scrolling row kept the bar a fixed height, but at
+ * 360 px it hid half the tools - Administer, Body and Procedures among them - off the
+ * right edge with no scrollbar and no hint that they existed (round-2 tester). Wrapping
+ * the two clusters onto their own rows shows every tool; the drawer now clears the bar's
+ * MEASURED height (App.tsx), so a taller bar can no longer let it reach the dock, which
+ * was the only reason for the scroll.
+ */
+@media (max-width: 720px) {
+  .dock {
+    flex-wrap: wrap;
+    justify-content: center;
+    overflow-x: visible;
+    row-gap: 8px;
+  }
+
+  .cluster {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+.cluster {
+  flex: none;
 }
 
 .cluster {

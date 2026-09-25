@@ -34,8 +34,20 @@ function entry(key: string): SourcedEntry | undefined {
   return e as SourcedEntry;
 }
 
+/**
+ * Validated numeric constants, memoised. `P()` is called several hundred times per tick
+ * from the hot path, and a profile of the 2026-09-25 engine put a tenth of all tick time
+ * in the lookup-and-validate below. The data is immutable at runtime (nothing writes to
+ * physiology.json after import), so a key that has passed validation once returns the
+ * same number for ever; only the first call pays for the checks, and a missing or null
+ * constant still throws on that first call exactly as before.
+ */
+const VALIDATED = new Map<string, number>();
+
 /** Numeric constant. Throws if absent or null — a null constant must never reach the engine. */
 export function P(key: string): number {
+  const cached = VALIDATED.get(key);
+  if (cached !== undefined) return cached;
   const e = entry(key);
   if (!e) throw new Error(`physiology.json: unknown constant "${key}"`);
   if (e.value === null) {
@@ -47,6 +59,7 @@ export function P(key: string): number {
   if (Array.isArray(e.value)) {
     throw new Error(`physiology.json: constant "${key}" is an array; use PArray().`);
   }
+  VALIDATED.set(key, e.value);
   return e.value;
 }
 

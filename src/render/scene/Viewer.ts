@@ -7,6 +7,7 @@ import { OrganSet, type OrganState } from '../organs/OrganSet';
 import { OrbitRig } from '../camera/OrbitRig';
 import { createDitherPass } from '../postfx/DitherPass';
 import { GiBolus } from '../organs/GiBolus';
+import { AirwayCue } from '../organs/AirwayCue';
 import { VascularSystem } from '../vascular/VascularSystem';
 import type { OrganId } from '../../data/types';
 import type { SimSnapshot } from '../../bridge/types';
@@ -61,7 +62,24 @@ export class Viewer {
   private pointer = new THREE.Vector2();
   private pointerInside = false;
   private bolus: GiBolus;
+  private airway: AirwayCue;
   private vascular: VascularSystem;
+
+  /**
+   * Touch gesture state. The Viewer owns touch directly on its own canvas so App.tsx
+   * (which we must not edit) needs no changes; the one hazard is that a browser fires
+   * BOTH a PointerEvent and a TouchEvent for the same finger, and App's PointerEvent
+   * path would then orbit alongside this one. `touchActive` is the guard: while a
+   * touch gesture is running, handlePointerMove leaves the orbit to the touch path.
+   */
+  private touchActive = false;
+  private touchMode: 'none' | 'orbit' | 'pinch' = 'none';
+  private lastTouchX = 0;
+  private lastTouchY = 0;
+  private lastTouchDist = 0;
+  private boundTouchStart?: (e: TouchEvent) => void;
+  private boundTouchMove?: (e: TouchEvent) => void;
+  private boundTouchEnd?: (e: TouchEvent) => void;
 
   private snapshots: SnapshotPair = { previous: null, current: null, receivedAt: 0, intervalMs: 50 };
   private lastFrameTime = 0;
@@ -104,6 +122,12 @@ export class Viewer {
     this.bolus = new GiBolus();
     this.scene.add(this.bolus.root);
 
+    // The inhaled/nebulised route made visible: cool tinted air drawn down the airway
+    // on inspiration. Additive bucket (renderOrder 22), the same bucket the vascular
+    // particles use, so it commutes with them and the order-independence claim holds.
+    this.airway = new AirwayCue();
+    this.scene.add(this.airway.root);
+
     // Vessels in bucket 1 and flow particles in bucket 2, so the order-independence
     // guarantee is untouched: both land in buckets that already exist.
     this.vascular = new VascularSystem();
@@ -141,6 +165,95 @@ export class Viewer {
     this.composer.addPass(this.dither);
 
     this.resize();
+    this.attachTouch();
+  }
+
+  /* --------------------------------------------------------------- touch */
+
+  /**
+   * Attach touch handlers to our own canvas so the body is fully movable by finger:
+   * one finger orbits, two fingers pinch to zoom. App.tsx already routes PointerEvents
+   * here for the mouse, and touch also produces PointerEvents, so the guard in
+   * handlePointerMove stops the two from orbiting the same drag twice. We preventDefault
+   * on the touch moves to stop the page itself panning or pinch-zooming underneath us.
+   */
+  attachTouch(): void {
+    const canvas = this.renderer.domElement;
+
+    const norm = (t: Touch): { x: number; y: number } => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: ((t.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1,
+        y: -(((t.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1),
+      };
+    };
+    const dist = (a: Touch, b: Touch): number => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+
+    this.boundTouchStart = (e: TouchEvent) => {
+      this.touchActive = true;
+      if (e.touches.length >= 2) {
+        this.touchMode = 'pinch';
+        this.lastTouchDist = dist(e.touches[0], e.touches[1]);
+      } else {
+        this.touchMode = 'orbit';
+        const n = norm(e.touches[0]);
+        this.lastTouchX = n.x;
+        this.lastTouchY = n.y;
+      }
+      e.preventDefault();
+    };
+
+    this.boundTouchMove = (e: TouchEvent) => {
+      if (this.touchMode === 'pinch' && e.touches.length >= 2) {
+        const d = dist(e.touches[0], e.touches[1]);
+        if (this.lastTouchDist > 0) this.handlePinch(d / this.lastTouchDist);
+        this.lastTouchDist = d;
+      } else if (e.touches.length >= 1) {
+        // Fall back to orbit if a finger was lifted from a pinch mid-gesture.
+        if (this.touchMode !== 'orbit') {
+          this.touchMode = 'orbit';
+          const n0 = norm(e.touches[0]);
+          this.lastTouchX = n0.x;
+          this.lastTouchY = n0.y;
+        }
+        const n = norm(e.touches[0]);
+        const dx = n.x - this.lastTouchX;
+        const dy = n.y - this.lastTouchY;
+        // Same sign convention as the mouse path in handlePointerMove.
+        this.rig.orbit(-dx, -dy);
+        this.lastTouchX = n.x;
+        this.lastTouchY = n.y;
+      }
+      e.preventDefault();
+    };
+
+    this.boundTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length === 0) {
+        // Cleared before App's compatibility pointerup fires, so a tap still selects.
+        this.touchActive = false;
+        this.touchMode = 'none';
+      } else if (e.touches.length === 1) {
+        this.touchMode = 'orbit';
+        const n = norm(e.touches[0]);
+        this.lastTouchX = n.x;
+        this.lastTouchY = n.y;
+      }
+    };
+
+    canvas.addEventListener('touchstart', this.boundTouchStart, { passive: false });
+    canvas.addEventListener('touchmove', this.boundTouchMove, { passive: false });
+    canvas.addEventListener('touchend', this.boundTouchEnd);
+    canvas.addEventListener('touchcancel', this.boundTouchEnd);
+  }
+
+  private detachTouch(): void {
+    const canvas = this.renderer.domElement;
+    if (this.boundTouchStart) canvas.removeEventListener('touchstart', this.boundTouchStart);
+    if (this.boundTouchMove) canvas.removeEventListener('touchmove', this.boundTouchMove);
+    if (this.boundTouchEnd) {
+      canvas.removeEventListener('touchend', this.boundTouchEnd);
+      canvas.removeEventListener('touchcancel', this.boundTouchEnd);
+    }
   }
 
   setCallbacks(cb: ViewerCallbacks): void {
@@ -152,7 +265,10 @@ export class Viewer {
   handlePointerMove(x: number, y: number, dragging: boolean, dx: number, dy: number): void {
     this.pointer.set(x, y);
     this.pointerInside = true;
-    if (dragging) this.rig.orbit(-dx, -dy);
+    // While a touch gesture is running, the Viewer's own touch handler is already
+    // orbiting; letting the PointerEvent that the same finger also generates orbit here
+    // would double the drag. The mouse never sets touchActive, so it is unaffected.
+    if (dragging && !this.touchActive) this.rig.orbit(-dx, -dy);
   }
 
   handlePointerLeave(): void {
@@ -165,7 +281,7 @@ export class Viewer {
   }
 
   handlePinch(scale: number): void {
-    this.rig.dolly(-(scale - 1) * 6);
+    this.rig.zoomBy(scale);
   }
 
   handleTap(x: number, y: number): void {
@@ -286,6 +402,7 @@ export class Viewer {
 
     this.organs.update(dtMs);
     this.vascular.update(dtMs / 1000);
+    this.airway.update(dtMs / 1000, this.snapshots.current);
     this.rig.update(dtMs);
     this.applySnapshotToScene(now);
     this.organs.sortSolidBucket(this.rig.camera);
@@ -386,8 +503,13 @@ export class Viewer {
 
   dispose(): void {
     this.stop();
+    this.detachTouch();
     this.organs.dispose();
     this.bolus.dispose();
+    this.airway.dispose();
+    // Was leaking: VascularSystem builds sixty tube geometries and their shader
+    // materials plus a large point cloud, and none of it was being freed on teardown.
+    this.vascular.dispose();
     this.composer.dispose();
     this.renderer.dispose();
   }
