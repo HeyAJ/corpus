@@ -25,6 +25,17 @@
   transition: background var(--tween-state) var(--ease-out);
 }
 
+/*
+ * Collapsed: a pill the size of its label. Only the open timeline takes the full width.
+ * align-self because the stack above it centres its children.
+ */
+.wrap:not(.wrapOpen) {
+  width: auto;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  align-self: center;
+}
+
 .wrapOpen {
   background: rgba(240, 240, 240, 0.97);
 }
@@ -194,8 +205,32 @@
 }
 
 @media (max-width: 640px) {
-  .wrap {
+  .wrapOpen {
     max-width: none;
     margin: 0 var(--inset-hud);
+  }
+}
+
+.wrap:not(.wrapOpen) .toggleLabel {
+  font-size: 10px;
+}
+
+/*
+ * The collapsed pill on a touch screen. The global 44 px touch-target rule made the
+ * whole pill 54 px tall - bigger than the dock chips beside it. The pill is the
+ * button: no padding of its own, a 36 px target (the same as the phone speed chip),
+ * so it reads as a small label and is still easy to tap.
+ */
+.wrap:not(.wrapOpen) {
+  padding: 0 12px;
+}
+
+.wrap:not(.wrapOpen) .toggle {
+  min-height: 32px;
+}
+
+@media (pointer: coarse) {
+  .wrap:not(.wrapOpen) .toggle {
+    min-height: 36px;
   }
 }

@@ -37,6 +37,32 @@ function DockButton({ label, active, onClick, children }: DockButtonProps) {
 
 const S = 20;
 
+/**
+ * THE VESSELS SWITCH, in the bottom-left corner of the stage, above the dock.
+ *
+ * Its own labelled control rather than an unlabelled chip in the dock. The anatomy
+ * opens WITHOUT the vessels (user choice, 2026-09-26: the organs first, the vascular
+ * tree on request), and a round drop icon among four tools did not say "vessels" to
+ * anyone. A word and an on/off state does.
+ */
+export function VesselToggle() {
+  const on = useStore((s) => s.vascularVisible);
+  const toggle = useStore((s) => s.toggleVascular);
+  return (
+    <button
+      className={`${styles.vessels} ${on ? styles.vesselsOn : ''}`}
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label={on ? 'Hide blood vessels' : 'Show blood vessels'}
+      title={on ? 'Hide blood vessels' : 'Show blood vessels'}
+    >
+      <BloodDrop filled={on} />
+      <span>Vessels</span>
+      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
+    </button>
+  );
+}
+
 function BloodDrop({ filled }: { filled: boolean }) {
   return (
     <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
@@ -273,8 +299,6 @@ export function ToolDock() {
   const closePanels = useStore((s) => s.closePanels);
   const menuOpen = useStore((s) => s.menuOpen);
   const setMenuOpen = useStore((s) => s.setMenuOpen);
-  const toggleVascular = useStore((s) => s.toggleVascular);
-  const vascularOn = useStore((s) => s.vascularVisible);
 
   // Only the panel flags and their toggles - a bare useStore() would re-render the dock
   // on every snapshot, twenty times a second, for nothing.
@@ -345,9 +369,6 @@ export function ToolDock() {
   return (
     <nav className={styles.dock} aria-label="Tools">
       <div className={styles.cluster}>
-        <DockButton label={vascularOn ? "Hide blood vessels" : "Show blood vessels"} active={vascularOn} onClick={toggleVascular}>
-          <BloodDrop filled={vascularOn} />
-        </DockButton>
         <DockButton label="Panels" active={menuOpen || anyPanel} onClick={() => setMenuOpen(!menuOpen)}>
           <Menu />
         </DockButton>

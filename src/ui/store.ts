@@ -81,7 +81,7 @@ interface UiState {
   /** Inoculate, watch and clear infections. */
   infectionPanelOpen: boolean;
   toggleInfectionPanel: () => void;
-  /** Blood vessels and the flow through them: on by default, the dock's drop button hides them. */
+  /** Blood vessels and the flow through them: OFF at start; the "Vessels" corner switch shows them. */
   vascularVisible: boolean;
   toggleVascular: () => void;
   /**
@@ -148,6 +148,8 @@ interface UiState {
 }
 
 let logId = 1;
+/** How long an action's toast stays over the body. The CSS fade-out runs inside this. */
+export const LOG_LIFETIME_MS = 2000;
 let eventId = 1;
 
 /** The longest history worth keeping; older entries fall off the front. */
@@ -232,7 +234,7 @@ export const useStore = create<UiState>((set, get) => ({
   toggleEnvironmentPanel: () => set((s) => openOnly(s, 'environmentPanelOpen')),
   infectionPanelOpen: false,
   toggleInfectionPanel: () => set((s) => openOnly(s, 'infectionPanelOpen')),
-  vascularVisible: true,
+  vascularVisible: false,
   toggleVascular: () => set((s) => ({ vascularVisible: !s.vascularVisible })),
   bloodPanelOpen: false,
   toggleBloodPanel: () => set((s) => openOnly(s, 'bloodPanelOpen')),
@@ -279,8 +281,15 @@ export const useStore = create<UiState>((set, get) => ({
       ],
     })),
   clearEvents: () => set({ events: [] }),
-  pushLog: (text, tone = 'info') =>
-    set((s) => ({ log: [...s.log.slice(-5), { id: logId++, text, tone }] })),
+  pushLog: (text, tone = 'info') => {
+    const id = logId++;
+    set((s) => ({ log: [...s.log.slice(-2), { id, text, tone }] }));
+    // A toast is a CONFIRMATION, not a record. They used to stay until three newer ones
+    // pushed them out, so "Morphine 4 mg IV" sat in grey over the body for the rest of
+    // the session (user report, 2026-09-26). Each now leaves after LOG_LIFETIME_MS; the
+    // timeline keeps the permanent, time-stamped copy (every caller also pushes an event).
+    setTimeout(() => set((s) => ({ log: s.log.filter((l) => l.id !== id) })), LOG_LIFETIME_MS);
+  },
 }));
 
 /**

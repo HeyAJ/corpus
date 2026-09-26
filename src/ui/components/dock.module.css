@@ -172,3 +172,53 @@ a.item {
   text-decoration: none;
   color: inherit;
 }
+
+/* ------------------------------------------------------------ vessels switch */
+
+/*
+ * Bottom-left corner of the stage, just above the dock. The body is centred, so this
+ * corner is empty at every width; the bottom offset is the MEASURED bar height, the
+ * same number the drawer and sheet use, so the switch can never sit under the dock.
+ */
+.vessels {
+  position: absolute;
+  left: var(--inset-hud);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  z-index: 14;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 12px 4px 9px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--chip-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+
+.vessels:hover {
+  background: var(--chip-bg-strong);
+}
+
+.vesselsOn {
+  background: var(--chip-bg-strong);
+  box-shadow: inset 0 0 0 1.5px rgba(214, 58, 47, 0.45);
+}
+
+.vesselsState {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.vesselsOn .vesselsState {
+  color: #d63a2f;
+}

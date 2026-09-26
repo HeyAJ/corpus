@@ -219,6 +219,8 @@
 }
 
 .log > span {
+  /* In, hold, out - all inside the 2 s the store keeps the toast (LOG_LIFETIME_MS). */
+  animation: toastLife 2000ms ease forwards;
   padding: 6px 14px;
   border-radius: var(--radius-pill);
   font-size: 12px;
@@ -226,6 +228,17 @@
   background: var(--chip-bg-strong);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+@keyframes toastLife {
+  0% { opacity: 0; transform: translateY(4px); }
+  8% { opacity: 1; transform: none; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .log > span { animation: none; }
 }
 
 .log_info { color: var(--ink-dim); }

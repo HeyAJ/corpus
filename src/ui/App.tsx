@@ -5,7 +5,7 @@ import { organDefs } from '../render/organs/OrganSet';
 import type { OrganId } from '../data/types';
 import type { WaveformChannel } from '../bridge/types';
 import { useStore } from './store';
-import { ToolDock } from './components/ToolDock';
+import { ToolDock, VesselToggle } from './components/ToolDock';
 import { DrugDrawer } from './panels/DrugDrawer';
 import { ReceptorPanel } from './panels/ReceptorPanel';
 import { ProcedurePanel } from './panels/ProcedurePanel';
@@ -269,6 +269,7 @@ export function App() {
         <Hud ready={ready} client={client} />
         <Conditions />
         <TimeScaleControl />
+        <VesselToggle />
         <NoticeToasts />
 
         {/* The resuscitation flow is spatial — pads on the thorax, eyes on the chest —

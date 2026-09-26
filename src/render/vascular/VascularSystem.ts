@@ -150,9 +150,10 @@ export class VascularSystem {
     const named = buildCentrelines();
     this.namedCount = named.length;
     this.lines = [...named, ...growFineBranches(named)];
-    // On by default since 2026-09-25: the vessels are part of the body, not an overlay
-    // you have to find. The dock's blood-drop button still hides them.
-    this.root.visible = true;
+    // Hidden at start: the anatomy opens as organs only, and the "Vessels" switch in the
+    // corner of the stage shows the whole tree (user choice, 2026-09-26). It was on by
+    // default for one day; that put ~500 branches over every organ from the first frame.
+    this.root.visible = false;
     this.root.add(this.wallGroup);
 
     // Heart-distance per line, then normalised against the deepest vessel, so the

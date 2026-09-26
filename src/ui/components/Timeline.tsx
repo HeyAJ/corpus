@@ -23,8 +23,11 @@ import styles from './timeline.module.css';
  * would compress exactly the part worth looking at. Everything here — the trend
  * buffers and the event stamps alike — is indexed on the body's clock.
  *
- * It collapses to a single strip of ticks, because most of the time the answer is
- * "nothing has happened yet" and that should take up almost no room.
+ * COLLAPSED IT IS ONE SMALL PILL - "Timeline" and a count - and nothing else. It used
+ * to be a full-width strip of ticks that sat over the pelvis from the first dose on;
+ * the ticks and the written record now appear only when it is opened (user report,
+ * 2026-09-26). The two-second toasts over the body confirm an action; this is where
+ * every action is kept.
  */
 
 const WINDOW_S = 60;
@@ -124,20 +127,20 @@ export function Timeline() {
         <span className={styles.toggleCount}>{events.length}</span>
       </button>
 
-      <div className={styles.track} aria-hidden="true">
-        {open && <canvas ref={canvasRef} className={styles.canvas} />}
-        {visible.map((e) => (
-          <span
-            key={e.id}
-            className={`${styles.mark} ${KIND_CLASS[e.kind] ?? ''}`}
-            style={{ left: `${Math.max(0, Math.min(100, ((WINDOW_S - (now - e.t)) / WINDOW_S) * 100))}%` }}
-            title={`${e.label} — ${timeAgo(now - e.t)}`}
-          />
-        ))}
-      </div>
-
       {open && (
         <>
+          <div className={styles.track} aria-hidden="true">
+            <canvas ref={canvasRef} className={styles.canvas} />
+            {visible.map((e) => (
+              <span
+                key={e.id}
+                className={`${styles.mark} ${KIND_CLASS[e.kind] ?? ''}`}
+                style={{ left: `${Math.max(0, Math.min(100, ((WINDOW_S - (now - e.t)) / WINDOW_S) * 100))}%` }}
+                title={`${e.label} — ${timeAgo(now - e.t)}`}
+              />
+            ))}
+          </div>
+
           <div className={styles.legend} aria-hidden="true">
             <span className={styles.legendMap}>mean pressure</span>
             <span className={styles.legendHr}>heart rate</span>

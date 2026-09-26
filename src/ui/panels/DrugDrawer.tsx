@@ -265,6 +265,7 @@ export function DrugDrawer() {
                           onClick={() => {
                             dispatch({ type: 'STOP_INFUSION', drugId: d.id });
                             pushLog(`${d.displayName} infusion stopped`, 'warn');
+                            pushEvent({ kind: 'drug', label: `${d.displayName} infusion stopped`, tone: 'warn' });
                           }}
                         >
                           Stop drip
