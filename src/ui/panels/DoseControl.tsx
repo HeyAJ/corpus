@@ -14,7 +14,7 @@ import { DoseCurve } from '../components/DoseCurve';
 import styles from './dose.module.css';
 
 /**
- * THE DOSE CONTROL.
+ * THE DOSE LEVER.
  *
  * The specification forbade a dose input field, and it was right to. A box you type
  * "0.1 mg/kg" into is a prescribing interface: the number that comes out of it is
@@ -45,6 +45,13 @@ import styles from './dose.module.css';
  * using the engine's own pharmacokinetics, not a second implementation of them — and
  * keeps the reference dose's curve underneath it as a dashed ghost, so the control
  * reads as a comparison rather than as a number that changes.
+ *
+ * WHY THE STATE LIVES OUTSIDE IT (2026-09-26 rebuild). The Give button used to sit
+ * inside each control, one per route, in the middle of a scrolling list; on a phone it
+ * was usually scrolled out of reach, below the chart. The drawer now shows ONE route
+ * at a time and pins a single Give button to the bottom of the sheet, under the
+ * thumb, so the lever's value has to be readable by the sheet — hence `useDose`, the
+ * state the drawer owns and hands down here.
  */
 
 interface RouteSpecLite {
@@ -52,6 +59,7 @@ interface RouteSpecLite {
   short: string;
   kind: string;
   durationMin?: number;
+  requiresIvAccess?: boolean;
 }
 const ROUTE_SPECS = (routesFile as unknown as { routes: Record<string, RouteSpecLite> }).routes;
 
@@ -60,6 +68,10 @@ export function routeLabel(route: Route): string {
 }
 export function routeShort(route: Route): string {
   return ROUTE_SPECS[route]?.short ?? route;
+}
+/** Whether the engine will refuse this route without an IV line (dosing.ts). */
+export function routeNeedsIv(route: Route): boolean {
+  return ROUTE_SPECS[route]?.requiresIvAccess === true;
 }
 
 /**
@@ -104,6 +116,24 @@ function posToMultiplier(pos: number): number {
   return Math.exp(LOG_MIN + pos * (LOG_MAX - LOG_MIN));
 }
 
+function multiplierToPos(m: number): number {
+  return (Math.log(m) - LOG_MIN) / (LOG_MAX - LOG_MIN);
+}
+
+/**
+ * The quick steps under the lever. They are MULTIPLES OF THE CITED REFERENCE, like
+ * every other value the lever can take, and each lies inside the worker's bound; they
+ * exist because a thumb on a phone cannot land on "exactly half" by dragging, and
+ * "what does half do, what does double do" is the comparison most people want.
+ */
+const QUICK_STEPS: { m: number; label: string }[] = [
+  { m: 0.25, label: '¼×' },
+  { m: 0.5, label: '½×' },
+  { m: 1, label: '1×' },
+  { m: 2, label: '2×' },
+  { m: 4, label: '4×' },
+];
+
 /** Two significant figures, so the readout never implies precision it does not have. */
 export function formatAmount(amount: number, unit: string): string {
   const abs = Math.abs(amount);
@@ -116,10 +146,35 @@ export function formatAmount(amount: number, unit: string): string {
   return `${text.replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1')} ${unit}`;
 }
 
-function formatMultiplier(m: number): string {
-  if (m >= 10) return '10x';
-  if (m >= 1) return `${m.toFixed(m < 3 ? 2 : 1).replace(/\.?0+$/, '')}x`;
-  return `${m.toPrecision(2).replace(/0+$/, '').replace(/\.$/, '')}x`;
+export function formatMultiplier(m: number): string {
+  if (m >= 10) return '10×';
+  if (m >= 1) return `${m.toFixed(m < 3 ? 2 : 1).replace(/\.?0+$/, '')}×`;
+  return `${m.toPrecision(2).replace(/0+$/, '').replace(/\.$/, '')}×`;
+}
+
+/** Whether a route is given over a set time, so the lever grows a duration stepper. */
+export function isTimedRoute(route: Route): boolean {
+  return route === 'IV_DRIP';
+}
+
+export interface DoseState {
+  pos: number;
+  setPos: (p: number) => void;
+  multiplier: number;
+  duration: number;
+  setDuration: (d: number) => void;
+}
+
+/**
+ * The lever's state, owned by whoever pins the Give button. `key` it on the preset so
+ * choosing another route starts again at that route's 1x rather than carrying a 4x
+ * across from a route whose reference was a different size.
+ */
+export function useDose(preset: Drug['presetDoses'][number]): DoseState {
+  const [pos, setPos] = useState(UNITY_POS);
+  const [duration, setDuration] = useState(preset.durationMin ?? 60);
+  const multiplier = useMemo(() => posToMultiplier(pos), [pos]);
+  return { pos, setPos, multiplier, duration, setDuration };
 }
 
 export interface DoseControlProps {
@@ -128,16 +183,12 @@ export interface DoseControlProps {
   preset: Drug['presetDoses'][number];
   presetSource: string | undefined;
   disabled: boolean;
-  onGive: (multiplier: number, durationMin: number | undefined) => void;
+  dose: DoseState;
 }
 
-export function DoseControl({ drug, route, preset, presetSource, disabled, onGive }: DoseControlProps) {
-  const [pos, setPos] = useState(UNITY_POS);
-  const spec = ROUTE_SPECS[route];
-  const timed = spec?.kind === 'intravascular' && route === 'IV_DRIP';
-  const [duration, setDuration] = useState(preset.durationMin ?? 60);
-
-  const multiplier = useMemo(() => posToMultiplier(pos), [pos]);
+export function DoseControl({ drug, route, preset, presetSource, disabled, dose }: DoseControlProps) {
+  const { pos, setPos, multiplier, duration, setDuration } = dose;
+  const timed = isTimedRoute(route);
   const band = doseBandFor(multiplier);
   const amount = preset.amount * multiplier;
 
@@ -149,109 +200,97 @@ export function DoseControl({ drug, route, preset, presetSource, disabled, onGiv
   const horizon = useMemo(() => horizonFor(drug, route, runFor), [drug, route, runFor]);
   const mg = toMilligrams(amount, preset.unit);
   const refMg = toMilligrams(preset.amount, preset.unit);
-  const curve = useMemo(
-    () => predict(drug, route, mg, horizon, runFor),
-    [drug, route, mg, horizon, runFor],
-  );
-  const refCurve = useMemo(
-    () => predict(drug, route, refMg, horizon, runFor),
-    [drug, route, refMg, horizon, runFor],
-  );
+  const curve = useMemo(() => predict(drug, route, mg, horizon, runFor), [drug, route, mg, horizon, runFor]);
+  const refCurve = useMemo(() => predict(drug, route, refMg, horizon, runFor), [drug, route, refMg, horizon, runFor]);
+
+  // The filled part of the track, as a CSS variable the stylesheet paints with a
+  // gradient: native range inputs have no cross-browser "fill up to the thumb".
+  const fill = `${(pos * 100).toFixed(2)}%`;
+
+  const stepDuration = (delta: number) =>
+    setDuration(Math.max(MIN_DOSE_DURATION_MIN, Math.min(MAX_DOSE_DURATION_MIN, duration + delta)));
 
   return (
     <div className={styles.control}>
-      {/*
-        Two columns on a wide drawer: the instrument on the left, what it predicts on
-        the right. One column below 760px, where the curve goes underneath rather than
-        beside — a 420px chart squeezed into a phone-width column is not a chart.
-      */}
-      <div className={styles.main}>
-        <div className={styles.head}>
-          <span className={styles.routeTag}>{routeLabel(route)}</span>
-          <span className={styles.reference}>
-            reference <strong>{preset.label}</strong>
-          </span>
-        </div>
+      {/* The readout first and large: what you would give, and what it is relative to. */}
+      <div className={styles.readout}>
+        <span className={styles.amount}>{formatAmount(amount, preset.unit)}</span>
+        <span className={styles.multiplier}>{formatMultiplier(multiplier)} of {preset.label}</span>
+      </div>
+      {/* Colour is never the only signal: the band is always spelled out. */}
+      <span className={`${styles.band} ${BAND_CLASS[band]}`}>{BAND_TEXT[band]}</span>
 
-        <div className={styles.sliderRow}>
-          <span className={styles.endLabel}>{formatMultiplier(MIN_DOSE_MULTIPLIER)}</span>
-          <div className={styles.sliderWrap}>
-            <input
-              id={id}
-              className={styles.slider}
-              type="range"
-              min={0}
-              max={1}
-              step={0.001}
-              value={pos}
-              disabled={disabled}
-              onChange={(e) => setPos(Number(e.target.value))}
-              aria-label={`Simulated dose of ${drug.displayName} by ${routeLabel(route)}, as a multiple of the cited reference dose of ${preset.label}`}
-              aria-valuetext={`${formatMultiplier(multiplier)} of the reference, ${formatAmount(amount, preset.unit)}, ${BAND_TEXT[band]}`}
-            />
-            {/* The anchor, drawn on the track so the cited dose is visibly the origin. */}
-            <span className={styles.detent} style={{ left: `${UNITY_POS * 100}%` }} aria-hidden="true" />
-          </div>
-          <span className={styles.endLabel}>{formatMultiplier(MAX_DOSE_MULTIPLIER)}</span>
-        </div>
-
-        <div className={styles.readout}>
-          <span className={styles.amount}>{formatAmount(amount, preset.unit)}</span>
-          <span className={styles.multiplier}>{formatMultiplier(multiplier)}</span>
-          {/* Colour is never the only signal: the band is always spelled out. */}
-          <span className={`${styles.band} ${BAND_CLASS[band]}`}>{BAND_TEXT[band]}</span>
-        </div>
-
-        {timed && (
-          <label className={styles.durationRow} htmlFor={`${id}-dur`}>
-            <span>over</span>
-            <input
-              id={`${id}-dur`}
-              className={styles.duration}
-              type="number"
-              min={MIN_DOSE_DURATION_MIN}
-              max={MAX_DOSE_DURATION_MIN}
-              step={1}
-              value={duration}
-              disabled={disabled}
-              onChange={(e) => setDuration(Number(e.target.value))}
-            />
-            <span>min ({formatAmount(amount / Math.max(1, duration), `${preset.unit}/min`)})</span>
-          </label>
-        )}
-
-        {curve.reason && <p className={styles.curveReason}>{curve.reason}</p>}
-
-        <div className={styles.actions}>
-          <button
-            className={styles.give}
-            disabled={disabled}
-            onClick={() => onGive(multiplier, timed ? duration : undefined)}
-          >
-            Give {formatAmount(amount, preset.unit)} {routeShort(route)}
-          </button>
-          {multiplier !== 1 && (
-            <button className={styles.resetDose} onClick={() => setPos(UNITY_POS)}>
-              Back to {preset.label}
-            </button>
-          )}
-        </div>
-
-        {presetSource && (
-          <details className={styles.provenance}>
-            <summary>Where {preset.label} comes from</summary>
-            <p>{presetSource}</p>
-          </details>
-        )}
+      <div className={styles.sliderWrap}>
+        <input
+          id={id}
+          className={styles.slider}
+          style={{ ['--fill' as string]: fill }}
+          type="range"
+          min={0}
+          max={1}
+          step={0.001}
+          value={pos}
+          disabled={disabled}
+          onChange={(e) => setPos(Number(e.target.value))}
+          aria-label={`Simulated dose of ${drug.displayName} by ${routeLabel(route)}, as a multiple of the cited reference dose of ${preset.label}`}
+          aria-valuetext={`${formatMultiplier(multiplier)} of the reference, ${formatAmount(amount, preset.unit)}, ${BAND_TEXT[band]}`}
+        />
+        {/* The anchor, drawn on the track so the cited dose is visibly the origin. Hidden
+            while the thumb sits on it: a tick painted over the thumb read as a glitch. */}
+        {multiplier !== 1 && <span className={styles.detent} style={{ left: `${UNITY_POS * 100}%`, ['--p' as string]: UNITY_POS }} aria-hidden="true" />}
+      </div>
+      <div className={styles.ends} aria-hidden="true">
+        <span>{formatMultiplier(MIN_DOSE_MULTIPLIER)}</span>
+        <span className={styles.endRef} style={{ left: `${UNITY_POS * 100}%`, ['--p' as string]: UNITY_POS }}>reference</span>
+        <span>{formatMultiplier(MAX_DOSE_MULTIPLIER)}</span>
       </div>
 
+      <div className={styles.steps} role="group" aria-label="Quick multiples of the reference dose">
+        {QUICK_STEPS.map((q) => (
+          <button
+            key={q.m}
+            className={`${styles.step} ${Math.abs(multiplier - q.m) < 1e-6 ? styles.stepOn : ''}`}
+            disabled={disabled}
+            onClick={() => setPos(q.m === 1 ? UNITY_POS : multiplierToPos(q.m))}
+            aria-pressed={Math.abs(multiplier - q.m) < 1e-6}
+          >
+            {q.label}
+          </button>
+        ))}
+      </div>
+
+      {timed && (
+        <div className={styles.durationRow}>
+          <span className={styles.durationLabel}>Run over</span>
+          <div className={styles.stepper}>
+            <button onClick={() => stepDuration(-5)} disabled={disabled || duration <= MIN_DOSE_DURATION_MIN} aria-label="Five minutes shorter">
+              {'−'}
+            </button>
+            <span className={styles.durationValue} aria-live="polite">{duration} min</span>
+            <button onClick={() => stepDuration(5)} disabled={disabled || duration >= MAX_DOSE_DURATION_MIN} aria-label="Five minutes longer">
+              +
+            </button>
+          </div>
+          <span className={styles.rate}>{formatAmount(amount / Math.max(1, duration), `${preset.unit}/min`)}</span>
+        </div>
+      )}
+
+      {curve.reason && <p className={styles.curveReason}>{curve.reason}</p>}
+
       {curve.points.length > 1 && (
-        <div className={styles.curveBlock}>
+        <div className={styles.curveCard}>
+          <div className={styles.curveHead}>
+            <span>Predicted plasma level</span>
+            {multiplier !== 1 && (
+              <span className={styles.curveKey}>
+                <i className={styles.keyGhost} aria-hidden="true" /> reference
+              </span>
+            )}
+          </div>
           <DoseCurve
             prediction={curve}
             reference={multiplier === 1 ? null : refCurve}
-            width={420}
-            height={132}
+            height={140}
             color="#c8433a"
             label={
               `Predicted plasma concentration for ${formatAmount(amount, preset.unit)} of ${drug.displayName} ` +
@@ -266,6 +305,13 @@ export function DoseControl({ drug, route, preset, presetSource, disabled, onGiv
               : 'Predicted for a resting body, this dose alone. Clearance changes with perfusion, so a shocked body will not follow it.'}
           </p>
         </div>
+      )}
+
+      {presetSource && (
+        <details className={styles.provenance}>
+          <summary>Where {preset.label} comes from</summary>
+          <p>{presetSource}</p>
+        </details>
       )}
     </div>
   );

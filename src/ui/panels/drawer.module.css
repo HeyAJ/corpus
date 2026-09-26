@@ -1,64 +1,82 @@
 /*
- * ADMINISTRATION DRAWER — a modal bottom sheet, snap points at roughly 46 % and 82 %.
+ * THE ADMINISTRATION SHEET — rebuilt 2026-09-26 on a phone's own vocabulary.
  *
- * It is the one panel that does NOT join the panel sheet: it is a task surface you open, act
- * in, and close, not a readout you keep on screen, and it wants the width while it is
- * up. So it stays a bottom sheet, but a confined one — it covers the STAGE (the body)
- * only, never the dock beside it, and it is anchored above the reserved bottom bar so
- * it can no longer sit on top of the tool dock, which was the reported bug. On a phone
- * responsive.css lets it span the full gutter width.
+ * A bottom sheet with a drag handle and two sizes; inside it, grouped rounded cards on
+ * a light grey ground (the "inset grouped" list of a phone's settings screens), rows
+ * with a coloured icon, a title, a grey subtitle and a chevron, and a drug page that
+ * slides in from the right with a back button. See DrugDrawer.tsx for why.
+ *
+ * It is the one panel that does NOT join the panel sheet: it is a task surface you
+ * open, act in and close, not a readout you keep on screen. It covers the STAGE only,
+ * never the dock, and is anchored above the MEASURED bottom bar (App.tsx publishes
+ * --corpus-bar-actual) so it can never sit on top of the dock, which was a reported
+ * bug. On a phone responsive.css lets it span the full gutter width.
  */
+
 .sheet {
+  --ios-ground: #f2f2f7;
+  --ios-card: #ffffff;
+  --ios-sep: rgba(60, 60, 67, 0.14);
+  --ios-sub: rgba(60, 60, 67, 0.6);
+  --ios-blue: #0a66d8;
+
   position: fixed;
-  /* Centred and capped: with no rail beside the body any more, a full-width sheet on a
-     desktop would be a metre of empty glass. */
+  /* Centred and capped: a full-width sheet on a desktop would be a metre of glass. */
   left: var(--inset-hud);
   right: var(--inset-hud);
-  max-width: 760px;
+  max-width: 640px;
   margin: 0 auto;
-  /* The MEASURED bar height (App.tsx publishes it), falling back to the nominal token.
-     The nominal value assumed 36 px dock buttons, but on a touch screen the 44 px target
-     rule makes the bar taller, and the sheet then sat 6-14 px over the dock it exists
-     to stay clear of (round-2 tester). */
   bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 4px);
-  height: 46vh;
-  max-height: calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
+  height: min(56vh, calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px));
   display: flex;
   flex-direction: column;
-  background: var(--sheet-bg);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-radius: var(--radius-card);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.16);
-  transition: height var(--tween-state) var(--ease-out);
+  overflow: hidden;
+  background: var(--ios-ground);
+  border-radius: 20px;
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.22), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  transition: height 260ms cubic-bezier(0.32, 0.72, 0, 1), transform 260ms cubic-bezier(0.32, 0.72, 0, 1);
   z-index: 30;
-  /* A width container, so the header can re-flow by the drawer's own width (which the
-     rail and the viewport both change) rather than guessing it from the viewport. Safe:
-     the sheet's width comes from left/right, never from its content. */
-  container-type: inline-size;
-  container-name: drawer;
+  animation: sheetIn 300ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .sheetFull {
   height: calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
+  height: calc(100dvh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
 }
 
+@keyframes sheetIn {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------- the handle */
+
 /*
- * The grabber is a button, so on a touch screen the global 44 px target rule gave it a
- * 44 px height - and because the bar was drawn as the button's own background, the 4 px
- * handle swelled into a grey blob. The button is now a transparent hit area of whatever
- * height the input needs, and the handle is drawn inside it at its real size.
+ * The whole strip above the header is the drag zone, not just the 36 px bar: a thumb
+ * aims at the top edge of a sheet, not at a 5 px line. touch-action none so the browser
+ * hands the vertical drag to us instead of scrolling the page with it.
  */
+.handleZone {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 2px;
+  touch-action: none;
+  cursor: grab;
+}
+
 .grabber {
   position: relative;
   display: block;
   width: 72px;
-  height: 18px;
-  margin: 2px auto 0;
+  height: 16px;
+  min-height: 16px !important;
   padding: 0;
   border: none;
   background: none;
-  cursor: pointer;
+  cursor: inherit;
 }
 
 .grabber::before {
@@ -66,340 +84,660 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 40px;
-  height: 4px;
+  width: 36px;
+  height: 5px;
   transform: translate(-50%, -50%);
-  border-radius: var(--radius-pill);
-  background: rgba(0, 0, 0, 0.18);
+  border-radius: 3px;
+  background: rgba(60, 60, 67, 0.3);
 }
 
-.tabs {
+/* -------------------------------------------------------------- the header */
+
+.header,
+.navBar {
+  flex: none;
   display: flex;
   align-items: center;
-  gap: 18px;
-  padding: 6px 20px 10px;
+  gap: 12px;
+  padding: 2px 14px 8px;
 }
 
-.tab,
-.tabActive {
-  font-size: 19px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  padding: 2px 0;
+.segmented {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 2px;
+  border-radius: 9px;
+  background: rgba(118, 118, 128, 0.14);
+  max-width: 360px;
 }
 
-.tab {
-  color: var(--ink-faint);
-}
-
-.tabActive {
+.segment {
+  min-height: 32px !important;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
   color: var(--ink);
+  cursor: pointer;
+  transition: background 160ms ease, box-shadow 160ms ease;
+}
+
+.segmentOn {
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
 }
 
 .close {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  min-height: 30px !important;
+  min-width: 30px !important;
   margin-left: auto;
-  font-size: 22px;
-  line-height: 1;
-  color: var(--ink-faint);
-  padding: 0 4px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(118, 118, 128, 0.14);
+  color: var(--ios-sub);
+  cursor: pointer;
+  /* The visible circle is 30 px; the hit area is grown to 44 px without moving it. */
+  position: relative;
 }
+
+.close::after {
+  content: '';
+  position: absolute;
+  inset: -7px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ios-blue);
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------ search and filters */
+
+.listTools {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0 14px 8px;
+}
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 10px 0 32px;
+  border-radius: 10px;
+  background: rgba(118, 118, 128, 0.12);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  color: var(--ios-sub);
+}
+
+.search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font: inherit;
+  /* 16 px or larger, or iOS Safari zooms the whole page when the field takes focus. */
+  font-size: 16px;
+  color: var(--ink);
+  outline: none;
+}
+
+.search input::placeholder {
+  color: var(--ios-sub);
+}
+
+.search input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+.searchClear {
+  display: inline-flex;
+  min-height: 0 !important;
+  padding: 4px;
+  border: none;
+  background: none;
+  color: rgba(60, 60, 67, 0.35);
+  cursor: pointer;
+}
+
+.chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  /* Run to the sheet's edges so a chip can scroll out from under the rounded corner. */
+  margin: 0 -14px;
+  padding: 0 14px 2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chips::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex: none;
+  scroll-snap-align: start;
+  min-height: 32px !important;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--ios-card);
+  box-shadow: 0 0 0 0.5px var(--ios-sep);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chipOn {
+  background: var(--ink);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------ the scroller */
 
 .scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 0 16px 8px;
+  overscroll-behavior: contain;
+  padding: 0 14px 18px;
   -webkit-overflow-scrolling: touch;
 }
 
 .groupHeader {
-  margin: 14px 4px 8px;
-  font-size: 17px;
-  font-weight: 700;
-  color: #b0b0b0;
-  letter-spacing: 0.01em;
+  margin: 18px 16px 7px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--ios-sub);
 }
 
-.rowGroup {
-  margin-bottom: 2px;
+.count {
+  margin: 12px 16px 0;
+  font-size: 13px;
+  color: var(--ios-sub);
 }
 
-.row {
+.card {
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--ios-card);
+}
+
+.cardPad {
+  padding: 14px;
+}
+
+/* ------------------------------------------------------------------ rows */
+
+.drugRow,
+.foodRow,
+.runRow {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 54px;
+  gap: 12px;
+  width: 100%;
+  min-height: 58px;
+  padding: 8px 14px;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
 }
 
-.drugPill {
+.drugRow {
+  cursor: pointer;
+  transition: background 100ms ease;
+}
+
+.drugRow:active {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+@media (hover: hover) {
+  .drugRow:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+}
+
+/* Hairline separators that start after the icon, as a phone's list draws them. */
+.drugRow + .drugRow::before,
+.foodRow + .foodRow::before,
+.runRow + .runRow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 58px;
+  right: 0;
+  border-top: 0.5px solid var(--ios-sep);
+}
+
+.icon {
+  flex: none;
   display: inline-flex;
   align-items: center;
-  padding: 9px 16px;
-  min-height: 40px;
-  border-radius: var(--radius-pill);
-  font-size: 17px;
-  font-weight: 700;
-  color: #111;
-  letter-spacing: 0.01em;
-  white-space: nowrap;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.72);
 }
 
-/* Route buttons are right-anchored so the rightmost column always lines up,
-   whether a drug offers one route or three (VISUAL_AUDIT section 7). */
-.routes {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.routeButton {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1px;
-  padding: 7px 13px;
-  border-radius: var(--radius-chip);
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--ink);
-  font-weight: 700;
-  transition: background 120ms ease;
-}
-
-.routeButton:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.11);
-}
-
-.routeButton:active:not(:disabled) {
-  transform: translateY(1px);
-}
-
-.routeButton:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.routeName {
-  font-size: 14px;
-}
-
-.routeDose {
-  font-size: 11px;
-  color: var(--ink-dim);
-}
-
-.stopButton {
-  padding: 8px 16px;
-  border-radius: var(--radius-chip);
-  background: var(--severity-warn-bg);
-  color: var(--severity-warn-ink);
-  font-weight: 700;
-}
-
-.foodMacros {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink-faint);
-}
-
-.details {
-  padding: 4px 6px 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.notes {
-  margin: 0 0 10px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-mid);
-  font-weight: 500;
-}
-
-.targets {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  margin-bottom: 8px;
-}
-
-.targets th {
-  text-align: left;
-  font-weight: 700;
-  color: var(--ink-faint);
-  padding: 2px 6px 2px 0;
-}
-
-.targets td {
-  padding: 2px 6px 2px 0;
-  font-weight: 700;
-  color: var(--ink-mid);
-}
-
-.sources {
-  font-size: 11px;
-  color: var(--ink-faint);
-}
-
-.sources summary {
-  cursor: pointer;
-  font-weight: 700;
-}
-
-.sources ul {
-  margin: 6px 0 0;
-  padding-left: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  line-height: 1.4;
-  font-weight: 500;
-}
-
-.emptyNote {
-  margin: 8px 4px;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ink-mid);
-  font-weight: 500;
-  max-width: 46ch;
-}
-
-.footnote {
-  margin: 0;
-  padding: 8px 20px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--ink-faint);
-  border-top: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-/* ------------------------------------------------------------ dose section */
-
-.doseSection {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.doseHeading {
-  margin: 0 0 4px;
-  font-size: var(--size-tag);
-  font-weight: var(--weight-bold);
-  color: var(--ink);
-}
-
-.doseIntro {
-  margin: 0 0 8px;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--ink-dim);
-}
-
-/* --------------------------------------------------------- depot readout */
-
-.depotList {
+.rowText {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  font-size: 12px;
-  color: var(--ink-dim);
 }
 
-.depotItem {
-  font-variant-numeric: tabular-nums;
-}
-
-.depotWaiting {
-  color: var(--severity-warn-ink);
-}
-
-/* ------------------------------------------------------------------ search */
-
-/*
- * At nineteen drugs a list was fine. At eighty-nine it is not, and the search is
- * the difference between a drawer you scroll and a drawer you use.
- */
-.search {
-  margin-left: auto;
+.rowTitle {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.search input {
-  width: min(320px, 40vw);
-  padding: 6px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.72);
-  font: inherit;
+.rowSub {
   font-size: 13px;
-  color: var(--ink);
+  line-height: 1.3;
+  color: var(--ios-sub);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.runRow .rowSub {
+  white-space: normal;
+}
+
+/* A food's portion and macros ARE the information, and on a 360 px phone one line cut
+   them off after the portion; food rows wrap instead of truncating. */
+.foodRow .rowTitle,
+.foodRow .rowSub {
+  white-space: normal;
+}
+
+.tag {
+  flex: none;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(200, 67, 58, 0.12);
+  color: #a8322c;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.chevron {
+  flex: none;
+  color: rgba(60, 60, 67, 0.3);
+}
+
+.stopButton,
+.eatButton {
+  flex: none;
+  min-height: 32px !important;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.stopButton {
+  background: var(--severity-warn-bg);
+  color: var(--severity-warn-ink);
+}
+
+.eatButton {
+  min-width: 64px;
+  background: rgba(10, 102, 216, 0.1);
+  color: var(--ios-blue);
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.eatDone {
+  background: #2f9e55;
+  color: #fff;
+}
+
+/* ------------------------------------------------------------- drug page */
+
+.page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: pushIn 280ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes pushIn {
+  from {
+    transform: translateX(28px);
+    opacity: 0;
+  }
+}
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 4px 2px;
+}
+
+.heroIcon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  font-size: 24px;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.72);
+}
+
+.heroText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.heroSub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ios-sub);
+}
+
+.scheduleNote {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(200, 67, 58, 0.08);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-mid);
 }
 
 /*
- * NARROW DRAWER: the header row held three tabs, a search box fixed at min(320px, 40vw)
- * and the close button with no wrapping, so below about 720 px of drawer width it was
- * 145-180 px wider than the sheet and the close button sat entirely off-screen - on every
- * phone, where it was supposed to be the 44 px target (round-4 verifier). Here the close
- * button stays on the tab row and the search takes a full-width row of its own.
+ * EVERY WAY TO GIVE IT, as cards. Two across on a phone, three or four on a wide
+ * sheet; the grid decides from the space, so a drug with one route and a drug with
+ * five both lay out without a breakpoint. The selected card carries a ring, not only a
+ * colour change.
  */
-@container drawer (max-width: 720px) {
-  .tabs {
-    flex-wrap: wrap;
-    row-gap: 8px;
-    gap: 14px;
-    padding: 6px 12px 10px 16px;
-  }
-
-  .close {
-    order: 2;
-  }
-
-  .search {
-    order: 3;
-    flex: 1 1 100%;
-    margin-left: 0;
-    min-width: 0;
-  }
-
-  .search input {
-    flex: 1 1 auto;
-    width: 100%;
-    min-width: 0;
-  }
+.routeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
 }
 
-.search input::placeholder {
-  color: var(--ink-faint);
+.routeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-height: 72px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 12px;
+  background: var(--ios-card);
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 0 0 0.5px var(--ios-sep);
+  transition: box-shadow 140ms ease, transform 140ms ease;
 }
 
-.searchCount {
-  font-size: 11px;
-  color: var(--ink-dim);
+.routeCard:active {
+  transform: scale(0.98);
+}
+
+.routeCardOn {
+  box-shadow: 0 0 0 2px #c8433a;
+}
+
+.routeShortName {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.routeLong {
+  font-size: 12px;
+  color: var(--ios-sub);
+}
+
+.routeRef {
+  margin-top: 3px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-mid);
+  overflow-wrap: anywhere;
+}
+
+.notes {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-mid);
+}
+
+.targetRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-height: 40px;
+  padding: 6px 14px;
+  font-size: 14px;
+}
+
+.targetRow + .targetRow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 0;
+  border-top: 0.5px solid var(--ios-sep);
+}
+
+.targetName {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.targetKi {
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  color: var(--ink-mid);
+}
+
+.targetAct {
+  text-align: right;
+  color: var(--ios-sub);
+}
+
+.sources {
+  margin: 16px 4px 0;
+  font-size: 12px;
+  color: var(--ios-sub);
+}
+
+.sources summary {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ios-blue);
+  cursor: pointer;
+}
+
+.sources ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  line-height: 1.5;
+}
+
+/* ---------------------------------------------------------- the give bar */
+
+.giveBar {
+  flex: none;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+  background: rgba(242, 242, 247, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 0.5px solid var(--ios-sep);
+}
+
+.giveButton {
+  width: 100%;
+  min-height: 50px;
+  border: none;
+  border-radius: 14px;
+  background: #c8433a;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: background 180ms ease, transform 120ms ease;
+}
+
+.giveButton:active {
+  transform: scale(0.985);
+}
+
+.giveDone {
+  background: #2f9e55;
+}
+
+.ivNeeded {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--ink-mid);
+}
+
+.ivNeeded span {
+  flex: 1;
+  min-width: 0;
+}
+
+.ivButton {
+  flex: none;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--ios-blue);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ------------------------------------------------------------------ misc */
+
+.emptyNote {
+  margin: 16px 4px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ios-sub);
+}
+
+.footnote {
+  margin: 20px 16px 4px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ios-sub);
 }
 
 .srOnly {
   position: absolute;
   width: 1px;
   height: 1px;
-  padding: 0;
-  margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  clip: rect(0 0 0 0);
   white-space: nowrap;
-  border: 0;
 }
 
-/* ------------------------------------------------------- controlled notice */
+/* On a phone the sheet is the task: it opens taller, since the body behind it is not
+   what you are looking at while choosing a drug. */
+@media (max-width: 720px) {
+  /* :not(.sheetFull) - an equal-weight `.sheet` rule here, later in the file, used to
+     override the full size, so opening a drug on a phone never grew the sheet. */
+  .sheet:not(.sheetFull) {
+    height: min(66vh, calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px));
+  }
+}
 
-.scheduleNote {
-  margin: 0 0 8px;
-  padding: 8px 10px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: var(--severity-warn-ink);
-  background: var(--severity-warn-bg);
-  border-radius: var(--radius-chip);
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .page {
+    animation: none;
+    transition: none;
+  }
 }
