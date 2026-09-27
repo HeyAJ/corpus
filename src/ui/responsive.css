@@ -1,28 +1,21 @@
 /*
  * RESPONSIVE RULES.
  *
- * The heavy lifting of layout now lives in the app-shell grid (src/ui/app.module.css):
- * a stage column for the body, a rail column for the docked panels, and a reserved
- * bottom row for the dock and the warning. Panels are plain cards with no position of
- * their own, so "which panel sits where and what covers what" is answered once, by the
- * grid, rather than by nine competing sets of absolute coordinates.
- *
- * What is left for this file is the part that genuinely depends on the VIEWPORT rather
- * than on the relationship between panels: how large the screen-space type is, how wide
- * the rail should be, and — the one rule that is about input rather than size — how big
- * a touch target has to be. The rail-becomes-a-bottom-sheet behaviour on a phone is in
- * app.module.css with the rest of the grid, because it is a grid change, not a token.
+ * Layout lives in the shell (src/ui/app.module.css): the body fills the screen, one
+ * panel at a time floats in a sheet (a right-hand card on a wide screen, a bottom sheet
+ * on a phone), and the dock is five floating chips. What is left here is what depends
+ * on the VIEWPORT rather than on the relationship between panels: type sizes, gutters,
+ * and - the one rule about input rather than size - how big a touch target must be.
  *
  * A few global hooks survive as `data-` attributes so this file and the shell can reach
  * a panel without depending on a hashed CSS-module class name: `data-panel` on every
- * docked card, `data-drawer` on the administration sheet, `data-blood-contents` on the
- * vascular legend, `data-timeline` on the timeline.
+ * card, `data-drawer` on the administration sheet, `data-sheet` on the shell.
  */
 
 :root {
-  /* Below this the layout is a phone: one column, the rail becomes a bottom sheet. */
+  /* Below this the layout is a phone: the panel sheet docks to the bottom. */
   --bp-phone: 720px;
-  /* Below this the rail narrows but the columns stay. */
+  /* Below this the type and gutters tighten. */
   --bp-tablet: 1080px;
 }
 
@@ -33,8 +26,6 @@
     /* The organ label competes with the HUD for the same corner at this width. */
     --size-label: 26px;
     --inset-hud: 12px;
-    /* A narrower rail leaves the body room on a tablet without starving the panels. */
-    --rail-w: 340px;
   }
 }
 
@@ -53,7 +44,7 @@
 
   /*
    * The administration drawer is the one panel that stays a modal bottom sheet rather
-   * than joining the rail — it is a task surface, not a readout, and it wants the whole
+   * than joining the sheet — it is a task surface, not a readout, and it wants the whole
    * width while it is open. It is anchored ABOVE the bottom bar so it can never cover
    * the dock (which was the reported bug), and it spans the gutter width.
    */

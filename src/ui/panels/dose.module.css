@@ -1,171 +1,55 @@
 /*
- * DOSE CONTROL.
+ * THE DOSE LEVER.
  *
  * Reads as an instrument, not a form field. The reference dose is the anchor and the
- * layout says so: the detent sits on the track, the multiplier is as prominent as the
- * amount, and the band is always spelled out in words next to whatever colour it
- * carries.
+ * layout says so: the detent sits on the track and is labelled "reference", the
+ * multiplier is printed against the reference it multiplies, and the band is always
+ * spelled out in words next to whatever colour it carries.
+ *
+ * Rebuilt 2026-09-26 for touch: one column at every width (the chart takes the full
+ * width of the sheet instead of a fixed 420 px that overflowed a phone), a 30 px thumb
+ * a finger can hold, quick-step pills under it, and a -/+ stepper for an infusion's
+ * run time instead of a number box that summoned the phone keyboard over the lever.
  */
 
 .control {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px 24px;
-  align-items: start;
-  padding: 12px 14px;
-  margin: 6px 0;
-  background: var(--chip-bg);
-  border-radius: var(--radius-well);
-}
-
-/*
- * Above this width the drawer is wide enough for the instrument and its prediction
- * to sit side by side, which is the layout that makes the control readable: you move
- * a thing on the left and a shape changes on the right. Below it they stack, because
- * a 420px chart in a 320px column is not a chart.
- */
-@media (min-width: 760px) {
-  .control {
-    grid-template-columns: minmax(300px, 1fr) auto;
-  }
-}
-
-.main {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.resetDose {
-  padding: 6px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  border-radius: var(--radius-pill);
-  background: transparent;
-  font: inherit;
-  font-size: 12px;
-  color: var(--ink-mid);
-  cursor: pointer;
-}
-
-.resetDose:hover {
-  background: var(--chip-bg-strong);
-}
-
-.head {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.routeTag {
-  font-size: var(--size-tag);
-  font-weight: var(--weight-bold);
-  color: var(--ink);
-  letter-spacing: 0.01em;
-}
-
-.reference {
-  font-size: 13px;
-  color: var(--ink-dim);
-}
-
-.reference strong {
-  color: var(--ink-mid);
-  font-weight: var(--weight-bold);
-}
-
-/* ------------------------------------------------------------------ slider */
-
-.sliderRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.endLabel {
-  font-size: 12px;
-  color: var(--ink-faint);
-  font-variant-numeric: tabular-nums;
-  min-width: 30px;
-  text-align: center;
-}
-
-.sliderWrap {
-  position: relative;
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.slider {
-  width: 100%;
-  margin: 0;
-  accent-color: var(--organ-active);
-  cursor: pointer;
-}
-
-.slider:disabled {
-  cursor: not-allowed;
-  opacity: 0.4;
-}
-
-/*
- * The detent mark. Drawn UNDER the thumb and ignored by pointer events, so it reads
- * as a scale marking rather than as something to grab.
- */
-.detent {
-  position: absolute;
-  top: 50%;
-  width: 2px;
-  height: 14px;
-  margin-left: -1px;
-  transform: translateY(-50%);
-  background: var(--ink-mid);
-  border-radius: 1px;
-  pointer-events: none;
-  opacity: 0.55;
-}
-
-/* ----------------------------------------------------------------- readout */
+/* ------------------------------------------------------------------ readout */
 
 .readout {
   display: flex;
   align-items: baseline;
-  gap: 10px;
   flex-wrap: wrap;
+  gap: 4px 10px;
 }
 
 .amount {
-  font-size: 22px;
-  font-weight: var(--weight-bold);
-  color: var(--ink);
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  line-height: 1.05;
 }
 
 .multiplier {
-  font-size: var(--size-tag);
-  font-weight: var(--weight-bold);
-  color: var(--ink-mid);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-dim);
   font-variant-numeric: tabular-nums;
-  padding: 1px 7px;
-  background: var(--chip-bg-strong);
-  border-radius: var(--radius-pill);
 }
 
 .band {
-  font-size: 12px;
-  padding: 2px 8px;
+  align-self: flex-start;
+  padding: 3px 10px;
   border-radius: var(--radius-pill);
-  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .bandLow {
@@ -186,60 +70,264 @@
 .bandExtreme {
   background: var(--severity-critical-bg);
   color: var(--severity-critical-ink);
-  font-weight: var(--weight-bold);
 }
 
-/* ---------------------------------------------------------------- duration */
+/* ------------------------------------------------------------------- lever */
+
+.sliderWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin-top: 4px;
+}
+
+/*
+ * A native range input, restyled. Native because it brings keyboard control, screen
+ * reader semantics and the platform's own touch handling for free; restyled because
+ * the default track is a 2 px hairline and the default thumb is smaller than a
+ * fingertip. The filled part is a gradient stop at --fill, which DoseControl sets.
+ */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 40px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.slider:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #c8433a 0, #c8433a var(--fill), rgba(0, 0, 0, 0.1) var(--fill));
+}
+
+.slider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.slider::-moz-range-progress {
+  height: 8px;
+  border-radius: 4px;
+  background: #c8433a;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 30px;
+  height: 30px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 3px 10px rgba(0, 0, 0, 0.16);
+  transition: transform 120ms ease;
+}
+
+.slider::-moz-range-thumb {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18), 0 3px 10px rgba(0, 0, 0, 0.16);
+}
+
+.slider:active::-webkit-slider-thumb {
+  transform: scale(1.08);
+}
+
+.slider:focus-visible {
+  outline: none;
+}
+
+.slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgba(200, 67, 58, 0.3), 0 3px 10px rgba(0, 0, 0, 0.16);
+}
+
+/*
+ * The reference detent: a short bar across the track at 1x. The thumb's centre travels
+ * 15 px in from each end (half the thumb), so the tick is placed on the same inset
+ * scale as the thumb, not the raw track, or it would sit beside 1x rather than on it.
+ */
+.detent {
+  position: absolute;
+  top: 50%;
+  width: 3px;
+  height: 18px;
+  margin-left: calc(15px - 1.5px);
+  transform: translate(calc(-30px * var(--p, 0)), -50%);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.ends {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin-top: -6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.endRef {
+  position: absolute;
+  top: 0;
+  /* Same inset scale as the detent above it, then centred on it. */
+  margin-left: 15px;
+  transform: translateX(calc(-50% - 30px * var(--p, 0)));
+}
+
+/* ------------------------------------------------------------- quick steps */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: 3px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.step {
+  min-height: 34px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-mid);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.stepOn {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+
+.step:disabled {
+  opacity: 0.4;
+}
+
+/* ---------------------------------------------------------- infusion time */
 
 .durationRow {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--ink-dim);
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.duration {
-  width: 68px;
-  padding: 4px 8px;
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  border-radius: var(--radius-chip);
-  background: rgba(255, 255, 255, 0.7);
-  font: inherit;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
+.durationLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-mid);
 }
 
-/* -------------------------------------------------------------------- give */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.06);
+}
 
-.give {
-  padding: 8px 18px;
+.stepper button {
+  width: 40px;
+  min-height: 34px;
   border: none;
-  border-radius: var(--radius-pill);
-  background: var(--well-black);
-  color: var(--ink-inverse);
-  font: inherit;
-  font-size: var(--size-tag);
-  font-weight: var(--weight-bold);
+  background: transparent;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
   cursor: pointer;
-  transition: transform var(--tween-state) var(--ease-out), opacity var(--tween-state);
 }
 
-.give:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.give:active:not(:disabled) {
-  transform: translateY(0);
-  opacity: 0.85;
-}
-
-.give:disabled {
-  opacity: 0.35;
+.stepper button:disabled {
+  color: var(--ink-faint);
   cursor: not-allowed;
 }
 
-/* -------------------------------------------------------------- provenance */
+.durationValue {
+  min-width: 64px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rate {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------------ chart */
+
+.curveCard {
+  padding: 12px 12px 10px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  min-width: 0;
+}
+
+.curveHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-dim);
+}
+
+.curveKey {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+  color: var(--ink-faint);
+}
+
+.keyGhost {
+  display: inline-block;
+  width: 14px;
+  border-top: 1.5px dashed rgba(0, 0, 0, 0.35);
+}
+
+.curveNote {
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink-faint);
+}
+
+.curveReason {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+/* ------------------------------------------------------------- provenance */
 
 .provenance {
   font-size: 12px;
@@ -248,42 +336,21 @@
 
 .provenance summary {
   cursor: pointer;
-  color: var(--ink-mid);
+  font-weight: 600;
+  color: #2f6fd6;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
 }
 
 .provenance p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   line-height: 1.45;
-  word-break: break-word;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .give {
+  .slider::-webkit-slider-thumb,
+  .step {
     transition: none;
   }
-  .give:hover:not(:disabled) {
-    transform: none;
-  }
-}
-
-/* ------------------------------------------------------------ curve block */
-
-.curveBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.curveNote {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--ink-faint);
-}
-
-.curveReason {
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--severity-warn-ink);
 }

@@ -56,6 +56,9 @@ const FLING = 1.5;
 /** Half-height of the whole exploded body, metres: brain crown to pelvic floor. */
 export const BODY_FRAMING_RADIUS = 0.40;
 
+/** Screen aspect (width / height) below which the whole-body framing pulls back. */
+const PORTRAIT_ASPECT = 0.55;
+
 export const DEFAULT_LIMITS: OrbitLimits = {
   // Azimuth is WRAPPED, not clamped (see the header and update()), so these bounds
   // describe the full turn rather than a fence. They are kept in the struct so the
@@ -93,14 +96,42 @@ export class OrbitRig {
 
   limits: OrbitLimits = { ...DEFAULT_LIMITS };
 
+  /**
+   * True while the camera is at its whole-body framing and the user has not moved it.
+   * Only then does a change of screen shape re-frame it: a resize must never undo a zoom
+   * the user made on purpose.
+   */
+  private atHome = true;
+
   constructor(aspect: number, fovDegrees = 21) {
     this.camera = new THREE.PerspectiveCamera(fovDegrees, aspect, 0.05, 50);
+    this.distance = this.homeDistance();
+    this.focusFromDistance = this.focusToDistance = this.distance;
     this.apply();
   }
 
   setAspect(aspect: number): void {
     this.camera.aspect = aspect;
     this.camera.updateProjectionMatrix();
+    if (this.atHome && this.focusT >= 1) this.distance = this.homeDistance();
+  }
+
+  /**
+   * Whole-body distance for the current screen shape. Height-fitting alone (the FILL
+   * rule in focus) is right on a landscape screen, but on a portrait phone the same
+   * distance also fills the WIDTH, so the pelvis ended under the dock and the brain under
+   * the HUD. Below an aspect of 0.55 the distance grows with the narrowness, which leaves
+   * the body about seventy per cent of the height with a margin for both.
+   */
+  private homeDistance(): number {
+    return this.fitDistance(BODY_FRAMING_RADIUS) / Math.min(1, this.camera.aspect / PORTRAIT_ASPECT);
+  }
+
+  private fitDistance(boundingRadius: number): number {
+    const FILL = 0.82;
+    const halfFov = (this.camera.fov * DEG) / 2;
+    const fit = boundingRadius / (Math.tan(halfFov) * FILL);
+    return THREE.MathUtils.clamp(fit, this.limits.minDistance, this.limits.maxDistance);
   }
 
   /**
@@ -122,11 +153,13 @@ export class OrbitRig {
     this.azimuthVel = dx * AZIMUTH_PER_UNIT * FLING;
     this.polarVel = dy * POLAR_PER_UNIT * FLING;
     this.focusT = 1; // a manual drag cancels any running focus animation
+    this.atHome = false;
   }
 
   dolly(delta: number): void {
     this.distanceVel += delta * 0.9;
     this.focusT = 1; // likewise: a running focus animation would overwrite the distance
+    this.atHome = false;
   }
 
   /**
@@ -139,6 +172,7 @@ export class OrbitRig {
     this.distance = THREE.MathUtils.clamp(this.distance / spreadRatio, this.limits.minDistance, this.limits.maxDistance);
     this.distanceVel = 0;
     this.focusT = 1;
+    this.atHome = false;
   }
 
   /**
@@ -152,17 +186,17 @@ export class OrbitRig {
     // Frame the bounding sphere so it fills FILL of the viewport half-height. At a
     // 21 degree FOV the tangent is small, so the distance is large and the
     // projection is nearly orthographic — which is the point of the low FOV.
-    const FILL = 0.82;
-    const halfFov = (this.camera.fov * DEG) / 2;
-    const fit = boundingRadius / (Math.tan(halfFov) * FILL);
-    this.focusToDistance = THREE.MathUtils.clamp(fit, this.limits.minDistance, this.limits.maxDistance);
+    this.focusToDistance = this.fitDistance(boundingRadius);
     this.focusT = 0;
+    this.atHome = false;
     this.focusDurationMs = durationMs;
   }
 
   /** Return to whole-body framing. */
   reset(durationMs = 600): void {
     this.focus(new THREE.Vector3(0, 0.16, 0), BODY_FRAMING_RADIUS, durationMs);
+    this.focusToDistance = this.homeDistance();
+    this.atHome = true;
   }
 
   update(dtMs: number): void {

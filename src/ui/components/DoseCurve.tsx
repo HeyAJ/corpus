@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Prediction } from '../../sim/pharma/predict';
 import styles from './components.module.css';
 
@@ -26,7 +26,14 @@ export interface DoseCurveProps {
   prediction: Prediction;
   /** The reference dose's curve, drawn underneath for comparison. */
   reference?: Prediction | null;
-  width: number;
+  /**
+   * Fixed width in CSS pixels, or omitted to FILL THE CONTAINER. The fixed 420 px it
+   * used to be drawn at was wider than a phone's drawer, so on a phone the chart ran
+   * off the right edge and was clipped (2026-09-26). Omitted, the figure measures its
+   * own box with a ResizeObserver and redraws at that width, so the same chart is
+   * 330 px in a phone sheet and 700 px on a desktop, at full resolution on both.
+   */
+  width?: number;
   height: number;
   color: string;
   /** Accessible text equivalent; colour and shape are never the only signal. */
@@ -40,8 +47,24 @@ function niceTime(min: number): string {
   return `${(min * 60).toFixed(0)} s`;
 }
 
-export function DoseCurve({ prediction, reference, width, height, color, label }: DoseCurveProps) {
+export function DoseCurve({ prediction, reference, width: fixedWidth, height, color, label }: DoseCurveProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const figureRef = useRef<HTMLElement | null>(null);
+  const [measured, setMeasured] = useState(0);
+  const width = fixedWidth ?? measured;
+
+  useEffect(() => {
+    if (fixedWidth !== undefined) return;
+    const el = figureRef.current;
+    if (!el) return;
+    // Whole pixels only: a sub-pixel change would redraw the canvas for nothing, and
+    // an open drawer animating its height would otherwise do that every frame.
+    const read = () => setMeasured(Math.floor(el.clientWidth));
+    read();
+    const observer = new ResizeObserver(read);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [fixedWidth]);
 
   const scale = useMemo(() => {
     const yMax = Math.max(prediction.peak, reference?.peak ?? 0) * 1.12;
@@ -54,7 +77,7 @@ export function DoseCurve({ prediction, reference, width, height, color, label }
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || width <= 0) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
@@ -150,8 +173,8 @@ export function DoseCurve({ prediction, reference, width, height, color, label }
   }, [prediction, reference, width, height, color, scale]);
 
   return (
-    <figure className={styles.doseCurveFigure}>
-      <canvas ref={canvasRef} style={{ width, height }} role="img" aria-label={label} />
+    <figure className={styles.doseCurveFigure} ref={figureRef}>
+      <canvas ref={canvasRef} style={{ width: width > 0 ? width : '100%', height }} role="img" aria-label={label} />
       <figcaption className={styles.srOnly}>{label}</figcaption>
     </figure>
   );

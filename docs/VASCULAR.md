@@ -11,7 +11,7 @@ whatever the simulation says is in it.
 
 ## What it shows
 
-Turn it on with the blood-drop button in the tool dock.
+Turn it on with the labelled "Vessels" switch in the bottom-left corner of the body view (it starts off).
 
 - **Thirty-one named vessel segments**, arterial and venous, with centrelines placed in
   the same body-local space as the organs in `src/data/organs.json` — so the renal

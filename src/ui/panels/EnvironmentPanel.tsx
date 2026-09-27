@@ -61,6 +61,9 @@ export function EnvironmentPanel() {
   const toggle = useStore((s) => s.toggleEnvironmentPanel);
   const dispatch = useStore((s) => s.dispatch);
   const pushLog = useStore((s) => s.pushLog);
+  // Every action lands on the timeline as well as the toast: the toast is gone after two
+  // seconds, and the timeline is where the user goes back to find it.
+  const pushEvent = useStore((s) => s.pushEvent);
   const snapshot = useStore((s) => s.snapshot);
 
   const env = snapshot?.environment;
@@ -201,7 +204,10 @@ export function EnvironmentPanel() {
               className={styles.toggle}
               onClick={() => {
                 dispatch({ type: 'ALLERGEN_EXPOSURE', severity: a.s });
-                pushLog(`Allergen exposure — ${a.label.toLowerCase()}`, a.s >= 0.6 ? 'critical' : 'warn');
+                const label = `Allergen exposure — ${a.label.toLowerCase()}`;
+                const tone = a.s >= 0.6 ? 'critical' : 'warn';
+                pushLog(label, tone);
+                pushEvent({ kind: 'state', label, tone });
               }}
             >
               {a.label}
@@ -217,13 +223,13 @@ export function EnvironmentPanel() {
       <div className={styles.group}>
         <h3 className={styles.groupTitle}>Fluid</h3>
         <div className={styles.buttons}>
-          <button className={styles.toggle} onClick={() => { dispatch({ type: 'DRINK_WATER', volume_mL: 250 }); pushLog('Drank 250 mL water'); }}>
+          <button className={styles.toggle} onClick={() => { dispatch({ type: 'DRINK_WATER', volume_mL: 250 }); pushLog('Drank 250 mL water'); pushEvent({ kind: 'food', label: 'Drank 250 mL water', tone: 'info' }); }}>
             Drink 250 mL
           </button>
-          <button className={styles.toggle} onClick={() => { dispatch({ type: 'DRINK_WATER', volume_mL: 500 }); pushLog('Drank 500 mL water'); }}>
+          <button className={styles.toggle} onClick={() => { dispatch({ type: 'DRINK_WATER', volume_mL: 500 }); pushLog('Drank 500 mL water'); pushEvent({ kind: 'food', label: 'Drank 500 mL water', tone: 'info' }); }}>
             Drink 500 mL
           </button>
-          <button className={styles.toggle} onClick={() => { dispatch({ type: 'VOID_BLADDER' }); pushLog('Bladder voided'); }}>
+          <button className={styles.toggle} onClick={() => { dispatch({ type: 'VOID_BLADDER' }); pushLog('Bladder voided'); pushEvent({ kind: 'state', label: 'Bladder voided', tone: 'info' }); }}>
             Void bladder
           </button>
         </div>

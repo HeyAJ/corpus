@@ -78,6 +78,7 @@ export function InfectionPanel() {
   const clear = (id: string, label: string) => {
     dispatch({ type: 'CLEAR_INFECTION', pathogenId: id });
     pushLog(`Cleared: ${label}`, 'info');
+    pushEvent({ kind: 'state', label: `Cleared: ${label}`, tone: 'info' });
   };
 
   return (
@@ -107,6 +108,7 @@ export function InfectionPanel() {
                 onClick={() => {
                   dispatch({ type: 'CLEAR_INFECTION' });
                   pushLog('All infections cleared', 'info');
+                  pushEvent({ kind: 'state', label: 'All infections cleared', tone: 'info' });
                 }}
               >
                 Clear all

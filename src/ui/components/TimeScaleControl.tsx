@@ -26,7 +26,26 @@ export function TimeScaleControl() {
   const mm = Math.floor((elapsed % 3600) / 60);
   const ss = Math.floor(elapsed % 60);
 
+  const next = SCALES[(SCALES.indexOf(timeScale as (typeof SCALES)[number]) + 1) % SCALES.length];
+
   return (
+    <>
+    {/*
+      PHONE: one chip that steps through the speeds. The four-button pill had nowhere to
+      go on a phone - top centre sat on the HUD, the bottom sat on the warning - and a
+      single tap-to-cycle control is how a phone camera app does the same job.
+    */}
+    <button
+      className={styles.compact}
+      onClick={() => setTimeScale(next)}
+      aria-label={`Simulation speed ${timeScale} times real time; tap for ${next} times`}
+    >
+      <span className={styles.compactClock}>
+        {hh > 0 ? `${hh}:` : ''}
+        {String(mm).padStart(2, '0')}:{String(ss).padStart(2, '0')}
+      </span>
+      <strong>{timeScale}&times;</strong>
+    </button>
     <div className={styles.wrap} role="group" aria-label="Simulation speed">
       <span className={styles.clock} aria-label={`Simulated time ${hh} hours ${mm} minutes ${ss} seconds`}>
         {hh > 0 ? `${hh}:` : ''}
@@ -44,5 +63,6 @@ export function TimeScaleControl() {
         </button>
       ))}
     </div>
+    </>
   );
 }

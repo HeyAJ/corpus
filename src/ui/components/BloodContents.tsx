@@ -26,7 +26,7 @@ const COMPARTMENT_WORD: Record<string, string> = {
 
 export function BloodContents() {
   const snapshot = useStore((s) => s.snapshot);
-  const visible = useStore((s) => s.vascularVisible);
+  const visible = useStore((s) => s.bloodPanelOpen);
 
   const t = snapshot?.transport;
   if (!visible || !t) return null;
