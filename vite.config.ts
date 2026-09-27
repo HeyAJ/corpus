@@ -1,6 +1,7 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
+import { readFileSync } from 'node:fs';
 
 const r = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 
@@ -27,8 +28,29 @@ const crossOriginIsolation: Plugin = {
   },
 };
 
+/**
+ * SHIP THE LIMITATIONS DOCUMENT WITH THE APP.
+ *
+ * The permanent footer links to docs/MODEL_LIMITATIONS.md, and the dev and preview
+ * servers happened to serve it because they serve the repository. A static host (the
+ * Vercel deployment) serves only dist/, so on the live site the one link that says
+ * what this model does NOT do was a 404 (found 2026-09-27). The file is copied into
+ * dist/docs/ at build time so the link works wherever the build is hosted.
+ */
+const shipLimitationsDoc: Plugin = {
+  name: 'ship-limitations-doc',
+  apply: 'build',
+  generateBundle() {
+    this.emitFile({
+      type: 'asset',
+      fileName: 'docs/MODEL_LIMITATIONS.md',
+      source: readFileSync(r('./docs/MODEL_LIMITATIONS.md'), 'utf8'),
+    });
+  },
+};
+
 export default defineConfig({
-  plugins: [react(), crossOriginIsolation],
+  plugins: [react(), crossOriginIsolation, shipLimitationsDoc],
   resolve: {
     alias: {
       '@sim': r('./src/sim'),
