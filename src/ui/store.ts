@@ -94,6 +94,33 @@ interface UiState {
   /** "What is happening": the plain-language status of the body. */
   statusPanelOpen: boolean;
   toggleStatusPanel: () => void;
+  /**
+   * "Structures": the parts of the selected organ, with what each does and how active
+   * it is. Opens by itself when an organ is selected (unless the user has closed it for
+   * this session - `anatomyAuto`), because seeing inside is the reason to tap an organ.
+   */
+  anatomyPanelOpen: boolean;
+  toggleAnatomyPanel: () => void;
+  setAnatomyPanel: (open: boolean) => void;
+  anatomyAuto: boolean;
+  setAnatomyAuto: (auto: boolean) => void;
+  /** The part of the selected organ the user has picked, by its id within the organ. */
+  selectedPart: string | null;
+  setSelectedPart: (id: string | null) => void;
+  /** Screen anchors of the selected organ's parts, from the viewer. */
+  partLabels: { id: string; x: number; y: number; visible: boolean }[];
+  setPartLabels: (l: { id: string; x: number; y: number; visible: boolean }[]) => void;
+  /** Reproduction: sex, the menstrual cycle, pregnancy and the sexual response. */
+  reproductionPanelOpen: boolean;
+  toggleReproductionPanel: () => void;
+  /** Body-wide overlays, like the vessels: the nerves, and hormones leaving their glands. */
+  nervesVisible: boolean;
+  toggleNerves: () => void;
+  hormonesVisible: boolean;
+  toggleHormones: () => void;
+  /** Keep the brain scan inset on screen when the brain is not the selected organ. */
+  scanPinned: boolean;
+  toggleScanPinned: () => void;
   /** The launcher that lists every panel behind the dock's menu button. */
   menuOpen: boolean;
   setMenuOpen: (open: boolean) => void;
@@ -165,6 +192,8 @@ const CLOSED = {
   infectionPanelOpen: false,
   statusPanelOpen: false,
   bloodPanelOpen: false,
+  anatomyPanelOpen: false,
+  reproductionPanelOpen: false,
   drawerOpen: false,
   menuOpen: false,
 } as const;
@@ -208,7 +237,21 @@ export const useStore = create<UiState>((set, get) => ({
   selectedOrgan: null,
   hoveredOrgan: null,
   labels: [],
-  setSelected: (id) => set({ selectedOrgan: id }),
+  // Selecting an organ clears the part picked in the previous one, and brings up its
+  // structures unless the user has dismissed that panel; deselecting closes it.
+  setSelected: (id) =>
+    set((s) => {
+      if (id === s.selectedOrgan) return {};
+      if (id === null) return { selectedOrgan: null, selectedPart: null, partLabels: [], anatomyPanelOpen: false };
+      if (!s.anatomyAuto) return { selectedOrgan: id, selectedPart: null };
+      return {
+        ...CLOSED,
+        tool: s.tool === 'body' || s.tool === 'drugs' ? ('none' as ToolMode) : s.tool,
+        selectedOrgan: id,
+        selectedPart: null,
+        anatomyPanelOpen: true,
+      };
+    }),
   setHovered: (id) => set({ hoveredOrgan: id }),
   setLabels: (l) => set({ labels: l }),
 
@@ -240,6 +283,23 @@ export const useStore = create<UiState>((set, get) => ({
   toggleBloodPanel: () => set((s) => openOnly(s, 'bloodPanelOpen')),
   statusPanelOpen: false,
   toggleStatusPanel: () => set((s) => openOnly(s, 'statusPanelOpen')),
+  anatomyPanelOpen: false,
+  toggleAnatomyPanel: () => set((s) => openOnly(s, 'anatomyPanelOpen')),
+  setAnatomyPanel: (open) => set((s) => (open ? { ...openOnly({ ...s, anatomyPanelOpen: false }, 'anatomyPanelOpen') } : { anatomyPanelOpen: false })),
+  anatomyAuto: true,
+  setAnatomyAuto: (auto) => set({ anatomyAuto: auto }),
+  selectedPart: null,
+  setSelectedPart: (id) => set({ selectedPart: id }),
+  partLabels: [],
+  setPartLabels: (l) => set({ partLabels: l }),
+  reproductionPanelOpen: false,
+  toggleReproductionPanel: () => set((s) => openOnly(s, 'reproductionPanelOpen')),
+  nervesVisible: false,
+  toggleNerves: () => set((s) => ({ nervesVisible: !s.nervesVisible })),
+  hormonesVisible: false,
+  toggleHormones: () => set((s) => ({ hormonesVisible: !s.hormonesVisible })),
+  scanPinned: false,
+  toggleScanPinned: () => set((s) => ({ scanPinned: !s.scanPinned })),
   menuOpen: false,
   setMenuOpen: (open) => set({ menuOpen: open }),
   closePanels: () => set((s) => ({ ...CLOSED, tool: s.tool === 'body' || s.tool === 'drugs' ? 'none' : s.tool })),
