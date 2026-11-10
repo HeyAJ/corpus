@@ -361,7 +361,9 @@ function Hud({ ready, client }: { ready: boolean; client: SimClient | null }) {
   const snapshot = useStore((s) => s.snapshot);
   const selected = useStore((s) => s.selectedOrgan);
   const selectedDef = useMemo(() => ORGANS.find((o) => o.id === selected) ?? null, [selected]);
-  const Panel = selectedDef ? PANELS[selectedDef.panel] : null;
+  // A panel kind the interface has no dedicated layout for falls back to the generic one
+  // rather than to nothing, so adding an organ to the data can never blank the HUD.
+  const Panel = selectedDef ? ((PANELS as Record<string, (typeof PANELS)['generic']>)[selectedDef.panel] ?? PANELS.generic) : null;
   const channelIndex = (c: WaveformChannel) => (client ? client.channelIndex(c) : 0);
   const heartDef = ORGANS.find((o) => o.id === 'heart')!;
   return (

@@ -1,18 +1,19 @@
 import * as THREE from 'three';
-import organsFile from '../../data/organs.json';
-import type { OrganDef, OrganId, OrgansFile } from '../../data/types';
-import { buildPlaceholderGeometry, triangleCount } from './placeholder';
+import type { OrganDef, OrganId } from '../../data/types';
+import { triangleCount } from './placeholder';
 import { createOrganAbsorptionMaterial, assertOrderIndependent } from '../materials/OrganAbsorption';
 import { createOrganRimMaterial, assertRimOrderIndependent } from '../materials/OrganRim';
 import { createOrganSolidMaterial, createFluidMaterial } from '../materials/OrganSolid';
+import { GeometryFactory } from '../anatomy/GeometryFactory';
+import { GI_CENTRELINES, ORGAN_DEFS, groupOffset as layoutGroupOffset, organPosition } from '../anatomy/layout';
+import { ANATOMY, atlasOf } from '../../data/anatomy';
 
 /**
  * THE ORGAN SET.
  *
  * Each organ is TWO `THREE.Mesh` instances SHARING ONE `BufferGeometry` (spec 6.2).
  * Sharing the geometry means the second mesh costs no extra memory — it is a second
- * draw of the same buffers with a different material. Fifteen organs therefore cost
- * thirty draw calls, which is irrelevant on any GPU made this decade.
+ * draw of the same buffers with a different material.
  *
  *   renderOrder 10  absorption shell   (bucket 1, multiply)
  *   renderOrder 20  fresnel rim        (bucket 2, additive)
@@ -20,67 +21,53 @@ import { createOrganSolidMaterial, createFluidMaterial } from '../materials/Orga
  *
  * Buckets 1 and 2 are order-independent by construction, so renderOrder between
  * organs within a bucket does not matter — only the bucket boundary does.
+ *
+ * FOUR THINGS THIS FILE DOES THAT THE FIRST VERSION DID NOT, and why each is here
+ * rather than somewhere else:
+ *
+ *   1. GEOMETRY ARRIVES LATER. Organs are built in a worker (anatomy/GeometryFactory.ts)
+ *      so the page is never frozen behind them. An organ therefore exists as a handle
+ *      with an empty geometry from the first frame and is filled in, and faded in, when
+ *      its buffers come back. Nothing may assume a handle has triangles.
+ *
+ *   2. NOT EVERY ORGAN BELONGS TO EVERY BODY. The reproductive organs depend on the
+ *      body's sex and the fetus on whether it is pregnant. `setBody` is the one place
+ *      that decides which organs are wanted; an unwanted organ is hidden, is not
+ *      pickable and is not built until the day it is wanted.
+ *
+ *   3. ONE ORGAN CHANGES SHAPE. The uterus grows from a pear to something that fills
+ *      the abdomen. Its geometry is rebuilt per gestational week (in the worker) and
+ *      swapped in; everything else about the handle stays.
+ *
+ *   4. A RESTING ORGAN CAN STILL SAY IT IS WORKING. `setActivity` deepens an organ's
+ *      own colour in proportion to how far above rest the engine says it is, so a body
+ *      that is running, frightened or digesting shows that across the whole stack and
+ *      not only in whichever organ happens to be selected.
  */
-
-const FILE = organsFile as unknown as OrgansFile;
 
 export type OrganState = 'dormant' | 'hovered' | 'selected';
 
 /** Spec 6.4, measured in docs/VISUAL_AUDIT.md section 2.2. */
-const STATE_STYLE: Record<OrganState, { density: number; rimGain: number; tint: number }> = {
-  // Density is CALIBRATED against the overlap measurements in VISUAL_AUDIT 2.
-  // With the tint's linear absorption coefficient of 0.453 in green and blue,
-  // sigma = density x 2 walls gives, on the #F0F0F0 ground:
-  //     1 layer  -> 204   (reference measured 196)
-  //     2 layers -> 171   (reference measured 159)
-  //     4 layers -> 120   (reference measured 121)
-  // That match across three overlap depths is the evidence that the compositing
-  // really is a product of transmittances rather than a sum of alphas.
+const STATE_STYLE: Record<OrganState, { density: number; rimGain: number }> = {
+  // DENSITY, AND WHY IT CAME DOWN FROM 1.15.
   //
-  // RAISED FROM 0.42. The calibration above is a match to the reference's OVERLAP
-  // RATIOS, which it still is — multiplying the density scales every layer count
-  // together and the ratios are preserved. What it was not was a match to the
-  // reference's CONTRAST: at 0.42 a single unoverlapped organ sat ten levels off the
-  // background and the abdomen read as one pink smudge rather than as distinguishable
-  // loops of bowel. The reference's organs have legible edges, and legibility is the
-  // thing worth matching.
+  // 1.15 was calibrated against the reference's overlap ratios with FIFTEEN fat
+  // ellipsoids: one layer 204, two 171, four 120 against the reference's 196, 159 and
+  // 121. Its own comment recorded the problem with it - "the rendered abdomen is still
+  // visibly more saturated than the reference frames ... a GEOMETRY gap, not a material
+  // one, and it closes when the placeholder meshes are replaced". They have now been
+  // replaced, and the body also has twice as many structures in it: adrenals on the
+  // kidneys, a diaphragm across the whole trunk, ureters, a cord, a gallbladder under
+  // the liver. A ray through the upper abdomen now crosses many more walls than the
+  // calibration assumed, and at 1.15 the trunk went to a uniform dark red in which no
+  // organ could be told from its neighbour - the opposite of what adding anatomy is for.
   //
-  // RIM GAINS LOWERED HARD. They were set to clear the bloom threshold at the
-  // silhouette, and they did — but with the density raised, every organ acquired a
-  // bright white outline and the abdomen turned into a tangle of glowing loops with
-  // the organs themselves lost behind them. The reference has no glow at all: its
-  // edges are soft and its brightness comes from tissue being translucent, not from
-  // anything emitting. The rim is now a hint of separation where two organs touch.
-  // LOWERED AGAIN, THIS TIME FROM THE ARITHMETIC RATHER THAN BY EYE. 0.42 was still
-  // drawing a white scribble over the whole abdomen, and the reason is a one-line sum
-  // that should have been done the first time.
-  //
-  // The rim is ADDITIVE near-white, so at the silhouette it adds roughly gain x 255
-  // levels. A dormant organ body sits near 204 on a 240 background, which leaves 36
-  // levels of headroom - about 0.14 in normalised units. At 0.42 the rim adds ~107,
-  // saturates past white, and every ellipsoid in the model gets a glowing outline
-  // BRIGHTER THAN THE BACKGROUND. With the placeholder geometry that is a tangle of
-  // overlapping loops, and it is the single thing that made the anatomy look wrong.
-  //
-  // At 0.12 the edge lands just under the background: a soft lightening inside the
-  // tissue rather than a line drawn on top of it, which is what the reference frames
-  // actually show for a dormant organ. The near-white rim the audit measured at
-  // #FFFDFB is on the SELECTED organ's silhouette, where it separates a deep saturated
-  // body from the field - not on the pale pink field itself.
-  //
-  // DENSITY WAS TRIED AT 0.72 AND PUT BACK. The rendered abdomen is still visibly more
-  // saturated than the reference frames, and the obvious move is to thin the tissue
-  // until it matches. It is the wrong move, and the arithmetic above says why: at 1.15
-  // a SINGLE layer renders 204 against the reference's measured 196, so one organ
-  // already matches - it is very slightly too light, not too dark. The abdomen is dark
-  // because the placeholder organs are fat ellipsoids that stack many more wall
-  // crossings than the reference's thin anatomical shells do, and thinning every layer
-  // to compensate would take an isolated organ (the bladder, say) further from the
-  // reference in order to drag a pile of overlapping ones towards it. The residual
-  // darkness is a GEOMETRY gap, not a material one, and it closes when the placeholder
-  // meshes are replaced - not before.
-  dormant: { density: 1.15, rimGain: 0.12, tint: 0xffc4c4 },
-  hovered: { density: 1.55, rimGain: 0.3, tint: 0xffc4c4 },
+  // Multiplying every density by one factor preserves the overlap RATIOS exactly (the
+  // product of transmittances scales as a power), so this keeps what the calibration
+  // established and gives back the legibility. The rim is unchanged: it was set from the
+  // headroom between tissue and background, and a lighter tissue has more of it.
+  dormant: { density: 0.5, rimGain: 0.12 },
+  hovered: { density: 0.8, rimGain: 0.3 },
 
   // THE SELECTED RIM GAIN WAS THE BUG, and it was a bad one.
   //
@@ -91,42 +78,52 @@ const STATE_STYLE: Record<OrganState, { density: number; rimGain: number; tint: 
   // saturated thing on screen.
   //
   // Now the halo is a hint and the colour does the work.
-  selected: { density: 0.0, rimGain: 0.30, tint: 0xffffff },
+  selected: { density: 0.0, rimGain: 0.3 },
 };
 
 /**
- * THE DORMANT TINT OF ONE ORGAN.
+ * How far an organ's dormant tint is pulled from its own colour toward the shared pink.
  *
- * Every organ used to share a single pink, which meant the only thing separating the
- * liver from the stomach behind it was their outlines. The reference does better than
- * that: its organs are cohesively pink at a glance and subtly differentiated when you
- * look, so the abdomen reads as several organs rather than one mass.
- *
- * So each organ's dormant tint is its own selected colour, lightened most of the way
- * to white. A tint near white absorbs almost nothing, which keeps the stack light; the
- * fraction that survives is the organ's own hue, and it is what makes the violet of a
- * lung distinguishable from the warm brown of a liver without either becoming loud.
+ * 0.84 keeps every resting organ in one pink family, with just enough of its own hue
+ * left that a liver is recognisably warmer than a lung when you look for it (the
+ * reference lets only the SELECTED organ take its own colour). A working organ gives
+ * some of that back: at full engagement it is drawn 0.5 of the way, plainly its own
+ * colour but still translucent tissue rather than the solid of a selected organ.
  *
  * WHY THIS IS SAFE FOR THE ORDER-INDEPENDENCE GUARANTEE: the tint enters as
  * `exp(-sigma * (1 - tint))`, so a per-organ tint is still a per-organ transmittance,
  * and a product of transmittances is commutative whatever the individual values are.
- * Different colours per organ changes what is multiplied, not that it is multiplied.
  */
-function dormantTintFor(selectedColor: string): THREE.Color {
-  // 0.84 toward a WARM PINK, not toward white: enough hue left to tell two adjacent
-  // organs apart, not enough for any single organ to read as coloured rather than as
-  // tissue.
-  //
-  // The reference keeps every dormant organ in one pink family and lets only the
-  // SELECTED organ take its own colour — a brain that is violet at rest is not what
-  // it shows. At 0.70 toward white the brain and lungs read as frankly purple, which
-  // differentiated them but left the palette. Pulling further, and toward pink rather
-  // than neutral, keeps the family while leaving just enough hue that a liver is
-  // recognisably warmer than a lung when you look for it.
-  return new THREE.Color(selectedColor).lerp(new THREE.Color(0xffd2cc), 0.84);
-}
+const REST_TINT_MIX = 0.84;
+const ACTIVE_TINT_MIX = 0.5;
+/** A fully engaged organ is also drawn this much denser. */
+const ACTIVE_DENSITY_GAIN = 0.45;
+const PINK = new THREE.Color(0xffd2cc);
+const WHITE = new THREE.Color(0xffffff);
 
 const TWEEN_MS = 250;
+/** How long a newly built organ takes to fade in. */
+const APPEAR_MS = 420;
+/** Organ engagement is smoothed over about this long so a noisy index does not flicker. */
+const ACTIVITY_TAU_MS = 350;
+
+/**
+ * The order organs are asked for, so the body assembles the same way every load and
+ * the things the eye goes to first are there first.
+ */
+const BUILD_ORDER: OrganId[] = [
+  'heart', 'brain', 'lung_l', 'lung_r', 'liver', 'stomach', 'kidney_l', 'kidney_r',
+  'intestine_large', 'intestine_small', 'trachea', 'oesophagus', 'spinal_cord', 'bladder',
+  'pancreas', 'spleen', 'diaphragm', 'eyes', 'thyroid', 'thymus', 'adrenal_l', 'adrenal_r',
+  'gallbladder', 'ureters',
+];
+
+export interface BodyKind {
+  sex: 'male' | 'female';
+  pregnant: boolean;
+  /** Gestational age, weeks. Only read while `pregnant`. */
+  gestationWeeks: number;
+}
 
 export interface OrganHandle {
   id: OrganId;
@@ -138,18 +135,44 @@ export interface OrganHandle {
   solid: THREE.Mesh;
   /** Interior fluid mesh for stomach and bladder; null elsewhere. */
   fluid: THREE.Mesh | null;
-  group: THREE.Group;
   state: OrganState;
-  /** Tween progress 0..1 between `fromStyle` and the current state's style. */
+  /** Tween progress 0..1 between the style at the last state change and the current state's. */
   tween: number;
   fromDensity: number;
   fromRim: number;
   /** Tint at the moment the state last changed, so the cross-fade starts from it. */
   fromTint: THREE.Color;
+  /** The organ's own colour and its resting tint, precomputed. */
+  ownColor: THREE.Color;
+  /**
+   * Centre of the organ's bounding sphere in the BODY frame (+x = the patient's right),
+   * before the renderer's mirror. Viewer converts it for the camera and the labels.
+   */
   centroid: THREE.Vector3;
   boundingRadius: number;
-  /** Base scale, so pulse animation multiplies rather than overwrites. */
-  baseScale: number;
+  /** Where the organ's own origin sits in the body frame. */
+  basePosition: THREE.Vector3;
+  /** Uniform scale from the sim-driven pulse (heart, lungs), multiplied into `pose`. */
+  pulse: number;
+  /** Extra transform some organs carry: the diaphragm's descent, an organ that changes size. */
+  offset: THREE.Vector3;
+  poseScale: THREE.Vector3;
+  poseRotationX: number;
+  /** True once the worker has delivered this organ's geometry. */
+  built: boolean;
+  /** True while a build is in flight, so it is not asked for twice. */
+  building: boolean;
+  /** The organ belongs to the body as it currently is. */
+  wanted: boolean;
+  /** 0..1 fade-in after the geometry arrives. */
+  appear: number;
+  /** Smoothed engagement above rest, 0..1, and the value it is heading for. */
+  activity: number;
+  activityTarget: number;
+  /** The organ has interior parts, so it turns to glass when selected. */
+  hasInterior: boolean;
+  /** Which gestational week the current geometry was built for (the uterus only). */
+  builtForWeek: number;
 }
 
 export class OrganSet {
@@ -158,62 +181,87 @@ export class OrganSet {
   readonly rimGroup = new THREE.Group();
   readonly solidGroup = new THREE.Group();
   readonly organs = new Map<OrganId, OrganHandle>();
+  /** Raycast targets: only organs that are built and belong to the current body. */
   readonly pickTargets: THREE.Object3D[] = [];
   totalTriangles = 0;
 
-  constructor() {
+  private body: BodyKind = { sex: 'male', pregnant: false, gestationWeeks: 0 };
+  private readonly scratchColor = new THREE.Color();
+  private readonly restTint = new THREE.Color();
+  private disposed = false;
+
+  constructor(private readonly factory: GeometryFactory = new GeometryFactory()) {
     this.root.add(this.absorptionGroup, this.rimGroup, this.solidGroup);
     this.absorptionGroup.renderOrder = 10;
     this.rimGroup.renderOrder = 20;
     this.solidGroup.renderOrder = 30;
 
-    for (const def of FILE.organs) {
-      this.organs.set(def.id, this.build(def));
+    for (const def of ORGAN_DEFS) {
+      // An organ has an interior to show if its atlas lists any parts.
+      const hasInterior = (ANATOMY[atlasOf(def)]?.parts.length ?? 0) > 0;
+      this.organs.set(def.id, this.createHandle(def, hasInterior));
     }
+
+    this.applyBody();
   }
 
-  private build(def: OrganDef): OrganHandle {
-    const geometry = buildPlaceholderGeometry(def.placeholder);
-    geometry.computeBoundingSphere();
-    this.totalTriangles += triangleCount(geometry);
+  /** The geometry factory, shared with the interior detail so one worker serves both. */
+  get geometryFactory(): GeometryFactory {
+    return this.factory;
+  }
 
-    const style = STATE_STYLE.dormant;
-    const dormantTint = dormantTintFor(def.selectedColor);
-    const absorptionMaterial = createOrganAbsorptionMaterial({ tint: dormantTint, density: style.density });
-    const rimMaterial = createOrganRimMaterial({ gain: style.rimGain });
+  /** Organs wanted by the current body whose geometry has not arrived yet. */
+  get pendingCount(): number {
+    let n = 0;
+    for (const h of this.organs.values()) if (h.wanted && !h.built) n++;
+    return n;
+  }
+
+  private createHandle(def: OrganDef, hasInterior: boolean): OrganHandle {
+    // An empty geometry draws nothing and intersects nothing, which is exactly what an
+    // organ that has not been built yet should do.
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(0), 3));
+    geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(0), 3));
+
+    const ownColor = new THREE.Color(def.selectedColor);
+    const tint = ownColor.clone().lerp(PINK, REST_TINT_MIX);
+    const absorptionMaterial = createOrganAbsorptionMaterial({ tint, density: 0 });
+    const rimMaterial = createOrganRimMaterial({ gain: 0 });
     assertOrderIndependent(absorptionMaterial);
     assertRimOrderIndependent(rimMaterial);
 
     // ONE geometry, two meshes. This is the whole memory story.
     const absorption = new THREE.Mesh(geometry, absorptionMaterial);
     const rim = new THREE.Mesh(geometry, rimMaterial);
-    const solid = new THREE.Mesh(geometry, createOrganSolidMaterial({ color: def.selectedColor }));
+    const solidMaterial = createOrganSolidMaterial({ color: def.selectedColor });
+    if (hasInterior) {
+      // A glass shell must not hide what is inside it: no depth write, and the interior
+      // (renderOrder 31 and up) is drawn over it.
+      solidMaterial.depthWrite = false;
+      solidMaterial.uniforms.uCore.value = 0.12;
+    }
+    const solid = new THREE.Mesh(geometry, solidMaterial);
 
     absorption.renderOrder = 10;
     rim.renderOrder = 20;
     solid.renderOrder = 30;
     solid.visible = false;
 
-    const group = FILE.groupLayout[def.group];
-    const position = new THREE.Vector3(
-      def.position[0] + def.layoutOffset[0] + group.offset[0],
-      def.position[1] + def.layoutOffset[1] + group.offset[1],
-      def.position[2] + def.layoutOffset[2] + group.offset[2],
-    );
-
+    const basePosition = organPosition(def);
     for (const mesh of [absorption, rim, solid]) {
-      mesh.position.copy(position);
+      mesh.position.copy(basePosition);
       if (def.rotation) mesh.rotation.set(def.rotation[0], def.rotation[1], def.rotation[2]);
       mesh.userData.organId = def.id;
+      // The bounding sphere of an empty geometry is degenerate; three would cull the
+      // mesh on it for ever. Culling thirty meshes is not worth the trap.
+      mesh.frustumCulled = false;
+      mesh.visible = false;
     }
 
     this.absorptionGroup.add(absorption);
     this.rimGroup.add(rim);
     this.solidGroup.add(solid);
-
-    // Raycasting uses the absorption mesh, which has depthTest off — that does not
-    // affect picking, which is pure geometry.
-    this.pickTargets.push(absorption);
 
     let fluid: THREE.Mesh | null = null;
     if (def.id === 'stomach' || def.id === 'bladder') {
@@ -228,15 +276,14 @@ export class OrganSet {
           meniscus: 0.004,
         }),
       );
-      fluid.position.copy(position);
+      fluid.position.copy(basePosition);
       if (def.rotation) fluid.rotation.set(def.rotation[0], def.rotation[1], def.rotation[2]);
       fluid.scale.setScalar(0.94);
       fluid.renderOrder = 34;
       fluid.visible = false;
+      fluid.frustumCulled = false;
       this.solidGroup.add(fluid);
     }
-
-    const sphere = geometry.boundingSphere ?? new THREE.Sphere(new THREE.Vector3(), 0.05);
 
     return {
       id: def.id,
@@ -246,17 +293,143 @@ export class OrganSet {
       rim,
       solid,
       fluid,
-      group: this.root,
       state: 'dormant',
       tween: 1,
-      fromDensity: style.density,
-      fromRim: style.rimGain,
-      fromTint: dormantTint.clone(),
-      centroid: position.clone().add(sphere.center),
-      boundingRadius: sphere.radius,
-      baseScale: 1,
+      fromDensity: 0,
+      fromRim: 0,
+      fromTint: tint.clone(),
+      ownColor,
+      centroid: basePosition.clone(),
+      boundingRadius: 0.05,
+      basePosition,
+      pulse: 1,
+      offset: new THREE.Vector3(),
+      poseScale: new THREE.Vector3(1, 1, 1),
+      poseRotationX: 0,
+      built: false,
+      building: false,
+      wanted: false,
+      appear: 0,
+      activity: 0,
+      activityTarget: 0,
+      hasInterior,
+      builtForWeek: -1,
     };
   }
+
+  /* ------------------------------------------------------------- the body */
+
+  /**
+   * Tell the organ set what kind of body this is. Cheap to call every snapshot: it does
+   * nothing unless the sex, the pregnancy or the gestational WEEK has changed.
+   */
+  setBody(body: BodyKind): void {
+    const week = body.pregnant ? Math.max(0, Math.round(body.gestationWeeks)) : 0;
+    const previousWeek = this.body.pregnant ? Math.max(0, Math.round(this.body.gestationWeeks)) : 0;
+    const changed = body.sex !== this.body.sex || body.pregnant !== this.body.pregnant || week !== previousWeek;
+    this.body = { ...body };
+    if (changed) this.applyBody();
+  }
+
+  private wants(def: OrganDef): boolean {
+    if (def.sex && def.sex !== this.body.sex) return false;
+    if (def.pregnancyOnly) return this.body.pregnant && this.body.gestationWeeks >= 8;
+    return true;
+  }
+
+  private applyBody(): void {
+    const order = [...BUILD_ORDER, ...ORGAN_DEFS.map((d) => d.id).filter((id) => !BUILD_ORDER.includes(id))];
+    for (const id of order) {
+      const h = this.organs.get(id);
+      if (!h) continue;
+      const wanted = this.wants(h.def);
+      if (wanted !== h.wanted) {
+        h.wanted = wanted;
+        if (!wanted) {
+          // Gone at once: an organ this body does not have must not linger half-faded.
+          h.appear = 0;
+          this.setMeshVisibility(h);
+          if (h.state !== 'dormant') this.setState(id, 'dormant');
+        } else if (h.built) {
+          h.appear = 0; // fade back in
+        }
+      }
+      if (!wanted) continue;
+
+      const week = id === 'uterus' && this.body.pregnant ? Math.max(0, Math.round(this.body.gestationWeeks)) : 0;
+      if ((!h.built || h.builtForWeek !== week) && !h.building) this.build(h, week);
+    }
+    this.refreshPickTargets();
+  }
+
+  private build(h: OrganHandle, week: number): void {
+    const recipe = h.def.placeholder;
+    if (recipe.kind !== 'model') {
+      throw new Error(`organ "${h.id}" uses a "${recipe.kind}" recipe; only "model" recipes are built here`);
+    }
+    h.building = true;
+    void this.factory
+      .model(recipe.model, { gestationWeeks: week })
+      .then((geometry) => {
+        h.building = false;
+        if (this.disposed) {
+          geometry.dispose();
+          return;
+        }
+        this.adopt(h, geometry, week);
+        // The body may have moved on while this was being built (a time-lapse advances a
+        // week faster than a uterus builds). Ask again for whatever is current.
+        if (h.wanted && h.id === 'uterus') {
+          const now = this.body.pregnant ? Math.max(0, Math.round(this.body.gestationWeeks)) : 0;
+          if (now !== h.builtForWeek) this.build(h, now);
+        }
+      })
+      .catch((error: unknown) => {
+        h.building = false;
+        // Loud in the console, quiet on screen: one organ failing to build must not take
+        // the body down with it.
+        console.error(`[corpus] could not build organ "${h.id}"`, error);
+      });
+  }
+
+  /** Swap a freshly built geometry into a handle. */
+  private adopt(h: OrganHandle, geometry: THREE.BufferGeometry, week: number): void {
+    const firstTime = !h.built;
+    if (h.built) this.totalTriangles -= triangleCount(h.geometry);
+    h.geometry.dispose();
+    h.geometry = geometry;
+    h.absorption.geometry = geometry;
+    h.rim.geometry = geometry;
+    h.solid.geometry = geometry;
+    if (h.fluid) h.fluid.geometry = geometry;
+    this.totalTriangles += triangleCount(geometry);
+
+    const sphere = geometry.boundingSphere ?? new THREE.Sphere(new THREE.Vector3(), 0.05);
+    h.centroid.copy(h.basePosition).add(sphere.center);
+    h.boundingRadius = sphere.radius;
+    h.built = true;
+    h.builtForWeek = week;
+    if (firstTime) h.appear = 0;
+    this.setMeshVisibility(h);
+    this.refreshPickTargets();
+  }
+
+  private setMeshVisibility(h: OrganHandle): void {
+    const on = h.built && h.wanted;
+    h.absorption.visible = on;
+    h.rim.visible = on;
+    if (!on) {
+      h.solid.visible = false;
+      if (h.fluid) h.fluid.visible = false;
+    }
+  }
+
+  private refreshPickTargets(): void {
+    this.pickTargets.length = 0;
+    for (const h of this.organs.values()) if (h.built && h.wanted) this.pickTargets.push(h.absorption);
+  }
+
+  /* --------------------------------------------------------------- states */
 
   setState(id: OrganId, state: OrganState): void {
     const h = this.organs.get(id);
@@ -277,51 +450,95 @@ export class OrganSet {
     }
   }
 
-  /** Advance the 250 ms state tweens. `dtMs` is real elapsed time, not sim time. */
+  /**
+   * How far above rest the engine says this organ is working, 0..1. Smoothed here, so
+   * the caller can pass the raw index every snapshot.
+   */
+  setActivity(id: OrganId, activity: number): void {
+    const h = this.organs.get(id);
+    if (h) h.activityTarget = Number.isFinite(activity) ? Math.max(0, Math.min(1, activity)) : 0;
+  }
+
+  /** Advance the state tweens, the fade-in and the activity tint. `dtMs` is real time. */
   update(dtMs: number): void {
+    const activityBlend = 1 - Math.exp(-dtMs / ACTIVITY_TAU_MS);
+
     for (const h of this.organs.values()) {
-      if (h.tween >= 1) continue;
-      h.tween = Math.min(1, h.tween + dtMs / TWEEN_MS);
+      if (!h.built || !h.wanted) continue;
+
+      h.activity += (h.activityTarget - h.activity) * activityBlend;
+      if (h.appear < 1) h.appear = Math.min(1, h.appear + dtMs / APPEAR_MS);
+      if (h.tween < 1) h.tween = Math.min(1, h.tween + dtMs / TWEEN_MS);
       // Ease-out cubic: fast start, gentle settle. Matches the camera focus easing.
       const e = 1 - Math.pow(1 - h.tween, 3);
+      const fade = h.appear * h.appear * (3 - 2 * h.appear);
 
       const target = STATE_STYLE[h.state];
       const abs = h.absorption.material as THREE.ShaderMaterial;
       const rim = h.rim.material as THREE.ShaderMaterial;
-
-      abs.uniforms.uDensity.value = h.fromDensity + (target.density - h.fromDensity) * e;
-      rim.uniforms.uRimGain.value = h.fromRim + (target.rimGain - h.fromRim) * e;
-
       const selected = h.state === 'selected';
-      // The selected organ is drawn by bucket 3; its absorption shell fades to the
-      // multiply identity (tint white, density 0) rather than being toggled off, so
-      // there is no pop and no change in draw order.
-      // Toward white while selected (the multiply identity, so bucket 1 contributes
-      // nothing and bucket 3 owns the look), back to the organ's OWN dormant tint
-      // otherwise — not to the shared pink, which is what erased the per-organ hue
-      // the moment anything was hovered.
-      const restTint = dormantTintFor(h.def.selectedColor);
-      (abs.uniforms.uTint.value as THREE.Color).lerpColors(
-        h.fromTint,
-        h.state === 'selected' ? new THREE.Color(0xffffff) : restTint,
-        e,
-      );
-      h.solid.visible = selected && e > 0.05;
-      (h.solid.material as THREE.ShaderMaterial).uniforms.uOpacity.value = selected ? 0.92 * e : 0;
 
+      // Where this organ's shell is heading: its state's density, raised by how hard the
+      // organ is working. A selected organ's shell goes to the multiply identity (white,
+      // density 0) rather than being switched off, so there is no pop and no change in
+      // draw order; bucket 3 owns its look.
+      const activeGain = selected ? 0 : (1 + ACTIVE_DENSITY_GAIN * h.activity) * (h.def.shellDensity ?? 1);
+      const density = h.fromDensity + (target.density * activeGain - h.fromDensity) * e;
+      abs.uniforms.uDensity.value = density * fade;
+      rim.uniforms.uRimGain.value = (h.fromRim + (target.rimGain - h.fromRim) * e) * fade;
+
+      this.restTint.copy(h.ownColor).lerp(PINK, REST_TINT_MIX + (ACTIVE_TINT_MIX - REST_TINT_MIX) * h.activity);
+      (abs.uniforms.uTint.value as THREE.Color).lerpColors(h.fromTint, selected ? WHITE : this.restTint, e);
+      // Once the cross-fade is over the tint simply follows the activity.
+      if (h.tween >= 1 && !selected) {
+        h.fromTint.copy(this.restTint);
+        h.fromDensity = target.density * activeGain;
+        h.fromRim = target.rimGain;
+      }
+
+      h.solid.visible = selected && e > 0.05;
+      (h.solid.material as THREE.ShaderMaterial).uniforms.uOpacity.value = selected ? 0.92 * e * fade : 0;
       if (h.fluid) h.fluid.visible = selected && e > 0.05;
+
+      this.applyTransform(h);
     }
   }
+
+  /* ----------------------------------------------------------- transforms */
 
   /** Uniform scale about the organ's own pivot — the sim-driven pulse (spec 6.7). */
   setScale(id: OrganId, scale: number): void {
     const h = this.organs.get(id);
+    if (h) h.pulse = scale;
+  }
+
+  /** Displace an organ from its resting place (the diaphragm's descent on inspiration). */
+  setOffset(id: OrganId, x: number, y: number, z: number): void {
+    this.organs.get(id)?.offset.set(x, y, z);
+  }
+
+  /** Non-uniform scale and a pitch about the organ's own origin, on top of the pulse. */
+  setPose(id: OrganId, scale: [number, number, number], rotationX = 0): void {
+    const h = this.organs.get(id);
     if (!h) return;
-    const s = h.baseScale * scale;
-    h.absorption.scale.setScalar(s);
-    h.rim.scale.setScalar(s);
-    h.solid.scale.setScalar(s);
-    if (h.fluid) h.fluid.scale.setScalar(s * 0.94);
+    h.poseScale.set(scale[0], scale[1], scale[2]);
+    h.poseRotationX = rotationX;
+  }
+
+  private applyTransform(h: OrganHandle): void {
+    const rx = (h.def.rotation?.[0] ?? 0) + h.poseRotationX;
+    const ry = h.def.rotation?.[1] ?? 0;
+    const rz = h.def.rotation?.[2] ?? 0;
+    for (const mesh of [h.absorption, h.rim, h.solid]) {
+      mesh.position.copy(h.basePosition).add(h.offset);
+      mesh.rotation.set(rx, ry, rz);
+      mesh.scale.copy(h.poseScale).multiplyScalar(h.pulse);
+    }
+    if (h.fluid) {
+      h.fluid.position.copy(h.basePosition).add(h.offset);
+      h.fluid.rotation.set(rx, ry, rz);
+      h.fluid.scale.copy(h.poseScale).multiplyScalar(h.pulse * 0.94);
+    }
   }
 
   /** World-space Y of the fluid surface, from a 0..1 fill fraction. */
@@ -335,7 +552,7 @@ export class OrganSet {
   }
 
   /**
-   * Manual back-to-front sort for bucket 3 (spec 6.2). At most five objects, so
+   * Manual back-to-front sort for bucket 3 (spec 6.2). At most a handful of objects, so
    * this is trivially correct and costs nothing.
    */
   sortSolidBucket(camera: THREE.Camera): void {
@@ -346,11 +563,12 @@ export class OrganSet {
     const cam = camera.position;
     visible.sort((a, b) => b.position.distanceToSquared(cam) - a.position.distanceToSquared(cam));
     visible.forEach((o, i) => {
-      o.renderOrder = 30 + i;
+      o.renderOrder = 30 + Math.min(i, 3);
     });
   }
 
   dispose(): void {
+    this.disposed = true;
     for (const h of this.organs.values()) {
       h.geometry.dispose();
       (h.absorption.material as THREE.Material).dispose();
@@ -358,17 +576,23 @@ export class OrganSet {
       (h.solid.material as THREE.Material).dispose();
       if (h.fluid) (h.fluid.material as THREE.Material).dispose();
     }
+    this.factory.dispose();
+  }
+
+  /** Scratch colour for callers that tint per frame without allocating. */
+  get scratch(): THREE.Color {
+    return this.scratchColor;
   }
 }
 
 export function organDefs(): OrganDef[] {
-  return FILE.organs;
+  return ORGAN_DEFS;
 }
 
 export function giCentrelines(): { segment: string; points: [number, number, number][] }[] {
-  return FILE.giCentrelines;
+  return GI_CENTRELINES;
 }
 
 export function groupOffset(group: OrganDef['group']): [number, number, number] {
-  return FILE.groupLayout[group].offset;
+  return layoutGroupOffset(group);
 }

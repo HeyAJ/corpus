@@ -1,21 +1,42 @@
 {
-  "version": 2,
+  "version": 3,
   "units": "metres",
-  "note": "Half-extents and positions are real adult dimensions (Guyton & Hall 14e; Standring, Gray's Anatomy 42e), with the body's origin at roughly the L3 vertebral level. The group offsets on top of them are the EXPLODED STACK (spec 6.1): a deliberate design choice, not anatomy, kept in data so it can be animated.",
+  "note": "Positions and sizes are adult dimensions (Guyton & Hall 14e; Standring, Gray's Anatomy 42e), with the origin at roughly the L3 vertebral level, +y towards the head and +z towards the front. THE X AXIS IS THE PATIENT'S: +x is the patient's RIGHT and -x the patient's LEFT, so the liver sits at +x and the stomach, spleen and cardiac apex at -x. A camera in front of the body sees the patient's right on its own left, which is the standard anatomical view; the renderer mirrors x once, at the root of the anatomy (render/scene/Viewer.ts), rather than every file storing screen coordinates. Version 2 of this file was drawn unmirrored and therefore showed a situs inversus - liver on the viewer's right - and three paths in it (the lower oesophagus, the pylorus and the tilt of the heart) had been authored to suit that mirrored picture; they are corrected here. The group offsets are the EXPLODED STACK (spec 6.1): a deliberate design choice, not anatomy, kept in data so it can be animated.",
   "groupLayout": {
-    "cranial": { "offset": [0, 0.06, 0] },
-    "thoracic": { "offset": [0, 0.0, 0] },
-    "abdominal": { "offset": [0, -0.025, 0] },
-    "pelvic": { "offset": [0, -0.045, 0] }
+    "cranial": {
+      "offset": [0, 0.06, 0]
+    },
+    "thoracic": {
+      "offset": [0, 0.0, 0]
+    },
+    "abdominal": {
+      "offset": [0, -0.025, 0]
+    },
+    "pelvic": {
+      "offset": [0, -0.045, 0]
+    },
+    "axial": {
+      "offset": [0, 0, 0]
+    }
+  },
+  "axialWarp": {
+    "note": "The exploded stack moves each body region by a rigid offset, which is fine for an organ that lives in one region and wrong for anything that runs through several: the spinal cord, the oesophagus, a ureter, the aorta, the vagus. Those are authored in unexploded body coordinates and bent by this continuous version of the same offsets - zero in the thorax, the cranial offset above the band between `cranial[0]` and `cranial[1]`, the abdominal offset below the diaphragm band, the pelvic offset below the pelvic brim band - so that a vessel still ends at the organ it supplies after that organ has been moved. Organs in the `axial` group carry the warp in their own geometry and take no group offset.",
+    "cranial": [0.385, 0.405],
+    "abdominal": [0.135, 0.11],
+    "pelvic": [-0.135, -0.165]
   },
   "organs": [
     {
       "id": "brain",
       "displayName": "Brain",
+      "system": "nervous",
       "group": "cranial",
       "panel": "neuro",
       "selectedColor": "#7E5AB3",
-      "placeholder": { "kind": "brainShell" },
+      "placeholder": {
+        "kind": "model",
+        "model": "brain"
+      },
       "position": [0, 0.42, 0],
       "layoutOffset": [0, 0, 0],
       "volume_mL": 1350,
@@ -23,15 +44,83 @@
       "labelBias": [0, 0]
     },
     {
+      "id": "eyes",
+      "displayName": "Eyes",
+      "system": "nervous",
+      "group": "cranial",
+      "panel": "ocular",
+      "selectedColor": "#3F7FA6",
+      "placeholder": {
+        "kind": "model",
+        "model": "eyes"
+      },
+      "position": [0, 0.386, 0.06],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0, 0.6]
+    },
+    {
+      "id": "spinal_cord",
+      "displayName": "Spinal Cord",
+      "system": "nervous",
+      "group": "axial",
+      "panel": "spinal",
+      "selectedColor": "#C9A14A",
+      "placeholder": {
+        "kind": "model",
+        "model": "spinal_cord"
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, 0]
+    },
+    {
+      "id": "thyroid",
+      "displayName": "Thyroid",
+      "system": "endocrine",
+      "group": "thoracic",
+      "panel": "endocrine",
+      "selectedColor": "#B8553C",
+      "placeholder": {
+        "kind": "model",
+        "model": "thyroid"
+      },
+      "position": [0, 0.326, 0.006],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 18,
+      "volumeSource": "The adult thyroid weighs 15 to 20 grams; Guyton & Hall 14e ch.77. Volume taken as the mass at tissue density ~1 g/mL.",
+      "labelBias": [0.9, 0]
+    },
+    {
+      "id": "thymus",
+      "displayName": "Thymus",
+      "system": "lymphatic",
+      "group": "thoracic",
+      "panel": "endocrine",
+      "selectedColor": "#C98A6B",
+      "placeholder": {
+        "kind": "model",
+        "model": "thymus"
+      },
+      "position": [0, 0.246, 0.03],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, 0.4]
+    },
+    {
       "id": "heart",
       "displayName": "Heart",
+      "system": "cardiovascular",
       "group": "thoracic",
       "panel": "cardiac",
       "selectedColor": "#B0232A",
-      "placeholder": { "kind": "heartShell" },
+      "placeholder": {
+        "kind": "model",
+        "model": "heart"
+      },
       "position": [-0.016, 0.168, 0.016],
       "layoutOffset": [0, 0, 0],
-      "rotation": [0.1, 0.0, 0.3],
       "volume_mL": 500,
       "volumeSource": "Whole-heart tissue and chamber volume, adult; Guyton & Hall 14e ch.9. Roughly 12 cm long by 9 cm wide.",
       "labelBias": [0, 0]
@@ -39,10 +128,14 @@
     {
       "id": "lung_l",
       "displayName": "Left Lung",
+      "system": "respiratory",
       "group": "thoracic",
       "panel": "respiratory",
       "selectedColor": "#5B3A8C",
-      "placeholder": { "kind": "lobedLung", "side": -1 },
+      "placeholder": {
+        "kind": "model",
+        "model": "lung_l"
+      },
       "position": [-0.068, 0.205, 0],
       "layoutOffset": [0, 0, 0],
       "volume_mL": 2600,
@@ -52,10 +145,14 @@
     {
       "id": "lung_r",
       "displayName": "Right Lung",
+      "system": "respiratory",
       "group": "thoracic",
       "panel": "respiratory",
       "selectedColor": "#5B3A8C",
-      "placeholder": { "kind": "lobedLung", "side": 1 },
+      "placeholder": {
+        "kind": "model",
+        "model": "lung_r"
+      },
       "position": [0.072, 0.21, 0],
       "layoutOffset": [0, 0, 0],
       "volume_mL": 3000,
@@ -65,13 +162,13 @@
     {
       "id": "trachea",
       "displayName": "Trachea",
+      "system": "respiratory",
       "group": "thoracic",
       "panel": "respiratory",
       "selectedColor": "#C8555A",
       "placeholder": {
-        "kind": "tube",
-        "path": [[0, 0.352, 0], [0, 0.32, 0.002], [0, 0.285, 0.004], [0, 0.252, 0.004]],
-        "radius": 0.0105
+        "kind": "model",
+        "model": "trachea"
       },
       "position": [0, 0, 0],
       "layoutOffset": [0, 0, 0],
@@ -79,15 +176,32 @@
       "volumeSource": "Tracheal contribution to anatomical dead space; West 10e. About 11 cm long, 2 cm bore."
     },
     {
+      "id": "diaphragm",
+      "displayName": "Diaphragm",
+      "system": "respiratory",
+      "group": "thoracic",
+      "panel": "respiratory",
+      "selectedColor": "#A0463C",
+      "placeholder": {
+        "kind": "model",
+        "model": "diaphragm"
+      },
+      "position": [0, 0.062, -0.006],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [-1.0, 0.2],
+      "shellDensity": 0.35
+    },
+    {
       "id": "oesophagus",
       "displayName": "Oesophagus",
-      "group": "thoracic",
+      "system": "digestive",
+      "group": "axial",
       "panel": "gi",
       "selectedColor": "#C8433A",
       "placeholder": {
-        "kind": "tube",
-        "path": [[0.004, 0.352, -0.02], [0.006, 0.29, -0.021], [0.008, 0.22, -0.019], [0.012, 0.15, -0.012], [0.018, 0.095, -0.002]],
-        "radius": 0.0095
+        "kind": "model",
+        "model": "oesophagus"
       },
       "position": [0, 0, 0],
       "layoutOffset": [0, 0, 0],
@@ -97,41 +211,50 @@
     {
       "id": "liver",
       "displayName": "Liver",
+      "system": "digestive",
       "group": "abdominal",
       "panel": "hepatic",
       "selectedColor": "#8E3A2A",
       "placeholder": {
-        "kind": "ellipsoid",
-        "radii": [0.098, 0.058, 0.055],
-        "detail": 5,
-        "noise": 0.09
+        "kind": "model",
+        "model": "liver"
       },
       "position": [0.032, 0.062, 0.006],
       "layoutOffset": [0, 0, 0],
-      "rotation": [0.0, 0.16, -0.12],
       "volume_mL": 1500,
       "volumeSource": "Adult liver volume ~1.5 L, about 20 cm across; Guyton & Hall 14e ch.71.",
       "labelBias": [0.6, 0]
     },
     {
+      "id": "gallbladder",
+      "displayName": "Gallbladder",
+      "system": "digestive",
+      "group": "abdominal",
+      "panel": "hepatic",
+      "selectedColor": "#5E8A3A",
+      "placeholder": {
+        "kind": "model",
+        "model": "gallbladder"
+      },
+      "position": [0.05, 0.012, 0.03],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 45,
+      "volumeSource": "The maximum volume the gallbladder can hold is 30 to 60 mL; Guyton & Hall 14e ch.65.",
+      "labelBias": [0.9, -0.3]
+    },
+    {
       "id": "stomach",
       "displayName": "Stomach",
+      "system": "digestive",
       "group": "abdominal",
       "panel": "gastric",
       "selectedColor": "#C8433A",
       "placeholder": {
-        "kind": "lathe",
-        "profile": [
-          [0.0, -0.082], [0.022, -0.078], [0.04, -0.06], [0.05, -0.032],
-          [0.053, 0.0], [0.05, 0.026], [0.042, 0.047], [0.028, 0.062],
-          [0.014, 0.071], [0.0, 0.075]
-        ],
-        "segments": 34,
-        "noise": 0.06
+        "kind": "model",
+        "model": "stomach"
       },
-      "position": [-0.05, 0.055, -0.004],
+      "position": [-0.044, 0.055, 0.002],
       "layoutOffset": [0, 0, 0],
-      "rotation": [0, 0, -0.38],
       "volume_mL": 1000,
       "volumeSource": "Adult gastric capacity ~1 L at comfortable distension, about 25 cm long; Guyton & Hall 14e ch.64.",
       "labelBias": [-0.6, 0]
@@ -139,13 +262,13 @@
     {
       "id": "pancreas",
       "displayName": "Pancreas",
+      "system": "digestive",
       "group": "abdominal",
-      "panel": "generic",
+      "panel": "pancreatic",
       "selectedColor": "#C99A4A",
       "placeholder": {
-        "kind": "capsuleChain",
-        "points": [[-0.07, 0.03, -0.028], [-0.03, 0.024, -0.03], [0.012, 0.016, -0.028], [0.042, 0.006, -0.022]],
-        "radius": 0.015
+        "kind": "model",
+        "model": "pancreas"
       },
       "position": [0, 0, 0],
       "layoutOffset": [0, 0, 0],
@@ -155,59 +278,121 @@
     {
       "id": "spleen",
       "displayName": "Spleen",
+      "system": "lymphatic",
       "group": "abdominal",
       "panel": "generic",
       "selectedColor": "#7A2B44",
-      "placeholder": { "kind": "ellipsoid", "radii": [0.03, 0.047, 0.026], "detail": 5, "noise": 0.05 },
+      "placeholder": {
+        "kind": "model",
+        "model": "spleen"
+      },
       "position": [-0.093, 0.055, -0.03],
       "layoutOffset": [0, 0, 0],
       "rotation": [0, 0.3, -0.22],
       "volume_mL": 180,
-      "volumeSource": "Adult spleen ~12 x 7 x 4 cm, volume 150-200 mL; Guyton & Hall 14e ch.33."
+      "volumeSource": "Adult spleen ~12 x 7 x 4 cm, volume 150-200 mL; Guyton & Hall 14e ch.33.",
+      "labelBias": [-0.9, 0.3]
+    },
+    {
+      "id": "adrenal_l",
+      "displayName": "Left Adrenal",
+      "system": "endocrine",
+      "group": "abdominal",
+      "panel": "endocrine",
+      "selectedColor": "#C9862B",
+      "placeholder": {
+        "kind": "model",
+        "model": "adrenal_l"
+      },
+      "position": [-0.05, 0.071, -0.046],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 4,
+      "volumeSource": "Each adrenal gland weighs about 4 grams; Guyton & Hall 14e ch.78. Volume taken as the mass at tissue density ~1 g/mL.",
+      "labelBias": [-1.0, 0.5],
+      "atlas": "adrenal"
+    },
+    {
+      "id": "adrenal_r",
+      "displayName": "Right Adrenal",
+      "system": "endocrine",
+      "group": "abdominal",
+      "panel": "endocrine",
+      "selectedColor": "#C9862B",
+      "placeholder": {
+        "kind": "model",
+        "model": "adrenal_r"
+      },
+      "position": [0.05, 0.059, -0.046],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": 4,
+      "volumeSource": "Each adrenal gland weighs about 4 grams; Guyton & Hall 14e ch.78. Volume taken as the mass at tissue density ~1 g/mL.",
+      "labelBias": [1.0, 0.5],
+      "atlas": "adrenal"
     },
     {
       "id": "kidney_l",
       "displayName": "Left Kidney",
+      "system": "urinary",
       "group": "abdominal",
       "panel": "renal",
       "selectedColor": "#8E4A6E",
-      "placeholder": { "kind": "ellipsoid", "radii": [0.026, 0.055, 0.02], "detail": 5, "noise": 0.05 },
+      "placeholder": {
+        "kind": "model",
+        "model": "kidney_l"
+      },
       "position": [-0.062, 0.012, -0.05],
       "layoutOffset": [0, 0, 0],
+      "rotation": [0, 0, -0.14],
       "volume_mL": 150,
       "volumeSource": "Adult kidney ~11 x 6 x 3 cm, volume 130-170 mL each; Guyton & Hall 14e ch.26.",
-      "labelBias": [-0.8, 0]
+      "labelBias": [-0.8, 0],
+      "atlas": "kidney"
     },
     {
       "id": "kidney_r",
       "displayName": "Right Kidney",
+      "system": "urinary",
       "group": "abdominal",
       "panel": "renal",
       "selectedColor": "#8E4A6E",
-      "placeholder": { "kind": "ellipsoid", "radii": [0.026, 0.055, 0.02], "detail": 5, "noise": 0.05 },
+      "placeholder": {
+        "kind": "model",
+        "model": "kidney_r"
+      },
       "position": [0.062, 0.0, -0.05],
       "layoutOffset": [0, 0, 0],
+      "rotation": [0, 0, 0.14],
       "volume_mL": 150,
       "volumeSource": "Adult kidney ~11 x 6 x 3 cm, volume 130-170 mL each; Guyton & Hall 14e ch.26.",
-      "labelBias": [0.8, 0]
+      "labelBias": [0.8, 0],
+      "atlas": "kidney"
+    },
+    {
+      "id": "ureters",
+      "displayName": "Ureters",
+      "system": "urinary",
+      "group": "axial",
+      "panel": "renal",
+      "selectedColor": "#B58A3A",
+      "placeholder": {
+        "kind": "model",
+        "model": "ureters"
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, 0]
     },
     {
       "id": "intestine_small",
       "displayName": "Small Intestine",
+      "system": "digestive",
       "group": "abdominal",
       "panel": "gi",
       "selectedColor": "#D0625A",
       "placeholder": {
-        "kind": "capsuleChain",
-        "points": [
-          [0.022, 0.012, 0.01], [0.006, -0.012, 0.026], [-0.04, -0.022, 0.02],
-          [-0.056, -0.052, 0.008], [-0.018, -0.07, 0.022], [0.03, -0.06, 0.018],
-          [0.054, -0.03, 0.002], [0.026, -0.012, -0.016], [-0.016, -0.028, -0.018],
-          [-0.044, -0.062, -0.01], [-0.008, -0.086, 0.004], [0.036, -0.08, 0.012],
-          [0.042, -0.104, 0.0], [0.0, -0.114, 0.006]
-        ],
-        "radius": 0.016,
-        "tube": 1
+        "kind": "model",
+        "model": "intestine_small"
       },
       "position": [0, 0, 0],
       "layoutOffset": [0, 0, 0],
@@ -217,19 +402,13 @@
     {
       "id": "intestine_large",
       "displayName": "Large Intestine",
-      "group": "abdominal",
+      "system": "digestive",
+      "group": "axial",
       "panel": "gi",
       "selectedColor": "#8E2020",
       "placeholder": {
-        "kind": "capsuleChain",
-        "points": [
-          [0.076, -0.122, -0.012], [0.08, -0.07, -0.014], [0.078, -0.018, -0.014],
-          [0.028, 0.0, -0.018], [-0.028, -0.002, -0.018], [-0.078, -0.018, -0.016],
-          [-0.08, -0.07, -0.014], [-0.07, -0.12, -0.008], [-0.034, -0.14, -0.006],
-          [0.0, -0.146, -0.008], [0.006, -0.17, -0.01]
-        ],
-        "radius": 0.021,
-        "tube": 1
+        "kind": "model",
+        "model": "intestine_large"
       },
       "position": [0, 0, 0],
       "layoutOffset": [0, 0, 0],
@@ -240,29 +419,311 @@
     {
       "id": "bladder",
       "displayName": "Bladder",
+      "system": "urinary",
       "group": "pelvic",
       "panel": "bladder",
       "selectedColor": "#C9A227",
-      "placeholder": { "kind": "ellipsoid", "radii": [0.038, 0.033, 0.033], "detail": 5, "noise": 0.03 },
-      "position": [0, -0.188, 0.004],
+      "placeholder": {
+        "kind": "model",
+        "model": "bladder"
+      },
+      "position": [0, -0.188, 0.012],
       "layoutOffset": [0, 0, 0],
       "volume_mL": 500,
       "volumeSource": "Adult bladder capacity 400-600 mL; Guyton & Hall 14e ch.26.",
-      "labelBias": [0, -0.7]
+      "labelBias": [0.9, 0]
+    },
+    {
+      "id": "prostate",
+      "displayName": "Prostate",
+      "system": "reproductive",
+      "sex": "male",
+      "group": "pelvic",
+      "panel": "reproductive",
+      "selectedColor": "#A8566A",
+      "placeholder": {
+        "kind": "model",
+        "model": "prostate"
+      },
+      "position": [0, -0.226, 0.004],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [-0.9, 0]
+    },
+    {
+      "id": "testes",
+      "displayName": "Testes",
+      "system": "reproductive",
+      "sex": "male",
+      "group": "pelvic",
+      "panel": "reproductive",
+      "selectedColor": "#B56A7A",
+      "placeholder": {
+        "kind": "model",
+        "model": "testes"
+      },
+      "position": [0, -0.305, 0.03],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [-0.9, -0.3]
+    },
+    {
+      "id": "penis",
+      "displayName": "Penis",
+      "system": "reproductive",
+      "sex": "male",
+      "group": "pelvic",
+      "panel": "reproductive",
+      "selectedColor": "#B8616C",
+      "placeholder": {
+        "kind": "model",
+        "model": "penis"
+      },
+      "position": [0, -0.25, 0.022],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, -0.3]
+    },
+    {
+      "id": "uterus",
+      "displayName": "Uterus",
+      "system": "reproductive",
+      "sex": "female",
+      "group": "pelvic",
+      "panel": "reproductive",
+      "selectedColor": "#B5476A",
+      "placeholder": {
+        "kind": "model",
+        "model": "uterus"
+      },
+      "position": [0, -0.218, -0.016],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [-0.9, 0.3]
+    },
+    {
+      "id": "ovaries",
+      "displayName": "Ovaries",
+      "system": "reproductive",
+      "sex": "female",
+      "group": "pelvic",
+      "panel": "reproductive",
+      "selectedColor": "#C9777F",
+      "placeholder": {
+        "kind": "model",
+        "model": "ovaries"
+      },
+      "position": [0, -0.148, -0.02],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, 0.4]
+    },
+    {
+      "id": "vagina",
+      "displayName": "Vagina and Vulva",
+      "system": "reproductive",
+      "sex": "female",
+      "group": "pelvic",
+      "panel": "reproductive",
+      "selectedColor": "#C06078",
+      "placeholder": {
+        "kind": "model",
+        "model": "vagina"
+      },
+      "position": [0, -0.218, -0.016],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, -0.4]
+    },
+    {
+      "id": "breasts",
+      "displayName": "Breasts",
+      "system": "reproductive",
+      "sex": "female",
+      "group": "thoracic",
+      "panel": "reproductive",
+      "selectedColor": "#D08A8A",
+      "placeholder": {
+        "kind": "model",
+        "model": "breasts"
+      },
+      "position": [0, 0.188, 0.082],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0, -0.9]
+    },
+    {
+      "id": "fetus",
+      "displayName": "Fetus",
+      "system": "reproductive",
+      "sex": "female",
+      "pregnancyOnly": true,
+      "group": "pelvic",
+      "panel": "fetal",
+      "selectedColor": "#D9826E",
+      "placeholder": {
+        "kind": "model",
+        "model": "fetus"
+      },
+      "position": [0, -0.218, -0.016],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, 0]
     }
   ],
   "giCentrelines": [
-    { "segment": "mouth", "points": [[0, 0.385, 0.008], [0.002, 0.368, 0.0]] },
-    { "segment": "oesophagus", "points": [[0.004, 0.352, -0.02], [0.006, 0.29, -0.021], [0.008, 0.22, -0.019], [0.012, 0.15, -0.012], [0.018, 0.095, -0.002]] },
-    { "segment": "stomach", "points": [[0.018, 0.095, -0.002], [-0.03, 0.098, 0.0], [-0.056, 0.07, 0.002], [-0.07, 0.036, 0.0], [-0.056, 0.008, -0.006], [-0.03, 0.0, -0.01]] },
-    { "segment": "duodenum", "points": [[-0.03, 0.0, -0.01], [-0.002, 0.008, -0.02], [0.028, 0.006, -0.024], [0.04, -0.014, -0.018]] },
-    { "segment": "jejunum", "points": [[0.04, -0.014, -0.018], [0.006, -0.012, 0.026], [-0.04, -0.022, 0.02], [-0.056, -0.052, 0.008], [-0.018, -0.07, 0.022], [0.03, -0.06, 0.018]] },
-    { "segment": "ileum", "points": [[0.03, -0.06, 0.018], [0.054, -0.03, 0.002], [0.026, -0.012, -0.016], [-0.016, -0.028, -0.018], [-0.044, -0.062, -0.01], [-0.008, -0.086, 0.004], [0.036, -0.08, 0.012], [0.042, -0.104, 0.0], [0.062, -0.12, -0.006]] },
-    { "segment": "caecum", "points": [[0.062, -0.12, -0.006], [0.076, -0.122, -0.012]] },
-    { "segment": "colon_ascending", "points": [[0.076, -0.122, -0.012], [0.08, -0.07, -0.014], [0.078, -0.018, -0.014]] },
-    { "segment": "colon_transverse", "points": [[0.078, -0.018, -0.014], [0.028, 0.0, -0.018], [-0.028, -0.002, -0.018], [-0.078, -0.018, -0.016]] },
-    { "segment": "colon_descending", "points": [[-0.078, -0.018, -0.016], [-0.08, -0.07, -0.014], [-0.07, -0.12, -0.008]] },
-    { "segment": "colon_sigmoid", "points": [[-0.07, -0.12, -0.008], [-0.034, -0.14, -0.006], [0.0, -0.146, -0.008]] },
-    { "segment": "rectum", "points": [[0.0, -0.146, -0.008], [0.006, -0.17, -0.01], [0.004, -0.196, -0.012]] }
+    {
+      "segment": "mouth",
+      "points": [
+        [0, 0.385, 0.008],
+        [0.002, 0.368, 0.0]
+      ]
+    },
+    {
+      "segment": "oesophagus",
+      "points": [
+        [0.002, 0.352, -0.02],
+        [0.003, 0.29, -0.021],
+        [0.002, 0.22, -0.02],
+        [-0.004, 0.15, -0.014],
+        [-0.012, 0.105, -0.008]
+      ]
+    },
+    {
+      "segment": "stomach",
+      "points": [
+        [-0.012, 0.105, -0.008],
+        [-0.03, 0.094, -0.002],
+        [-0.058, 0.08, 0.004],
+        [-0.07, 0.05, 0.006],
+        [-0.058, 0.02, 0.006],
+        [-0.03, 0.006, 0.004],
+        [0.01, 0.006, 0.0]
+      ]
+    },
+    {
+      "segment": "duodenum",
+      "points": [
+        [0.01, 0.006, 0.0],
+        [0.03, 0.004, -0.006],
+        [0.042, -0.012, -0.016],
+        [0.04, -0.04, -0.022],
+        [0.018, -0.05, -0.024],
+        [-0.006, -0.046, -0.022],
+        [-0.022, -0.03, -0.018]
+      ]
+    },
+    {
+      "segment": "jejunum",
+      "points": [
+        [-0.022, -0.03, -0.018],
+        [0.014, -0.044, 0.017],
+        [-0.003, -0.048, 0.025],
+        [-0.02, -0.056, 0.023],
+        [-0.037, -0.054, 0.013],
+        [-0.054, -0.042, 0.002],
+        [-0.054, -0.057, 0.023],
+        [-0.037, -0.058, 0.014],
+        [-0.02, -0.054, 0.003],
+        [-0.003, -0.051, -0.001],
+        [0.014, -0.06, 0.005],
+        [0.002, -0.077, 0.004],
+        [-0.013, -0.081, -0.001],
+        [-0.029, -0.078, 0.004],
+        [-0.044, -0.079, 0.015],
+        [-0.06, -0.078, 0.024],
+        [-0.054, -0.089, 0.003],
+        [-0.037, -0.079, 0.014],
+        [-0.02, -0.081, 0.023],
+        [-0.003, -0.086, 0.024],
+        [0.014, -0.086, 0.016]
+      ]
+    },
+    {
+      "segment": "ileum",
+      "points": [
+        [0.014, -0.086, 0.016],
+        [-0.029, -0.071, 0.026],
+        [-0.009, -0.082, 0.016],
+        [0.011, -0.084, 0.004],
+        [0.032, -0.076, 0],
+        [0.052, -0.073, 0.006],
+        [0.04, -0.089, 0.005],
+        [0.022, -0.083, 0],
+        [0.003, -0.075, 0.005],
+        [-0.015, -0.08, 0.017],
+        [-0.034, -0.09, 0.027],
+        [-0.027, -0.099, 0.004],
+        [-0.007, -0.099, 0.016],
+        [0.013, -0.105, 0.026],
+        [0.032, -0.107, 0.027],
+        [0.052, -0.097, 0.018],
+        [0.052, -0.106, 0.025],
+        [0.032, -0.105, 0.028],
+        [0.011, -0.106, 0.02],
+        [-0.009, -0.103, 0.008],
+        [-0.029, -0.107, 0],
+        [-0.034, -0.123, 0.021],
+        [-0.015, -0.131, 0.009],
+        [0.003, -0.127, 0.001],
+        [0.022, -0.125, 0.002],
+        [0.04, -0.125, 0.013],
+        [0.058, -0.124, -0.002],
+        [0.066, -0.122, -0.008]
+      ]
+    },
+    {
+      "segment": "caecum",
+      "points": [
+        [0.066, -0.122, -0.008],
+        [0.078, -0.128, -0.01],
+        [0.08, -0.112, -0.012]
+      ]
+    },
+    {
+      "segment": "colon_ascending",
+      "points": [
+        [0.08, -0.112, -0.012],
+        [0.082, -0.066, -0.014],
+        [0.08, -0.016, -0.012]
+      ]
+    },
+    {
+      "segment": "colon_transverse",
+      "points": [
+        [0.08, -0.016, -0.012],
+        [0.046, -0.03, 0.02],
+        [0.0, -0.04, 0.03],
+        [-0.046, -0.028, 0.022],
+        [-0.082, 0.0, -0.01]
+      ]
+    },
+    {
+      "segment": "colon_descending",
+      "points": [
+        [-0.082, 0.0, -0.01],
+        [-0.084, -0.06, -0.014],
+        [-0.078, -0.118, -0.01]
+      ]
+    },
+    {
+      "segment": "colon_sigmoid",
+      "points": [
+        [-0.078, -0.118, -0.01],
+        [-0.06, -0.14, 0.004],
+        [-0.03, -0.15, 0.012],
+        [-0.005, -0.14, 0.0],
+        [0.0, -0.158, -0.02]
+      ]
+    },
+    {
+      "segment": "rectum",
+      "points": [
+        [0.0, -0.158, -0.02],
+        [0.0, -0.18, -0.03],
+        [0.0, -0.205, -0.028],
+        [0.0, -0.232, -0.02]
+      ]
+    }
   ]
 }

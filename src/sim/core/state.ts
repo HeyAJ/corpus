@@ -1,5 +1,6 @@
 import { P } from './constants';
 import type { RhythmMode } from '../../bridge/types';
+import { createReproductiveState, type ReproductiveState } from '../systems/reproductive';
 
 /**
  * THE STATE VECTOR.
@@ -656,6 +657,14 @@ export interface SimState {
   mind: MindState;
   coagulation: CoagulationState;
   airway: AirwayState;
+  /**
+   * The gonadal axis, the menstrual cycle, pregnancy and the sexual response. Its shape
+   * is owned by systems/reproductive.ts and imported here, rather than declared in this
+   * file like the others, because it is the one block whose contents depend on which
+   * body this is; keeping the interface beside the code that gives it meaning means the
+   * two cannot drift.
+   */
+  reproductive: ReproductiveState;
 
   /** Non-urine fluid loss right now (diarrhoea + sweat), mL/min. Readout. */
   fluidLossRate_mL_per_min: number;
@@ -951,6 +960,7 @@ export function createInitialState(seed: number): SimState {
       haemostasis: 0,
     },
     airway: { asthma: 0, histamine: 0, constriction: 0, releaseRemaining: 0 },
+    reproductive: createReproductiveState(),
 
     fluidLossRate_mL_per_min: 0,
 

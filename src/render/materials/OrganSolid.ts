@@ -32,6 +32,7 @@ uniform vec3  uColor;
 uniform float uOpacity;
 uniform float uRimGain;
 uniform float uDepthGain;
+uniform float uCore;
 
 varying vec3 vNormalW;
 varying vec3 vViewDirW;
@@ -62,7 +63,16 @@ void main() {
   float spec = pow(ndv, 8.0) * uRimGain;
   vec3 highlight = mix(uColor, vec3(1.0), 0.55) * spec;
 
-  gl_FragColor = vec4(body + highlight, uOpacity);
+  // GLASS. An organ with an interior to show is drawn as a vessel you look INTO: thin
+  // where the wall faces you, dense where you look along it. That is the same
+  // path-length argument as everywhere else in this renderer - a grazing ray crosses
+  // more wall - applied to opacity, so the silhouette stays the deepest part of the
+  // organ and the chambers, lobes or nuclei inside it show through the middle. uCore is
+  // the opacity multiplier at normal incidence; 1 (the default) is the solid organ the
+  // reference frames show and changes nothing.
+  float alpha = uOpacity * mix(uCore, 1.0, pow(thickness, 1.6));
+
+  gl_FragColor = vec4(body + highlight * mix(uCore, 1.0, 0.5), alpha);
 }
 `;
 
@@ -102,6 +112,8 @@ export interface SolidOptions {
   opacity?: number;
   rimGain?: number;
   depthGain?: number;
+  /** Opacity multiplier where the wall faces the viewer; below 1 makes the organ a glass shell. */
+  core?: number;
 }
 
 export function createOrganSolidMaterial(options: SolidOptions = {}): THREE.ShaderMaterial {
@@ -117,6 +129,7 @@ export function createOrganSolidMaterial(options: SolidOptions = {}): THREE.Shad
       // volume, and at 0.45 it was too subtle to separate the shape from its own
       // silhouette.
       uDepthGain: { value: options.depthGain ?? 0.62 },
+      uCore: { value: options.core ?? 1 },
     },
     vertexShader: SOLID_VERT,
     fragmentShader: SOLID_FRAG,

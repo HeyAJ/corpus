@@ -423,6 +423,117 @@ export interface FluidSnapshot {
   bronchoconstriction: number;
 }
 
+/* ==========================================================================
+ * REPRODUCTION, AND THE BODY AS ANATOMY
+ *
+ * Two blocks added together (2026-11). `reproductive` is physiology: the gonadal axis,
+ * the menstrual cycle, pregnancy and the sexual response, all computed by
+ * src/sim/systems/reproductive.ts and all reaching the rest of the body through the
+ * effect bus. `anatomy` is NOT physiology: it is the engine's own state re-expressed
+ * as how hard each named structure is being driven, for the renderer to light up and
+ * the interface to list. Nothing in `anatomy` is read back by the simulation.
+ * ========================================================================== */
+
+export type CyclePhase = 'menstrual' | 'follicular' | 'ovulation' | 'luteal';
+export type SexualPhase = 'rest' | 'excitement' | 'plateau' | 'orgasm' | 'resolution';
+
+/** The menstrual cycle. Meaningful only while `active`. */
+export interface CycleSnapshot {
+  /** True in a female body that is not pregnant. */
+  active: boolean;
+  /** Day of the cycle, 1-based and fractional; day 1 is the first day of menstruation. */
+  day: number;
+  /** Length of the modelled cycle, days. */
+  length_days: number;
+  phase: CyclePhase;
+  /** Days from the LH peak, negative before it: the axis the cited hormone data is on. */
+  dayFromLhPeak: number;
+  menstruating: boolean;
+  /** Blood lost in the current (or last) period so far, mL. */
+  bloodLoss_mL: number;
+  /** 0..1: thickness of the endometrium relative to its secretory-phase peak. */
+  endometrium: number;
+  /** 0..1: growth of the dominant follicle toward ovulation. */
+  follicle: number;
+  /** 0..1: the corpus luteum, from formation after ovulation to its regression. */
+  corpusLuteum: number;
+  /** Rise in the defended core temperature the luteal phase is applying, C. */
+  temperatureShift_C: number;
+}
+
+export interface PregnancySnapshot {
+  pregnant: boolean;
+  /** Gestational age from the last menstrual period, weeks. 0 when not pregnant. */
+  gestationWeeks: number;
+  trimester: 0 | 1 | 2 | 3;
+  /** Estimated fetal weight, g; null before the cited growth curve begins (10 weeks). */
+  fetalWeight_g: number | null;
+  /** Amniotic fluid volume, mL; null outside the gestational range the citation covers. */
+  amnioticFluid_mL: number | null;
+  /** Fractional expansion of plasma volume and of red-cell mass currently applied. */
+  plasmaVolumeGain: number;
+  redCellMassGain: number;
+}
+
+export interface SexualResponseSnapshot {
+  /** Operator-set stimulation, 0..1. */
+  stimulation: number;
+  /** Arousal the body has actually reached, 0..1. */
+  arousal: number;
+  phase: SexualPhase;
+  /** 0..1 envelope of the orgasmic phase; 0 outside it. */
+  orgasm: number;
+  /** Seconds of post-ejaculatory refractory period remaining. Always 0 in a female body. */
+  refractory_s: number;
+  /** 0..1 engorgement of the genital erectile tissue. */
+  vasocongestion: number;
+  /** Orgasms since the run began. */
+  orgasms: number;
+}
+
+export interface ReproductiveSnapshot {
+  sex: 'male' | 'female';
+  /**
+   * How fast the reproductive clock runs: reproductive days per simulated second.
+   * Real time is 1/86400. A cycle or a pregnancy takes weeks, so the operator may run
+   * this clock far ahead of the rest of the body; see systems/reproductive.ts.
+   */
+  lapse_days_per_s: number;
+  cycle: CycleSnapshot;
+  pregnancy: PregnancySnapshot;
+  sexual: SexualResponseSnapshot;
+}
+
+/**
+ * How hard each structure is being driven. A DISPLAY INDEX, derived each snapshot by
+ * src/sim/derive/anatomy.ts from state the engine already has. See
+ * src/data/anatomy-types.ts for exactly what it does and does not mean.
+ */
+export interface AnatomySnapshot {
+  /** Engagement above rest of each organ, 0..1, keyed by organ id. Tints the dormant shell. */
+  organs: Record<string, number>;
+  /** Activity of each part, 0..1, keyed `<organId>.<partId>`. */
+  parts: Record<string, number>;
+  /** Nerve traffic by class, each 0..1 above rest: what the nervous-system overlay animates. */
+  nerves: {
+    sympathetic: number;
+    parasympathetic: number;
+    /** Somatic motor outflow: voluntary movement, shivering, a seizure. */
+    motor: number;
+    /** Ordinary somatic and visceral sensation. */
+    sensory: number;
+    /** Nociceptive afferents, before any analgesia. */
+    pain: number;
+  };
+  /**
+   * Secretion of each endocrine gland relative to its own resting output: 1 is basal,
+   * 2 is double. Keyed by gland id (`pituitary`, `adrenal_cortex`, `adrenal_medulla`,
+   * `thyroid`, `pancreas_beta`, `pancreas_alpha`, `pineal`, `gonads`, `placenta`,
+   * `kidney`). What the hormone overlay animates.
+   */
+  glands: Record<string, number>;
+}
+
 /** One message from the engine that the operator should see: a refused dose, say. */
 export interface EngineNotice {
   id: number;
@@ -477,6 +588,8 @@ export interface SimSnapshot {
    * contributions above a small threshold are kept, so the object stays small.
    */
   effectSources: Record<string, Record<string, number>>;
+  reproductive: ReproductiveSnapshot;
+  anatomy: AnatomySnapshot;
   /** Recent engine messages, newest last. Refused doses land here instead of vanishing. */
   notices: EngineNotice[];
   /** The subject being simulated, as the engine is using it. Set with SET_BODY. */
@@ -606,7 +719,30 @@ export type SimIntent =
   /** Exposure to an allergen the body is sensitised to: a mast-cell discharge, 0..1. */
   | { type: 'ALLERGEN_EXPOSURE'; severity: number }
   /** Clamp and set a bleed back to zero AND reset the lost-blood tally. */
-  | { type: 'STOP_ALL_BLEEDING' };
+  | { type: 'STOP_ALL_BLEEDING' }
+
+  /* ----------------------------------------------------------- reproduction */
+  /**
+   * Move the menstrual cycle to a given day (1-based; day 1 is the first day of
+   * menstruation). Refused in a male or a pregnant body. This sets where in the cycle
+   * the body IS - every hormone and every effect follows from the day - it does not
+   * set a hormone level.
+   */
+  | { type: 'SET_CYCLE_DAY'; day: number }
+  /**
+   * Begin a pregnancy at a gestational age (weeks from the last menstrual period), move
+   * an existing one to that age, or end it (`pregnant: false`). Female body only. The
+   * maternal adaptations are functions of gestational age and are applied through the
+   * effect bus; nothing is written to the circulation directly.
+   */
+  | { type: 'SET_PREGNANCY'; pregnant: boolean; weeks?: number }
+  /**
+   * How fast the reproductive clock runs, in reproductive days per simulated second.
+   * 0 (or anything below real time) restores real time. Clamped in the worker.
+   */
+  | { type: 'SET_REPRODUCTIVE_LAPSE'; days_per_s: number }
+  /** Sexual stimulation the body is receiving, 0..1. Arousal follows on its own time course. */
+  | { type: 'SET_SEXUAL_STIMULATION'; level: number };
 
 /** Waveform channel layout in the shared ring (spec 3). */
 export const WAVEFORM_CHANNELS = ['ecg', 'eeg', 'abp', 'resp'] as const;

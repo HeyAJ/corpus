@@ -9,6 +9,7 @@ import { createDitherPass } from '../postfx/DitherPass';
 import { GiBolus } from '../organs/GiBolus';
 import { AirwayCue } from '../organs/AirwayCue';
 import { VascularSystem } from '../vascular/VascularSystem';
+import { BODY_MIRROR_X } from '../anatomy/layout';
 import type { OrganId } from '../../data/types';
 import type { SimSnapshot } from '../../bridge/types';
 
@@ -51,6 +52,17 @@ interface SnapshotPair {
 
 export class Viewer {
   readonly scene = new THREE.Scene();
+  /**
+   * THE BODY FRAME. Everything anatomical hangs off this group, and this group is
+   * mirrored in x. The data's +x is the PATIENT'S right; a camera facing the patient
+   * must see that on its own left. See anatomy/layout.ts for the history: until this
+   * existed the whole body was drawn as its own mirror image.
+   *
+   * Anything added to the scene that is part of the body goes HERE, not on `scene`.
+   * Anything that reads a body-frame position for the camera or for a screen label
+   * converts it with `toScene`.
+   */
+  readonly body = new THREE.Group();
   readonly rig: OrbitRig;
   readonly organs = new OrganSet();
   readonly renderer: THREE.WebGLRenderer;
@@ -95,6 +107,12 @@ export class Viewer {
 
   private labelBuffer: { id: OrganId; x: number; y: number; visible: boolean }[] = [];
   private projected = new THREE.Vector3();
+  private focusPoint = new THREE.Vector3();
+
+  /** A body-frame point (+x = the patient's right) as a scene point. */
+  private toScene(bodyPoint: THREE.Vector3, out: THREE.Vector3): THREE.Vector3 {
+    return out.set(bodyPoint.x * BODY_MIRROR_X, bodyPoint.y, bodyPoint.z);
+  }
 
   /** Set from the store; freezes organ motion but leaves numbers live (spec 10.6). */
   reducedMotion = false;
@@ -136,21 +154,23 @@ export class Viewer {
     this.renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
 
     this.scene.background = this.backgroundColor;
-    this.scene.add(this.organs.root);
+    this.body.scale.x = BODY_MIRROR_X;
+    this.scene.add(this.body);
+    this.body.add(this.organs.root);
 
     this.bolus = new GiBolus();
-    this.scene.add(this.bolus.root);
+    this.body.add(this.bolus.root);
 
     // The inhaled/nebulised route made visible: cool tinted air drawn down the airway
     // on inspiration. Additive bucket (renderOrder 22), the same bucket the vascular
     // particles use, so it commutes with them and the order-independence claim holds.
     this.airway = new AirwayCue();
-    this.scene.add(this.airway.root);
+    this.body.add(this.airway.root);
 
     // Vessels in bucket 1 and flow particles in bucket 2, so the order-independence
     // guarantee is untouched: both land in buckets that already exist.
     this.vascular = new VascularSystem();
-    this.scene.add(this.vascular.root);
+    this.body.add(this.vascular.root);
 
     const aspect = (canvas.clientWidth || 1) / (canvas.clientHeight || 1);
     this.rig = new OrbitRig(aspect, 21);
@@ -316,7 +336,7 @@ export class Viewer {
     if (id) {
       const h = this.organs.organs.get(id);
       this.organs.setState(id, 'selected');
-      if (h) this.rig.focus(h.centroid, h.boundingRadius);
+      if (h) this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius);
     } else {
       this.rig.reset();
     }
@@ -356,6 +376,13 @@ export class Viewer {
   pushSnapshot(s: SimSnapshot): void {
     const now = performance.now();
     this.vascular.pushSnapshot(s);
+    // Which organs this body has: the reproductive set follows its sex, the fetus and
+    // the size of the uterus follow the pregnancy.
+    this.organs.setBody({
+      sex: s.body.sex,
+      pregnant: s.reproductive.pregnancy.pregnant,
+      gestationWeeks: s.reproductive.pregnancy.gestationWeeks,
+    });
     if (this.snapshots.current) {
       this.snapshots.intervalMs = Math.max(8, Math.min(200, now - this.snapshots.receivedAt));
     }
@@ -477,10 +504,12 @@ export class Viewer {
     const height = this.renderer.domElement.clientHeight;
 
     for (const h of this.organs.organs.values()) {
-      if (h.state === 'dormant') continue;
-      this.projected.copy(h.centroid).project(this.rig.camera);
+      if (h.state === 'dormant' || !h.built || !h.wanted) continue;
+      this.toScene(h.centroid, this.projected).project(this.rig.camera);
       const bias = h.def.labelBias ?? [0, 0];
-      const x = (this.projected.x * 0.5 + 0.5) * width + bias[0] * 40;
+      // labelBias is authored in the body frame too: a positive x pushes the label
+      // toward the patient's right, which is the viewer's left.
+      const x = (this.projected.x * 0.5 + 0.5) * width + bias[0] * BODY_MIRROR_X * 40;
       const y = (-this.projected.y * 0.5 + 0.5) * height + bias[1] * 40;
       this.labelBuffer.push({
         id: h.id,

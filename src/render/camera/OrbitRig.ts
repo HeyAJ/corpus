@@ -53,8 +53,14 @@ const POLAR_PER_UNIT = (75 * Math.PI) / 180;
  */
 const FLING = 1.5;
 
-/** Half-height of the whole exploded body, metres: brain crown to pelvic floor. */
-export const BODY_FRAMING_RADIUS = 0.40;
+/**
+ * Half-height of the whole exploded body, metres, and the height of its middle. The body
+ * now runs from the crown of the brain (y about 0.545) to the lowest of the pelvic organs
+ * (about -0.39), where it used to stop at the bladder; framed on the old centre the
+ * reproductive organs sat under the dock.
+ */
+export const BODY_FRAMING_RADIUS = 0.49;
+export const BODY_CENTRE_Y = 0.08;
 
 /** Screen aspect (width / height) below which the whole-body framing pulls back. */
 const PORTRAIT_ASPECT = 0.55;
@@ -76,7 +82,7 @@ export const DEFAULT_LIMITS: OrbitLimits = {
 
 export class OrbitRig {
   readonly camera: THREE.PerspectiveCamera;
-  readonly target = new THREE.Vector3(0, 0.16, 0);
+  readonly target = new THREE.Vector3(0, BODY_CENTRE_Y, 0);
 
   private azimuth = 0;
   private polar = 90 * DEG;
@@ -86,7 +92,7 @@ export class OrbitRig {
   private polarVel = 0;
   private distanceVel = 0;
 
-  private desiredTarget = new THREE.Vector3(0, 0.16, 0);
+  private desiredTarget = new THREE.Vector3(0, BODY_CENTRE_Y, 0);
   private focusFrom = new THREE.Vector3();
   private focusTo = new THREE.Vector3();
   private focusFromDistance = 2.63;
@@ -194,7 +200,7 @@ export class OrbitRig {
 
   /** Return to whole-body framing. */
   reset(durationMs = 600): void {
-    this.focus(new THREE.Vector3(0, 0.16, 0), BODY_FRAMING_RADIUS, durationMs);
+    this.focus(new THREE.Vector3(0, BODY_CENTRE_Y, 0), BODY_FRAMING_RADIUS, durationMs);
     this.focusToDistance = this.homeDistance();
     this.atHome = true;
   }

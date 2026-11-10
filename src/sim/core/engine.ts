@@ -50,6 +50,14 @@ import { stepMind, seizureMargin } from '../systems/mind';
 import { stepCoagulation, inr, aptt } from '../systems/coagulation';
 import { stepAirway } from '../systems/airway';
 import { barometricPressure } from '../systems/respiratory';
+import {
+  stepReproductive,
+  applyReproductiveIntent,
+  onSexChanged,
+  reproductiveSnapshot,
+  reproductiveHormones,
+} from '../systems/reproductive';
+import { buildAnatomy } from '../derive/anatomy';
 import { inspiredPo2 } from '../systems/environment';
 import { voidBladder } from '../systems/fluids';
 import {
@@ -280,6 +288,13 @@ export class Engine {
     stepInfection(s, dt); // labels its own sources per pathogen
     setEffectSource('anaphylaxis');
     stepAirway(s, dt);
+    // The menstrual cycle, a pregnancy and the sexual response are states of the body in
+    // exactly the sense exertion and fright are, and for the same reason they run here:
+    // what they push onto the bus must already be there when the drugs push on the same
+    // targets, so that (say) a beta blocker blunts the tachycardia of arousal and of
+    // pregnancy by the path it blunts every other tachycardia.
+    setEffectSource('reproduction');
+    stepReproductive(s, dt);
     setEffectSource('body');
 
     // 1. Pharmacodynamics reads last tick's free concentrations.
@@ -686,8 +701,27 @@ export class Engine {
         if (finite(intent.mass_kg)) s.body.mass_kg = Math.max(30, Math.min(250, intent.mass_kg));
         if (finite(intent.height_m)) s.body.height_m = Math.max(0.3, Math.min(2.5, intent.height_m));
         if (finite(intent.age_y)) s.body.age_y = Math.max(16, Math.min(100, intent.age_y));
-        if (intent.sex) s.body.sex = intent.sex;
+        if (intent.sex && intent.sex !== s.body.sex) {
+          s.body.sex = intent.sex;
+          // The reproductive subsystem owns what a change of sex means for its own
+          // state: a cycle begins or ends, a pregnancy cannot continue in a male body.
+          onSexChanged(s);
+        }
         s.body.bsa_m2 = 0.007184 * Math.pow(s.body.height_m * 100, 0.725) * Math.pow(s.body.mass_kg, 0.425);
+        break;
+      }
+
+      /* -------------------------------------------------------- reproduction */
+      //
+      // Like every intent above these set WHERE THE BODY IS - which day of the cycle,
+      // which week of a pregnancy, how much stimulation - and never a hormone level or a
+      // vital sign. The subsystem decides what follows, through the effect bus.
+      case 'SET_CYCLE_DAY':
+      case 'SET_PREGNANCY':
+      case 'SET_REPRODUCTIVE_LAPSE':
+      case 'SET_SEXUAL_STIMULATION': {
+        const refusal = applyReproductiveIntent(s, intent);
+        if (refusal) this.notice('warn', refusal);
         break;
       }
 
@@ -826,7 +860,7 @@ export class Engine {
         coreTemp_C: s.metabolic.coreTemp,
       },
       endocrine: {
-        hormones: HORMONES.map((def) => {
+        hormones: [...HORMONES.map((def) => {
           const h = s.endocrine.hormones[def.id];
           // The panel shows what an assay would read and the receptor activity that level
           // implies - including a drug that acts through its own receptors rather than
@@ -847,6 +881,11 @@ export class Engine {
             gland: def.gland,
           };
         }),
+        // The gonadal and pregnancy hormones are computed by the reproductive subsystem,
+        // not by the six-hormone integrator above (their levels follow a cycle or a
+        // gestational age, not a first-order feedback loop), but an assay does not care
+        // who computed them: they are listed with the rest.
+        ...reproductiveHormones(s)],
         stressAxis: s.endocrine.stressAxis,
         clockHour: s.endocrine.clockHour,
       },
@@ -1016,6 +1055,8 @@ export class Engine {
       },
       effects: activeEffects(s),
       effectSources: buildEffectSources(s),
+      reproductive: reproductiveSnapshot(s),
+      anatomy: buildAnatomy(s),
       notices: this.notices.map((n) => ({ ...n })),
       body: { ...s.body },
     };
