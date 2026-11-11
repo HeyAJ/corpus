@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { triTable } from 'three/examples/jsm/objects/MarchingCubes.js';
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 /**
  * SIGNED-DISTANCE MODELLING FOR ORGANS.
@@ -543,4 +544,21 @@ export function boundsOf(points: readonly V3[], padding: number): { min: V3; max
     if (p[2] > z1) z1 = p[2];
   }
   return { min: [x0 - padding, y0 - padding, z0 - padding], max: [x1 + padding, y1 + padding, z1 + padding] };
+}
+
+/**
+ * Join several geometries (extracted surfaces, tubes) into one mesh's worth of buffers,
+ * disposing of the inputs. Everything this toolkit produces carries positions, normals
+ * and an index; the tubes also arrive with texture coordinates nothing here uses, which
+ * are dropped so the parts agree on their attributes.
+ */
+export function mergeParts(parts: THREE.BufferGeometry[]): THREE.BufferGeometry {
+  if (parts.length === 0) throw new Error('anatomy: nothing to merge');
+  for (const g of parts) if (g.getAttribute('uv')) g.deleteAttribute('uv');
+  const merged = parts.length === 1 ? parts[0].clone() : mergeGeometries(parts, false);
+  for (const g of parts) g.dispose();
+  if (!merged) throw new Error('anatomy: could not merge geometries');
+  merged.computeBoundingSphere();
+  merged.computeBoundingBox();
+  return merged;
 }

@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
   capsule,
   chain,
@@ -8,6 +7,7 @@ import {
   ellipsoid,
   halfSpace,
   intersect,
+  mergeParts,
   polygonise,
   slab,
   smoothSubtract,
@@ -68,17 +68,7 @@ function local(points: readonly V3[], origin: V3): [number, number, number][] {
   return points.map((p) => [p[0] - origin[0], p[1] - origin[1], p[2] - origin[2]]);
 }
 
-function merge(parts: THREE.BufferGeometry[]): THREE.BufferGeometry {
-  // mergeGeometries needs every part to carry the same attributes; the tubes come with
-  // texture coordinates nothing here uses.
-  for (const g of parts) if (g.getAttribute('uv')) g.deleteAttribute('uv');
-  const merged = mergeGeometries(parts, false);
-  for (const g of parts) g.dispose();
-  if (!merged) throw new Error('anatomy: could not merge model parts');
-  merged.computeBoundingSphere();
-  merged.computeBoundingBox();
-  return merged;
-}
+const merge = mergeParts;
 
 /* ------------------------------------------------------------------ brain */
 
