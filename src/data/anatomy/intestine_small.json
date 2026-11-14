@@ -1,6 +1,166 @@
 {
   "atlas": "intestine_small",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The inside of the small intestine, drawn as anatomy: its three regions (duodenum, jejunum and ileum) inside a muscular wall, the circular folds, the string of chyme in the lumen, the Peyer's patches of the ileum, the ileocaecal junction, and the mesenteric arteries and veins. One short stretch of jejunal mucosa is drawn opened out and ENLARGED, with its villi, capillary loops and central lacteals, because the real villi are far too small to see at the scale of the bowel. It leaves out the mesentery as a membrane, the crypts, the enteric nerve plexuses, the brush border and every secretory and enzymatic detail. Chyme moves along the lumen with the model's peristalsis, absorbed nutrients leave the mucosa towards the portal vein at the rate the engine reports for glucose absorption, and lymph appears in the lacteals when fat is in the upper gut. Activity bars are display indices, not measurements.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "duodenum",
+      "label": "Duodenum",
+      "summary": "First part of the small bowel; receives stomach contents, bile and pancreatic juice",
+      "function": "The duodenum is the short, wide first region of the small intestine. Chyme from the stomach is neutralised here, and bile and pancreatic juice join it at the major duodenal papilla, which is where most chemical digestion begins. Fat arriving in it triggers the hormonal signals that release bile and slow the stomach. In this simulator it brightens when food reaches the upper gut.",
+      "color": "#d9a05b",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "digestion", "weight": 0.45, "note": "Food in the stomach and upper bowel means chyme is arriving here to be mixed with bile and pancreatic juice.", "source": "GH14" },
+        { "signal": "fatLoad", "weight": 0.2, "note": "Fat in the duodenum is the stimulus for bile release and for slowing gastric emptying.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.15, "note": "Vagal outflow raises secretion and motility in the upper gut.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "jejunum",
+      "label": "Jejunum",
+      "summary": "Middle region; the main site of nutrient absorption, with the densest folds",
+      "function": "The jejunum is the middle region of the small bowel, with the tallest and most closely set circular folds and the most villi. Most sugars, amino acids and fats are absorbed here. It brightens when the engine reports glucose entering the portal blood and when contents are passing through the small bowel.",
+      "color": "#e0b27a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "absorption", "weight": 0.4, "note": "The jejunum is the principal absorbing region, so it follows the absorption signal.", "source": "GH14" },
+        { "signal": "digestion", "weight": 0.25, "note": "Digestion in the upper gut sends chyme on into the jejunum.", "source": "GH14" },
+        { "signal": "intestinalTransit", "weight": 0.2, "note": "Contents in the small bowel mean the region is working.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ileum",
+      "label": "Ileum",
+      "summary": "Last region; absorbs bile salts and vitamin B12 and carries the Peyer's patches",
+      "function": "The ileum is the final, narrower region of the small intestine. It absorbs what the jejunum left, including bile salts, which are returned to the liver, and it has the lymphoid Peyer's patches in its wall. It ends at the ileocaecal junction. It brightens with transit of contents and with gut motility.",
+      "color": "#c98f6a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "intestinalTransit", "weight": 0.3, "note": "Chyme that has passed the jejunum arrives here.", "source": "GH14" },
+        { "signal": "absorption", "weight": 0.2, "note": "The ileum absorbs the remainder of the nutrient load.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.3, "note": "Raised gut motility drives chyme through the ileum faster.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscular_wall",
+      "label": "Muscular Wall",
+      "summary": "Circular and longitudinal smooth muscle that mixes and propels the chyme",
+      "function": "The wall of the small intestine has an inner circular and an outer longitudinal layer of smooth muscle. Segmenting contractions mix the chyme with digestive juices, and peristaltic waves move it on towards the colon. Vagal activity increases this muscle's work and sympathetic activity reduces it. In this simulator it brightens with motility and vagal outflow and dims with sympathetic outflow.",
+      "color": "#b5655a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "motilityRise", "weight": 0.4, "note": "Drugs or states that raise gut motility act on this muscle.", "source": "GH14" },
+        { "signal": "motilityFall", "weight": -0.3, "note": "Reduced motility, for example from opioids, quietens the muscle.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.3, "note": "Vagal outflow excites intestinal smooth muscle.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits intestinal motility.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "lumen_contents",
+      "label": "Chyme in the Lumen",
+      "summary": "The partly digested food mixture, drawn as a segmented string of boluses",
+      "function": "Chyme is the semi-fluid mixture of food, gastric and pancreatic juice and bile that passes along the lumen. Segmenting contractions divide it into short portions, which is why it is drawn as a string of boluses with constrictions between them. It brightens with the amount of material in the small bowel and with motility.",
+      "color": "#c9a24a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "intestinalTransit", "weight": 0.6, "note": "More material in the small bowel means more chyme to show.", "source": "GH14" },
+        { "signal": "digestion", "weight": 0.2, "note": "Digestion in the upper gut is what supplies chyme.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.2, "note": "Faster motility carries chyme through more quickly.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "plicae_circulares",
+      "label": "Circular Folds",
+      "summary": "Permanent folds of mucosa and submucosa; closest together in the jejunum",
+      "function": "The plicae circulares, or valvulae conniventes, are permanent circular folds of the mucosa and submucosa that project into the lumen. They increase the surface available for absorption and slow the passage of chyme. They are close together in the duodenum and jejunum and sparse and low in the ileum. They brighten with absorption.",
+      "color": "#e8c9a0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "absorption", "weight": 0.4, "note": "The folds carry the absorbing surface, so they follow the absorption signal.", "source": "GH14" },
+        { "signal": "digestion", "weight": 0.2, "note": "Digestion in the upper gut is what gives them something to absorb.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mucosa_villi",
+      "label": "Mucosa with Villi",
+      "summary": "Absorbing lining; one stretch drawn opened out and enlarged",
+      "function": "The mucosa is the absorbing lining of the bowel. Its finger-like villi, and the microvilli on their cells, multiply the surface in contact with the chyme. Each villus has a capillary network that takes up sugars and amino acids into the portal blood. The stretch drawn here is opened out and ENLARGED so the villi can be seen; it is not at the scale of the bowel. It brightens with the glucose absorption the engine reports.",
+      "color": "#e6a0a0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "absorption", "weight": 0.6, "note": "Nutrients crossing the mucosa into the portal blood are what the absorption signal counts.", "source": "GH14" },
+        { "signal": "digestion", "weight": 0.2, "note": "Digestion supplies the nutrients to absorb.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lacteals",
+      "label": "Lacteals",
+      "summary": "Lymph vessels in each villus that carry absorbed fat away as chyle",
+      "function": "Each villus has a central blind-ended lymphatic vessel, the lacteal. Absorbed fats, packaged as chylomicrons, enter the lacteals rather than the blood capillaries and travel in the lymph, which looks milky and is called chyle, towards the thoracic duct. In this simulator the lacteals light and their lymph stream appears when there is fat in the upper gut.",
+      "color": "#f1ead0",
+      "rest": 0.1,
+      "drives": [
+        { "signal": "fatLoad", "weight": 0.7, "note": "Fat arriving in the gut is what the lacteals carry away.", "source": "GH14" },
+        { "signal": "digestion", "weight": 0.1, "note": "A meal in the upper gut precedes fat absorption.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "peyers_patches",
+      "label": "Peyer's Patches",
+      "summary": "Lymphoid follicles in the ileal wall that sample the gut contents",
+      "function": "Peyer's patches are aggregates of lymphoid follicles in the wall of the ileum, on the side away from the mesentery. They sample material from the lumen and take part in mucosal immunity. They brighten when the simulator reports immune activation or infection.",
+      "color": "#7aa6d6",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "immune", "weight": 0.3, "note": "Immune activation raises lymphoid tissue activity.", "source": "GH14" },
+        { "signal": "infection", "weight": 0.3, "note": "A pathogen burden engages gut-associated lymphoid tissue.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ileocaecal_junction",
+      "label": "Ileocaecal Junction",
+      "summary": "Valve at the end of the ileum where it joins the caecum",
+      "function": "The ileocaecal junction is where the ileum opens into the caecum. Its lips act as a valve that releases chyme into the colon in small portions and resists the backward flow of colonic contents. It brightens with transit of contents and motility.",
+      "color": "#a8566b",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "intestinalTransit", "weight": 0.3, "note": "Chyme reaching the end of the ileum is passed through this valve.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.3, "note": "Faster motility passes chyme through more often.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mesenteric_vessels",
+      "label": "Mesenteric Arteries and Veins",
+      "summary": "Arterial arcades bring blood to the bowel; veins carry nutrients to the portal vein",
+      "function": "The superior mesenteric artery fans into branches and arcades in the mesentery that supply the small bowel. Matching veins collect the blood that has taken up nutrients and join the superior mesenteric vein, which drains into the portal vein and so to the liver. Blood flow to the gut rises after a meal and falls when sympathetic outflow rises. It brightens with digestion and absorption.",
+      "color": "#b03a48",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "digestion", "weight": 0.35, "note": "Gut blood flow rises while food is being digested.", "source": "GH14" },
+        { "signal": "absorption", "weight": 0.3, "note": "Absorbed nutrients leave the gut in the mesenteric veins.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.15, "note": "Sympathetic outflow constricts the splanchnic vessels.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }
