@@ -74,7 +74,13 @@ interface OrganMesh {
 
 function buildScene(): OrganMesh[] {
   const out: OrganMesh[] = [];
+  // THE BODY AS THE APP OPENS IT: the default subject is male and not pregnant, so the
+  // organs only a female body has, and the fetus, are left out - exactly as OrganSet
+  // leaves them out. Rendering both sexes' organs on top of one another would still
+  // commute (the blend does not care what it is blending), but it would be a test of a
+  // body nobody can see, and it would spend a third of its time on it.
   for (const def of FILE.organs) {
+    if (def.pregnancyOnly || (def.sex && def.sex !== 'male')) continue;
     const geometry = buildPlaceholderGeometry(def.placeholder);
     const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
     const group = FILE.groupLayout[def.group];

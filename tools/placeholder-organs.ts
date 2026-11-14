@@ -21,19 +21,35 @@ import { buildPlaceholderGeometry, triangleCount } from '../src/render/organs/pl
 
 const FILE = organsFile as unknown as OrgansFile;
 
-/** Triangle budgets from spec 7.5. Total scene budget 140 k. */
+/**
+ * Triangle budgets.
+ *
+ * Spec 7.5 budgeted fifteen organs at 140 k triangles in total. The body now has more
+ * than twice as many structures, and each is authored anatomy rather than a deformed
+ * sphere, so the budgets are restated for what is actually drawn. What they protect is
+ * unchanged: the absorption material shows silhouette and nothing else, so triangles
+ * beyond what a smooth outline needs buy only load time and memory.
+ *
+ * The total counts EVERY organ in the data, both sexes' reproductive organs and the
+ * fetus included. No body has all of them: a male body draws about 165 k and a
+ * non-pregnant female body about the same.
+ */
 const BUDGET: Record<string, number> = {
-  heart: 15000,
-  lung_l: 12000,
-  lung_r: 12000,
-  brain: 20000,
-  liver: 10000,
-  intestine_small: 15000,
-  intestine_large: 10000,
-  stomach: 8000,
+  brain: 26000,
+  heart: 16000,
+  lung_l: 16000,
+  lung_r: 16000,
+  fetus: 16000,
+  uterus: 16000,
+  trachea: 11000,
+  liver: 11000,
+  intestine_small: 9000,
+  intestine_large: 9000,
+  stomach: 8500,
+  testes: 9000,
 };
-const DEFAULT_BUDGET = 6000;
-const TOTAL_BUDGET = 140000;
+const DEFAULT_BUDGET = 8000;
+const TOTAL_BUDGET = 240000;
 
 interface Row {
   id: string;
@@ -69,7 +85,7 @@ function main(): void {
     geometry.dispose();
   }
 
-  process.stdout.write('PLACEHOLDER ORGAN GEOMETRY\n\n');
+  process.stdout.write('ORGAN GEOMETRY (all organs in the data, both sexes)\n\n');
   process.stdout.write('  organ              tris    budget   status   radius(m)  centre(m)\n');
   process.stdout.write('  ' + '-'.repeat(74) + '\n');
 
@@ -102,9 +118,10 @@ function main(): void {
   const manifest = {
     generatedBy: 'tools/placeholder-organs.ts',
     note:
-      'Bounding spheres and centroids of the procedural placeholders. A real mesh from ' +
-      'Phase 7 must match these within a few millimetres, or the camera focus animation ' +
-      'and the sim-driven pulse scaling will be framed on the wrong point.',
+      'Bounding spheres and centroids of the authored organ shells, in the BODY frame ' +
+      '(+x = the patient\'s right; the renderer mirrors x). Anything that replaces a shell ' +
+      'must match these within a few millimetres, or the camera focus animation and the ' +
+      'sim-driven pulse scaling will be framed on the wrong point.',
     totalTriangles: total,
     organs: rows.map((r) => ({
       id: r.id,

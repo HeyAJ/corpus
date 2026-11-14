@@ -10,6 +10,7 @@ import { GiBolus } from '../organs/GiBolus';
 import { AirwayCue } from '../organs/AirwayCue';
 import { VascularSystem } from '../vascular/VascularSystem';
 import { BODY_MIRROR_X } from '../anatomy/layout';
+import { OrganDetail } from '../anatomy/detail/OrganDetail';
 import type { OrganId } from '../../data/types';
 import type { SimSnapshot } from '../../bridge/types';
 
@@ -41,6 +42,10 @@ export interface ViewerCallbacks {
   onSelect?: (id: OrganId | null) => void;
   /** Screen-space label anchors, recomputed each frame (spec 6.4). */
   onLabels?: (labels: { id: OrganId; x: number; y: number; visible: boolean }[]) => void;
+  /** A part of the selected organ's interior was tapped; null when the organ changes. */
+  onPart?: (p: { organ: OrganId; part: string } | null) => void;
+  /** Screen anchors of the selected organ's interior parts, sent only when they move. */
+  onPartLabels?: (labels: { id: string; x: number; y: number; visible: boolean }[]) => void;
 }
 
 interface SnapshotPair {
@@ -76,6 +81,17 @@ export class Viewer {
   private bolus: GiBolus;
   private airway: AirwayCue;
   private vascular: VascularSystem;
+  /**
+   * The inside of the selected organ: part meshes and particle streams, drawn through the
+   * organ's glass shell. Owned and animated by OrganDetail; this class only selects, ticks,
+   * taps and relays labels.
+   */
+  private detail: OrganDetail;
+  /** Gestational week the interior was last asked for, so a week change rebuilds it. */
+  private interiorWeeks = 0;
+  private lastViewportKey = '';
+  /** Rounded interior-part label positions last sent to React. */
+  private lastPartLabelKey = '';
 
   /**
    * Touch gesture state. The Viewer owns touch directly on its own canvas so App.tsx
@@ -171,6 +187,10 @@ export class Viewer {
     // guarantee is untouched: both land in buckets that already exist.
     this.vascular = new VascularSystem();
     this.body.add(this.vascular.root);
+
+    // The interiors share the organ set's geometry worker, so one worker serves both.
+    this.detail = new OrganDetail(this.organs.geometryFactory);
+    this.body.add(this.detail.root);
 
     const aspect = (canvas.clientWidth || 1) / (canvas.clientHeight || 1);
     this.rig = new OrbitRig(aspect, 21);
@@ -325,8 +345,36 @@ export class Viewer {
 
   handleTap(x: number, y: number): void {
     this.pointer.set(x, y);
+    // With an organ open, its interior parts get the first claim on the tap. A hit marks
+    // the part and leaves the organ selected; a miss falls through to the ordinary organ
+    // picking below, so tapping empty space still deselects.
+    if (this.selected) {
+      this.raycaster.setFromCamera(this.pointer, this.rig.camera);
+      const part = this.detail.pick(this.raycaster);
+      if (part) {
+        this.detail.highlight(part);
+        this.callbacks.onPart?.({ organ: this.selected, part });
+        return;
+      }
+    }
     const hit = this.pick();
     this.select(hit);
+  }
+
+  /** The UI picked a part from its list: mark it (or clear with null) in the interior. */
+  highlightPart(partId: string | null): void {
+    this.detail.highlight(partId);
+  }
+
+  /** True once the selected organ's interior has been built and is on screen. */
+  get interiorReady(): boolean {
+    return this.detail.ready;
+  }
+
+  /** The gestational age the body is at, 0 when it is not pregnant. */
+  private currentWeeks(snapshot: SimSnapshot | null = this.snapshots.current): number {
+    const p = snapshot?.reproductive.pregnancy;
+    return p?.pregnant ? p.gestationWeeks : 0;
   }
 
   select(id: OrganId | null): void {
@@ -337,9 +385,16 @@ export class Viewer {
       const h = this.organs.organs.get(id);
       this.organs.setState(id, 'selected');
       if (h) this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius);
+      if (h) {
+        this.interiorWeeks = this.currentWeeks();
+        this.detail.show(h, this.interiorWeeks);
+      }
     } else {
       this.rig.reset();
+      this.detail.hide();
     }
+    // A picked part belongs to the organ it was picked in.
+    this.callbacks.onPart?.(null);
     this.callbacks.onSelect?.(id);
   }
 
@@ -389,6 +444,26 @@ export class Viewer {
     this.snapshots.previous = this.snapshots.current;
     this.snapshots.current = s;
     this.snapshots.receivedAt = now;
+
+    // Organ engagement reaches the shells every snapshot (OrganSet smooths it), so a body
+    // that is running or digesting shows it across the whole stack. Keys the organ set
+    // does not have (a gland, say) are ignored.
+    const engagement = s.anatomy.organs;
+    for (const key in engagement) {
+      const id = key as OrganId;
+      if (this.organs.organs.has(id)) this.organs.setActivity(id, engagement[key]);
+    }
+
+    // The uterus and the fetus are rebuilt as the weeks pass; show() is a no-op for every
+    // other organ and for an unchanged week.
+    if (this.selected) {
+      const weeks = this.currentWeeks(s);
+      if (weeks !== this.interiorWeeks) {
+        this.interiorWeeks = weeks;
+        const h = this.organs.organs.get(this.selected);
+        if (h) this.detail.show(h, weeks);
+      }
+    }
   }
 
   /** Interpolation factor for the current frame, 0..1 with a small extrapolation cap. */
@@ -452,8 +527,18 @@ export class Viewer {
     this.airway.update(dtMs / 1000, this.snapshots.current);
     this.rig.update(dtMs);
     this.applySnapshotToScene(now);
+    // After the shells have taken this frame's pulse and pose: the interior copies them.
+    this.syncDetailViewport();
+    this.detail.update(
+      dtMs / 1000,
+      this.snapshots.current,
+      this.snapshots.previous,
+      Math.min(1, this.alpha(now)),
+      this.reducedMotion,
+    );
     this.organs.sortSolidBucket(this.rig.camera);
     this.emitLabels();
+    this.emitPartLabels();
 
     this.composer.render();
   }
@@ -529,6 +614,34 @@ export class Viewer {
     this.callbacks.onLabels(this.labelBuffer.slice());
   }
 
+  /**
+   * Stream particles are sized in world metres and converted to pixels in the vertex
+   * shader, which needs the DRAWING-BUFFER height (CSS height times the pixel ratio the
+   * adaptive resolution is currently at) and the lens. Sent only when either changes.
+   */
+  private syncDetailViewport(): void {
+    const height = Math.round(this.renderer.domElement.clientHeight * this.dpr);
+    const fov = this.rig.camera.fov;
+    const key = `${height}:${fov}`;
+    if (key === this.lastViewportKey) return;
+    this.lastViewportKey = key;
+    this.detail.setViewport(height, fov);
+  }
+
+  /** Part label anchors, sent only when a rounded position changed (as `emitLabels`). */
+  private emitPartLabels(): void {
+    if (!this.callbacks.onPartLabels) return;
+    const width = this.renderer.domElement.clientWidth;
+    const height = this.renderer.domElement.clientHeight;
+    const anchors = this.detail.anchors(this.rig.camera, width, height, BODY_MIRROR_X);
+    let key = '';
+    for (const l of anchors) key += `${l.id}:${Math.round(l.x)},${Math.round(l.y)},${l.visible ? 1 : 0};`;
+    if (key === this.lastPartLabelKey) return;
+    this.lastPartLabelKey = key;
+    // The detail's array is reused every frame, so React gets copies.
+    this.callbacks.onPartLabels(anchors.map((l) => ({ id: l.id, x: l.x, y: l.y, visible: l.visible })));
+  }
+
   /** See `maxDpr`: step the render resolution to hold the frame rate. */
   private adaptResolution(now: number): void {
     if (++this.framesSinceCheck < 60) return;
@@ -581,6 +694,7 @@ export class Viewer {
     this.organs.dispose();
     this.bolus.dispose();
     this.airway.dispose();
+    this.detail.dispose();
     // Was leaking: VascularSystem builds sixty tube geometries and their shader
     // materials plus a large point cloud, and none of it was being freed on teardown.
     this.vascular.dispose();

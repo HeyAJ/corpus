@@ -1,6 +1,149 @@
 {
   "atlas": "eyes",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The two eyes drawn as their main structures: the outer coat (sclera and cornea), the iris with its pupil, the lens, the retina and the optic nerve. The pupil is live: its diameter follows the simulation's own pupil, so opioids pin it and atropine-like drugs or fright widen it. The vitreous and aqueous, the ciliary body, the eye muscles, the macula and the retinal layers are left out, and there is no image formation or accommodation; the model has no visual signal, so the retina and nerve show only how awake the body is.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "sclera",
+      "label": "Sclera",
+      "summary": "The tough white outer coat of the eyeball",
+      "function": "The sclera is the dense fibrous coat that gives the eyeball its shape and carries the pull of the eye muscles. It is continuous with the clear cornea at the front and with the sheath of the optic nerve at the back. It is structural and has no drive in this simulator, so it stays at a steady dim glow.",
+      "color": "#e8e4d8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cornea",
+      "label": "Cornea",
+      "summary": "The clear dome at the front that does most of the focusing",
+      "function": "The cornea is the transparent front window of the eye, and because light passes from air into it, its curved surface bends light more than the lens does. It has no blood vessels and is kept clear by the tear film. It has no drive in this simulator and glows steadily.",
+      "color": "#9fd6e8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "iris",
+      "label": "Iris",
+      "summary": "The coloured ring of muscle that sets the pupil's size",
+      "function": "The iris holds two smooth muscles: a ring (the sphincter) that narrows the pupil under parasympathetic control, and a radial one (the dilator) that widens it under sympathetic control. Both are active whenever the pupil is away from its resting size, in either direction. The iris brightens when a drug or fright moves the pupil from its resting diameter.",
+      "color": "#5b8fb9",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "mydriasis",
+          "weight": 0.4,
+          "note": "A wider pupil means the sympathetically driven dilator is working harder against the sphincter.",
+          "source": "GH14"
+        },
+        {
+          "signal": "miosis",
+          "weight": 0.4,
+          "note": "A narrower pupil means the parasympathetically driven sphincter is working harder against the dilator.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pupil_right",
+      "label": "Right Pupil",
+      "summary": "The opening in the right iris that admits light",
+      "function": "The pupil is the hole in the middle of the iris, and the iris muscles set its diameter: it narrows with parasympathetic drive and in bright light, and widens with sympathetic drive and in the dark. In this simulator the disc is drawn at the engine's live pupil diameter, so opioids pin it small and atropine-like drugs or fright open it wide. It glows when it is away from its resting size.",
+      "color": "#1b1f2a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "mydriasis",
+          "weight": 0.5,
+          "note": "The disc is scaled up with the engine's pupil, so a wide pupil is shown as an active change.",
+          "source": "GH14"
+        },
+        {
+          "signal": "miosis",
+          "weight": 0.5,
+          "note": "The disc is scaled down with the engine's pupil, so a pinned pupil is shown as an active change.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pupil_left",
+      "label": "Left Pupil",
+      "summary": "The opening in the left iris that admits light",
+      "function": "The pupil is the hole in the middle of the iris, and the iris muscles set its diameter: it narrows with parasympathetic drive and in bright light, and widens with sympathetic drive and in the dark. In this simulator the disc is drawn at the engine's live pupil diameter, so opioids pin it small and atropine-like drugs or fright open it wide. It glows when it is away from its resting size.",
+      "color": "#1b1f2a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "mydriasis",
+          "weight": 0.5,
+          "note": "The disc is scaled up with the engine's pupil, so a wide pupil is shown as an active change.",
+          "source": "GH14"
+        },
+        {
+          "signal": "miosis",
+          "weight": 0.5,
+          "note": "The disc is scaled down with the engine's pupil, so a pinned pupil is shown as an active change.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lens",
+      "label": "Lens",
+      "summary": "The clear biconvex disc that fine-tunes focus",
+      "function": "The lens sits just behind the iris and changes its curvature to bring near or far objects into focus. The model has no focusing demand, so the lens has no drive and glows steadily.",
+      "color": "#d9c88a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "retina",
+      "label": "Retina",
+      "summary": "The light-sensitive lining of the back of the eye",
+      "function": "The retina is a layer of nervous tissue lining the back of the eyeball, where photoreceptors turn light into nerve signals that leave by the optic nerve. It is part of the central nervous system and is metabolically very active. It dims as consciousness is lost, as a display of reduced neural activity rather than of vision.",
+      "color": "#d9784a",
+      "rest": 0.4,
+      "drives": [
+        {
+          "signal": "unconscious",
+          "weight": -0.2,
+          "note": "Neural activity of the central nervous system falls as consciousness is lost.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "optic_nerve",
+      "label": "Optic Nerve",
+      "summary": "The cable that carries retinal signals to the brain",
+      "function": "The optic nerve is made of the axons of the retinal ganglion cells and leaves each eye at the optic disc, which has no photoreceptors. It runs back and medially towards the brain. It dims with loss of consciousness, as a display of reduced neural activity.",
+      "color": "#f0c04a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Neural traffic in central pathways falls as consciousness is lost.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }
