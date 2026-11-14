@@ -1,6 +1,6 @@
 import { P } from '../core/constants';
 import type { SimState } from '../core/state';
-import { addEffect } from '../core/effects';
+import { addEffect, effect } from '../core/effects';
 import { B } from './activity';
 
 /**
@@ -38,7 +38,21 @@ export function stepBaroreflex(s: SimState, dt: number): void {
   // neutral at the raised exercising pressure instead of reading the intended vasodilation
   // as hypotension and cranking heart rate to fight it (see activity.ts). Proportional to
   // actual exertion, so it fades out with recovery exactly as the tachycardia does.
-  const pn = P('baroreflex.setpoint_mmHg') + B('exercise.baroreflexResetting') * s.activity.exertion;
+  //
+  // CENTRAL COMMAND CAN RESET IT OUTSIDE EXERCISE TOO, through `reflex.setpointShift` (a
+  // fraction of the baseline set point). The sexual response is the case that forced it.
+  // XUERUI2008 measured pressure up by about 20 mmHg for minutes WHILE heart rate was up
+  // by about 20 bpm. A reflex still defending its resting pressure cannot produce that:
+  // every pressor gain the previous calibration added was met by vagal slowing, and
+  // raising the gains further only lowered heart rate (the model sat at about 124/77 at
+  // plateau against a cited 141/91). Pressure and heart rate rising together means the
+  // operating point itself has moved, which is what central command does; the same
+  // bus target now carries any such resetting so the reflex reads one defended pressure.
+  const setpoint = P('baroreflex.setpoint_mmHg');
+  const pn =
+    setpoint +
+    B('exercise.baroreflexResetting') * s.activity.exertion +
+    setpoint * effect(s, 'reflex.setpointShift');
   const ka = P('baroreflex.sigmoidWidth_mmHg');
   const fMin = P('baroreflex.afferentMin_Hz');
   const fMax = P('baroreflex.afferentMax_Hz');

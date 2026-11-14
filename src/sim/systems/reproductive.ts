@@ -500,19 +500,46 @@ function stepSexual(s: SimState, dt: number): void {
     // Pressure peaks at the START of plateau (XUERUI2008), so the pressure terms reach
     // full value at the plateau threshold; heart rate keeps rising to the start of orgasm.
     const arm = Math.min(1, a / thr);
-    addEffect(s.effects, 'cardio.heartRate', (R('sexual.hr_arousal_bpm') * a + R('sexual.hr_orgasm_bpm') * env) / P('cardio.heartRateBaseline_bpm'));
-    addEffect(s.effects, 'cardio.contractility', R('sexual.contractility_arousal') * arm + R('sexual.contractility_orgasm') * env);
-    addEffect(s.effects, 'cardio.systemicResistance', R('sexual.resistance_arousal') * arm + R('sexual.resistance_orgasm') * env);
+    // CENTRAL COMMAND RESETS THE BAROREFLEX. This is the term that makes the pressure
+    // rise possible at all. XUERUI2008 found pressure up by about 20 mmHg for minutes
+    // while heart rate was up by about 20 bpm; a reflex defending its resting set point
+    // cannot do that, and the previous calibration proved it the hard way - every pressor
+    // gain it added came back as vagal slowing, and raising the gains until the pressure
+    // moved only made the heart rate FALL. The fix is the mechanism, not a bigger number:
+    // the defended pressure is moved up by the cited rise in mean pressure, as a fraction
+    // of the set point (derived per sex in reproduction.json), full at the plateau
+    // threshold where XUERUI2008 found the pressure peak, and fading with arousal in
+    // resolution exactly as the exercise resetting fades with exertion.
+    const sx = male ? 'male' : 'female';
+    addEffect(s.effects, 'reflex.setpointShift', R(`sexual.setpointShift_${sx}`) * arm);
+    // The direct terms on top of the reset are now small, and per sex where the citation
+    // is per sex. The orgasmic increments are NEMEC1976's (men only) and are applied to
+    // both sexes; see the notes on the sexual.*_orgasm constants.
+    addEffect(s.effects, 'cardio.heartRate', (R(`sexual.hr_arousal_${sx}_bpm`) * a + R('sexual.hr_orgasm_bpm') * env) / P('cardio.heartRateBaseline_bpm'));
+    addEffect(s.effects, 'cardio.contractility', R(`sexual.contractility_arousal_${sx}`) * arm + R('sexual.contractility_orgasm') * env);
+    addEffect(s.effects, 'cardio.systemicResistance', R(`sexual.resistance_arousal_${sx}`) * arm + R('sexual.resistance_orgasm') * env);
     // pathology.ts: felt pain = nociception x (1 - analgesia). The stimulus needed to
     // reach a fixed felt pain is therefore proportional to 1 / (1 - analgesia), so a
     // threshold raised by a fraction q needs analgesia = 1 - 1 / (1 + q) (WHIPPLE1985).
     const a1 = 1 - 1 / (1 + R('sexual.painThresholdRise_stimulation'));
     const a2 = 1 - 1 / (1 + R('sexual.painThresholdRise_orgasm'));
     addEffect(s.effects, 'neuro.analgesia', a1 * arm + (a2 - a1) * env);
-    // Declarations of state, as affect.ts makes for fright; nothing requires a consumer.
-    addEffect(s.effects, 'neuro.arousal', a);
+    // A declaration of state, as affect.ts makes for fright.
     addEffect(s.effects, 'neuro.euphoria', env);
-    addEffect(s.effects, 'neuro.dependence', env);
+    // TWO WRITES THAT USED TO BE HERE, AND WHY THEY ARE GONE.
+    //
+    // `neuro.arousal` (sexual arousal x 1): it read as a harmless declaration, but it is
+    // not one. neuro.ts SUBTRACTS that target from the sedation load, so a body at full
+    // stimulation could not be anaesthetised - a propofol induction dose was cancelled
+    // term for term - and because sexual arousal follows consciousness, the two held
+    // each other up in a loop. No source available to this project gives a magnitude
+    // for any such opposition to sedation, so the honest value is none at all. The
+    // shared English word "arousal" (wakefulness there, sexual response here) is what
+    // made the wiring look right.
+    //
+    // `neuro.dependence` (the orgasm envelope): that target is the interface's readout of
+    // a DRUG's dependence liability. An orgasm is not a dose of anything, and writing to
+    // it put a physiological event on a pharmacological scale.
   }
 }
 
@@ -806,5 +833,10 @@ export function reproductiveSignals(s: SimState): ReproductiveSignals {
 export function slowClockScale(s: SimState): number {
   const r = s.reproductive;
   if (r.catchUp_s > 0) return CATCH_UP_FACTOR;
+  // The time-lapse advances only a female body's cycle or pregnancy. It used to be
+  // applied to any body, so a lapse left set when the body was switched to male ran a
+  // male kidney's clocks thousands of times faster than real time while nothing in that
+  // body was being advanced. A male body is in real time outside a catch-up window.
+  if (s.body.sex !== 'female') return 1;
   return Math.max(1, r.lapse_days_per_s * 86400);
 }

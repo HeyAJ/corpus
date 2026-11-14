@@ -689,13 +689,37 @@
       "confidence": "assumed",
       "note": "Arousal the body is left at when the orgasmic phase ends: the plateau threshold, from which resolution (or, in a female body with continuing stimulation, a new rise) begins."
     },
-    "sexual.hr_arousal_bpm": {
-      "value": 30,
+    "sexual.setpointShift_male": {
+      "value": 0.217,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "TBD"
+    },
+    "sexual.setpointShift_female": {
+      "value": 0.1341,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "TBD"
+    },
+    "sexual.hr_arousal_male_bpm": {
+      "value": 0,
       "unit": "bpm",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.heartRate) per unit arousal (in bpm over the 72 bpm baseline; the baroreflex answers the pressure rise and takes most of it back, hence a value above the target): set with .cache/probes/repro_sexsens.ts so a body at the start of the orgasmic phase (arousal about 0.87) has heart rate about 20 bpm above rest (men 96.4 vs 75.4 bpm). The same gain is used for both sexes (EXTON1999: the female pattern concurs with the male)."
+      "note": "TBD"
+    },
+    "sexual.hr_arousal_female_bpm": {
+      "value": 0,
+      "unit": "bpm",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "TBD"
     },
     "sexual.hr_orgasm_bpm": {
       "value": 60,
@@ -705,21 +729,37 @@
       "confidence": "derived",
       "note": "CALIBRATED bus gain (cardio.heartRate, bpm over the 72 bpm baseline) per unit orgasm envelope, on top of the arousal term: set so the heart rate at the orgasmic peak is about 105-115 bpm against the 114-117 of NEMEC1976 (men during coitus); the baroreflex returns part of it."
     },
-    "sexual.contractility_arousal": {
-      "value": 0.4,
+    "sexual.contractility_arousal_male": {
+      "value": 0,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.contractility), reaching full value at the plateau threshold, toward XUERUI2008 (pressure peaks at the START of plateau, men 141/91 from 120/73). NOT REACHED: the model's baroreflex defends mean pressure and returns most of any push (the model gives about 124/77 at that point); a larger gain only lowers heart rate further. See docs note in the report."
+      "note": "TBD"
     },
-    "sexual.resistance_arousal": {
-      "value": 0.4,
+    "sexual.contractility_arousal_female": {
+      "value": 0,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.systemicResistance), reaching full value at the plateau threshold. Limited as sexual.contractility_arousal is: raising it to +100 % moved systolic pressure only about 11 mmHg and lowered the heart rate."
+      "note": "TBD"
+    },
+    "sexual.resistance_arousal_male": {
+      "value": 0,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "TBD"
+    },
+    "sexual.resistance_arousal_female": {
+      "value": 0,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "TBD"
     },
     "sexual.contractility_orgasm": {
       "value": 0.5,

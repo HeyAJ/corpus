@@ -1,6 +1,161 @@
 {
   "atlas": "vagina",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the vagina and of the part of the vulva that its shell contains: the muscular wall, the folds of its lining (rugae), the cervix with its external opening, the fornices round the cervix, the vestibule, the clitoris (glans, body and two crura), the two vestibular bulbs and the greater vestibular glands. The erectile tissue fills and deepens in colour with the simulated engorgement of the genital tissue, and the wall passes a plasma transudate into the canal. The layers of the wall, the hymen, the labia, the urethral opening and the pelvic floor muscles beyond the lower-third muscle are left out; the cervix is only its lower part and its sizes were chosen to read clearly rather than measured.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "vaginal_wall",
+      "label": "Vaginal Wall",
+      "summary": "The muscular tube that runs from the vestibule up to the cervix",
+      "function": "The vagina is a fibromuscular tube whose wall has a muscular coat and an inner mucous lining, and it passes upward and backward from the vestibule to the cervix. Its lining is influenced by estrogen. During sexual arousal the wall fills with blood and passes fluid, a transudate of plasma, into the canal. It is drawn as glass that becomes a little deeper as the wall fills with blood.",
+      "color": "#d98f8f",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.3, "note": "The wall is part of the genital tissue that fills with blood in arousal.", "source": "GH14" },
+        { "signal": "estradiol", "weight": 0.15, "note": "Estrogen acts on the vaginal lining.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rugae",
+      "label": "Vaginal Rugae",
+      "summary": "Transverse folds of the lining, mainly on the front and back walls",
+      "function": "The mucous lining of the vagina is thrown into transverse ridges called rugae, most marked on the front and back walls. The folds allow the canal to stretch. They brighten a little with estradiol.",
+      "color": "#c46a7a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "The lining is estrogen-responsive.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lower_third_muscle",
+      "label": "Lower-Third Muscle",
+      "summary": "The muscle round the lowest part of the canal; it contracts in orgasm",
+      "function": "The lowest part of the vagina is surrounded by muscle of the pelvic floor and perineum. During orgasm these muscles contract rhythmically. In this simulator the muscle glows in a rhythmic pulse while the orgasm signal is above zero, or steadily if reduced motion is requested.",
+      "color": "#a8505a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "orgasm", "weight": 0.5, "note": "The perineal muscles contract during orgasm.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cervix",
+      "label": "Cervix",
+      "summary": "The lower part of the uterus, projecting into the top of the vagina",
+      "function": "The cervix is the narrow lower part of the uterus and its lower end projects into the top of the vagina. Its glands produce mucus whose character changes with the hormones of the cycle. Only the lower part is drawn.",
+      "color": "#e0a0a0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "Estrogen and progesterone change the cervical mucus.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_os",
+      "label": "External Os",
+      "summary": "The opening of the cervical canal into the vagina",
+      "function": "The external os is the small opening at the lower end of the cervix through which the cervical canal opens into the vagina. It is drawn as a ring, facing downward for clarity.",
+      "color": "#8f3d4d",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fornices",
+      "label": "Fornices",
+      "summary": "The recess of the vagina that surrounds the cervix",
+      "function": "Because the cervix projects into the vagina, the top of the canal forms a recess round it. This is the fornix, described as having anterior, posterior and lateral parts, the posterior being the deepest. It is drawn as a ring round the cervix.",
+      "color": "#d27d8c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibule",
+      "label": "Vestibule",
+      "summary": "The cleft between the labia minora into which the vagina opens",
+      "function": "The vestibule is the space between the labia minora. The vagina and the urethra open into it, and the ducts of the greater vestibular glands open at its sides. It is drawn as a shallow glass pocket round the lower end of the canal.",
+      "color": "#e6aaa0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.2, "note": "The tissue round the vestibule fills with blood in arousal.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "clitoral_glans",
+      "label": "Clitoral Glans",
+      "summary": "The small erectile tip of the clitoris",
+      "function": "The glans is the exposed tip of the clitoris and is richly supplied with sensory nerve endings. Like the rest of the erectile tissue, it fills with blood during sexual arousal. In this simulator it deepens in colour and glows as engorgement rises.",
+      "color": "#d9707e",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.5, "note": "Erectile tissue fills with blood in arousal.", "source": "GH14" },
+        { "signal": "sexualArousal", "weight": 0.2, "note": "Arousal drives the parasympathetic inflow that fills it.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "clitoral_body",
+      "label": "Clitoral Body",
+      "summary": "The shaft of erectile tissue joining the glans to the two crura",
+      "function": "The body of the clitoris is made of two corpora cavernosa lying side by side, and it continues backward into the two crura. It fills with blood during arousal, and it deepens in colour and glows as it does.",
+      "color": "#cf6575",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.5, "note": "Erectile tissue fills with blood in arousal.", "source": "GH14" },
+        { "signal": "sexualArousal", "weight": 0.2, "note": "Arousal drives the parasympathetic inflow that fills it.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "clitoral_crura",
+      "label": "Clitoral Crura",
+      "summary": "The two roots of the clitoris, anchored to the pubic bones",
+      "function": "The crura are the two diverging roots of the clitoris. Each is attached to the bone of the pelvis and is covered by a muscle. The arterial stream along them runs faster as engorgement rises.",
+      "color": "#c25a70",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.5, "note": "Erectile tissue fills with blood in arousal.", "source": "GH14" },
+        { "signal": "sexualArousal", "weight": 0.2, "note": "Arousal drives the parasympathetic inflow that fills it.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibular_bulbs",
+      "label": "Vestibular Bulbs",
+      "summary": "Two masses of erectile tissue either side of the vaginal opening",
+      "function": "The vestibular bulbs are two elongated masses of erectile tissue lying on either side of the vaginal opening, the female counterpart of the bulb of the penis. They fill with blood during sexual arousal. They deepen in colour and glow as engorgement rises, and the arterial inflow streaming into them speeds up.",
+      "color": "#b94f6a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.5, "note": "Erectile tissue fills with blood in arousal.", "source": "GH14" },
+        { "signal": "sexualArousal", "weight": 0.2, "note": "Arousal drives the parasympathetic inflow that fills it.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibular_glands",
+      "label": "Greater Vestibular Glands",
+      "summary": "Two small glands at the back of the bulbs that secrete mucus",
+      "function": "The greater vestibular glands, also called Bartholin's glands, lie at the back of the vestibular bulbs and open into the vestibule by short ducts. They secrete mucus during sexual arousal, which moistens the opening.",
+      "color": "#e8c07a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "sexualArousal", "weight": 0.3, "note": "They secrete mucus under parasympathetic stimulation in arousal.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

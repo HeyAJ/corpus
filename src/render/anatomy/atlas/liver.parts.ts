@@ -23,7 +23,7 @@ import { mulberry32 } from '../noise';
  * The frame is the liver shell's own (models.ts `liver()`): origin at the organ's position,
  * +x the patient's right (the big right lobe), +y cranial, +z anterior, metres.
  *
- * WHAT IS BUILT. Four lobes as glass-ready closed surfaces a few millimetres inside the
+ * WHAT IS BUILT. The falciform ligament; four lobes as glass-ready closed surfaces a few millimetres inside the
  * shell (right, left, caudate, quadrate); the portal triad entering at the porta hepatis on
  * the visceral surface (portal vein, hepatic artery, bile duct) and dividing into right and
  * left branches that keep dividing; the three hepatic veins converging up and back to the
@@ -373,6 +373,19 @@ export const parts: PartBuilder = () => {
     {
       id: 'quadrate_lobe',
       geometry: polygonise(intersect(inner, quadrate), [-0.016, -0.036, 0.004], [0.016, -0.004, 0.044], { cell: 0.0028 }),
+    },
+    {
+      // The falciform ligament: a thin sheet of peritoneum standing in the cleft between the
+      // right and left lobes on the front of the liver. It is the landmark that divides the
+      // two lobes on the anterior surface; drawn as a flat ellipsoid in the gap left at
+      // x = -0.021 so that it neither overlaps a lobe nor leaves the shell.
+      id: 'falciform_ligament',
+      geometry: polygonise(
+        intersect(ellipsoid([-0.021, 0.012, 0.034], [0.0016, 0.034, 0.0085]), offset(shell, -0.0012)),
+        [-0.026, -0.03, 0.02],
+        [-0.016, 0.06, 0.05],
+        { cell: 0.0008 },
+      ),
     },
     { id: 'portal_vein', geometry: treeGeometry(t.portal) },
     { id: 'hepatic_artery', geometry: treeGeometry(t.artery) },

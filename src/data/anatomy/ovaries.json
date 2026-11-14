@@ -1,6 +1,142 @@
 {
   "atlas": "ovaries",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the two ovaries: the fibrous capsule (tunica albuginea), the cortex and the medulla, the ovarian artery and vein entering at the hilum, the small follicles of the cortex, one dominant follicle with its oocyte (drawn in the right ovary), the corpus luteum that forms where it ovulated, and a corpus albicans scar (drawn in the left ovary). The dominant follicle and the corpus luteum follow the simulated menstrual cycle. The follicle's wall layers, the ligaments, the nerves and the true number and size of the small follicles are left out; the small follicles are drawn far larger than life so that they can be seen, and which ovary carries the dominant follicle is a drawing choice.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "tunica_albuginea",
+      "label": "Tunica Albuginea",
+      "summary": "The dense fibrous capsule just under the surface of the ovary",
+      "function": "The tunica albuginea is a layer of dense connective tissue lying under the surface covering of the ovary. It gives the organ its firm, almond shape and encloses the cortex. It is drawn as a glass shell so that the follicles beneath it can be seen.",
+      "color": "#d8cfc0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cortex",
+      "label": "Ovarian Cortex",
+      "summary": "The outer zone of the ovary, where the follicles lie",
+      "function": "The cortex is the outer part of the ovary and contains the follicles at every stage of development, together with the scars left by those that have ovulated. Follicle-stimulating hormone drives the growth of follicles within it. It is drawn as glass, and it becomes a little more vivid when follicle-stimulating hormone is high.",
+      "color": "#e8b8a0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "fsh", "weight": 0.3, "note": "Follicle-stimulating hormone acts on the follicles of the cortex.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "medulla",
+      "label": "Ovarian Medulla",
+      "summary": "The central connective tissue core that carries the vessels",
+      "function": "The medulla is the central part of the ovary, made of loose connective tissue with many blood vessels and nerves, which reach it from the hilum. It is drawn as a glass core with the vessels running through it.",
+      "color": "#b98a8a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ovarian_artery",
+      "label": "Ovarian Artery",
+      "summary": "The artery that supplies the ovary, entering at the hilum",
+      "function": "The ovarian artery reaches the ovary through the ligaments that suspend it and enters at the hilum, then branches through the medulla towards the cortex. The blood streaming in is coloured by the simulated arterial oxygen saturation, and it runs faster when the corpus luteum is large, because that structure is richly supplied with blood.",
+      "color": "#c0433a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "corpusLuteum", "weight": 0.2, "note": "The corpus luteum is a highly vascular structure.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ovarian_vein",
+      "label": "Ovarian Vein",
+      "summary": "The vein that carries blood and hormones away from the ovary",
+      "function": "Blood leaves the medulla through veins that gather at the hilum and drain the organ. The blood carries away the hormones the ovary secretes. It is coloured by the simulated venous oxygen saturation.",
+      "color": "#6a4a8a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "The venous drainage carries the ovarian hormones, estradiol among them, into the circulation.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "primordial_follicles",
+      "label": "Primordial Follicles",
+      "summary": "The reserve of resting follicles, each an oocyte in a thin layer of cells",
+      "function": "Primordial follicles are the resting reserve, each a single immature egg cell surrounded by a flat layer of cells. They lie close under the capsule. In life they are far too small to see; here they are drawn as beads so that the cortex reads as a population.",
+      "color": "#f0e4d0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "growing_follicles",
+      "label": "Growing Follicles",
+      "summary": "Primary and secondary follicles, enlarging in the cortex",
+      "function": "Some of the follicles in the cortex begin to enlarge, gaining layers of cells around the egg. Their later growth depends on follicle-stimulating hormone. They brighten when follicle-stimulating hormone rises.",
+      "color": "#f2cf9c",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "fsh", "weight": 0.4, "note": "Follicle-stimulating hormone supports the growth of the developing follicles.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dominant_follicle",
+      "label": "Dominant Follicle",
+      "summary": "The one follicle that grows to ovulate; it makes estradiol as it grows",
+      "function": "In each cycle one follicle outgrows the rest and fills with fluid. As it grows it makes more estradiol, and in the middle of the cycle a surge of luteinising hormone causes it to rupture and release its egg. In this simulator its size follows the follicular growth of the cycle and it glows with estradiol. At ovulation it collapses and disappears, and it is hidden in the luteal phase and when the body is pregnant or not cycling.",
+      "color": "#f6e7b8",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "follicle", "weight": 0.5, "note": "Its growth is the follicular growth of the cycle.", "source": "GH14" },
+        { "signal": "estradiol", "weight": 0.3, "note": "The growing follicle is the main source of estradiol before ovulation.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oocyte",
+      "label": "Oocyte",
+      "summary": "The egg cell, held on the wall of the fluid-filled follicle",
+      "function": "The oocyte lies within a small mound of cells on the wall of the follicle. At ovulation it is released with some of the surrounding cells and carried towards the fimbriae of the uterine tube. It is shown here much larger than life.",
+      "color": "#fff6dc",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "lh", "weight": 0.3, "note": "The luteinising hormone surge triggers its release.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corpus_luteum",
+      "label": "Corpus Luteum",
+      "summary": "The yellow body formed from the follicle after ovulation; it makes progesterone",
+      "function": "After ovulation the wall of the ruptured follicle becomes the corpus luteum, a yellow endocrine body that secretes progesterone and some estradiol. If pregnancy does not follow, it regresses; if it does, human chorionic gonadotropin keeps it active. In this simulator it grows and glows with its activity in the cycle and, when the body is pregnant, with the corpus luteum and hCG drives.",
+      "color": "#e6b422",
+      "rest": 0.1,
+      "drives": [
+        { "signal": "corpusLuteum", "weight": 0.6, "note": "Its size and secretion follow its place in the luteal phase.", "source": "GH14" },
+        { "signal": "hcg", "weight": 0.3, "note": "Human chorionic gonadotropin maintains the corpus luteum in early pregnancy.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corpus_albicans",
+      "label": "Corpus Albicans",
+      "summary": "The pale scar left when a corpus luteum has regressed",
+      "function": "When a corpus luteum regresses it is replaced by a small white scar of fibrous tissue, the corpus albicans, which slowly shrinks in the cortex. It makes no hormones, so it does not glow. It is drawn in the opposite ovary to the dominant follicle.",
+      "color": "#f2efe6",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
 }
