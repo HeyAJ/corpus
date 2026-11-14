@@ -87,7 +87,7 @@ export function cordLine(y0: number, y1: number, n: number, fx: number, fz: numb
 
 /** A tube along a line of the cord, with the radius a fraction of the shell radius. */
 function lineTube(y0: number, y1: number, fx: number, fz: number, radiusFraction: number, taperEnd = 0): THREE.BufferGeometry {
-  const n = Math.max(8, Math.round(Math.abs(y1 - y0) / 0.004));
+  const n = Math.max(8, Math.round(Math.abs(y1 - y0) / 0.005));
   const pts = cordLine(y0, y1, 24, fx, fz);
   return tubeAlong(
     pts,
@@ -109,7 +109,7 @@ const ROOT_LEVELS: readonly number[] = [0.36, 0.33, 0.3, 0.27, 0.235, 0.2, 0.165
 function root(y: number, side: 1 | -1, startX: number, startZ: number, endX: number, endZ: number, ganglion: boolean): THREE.BufferGeometry {
   const c = centreAt(y);
   const r = spinalCordRadius(y);
-  const ext = ganglion ? 0.0022 : 0.0018;
+  const ext = ganglion ? 0.0015 : 0.0012;
   const p0: V3 = [c.x + side * startX * r, y, c.z + startZ * r];
   const p1: V3 = [c.x + side * (r * 0.9 + ext * 0.35), y - 0.0006, c.z + (startZ + endZ) * 0.5 * r];
   const p2: V3 = [c.x + side * (r * endX + ext), y - 0.0016, c.z + endZ * r];
@@ -186,7 +186,7 @@ export const parts: PartBuilder = () => {
       const y = chainTop - ((chainTop - chainBottom) * i) / 40;
       centreAt(y, c);
       const r = spinalCordRadius(y);
-      pts.push([c.x + side * (r + 0.0018), y, c.z + 0.0008]);
+      pts.push([c.x + side * (r + 0.0012), y, c.z + 0.0008]);
     }
     chains.push(
       tubeAlong(

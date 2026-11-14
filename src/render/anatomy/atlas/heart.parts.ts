@@ -348,19 +348,19 @@ export const parts: PartBuilder = () => {
   // Chambers. Cell sizes are about 1/35 of the part: the ventricles are ~70 mm long.
   out.push({
     id: 'right_atrium',
-    geometry: polygonise(c.ra, [0.006, -0.004, -0.024], [0.054, 0.052, 0.026], { cell: 0.0016 }),
+    geometry: polygonise(c.ra, [0.006, -0.004, -0.024], [0.054, 0.052, 0.026], { cell: 0.0026 }),
   });
   out.push({
     id: 'right_ventricle',
-    geometry: polygonise(c.rv, [-0.044, -0.06, -0.002], [0.032, 0.042, 0.042], { cell: 0.0019 }),
+    geometry: polygonise(c.rv, [-0.044, -0.06, -0.002], [0.032, 0.042, 0.042], { cell: 0.0027 }),
   });
   out.push({
     id: 'left_atrium',
-    geometry: polygonise(c.la, [-0.036, 0.012, -0.046], [0.014, 0.056, -0.004], { cell: 0.0016 }),
+    geometry: polygonise(c.la, [-0.036, 0.012, -0.046], [0.014, 0.056, -0.004], { cell: 0.0026 }),
   });
   out.push({
     id: 'left_ventricle',
-    geometry: polygonise(c.lv, [-0.06, -0.066, -0.026], [0.014, 0.038, 0.032], { cell: 0.0019 }),
+    geometry: polygonise(c.lv, [-0.06, -0.066, -0.026], [0.014, 0.038, 0.032], { cell: 0.0027 }),
   });
 
   // Septum: the layer of left ventricular wall that faces the right ventricle - the
@@ -370,7 +370,7 @@ export const parts: PartBuilder = () => {
   const septum = intersect(intersect(wall, nearRv), downstream(TRICUSPID));
   out.push({
     id: 'interventricular_septum',
-    geometry: polygonise(septum, [-0.05, -0.062, -0.016], [0.022, 0.032, 0.032], { cell: 0.0016 }),
+    geometry: polygonise(septum, [-0.05, -0.062, -0.016], [0.022, 0.032, 0.032], { cell: 0.0026 }),
   });
 
   // Valves.

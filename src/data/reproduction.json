@@ -274,7 +274,7 @@
       "note": "Mid-luteal minute ventilation is about 1 L/min greater than early follicular, with a lower PaCO2. The target the gain below is calibrated to; it is \"about 1\" in the paper."
     },
     "cycle.ventilationDriveGain": {
-      "value": 0.07,
+      "value": 0.25,
       "unit": "fraction of resp.drive",
       "source": "SLATKOVSKA2006",
       "sourceUrl": "https://doi.org/10.1016/j.resp.2006.01.011",
@@ -503,7 +503,7 @@
       "source": "SCHOCK2016",
       "sourceUrl": "https://doi.org/10.1186/s12884-016-0937-5",
       "confidence": "derived",
-      "note": "1 ng/mL = 100 ng/dL."
+      "note": "Unit conversion: 1 ng/mL = 100 ng/dL (the brief's stated factor), applied to SCHOCK2016 testosterone."
     },
     "pregnancy.plasmaVolume.maxGain": {
       "value": 0.48,
@@ -546,7 +546,7 @@
       "note": "Systemic vascular resistance falls 25-30 %; the midpoint. The landmark, NOT the bus value: the engine calibrates the bus gain below so the model's own cardiac output lands on the cited rise."
     },
     "pregnancy.systemicResistance.gain": {
-      "value": -0.275,
+      "value": -0.346,
       "unit": "fraction",
       "source": "SOMAPILLAY2016",
       "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
@@ -554,12 +554,20 @@
       "note": "CALIBRATED bus value at full effect (cardio.systemicResistance). See .cache/probes/repro_preg.ts."
     },
     "pregnancy.venousTone.gain": {
-      "value": -0.3,
+      "value": 0.117,
       "unit": "fraction",
       "source": "SOMAPILLAY2016",
       "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
       "confidence": "derived",
-      "note": "CALIBRATED bus value at full plasma expansion (cardio.venousTone, negative = more venous capacity): chosen so central venous pressure stays within 2 mmHg of the non-pregnant body, as SOMAPILLAY2016 report that CVP does not increase significantly."
+      "note": "CALIBRATED bus value at full plasma expansion (cardio.venousTone, negative = more venous capacity): fitted jointly with the three other cardiovascular gains by .cache/probes/repro_fitcv.ts (Nelder-Mead on cardiac output +20 % at 8 wk and about +40 % at 24 and 36 wk, heart rate about +15 bpm from 28 wk, mean pressure 0-6 mmHg below non-pregnant, CVP within 2 mmHg of it; SOMAPILLAY2016, ROBSON1989). The fit settled on a small POSITIVE value here (slightly less venous capacity early, while the arterial dilation shifts blood centrally) and the volume term below carries the capacity."
+    },
+    "pregnancy.venousTone.volumeGain": {
+      "value": -0.681,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full plasma expansion (cardio.venousTone), following the plasma-volume curve: the extra venous capacity that accommodates the added volume. See pregnancy.venousTone.gain, which follows the systemic-resistance curve instead (the arterial vasodilation of early pregnancy also opens the veins)."
     },
     "pregnancy.heartRate.landmarkRise_bpm": {
       "value": 15,
@@ -570,15 +578,15 @@
       "note": "Heart rate +10-20 bpm, maintained; the midpoint. The landmark the bus gain below is calibrated to."
     },
     "pregnancy.heartRate.gain": {
-      "value": 0.2,
+      "value": 0.125,
       "unit": "fraction",
       "source": "SOMAPILLAY2016",
       "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
       "confidence": "derived",
-      "note": "CALIBRATED bus value at full effect (cardio.heartRate), chosen so the model's own heart rate is about 15 bpm above the non-pregnant body from about 28 wk; the baroreflex gives part of it back."
+      "note": "CALIBRATED bus value at full effect (cardio.heartRate), fitted with the other cardiovascular gains (see pregnancy.venousTone.gain) so the model's own heart rate is about 15 bpm above the non-pregnant body from about 28 wk; the baroreflex answers the larger blood volume and lower resistance, so the bus value is not the heart-rate rise; the measured outcome of the model is."
     },
     "pregnancy.resp.drive.gain": {
-      "value": 0.35,
+      "value": 0.42,
       "unit": "fraction",
       "source": "SOMAPILLAY2016",
       "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
@@ -602,7 +610,7 @@
       "note": "CALIBRATED bus value at full effect (renal.vascularResistance), chosen so the model's GFR rises about 50 % (cited +50-85 %) and then falls toward the cited creatinine of about 0.5 mg/dL by itself."
     },
     "pregnancy.renalSodiumReabsorption.gain": {
-      "value": 0.55,
+      "value": 0.45,
       "unit": "fraction",
       "source": "SOMAPILLAY2016",
       "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
@@ -682,47 +690,47 @@
       "note": "Arousal the body is left at when the orgasmic phase ends: the plateau threshold, from which resolution (or, in a female body with continuing stimulation, a new rise) begins."
     },
     "sexual.hr_arousal_bpm": {
-      "value": 21,
-      "unit": "bpm",
-      "source": "XUERUI2008",
-      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
-      "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.heartRate) per unit arousal: set so a body at the start of the orgasmic phase has heart rate about 21 bpm above rest (men 96.4 vs 75.4 bpm). The same gain is used for both sexes (EXTON1999: the female pattern concurs with the male)."
-    },
-    "sexual.hr_orgasm_bpm": {
       "value": 30,
       "unit": "bpm",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "CALIBRATED bus gain (cardio.heartRate) per unit arousal (in bpm over the 72 bpm baseline; the baroreflex answers the pressure rise and takes most of it back, hence a value above the target): set with .cache/probes/repro_sexsens.ts so a body at the start of the orgasmic phase (arousal about 0.87) has heart rate about 20 bpm above rest (men 96.4 vs 75.4 bpm). The same gain is used for both sexes (EXTON1999: the female pattern concurs with the male)."
+    },
+    "sexual.hr_orgasm_bpm": {
+      "value": 60,
+      "unit": "bpm",
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.heartRate) per unit orgasm envelope, on top of the arousal term: set so the heart rate at the orgasmic peak is about 114-117 bpm (NEMEC1976, men during coitus)."
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm over the 72 bpm baseline) per unit orgasm envelope, on top of the arousal term: set so the heart rate at the orgasmic peak is about 105-115 bpm against the 114-117 of NEMEC1976 (men during coitus); the baroreflex returns part of it."
     },
     "sexual.contractility_arousal": {
-      "value": 0.2,
+      "value": 0.4,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.contractility), reaching full value at the plateau threshold: pressure peaks at the START of plateau (men 141/91 from 120/73)."
+      "note": "CALIBRATED bus gain (cardio.contractility), reaching full value at the plateau threshold, toward XUERUI2008 (pressure peaks at the START of plateau, men 141/91 from 120/73). NOT REACHED: the model's baroreflex defends mean pressure and returns most of any push (the model gives about 124/77 at that point); a larger gain only lowers heart rate further. See docs note in the report."
     },
     "sexual.resistance_arousal": {
-      "value": 0.2,
+      "value": 0.4,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.systemicResistance), reaching full value at the plateau threshold. See sexual.contractility_arousal."
+      "note": "CALIBRATED bus gain (cardio.systemicResistance), reaching full value at the plateau threshold. Limited as sexual.contractility_arousal is: raising it to +100 % moved systolic pressure only about 11 mmHg and lowered the heart rate."
     },
     "sexual.contractility_orgasm": {
-      "value": 0.3,
+      "value": 0.5,
       "unit": "fraction",
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.contractility) per unit orgasm envelope: pressure about 162/79 at orgasm (higher systolic, lower diastolic than at plateau)."
+      "note": "CALIBRATED bus gain (cardio.contractility) per unit orgasm envelope, toward the NEMEC1976 pressure of about 162/79 at orgasm. NOT REACHED for the reason given at sexual.contractility_arousal."
     },
     "sexual.resistance_orgasm": {
-      "value": -0.2,
+      "value": -0.3,
       "unit": "fraction",
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",

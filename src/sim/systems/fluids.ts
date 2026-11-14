@@ -2,6 +2,7 @@ import { P } from '../core/constants';
 import type { SimState } from '../core/state';
 import { effect } from '../core/effects';
 import { referenceBloodVolume } from '../core/body';
+import { R } from './reproductive';
 
 /**
  * BODY FLUID BALANCE.
@@ -41,12 +42,16 @@ export function stepFluids(s: SimState, dt: number): void {
   const insensible = P('fluid.insensibleLoss_mL_per_min') * dtMin;
   f.interstitial += intake - insensible;
 
+  stepVolumeExpansion(s, dt);
+
   // --- transcapillary refill ----------------------------------------------
   // Plasma volume is defended toward its baseline by exchange with the
   // interstitium. The gradient is the plasma deficit; the rate is first-order with
   // the published restitution time constant.
   const plasma = s.cardio.bloodVolume * (1 - s.chem.hct);
-  const plasmaTarget = referenceBloodVolume(s) * (1 - P('blood.haematocrit'));
+  // Raised by the expansion the bus has asked for and fluids has achieved (pregnancy), so
+  // the refill defends the NEW plasma volume instead of draining it back to the old one.
+  const plasmaTarget = referenceBloodVolume(s) * (1 - P('blood.haematocrit')) + f.plasmaExpansion_mL;
   const deficit = plasmaTarget - plasma;
 
   const tau = P('fluid.transcapillaryRefillTau_min');
@@ -117,6 +122,43 @@ export function stepFluids(s: SimState, dt: number): void {
   }
 
   f.balance_mL += intake - insensible - (s.renal.urineRate * dtMin);
+}
+
+/**
+ * PLASMA VOLUME AND RED-CELL MASS EXPANSION (the `blood.plasmaVolume` and
+ * `blood.redCellMass` bus targets; written by the pregnancy adaptations).
+ *
+ * Both targets are fractions of the model's reference volumes. The ACHIEVED expansion is
+ * held in FluidState and chases `reference x target` with a short pacing constant (the
+ * target itself moves over weeks of gestation; the constant only keeps the change smooth
+ * from tick to tick). The difference is added as ISOTONIC volume, exactly as cardio.ts
+ * addVolume does, so serum electrolytes are not diluted; haematocrit follows by mass
+ * balance (red cells added over the new total), which is why plasma expands more than
+ * cells and the haematocrit falls. With both targets at zero and nothing achieved, this
+ * function does nothing at all and the body behaves exactly as before.
+ */
+function stepVolumeExpansion(s: SimState, dt: number): void {
+  const f = s.fluids;
+  const pT = effect(s, 'blood.plasmaVolume');
+  const rT = effect(s, 'blood.redCellMass');
+  if (pT === 0 && rT === 0 && f.plasmaExpansion_mL === 0 && f.redCellExpansion_mL === 0) return;
+
+  const refV = referenceBloodVolume(s);
+  const hct0 = P('blood.haematocrit');
+  const k = 1 - Math.exp(-dt / R('pregnancy.plasmaPacingTau_s'));
+  const dP = (refV * (1 - hct0) * pT - f.plasmaExpansion_mL) * k;
+  const dR = (refV * hct0 * rT - f.redCellExpansion_mL) * k;
+  f.plasmaExpansion_mL += dP;
+  f.redCellExpansion_mL += dR;
+  if (Math.abs(f.plasmaExpansion_mL) < 1e-6 && pT === 0) f.plasmaExpansion_mL = 0;
+  if (Math.abs(f.redCellExpansion_mL) < 1e-6 && rT === 0) f.redCellExpansion_mL = 0;
+
+  const d = dP + dR;
+  const total = Math.max(1, s.cardio.bloodVolume);
+  s.cardio.veins.V += d;
+  s.cardio.targetBloodVolume += d;
+  s.cardio.isotonicDelta_mL += d;
+  s.chem.hct = Math.max(0.1, Math.min(0.7, (s.chem.hct * total + dR) / (total + d)));
 }
 
 /** Remove fluid from the circulation carrying the stated electrolyte concentrations. */

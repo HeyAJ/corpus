@@ -219,6 +219,16 @@ function Mountain({ filled }: { filled: boolean }) {
   );
 }
 
+/** A ring with a phase dot on it: the reproduction panel (the cycle). */
+function Cycle({ filled }: { filled: boolean }) {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="7.5" fill={filled ? '#1a1a1a' : 'none'} stroke="#1a1a1a" strokeWidth="1.6" />
+      <circle cx="12" cy="4.5" r="2.4" fill={filled ? '#fff' : '#1a1a1a'} stroke="#1a1a1a" strokeWidth="1" />
+    </svg>
+  );
+}
+
 /** A microbe: the infection panel. */
 function Microbe({ filled }: { filled: boolean }) {
   return (
@@ -312,6 +322,8 @@ export function ToolDock() {
       togglePhysiologyPanel: s.togglePhysiologyPanel,
       environmentPanelOpen: s.environmentPanelOpen,
       toggleEnvironmentPanel: s.toggleEnvironmentPanel,
+      reproductionPanelOpen: s.reproductionPanelOpen,
+      toggleReproductionPanel: s.toggleReproductionPanel,
       infectionPanelOpen: s.infectionPanelOpen,
       toggleInfectionPanel: s.toggleInfectionPanel,
       endocrinePanelOpen: s.endocrinePanelOpen,
@@ -329,6 +341,7 @@ export function ToolDock() {
     { key: 'impact', label: 'Impact', hint: 'what your actions changed', icon: <Impact filled={st.impactPanelOpen} />, active: st.impactPanelOpen, onClick: st.toggleImpactPanel },
     { key: 'physiology', label: 'Physiology', hint: 'sleep, exercise, stress, pain, bleeding', icon: <Runner filled={st.physiologyPanelOpen} />, active: st.physiologyPanelOpen, onClick: st.togglePhysiologyPanel },
     { key: 'environment', label: 'Environment', hint: 'temperature, altitude, oxygen, posture', icon: <Mountain filled={st.environmentPanelOpen} />, active: st.environmentPanelOpen, onClick: st.toggleEnvironmentPanel },
+    { key: 'reproduction', label: 'Reproduction', hint: 'cycle, pregnancy, sexual response', icon: <Cycle filled={st.reproductionPanelOpen} />, active: st.reproductionPanelOpen, onClick: st.toggleReproductionPanel },
     { key: 'infection', label: 'Infection', hint: 'inoculate, watch and clear', icon: <Microbe filled={st.infectionPanelOpen} />, active: st.infectionPanelOpen, onClick: st.toggleInfectionPanel },
     { key: 'endocrine', label: 'Hormones', hint: 'cortisol, ADH, glucagon and more', icon: <Flask filled={st.endocrinePanelOpen} />, active: st.endocrinePanelOpen, onClick: st.toggleEndocrinePanel },
     { key: 'blood', label: 'In the blood', hint: 'what the vessels are carrying', icon: <BloodDrop filled={st.bloodPanelOpen} />, active: st.bloodPanelOpen, onClick: st.toggleBloodPanel },

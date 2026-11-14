@@ -1,15 +1,10 @@
-import type * as THREE from 'three';
+import * as THREE from 'three';
 import type { PartBuilder, PartGeometry } from '../parts';
 import {
   type V3,
   ellipsoid,
-  halfSpace,
-  intersect,
   mergeParts,
   polygonise,
-  shell,
-  sphere,
-  subtract,
   tubeAlong,
 } from '../sdf';
 
@@ -71,6 +66,29 @@ export function opticNervePath(side: 1 | -1): V3[] {
   return out;
 }
 
+/** An open patch of a sphere about `c`, from polar angle t0 to t1 measured from +z. */
+function cap(c: V3, radius: number, t0: number, t1: number, wSeg: number, hSeg: number): THREE.BufferGeometry {
+  const g = new THREE.SphereGeometry(radius, wSeg, hSeg, 0, Math.PI * 2, t0, t1 - t0);
+  g.rotateX(Math.PI / 2); // SphereGeometry's pole is +y; the eye's axis is +z
+  g.translate(c[0], c[1], c[2]);
+  return g;
+}
+
+/** A flat annulus, 12 mm across with a 2 mm hole, 0.9 mm thick, facing +z, about the origin. */
+function irisRing(): THREE.BufferGeometry {
+  const t = 0.00045;
+  const pts = [
+    new THREE.Vector2(0.001, -t),
+    new THREE.Vector2(0.006, -t),
+    new THREE.Vector2(0.006, t),
+    new THREE.Vector2(0.001, t),
+    new THREE.Vector2(0.001, -t),
+  ];
+  const g = new THREE.LatheGeometry(pts, 48);
+  g.rotateX(Math.PI / 2);
+  return g;
+}
+
 const SCLERA_OUTER = 0.0109;
 const SCLERA_THICK = 0.0014;
 /** The plane where the sclera stops and the cornea begins, metres in front of the globe centre. */
@@ -89,52 +107,42 @@ export const parts: PartBuilder = () => {
     const cx = s * EYE_X;
     const c: V3 = [cx, 0, 0];
 
-    // SCLERA: the globe's wall, open in front of the limbus.
-    const wall = shell(sphere(c, SCLERA_OUTER - SCLERA_THICK / 2), SCLERA_THICK / 2);
-    const sclField = intersect(wall, halfSpace([0, 0, LIMBUS_Z], [0, 0, -1]));
-    // The optic canal: a hole through the back for the nerve.
-    const sclCut = subtract(sclField, sphere([s * 0.029, 0, -0.0112], 0.0017));
-    sclera.push(
-      polygonise(sclCut, [cx - 0.0115, -0.0115, -0.0115], [cx + 0.0115, 0.0115, LIMBUS_Z + 0.001], { cell: 0.0007 }),
-    );
+    // SCLERA: the globe's wall, open in front of the limbus. A single swept sphere
+    // patch: a polygonised shell thick enough to resolve cost over a hundred thousand
+    // triangles for the pair of eyes, and the atlas budget is twenty-five thousand.
+    // The optic canal is not cut: the nerve simply passes through the wall.
+    sclera.push(cap(c, SCLERA_OUTER - SCLERA_THICK / 2, Math.acos(LIMBUS_Z / (SCLERA_OUTER - SCLERA_THICK / 2)), Math.PI, 40, 22));
 
     // CORNEA: a spherical cap, steeper than the globe, meeting the sclera at the limbus.
-    // Chosen so it passes through the sclera's rim (radius ~9 mm at the limbus) and its
-    // front stays 1.5 mm inside the shell's own corneal bulge.
+    // Chosen so it passes through the sclera's rim and its front stays 1.5 mm inside the
+    // shell's own corneal bulge.
     const corneaCentre: V3 = [cx, 0, 0.0043];
-    const cap = shell(sphere(corneaCentre, 0.0092 - 0.0006), 0.0006);
-    const corField = intersect(cap, halfSpace([0, 0, LIMBUS_Z - 0.0003], [0, 0, 1]));
-    cornea.push(polygonise(corField, [cx - 0.0095, -0.0095, LIMBUS_Z - 0.001], [cx + 0.0095, 0.0095, 0.0142], { cell: 0.0004 }));
+    cornea.push(cap(corneaCentre, 0.0092 - 0.0003, 0, Math.acos((LIMBUS_Z - 0.0043) / (0.0092 - 0.0003)), 32, 12));
 
     // IRIS: a flat annulus a few millimetres behind the cornea. Its hole is the smallest
     // pupil it can make (1 mm radius); the pupil disc covers the hole at rest and is
     // scaled larger or smaller from there, so the iris never shows a gap behind it.
-    const irisC: V3 = [cx, 0, PUPIL_Z];
-    const irisField = subtract(ellipsoid(irisC, [0.006, 0.006, 0.00045]), ellipsoid(irisC, [0.001, 0.001, 0.003]));
-    iris.push(polygonise(irisField, [cx - 0.0065, -0.0065, PUPIL_Z - 0.001], [cx + 0.0065, 0.0065, PUPIL_Z + 0.001], { cell: 0.0003 }));
+    const irisG = irisRing();
+    irisG.translate(cx, 0, PUPIL_Z);
+    iris.push(irisG);
 
     // PUPIL: a dark disc a hair in front of the iris, authored at 3.5 mm across.
     const pr = PUPIL_AUTHORED_MM / 2000;
     const pupilC: V3 = [cx, 0, PUPIL_Z + 0.0002];
     pupils.push(
-      polygonise(ellipsoid(pupilC, [pr, pr, 0.00025]), [cx - pr - 0.0005, -pr - 0.0005, PUPIL_Z - 0.0006], [cx + pr + 0.0005, pr + 0.0005, PUPIL_Z + 0.001], { cell: 0.00018 }),
+      polygonise(ellipsoid(pupilC, [pr, pr, 0.00025]), [cx - pr - 0.0005, -pr - 0.0005, PUPIL_Z - 0.0006], [cx + pr + 0.0005, pr + 0.0005, PUPIL_Z + 0.001], { cell: 0.00025 }),
     );
 
     // LENS: biconvex, about 4 mm thick and 9 mm across, just behind the iris.
     lens.push(
-      polygonise(ellipsoid([cx, 0, 0.0062], [0.0045, 0.0045, 0.002]), [cx - 0.0052, -0.0052, 0.0036], [cx + 0.0052, 0.0052, 0.0088], { cell: 0.0003 }),
+      polygonise(ellipsoid([cx, 0, 0.0062], [0.0045, 0.0045, 0.002]), [cx - 0.0052, -0.0052, 0.0036], [cx + 0.0052, 0.0052, 0.0088], { cell: 0.0006 }),
     );
 
     // RETINA: the inner lining of the back two-thirds. A sphere's area behind the plane
-    // z = R/3 is two-thirds of it, so that is where the lining stops.
-    const rOut = SCLERA_OUTER - SCLERA_THICK - 0.0002;
-    const lining = shell(sphere(c, rOut - 0.0006), 0.0006);
-    const retField = intersect(lining, halfSpace([0, 0, rOut / 3], [0, 0, -1]));
-    // The optic disc: the lining is absent where the nerve leaves.
-    const retCut = subtract(retField, sphere([s * 0.029, 0, -0.0105], 0.0016));
-    retina.push(
-      polygonise(retCut, [cx - rOut - 0.001, -rOut - 0.001, -rOut - 0.001], [cx + rOut + 0.001, rOut + 0.001, rOut / 3 + 0.001], { cell: 0.0006 }),
-    );
+    // z = R/3 is two-thirds of it, so that is where the lining stops. The optic disc is
+    // not cut out; the nerve tube meets the lining there.
+    const rMid = SCLERA_OUTER - SCLERA_THICK - 0.0004;
+    retina.push(cap(c, rMid, Math.acos(1 / 3), Math.PI, 36, 20));
 
     // OPTIC NERVE: a tube, a little thinner than the shell's own, from the disc backwards.
     nerve.push(tubeAlong(opticNervePath(s), (t) => 0.0016 + 0.0002 * (1 - t), { tubular: 24, radial: 8 }));

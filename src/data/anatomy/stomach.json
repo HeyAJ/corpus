@@ -1,6 +1,133 @@
 {
   "atlas": "stomach",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The stomach drawn as its named regions (cardia, fundus, body, antrum, pylorus), the mucosal folds (rugae), the two curvatures and the acid- and enzyme-secreting glands, one of them enlarged to show its parietal and chief cells. Activity is a display index of how hard the engine's own digestive, autonomic and filling signals push each region; it is not a secretion rate or a pressure. It leaves out the layered wall, the enteric nervous system, gastric hormones and the stomach's contents, which the main view already shows as a fluid level.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "cardia",
+      "label": "Cardia",
+      "summary": "The short entrance region where the oesophagus joins the stomach",
+      "function": "The cardia is the small zone around the opening of the oesophagus into the stomach. It guards against reflux of gastric contents together with the lower oesophageal sphincter, and it opens for a swallow and during vomiting. It brightens while something is being swallowed.",
+      "color": "#d98f8a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "swallowing", "weight": 0.4, "note": "The cardia opens to receive a swallowed bolus.", "source": "GH14" },
+        { "signal": "vomiting", "weight": 0.4, "note": "The gastro-oesophageal junction opens when the stomach is emptied upwards.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fundus",
+      "label": "Fundus",
+      "summary": "The dome above the cardia that relaxes to receive a meal",
+      "function": "The fundus is the upper dome of the stomach and acts as a storage reservoir. It relaxes as food arrives so that the stomach can fill without a large rise in pressure. Its glow rises as the stomach fills.",
+      "color": "#e0a59b",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "gastricFill", "weight": 0.45, "note": "Receptive relaxation accommodates the meal as the stomach fills.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "body",
+      "label": "Body",
+      "summary": "The main part of the stomach, where food is stored and mixed",
+      "function": "The body is the large central part of the stomach. It stores food, secretes acid and enzymes from its glands, and begins the mixing waves that turn a meal into chyme. It glows more with food present, with filling and with gut motility.",
+      "color": "#d98070",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "digestion", "weight": 0.35, "note": "Mixing and secretion occur while food is in the stomach.", "source": "GH14" },
+        { "signal": "gastricFill", "weight": 0.2, "note": "Stretch of the wall increases motility and secretion.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility strengthens the mixing waves.", "source": "GH14" },
+        { "signal": "motilityFall", "weight": -0.2, "note": "Reduced gut motility weakens the mixing waves.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "antrum",
+      "label": "Antrum",
+      "summary": "The lower, muscular part that grinds food and pumps chyme onward",
+      "function": "The antrum has the thickest muscle of the stomach. Its strong contractions grind food against a mostly closed pylorus and push small amounts of chyme into the duodenum. It glows during digestion and when motility is raised.",
+      "color": "#c97067",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "digestion", "weight": 0.4, "note": "The antral pump works while there is food to process.", "source": "GH14" },
+        { "signal": "gastricFill", "weight": 0.15, "note": "Distension of the stomach strengthens antral contraction.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility strengthens antral contractions.", "source": "GH14" },
+        { "signal": "motilityFall", "weight": -0.2, "note": "Reduced gut motility weakens antral contractions.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pylorus",
+      "label": "Pylorus",
+      "summary": "The thick ring of muscle at the outlet to the duodenum",
+      "function": "The pyloric sphincter is a thickened ring of circular muscle that controls how much chyme leaves the stomach and holds back larger particles. It opens briefly as each antral wave arrives, so chyme leaves in small squirts. It glows while the stomach is digesting.",
+      "color": "#b5504f",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "digestion", "weight": 0.4, "note": "The pylorus meters chyme into the duodenum while food is being processed.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rugae",
+      "label": "Rugae",
+      "summary": "Longitudinal mucosal folds that flatten as the stomach fills",
+      "function": "Rugae are the folds of the stomach's lining that run along its length. They allow the stomach to stretch and flatten as it fills. In this view they fade as the stomach fills.",
+      "color": "#e8b4a6",
+      "rest": 0.4,
+      "drives": [
+        { "signal": "gastricFill", "weight": -0.35, "note": "Folds smooth out as the wall is stretched.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gastric_glands",
+      "label": "Gastric Glands",
+      "summary": "Pits that secrete acid and enzymes; one is drawn enlarged",
+      "function": "Gastric glands open as pits in the lining of the body and fundus. Parietal cells secrete hydrochloric acid and intrinsic factor, and chief cells secrete pepsinogen, which the acid converts to pepsin. Secretion is stimulated by the vagus and by food and is reduced by sympathetic activity. Acid particles stream from the glands when the stomach is digesting.",
+      "color": "#f0d060",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "digestion", "weight": 0.4, "note": "Food in the stomach stimulates acid and enzyme secretion.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.3, "note": "Vagal outflow stimulates parietal and chief cells.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.25, "note": "Sympathetic activity reduces gastric secretion.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "lesser_curvature",
+      "label": "Lesser Curvature",
+      "summary": "The short, concave right border of the stomach",
+      "function": "The lesser curvature is the concave border between the cardia and the pylorus, carrying the left and right gastric vessels in the lesser omentum. Blood flow through it rises with digestion.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "digestion", "weight": 0.25, "note": "Gastric blood flow rises while food is being digested.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "greater_curvature",
+      "label": "Greater Curvature",
+      "summary": "The long, convex left border of the stomach",
+      "function": "The greater curvature is the long convex border, from which the greater omentum hangs. It carries the gastro-epiploic vessels. Blood flow through it rises with digestion.",
+      "color": "#b8786e",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "digestion", "weight": 0.25, "note": "Gastric blood flow rises while food is being digested.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

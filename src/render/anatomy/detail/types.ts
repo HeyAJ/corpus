@@ -48,7 +48,13 @@ export interface PartHandle {
   setColor(color: THREE.ColorRepresentation): void;
   /** 0..1: how brightly the part glows. */
   setGlow(glow: number): void;
-  /** 0..1. */
+  /**
+   * 0..1. Anything below about 0.98 draws the part as GLASS: it stops hiding what is
+   * inside or behind it and reads mostly by its outline (OrganDetail explains how). This is
+   * how a WALL AROUND SOMETHING must be drawn - the cortex over the thalamus, a ventricle's
+   * muscle over its blood, a capsule over a medulla - or the wall is all anyone ever sees.
+   * 0.2 to 0.45 suits a wall; raising it with the part's activity makes a busy wall vivid.
+   */
   setOpacity(opacity: number): void;
   setVisible(visible: boolean): void;
   /** Scale about a pivot (default: the part's own centre). A number scales uniformly. */

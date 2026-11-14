@@ -1,6 +1,7 @@
 import { P } from '../core/constants';
 import type { SimState } from '../core/state';
 import { metabolicBicarbonate } from './respiratory';
+import { slowClockScale } from './reproductive';
 
 /**
  * ACID-BASE.
@@ -41,7 +42,11 @@ import { metabolicBicarbonate } from './respiratory';
 
 export function stepAcidBase(s: SimState, dt: number): void {
   const ab = s.acidBase;
-  const dtH = dt / 3600;
+  // The kidney's clocks are measured in days. While the reproductive clock is run ahead of
+  // real time (a time-lapsed pregnancy, or the catch-up window after a jump) they keep
+  // pace with it; the factor is exactly 1 otherwise. Both updates below are exact
+  // exponentials, so a very large factor cannot make them unstable.
+  const dtH = (dt * slowClockScale(s)) / 3600;
 
   const normalHco3 = P('blood.hco3_mEq_per_L');
   const paco2 = s.resp.arterialPco2;

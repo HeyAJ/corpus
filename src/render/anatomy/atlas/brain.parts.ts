@@ -3,7 +3,6 @@ import type { PartBuilder, PartGeometry } from '../parts';
 import {
   capsule,
   displaced,
-  displacedNear,
   ellipsoid,
   intersect,
   mergeParts,
@@ -16,7 +15,6 @@ import {
   union,
 } from '../sdf';
 import type { Sdf, V3 } from '../sdf';
-import { ridged } from '../noise';
 
 /**
  * INTERIOR OF THE BRAIN: twenty-one parts that sit inside the shell built by `brain()` in
@@ -25,12 +23,12 @@ import { ridged } from '../noise';
  *
  * HOW THE CORTEX IS MADE. The shell is two hemispheres (a smooth union of four ellipsoids
  * each), cut by the lateral fissure and the central sulcus, and then wrinkled by a ridged
- * noise that moves the surface inward. This file rebuilds that same per-hemisphere field,
- * wrinkles and all, so that a cortical part is a true curved slab that FOLLOWS the folds:
- * the region between a surface 3.5 mm inside the shell and a smooth surface 10.5 mm
- * inside it. The inner surface is deliberately the smooth one, so the slab is thicker
- * under a gyral crown than in a sulcal floor, as grey matter is. The noise is evaluated
- * at the true world position, so it is the very same noise the shell used.
+ * noise that moves the surface inward by up to about 4 mm. This file rebuilds the smooth,
+ * cut hemisphere and makes a cortical part a curved slab 7 mm thick whose outer face is
+ * 4.5 mm inside it, so the slab stays inside the wrinkled shell. The wrinkles themselves
+ * are NOT repeated: they multiply the surface area, and with it the triangle count,
+ * about threefold, which the budget for this showcase cannot afford (the 3 mm grid
+ * that fits the budget could not resolve them anyway).
  *
  * Each lobe is then that slab intersected with a REGION written as a signed function of
  * position (negative inside). The regions partition the slab: the central sulcus is a
@@ -72,19 +70,6 @@ function hemisphereCut(s: number): Sdf {
   h = smoothSubtract(0.004, h, capsule([s * 0.068, -0.01, 0.05], [s * 0.064, 0.004, -0.014], 0.004));
   h = smoothSubtract(0.003, h, capsule([s * 0.008, 0.056, -0.004], [s * 0.058, 0.02, 0.006], 0.003));
   return h;
-}
-
-/** The hemisphere exactly as the shell draws it, wrinkles included (same noise, same band). */
-function hemisphereWrinkled(s: number): Sdf {
-  return displacedNear(
-    hemisphereCut(s),
-    (x, y, z) => {
-      const a = ridged(x, y * 1.15, z, 62);
-      const b = ridged(x + 0.37, y, z * 0.9 + 0.11, 118);
-      return 0.0031 * a * a * a + 0.0012 * b * b;
-    },
-    0.011,
-  );
 }
 
 /* ---------------------------------------------------------------- 2D arches */
@@ -143,8 +128,8 @@ const CINGULATE_PTS: readonly (readonly [number, number])[] = [
 /* ------------------------------------------------------------ cortical lobes */
 
 /** Slab thickness: outer surface this far inside the shell, inner surface this far. */
-const SLAB_OUT = 0.0035;
-const SLAB_IN = 0.0105;
+const SLAB_OUT = 0.0045;
+const SLAB_IN = 0.0125;
 
 /** z of the central sulcus at distance `ax` from the midline: it leans forward going laterally. */
 const centralZ = (ax: number): number => -0.0056 + 0.2 * ax;
@@ -182,7 +167,7 @@ const occipitalRegion: Sdf = (_x, _y, z) => z + 0.04;
 
 /** The slab of one hemisphere, then a lobe cut from it, then the cingulate removed from it. */
 function cortexSide(s: number, region: Sdf, min: V3, max: V3, cell: number, keepCingulate = false): THREE.BufferGeometry {
-  const slab = subtract(offset(hemisphereWrinkled(s), -SLAB_OUT), offset(hemisphereCut(s), -SLAB_IN));
+  const slab = subtract(offset(hemisphereCut(s), -SLAB_OUT), offset(hemisphereCut(s), -SLAB_IN));
   let field = intersect(slab, region);
   if (!keepCingulate) field = subtract(field, cingulateRegion);
   return polygonise(field, min, max, { cell });
@@ -221,7 +206,7 @@ function corpusCallosum(): THREE.BufferGeometry {
   // A curved band, widest in the body, narrowing to the genu and the splenium; the limiter
   // ellipsoid rounds its lateral edges so it reads as a fan of fibres, not a plank.
   const band = intersect(arch2D(CALLOSUM_PTS, CALLOSUM_R), ellipsoid([0, 0.011, 0], [0.0155, 0.04, 0.046]));
-  return polygonise(band, [-0.02, -0.005, -0.045], [0.02, 0.03, 0.045], { cell: 0.0013 });
+  return polygonise(band, [-0.02, -0.005, -0.045], [0.02, 0.03, 0.045], { cell: 0.003 });
 }
 
 function thalamus(): THREE.BufferGeometry {
@@ -229,7 +214,7 @@ function thalamus(): THREE.BufferGeometry {
   // The interthalamic adhesion: the grey bridge that crosses the third ventricle in most brains.
   const adhesion = capsule([-0.006, 0.0, -0.004], [0.006, 0.0, -0.004], 0.0025);
   return polygonise(smoothUnion(0.003, oval(1), oval(-1), adhesion), [-0.022, -0.014, -0.03], [0.022, 0.014, 0.012], {
-    cell: 0.0013,
+    cell: 0.0022,
   });
 }
 
@@ -242,7 +227,7 @@ function hypothalamus(): THREE.BufferGeometry {
       ellipsoid([s * 0.0032, -0.0148, -0.0045], [0.0025, 0.0025, 0.0025]),
     );
   return polygonise(smoothUnion(0.003, half(1), half(-1)), [-0.012, -0.022, -0.012], [0.012, -0.006, 0.016], {
-    cell: 0.0008,
+    cell: 0.0016,
   });
 }
 
@@ -258,14 +243,14 @@ function pituitary(): THREE.BufferGeometry {
   );
   // The gland itself: wider than it is tall, as it sits in its bony fossa.
   const gland = polygonise(ellipsoid([0, -0.0265, 0.0095], [0.0055, 0.0035, 0.0045]), [-0.009, -0.032, 0.003], [0.009, -0.021, 0.016], {
-    cell: 0.0006,
+    cell: 0.0012,
   });
   return mergeParts([stalk, gland]);
 }
 
 function pineal(): THREE.BufferGeometry {
   return polygonise(ellipsoid([0, -0.0005, -0.0285], [0.003, 0.003, 0.0042]), [-0.006, -0.005, -0.034], [0.006, 0.005, -0.023], {
-    cell: 0.0005,
+    cell: 0.001,
   });
 }
 
@@ -284,7 +269,7 @@ function hippocampus(): THREE.BufferGeometry {
     tubeAlong(
       path.map((p): V3 => [s * p[0], p[1], p[2]]),
       (t) => 0.0046 - 0.0024 * t,
-      { tubular: 48, radial: 12 },
+      { tubular: 36, radial: 8 },
     ),
   );
 }
@@ -292,7 +277,7 @@ function hippocampus(): THREE.BufferGeometry {
 function amygdala(): THREE.BufferGeometry {
   return bilateral((s) =>
     polygonise(ellipsoid([s * 0.03, -0.026, 0.027], [0.005, 0.005, 0.0065]), [s * 0.03 - 0.01, -0.036, 0.016], [s * 0.03 + 0.01, -0.016, 0.038], {
-      cell: 0.0006,
+      cell: 0.0018,
     }),
   );
 }
@@ -318,11 +303,11 @@ function basalGanglia(): THREE.BufferGeometry {
         const i = Math.min(radii.length - 2, Math.floor(f));
         return radii[i] + (radii[i + 1] - radii[i]) * (f - i);
       },
-      { tubular: 56, radial: 10 },
+      { tubular: 40, radial: 8 },
     );
     // Putamen: the lens-shaped nucleus lateral to the internal capsule.
     const putamen = polygonise(ellipsoid([s * 0.028, 0.0, 0.008], [0.0055, 0.01, 0.016]), [s * 0.028 - 0.009, -0.014, -0.01], [s * 0.028 + 0.009, 0.014, 0.026], {
-      cell: 0.0012,
+      cell: 0.003,
     });
     return mergeParts([tail, putamen]);
   });
@@ -331,7 +316,7 @@ function basalGanglia(): THREE.BufferGeometry {
 function nucleusAccumbens(): THREE.BufferGeometry {
   return bilateral((s) =>
     polygonise(ellipsoid([s * 0.0115, 0.008, 0.027], [0.0045, 0.0042, 0.0045]), [s * 0.0115 - 0.008, 0.001, 0.02], [s * 0.0115 + 0.008, 0.015, 0.034], {
-      cell: 0.0006,
+      cell: 0.0016,
     }),
   );
 }
@@ -340,7 +325,7 @@ function insula(): THREE.BufferGeometry {
   // A shallow plate of cortex tucked deep to the lateral fissure.
   return bilateral((s) =>
     polygonise(ellipsoid([s * 0.05, -0.003, 0.012], [0.004, 0.012, 0.017]), [s * 0.05 - 0.008, -0.018, -0.008], [s * 0.05 + 0.008, 0.012, 0.032], {
-      cell: 0.0009,
+      cell: 0.0025,
     }),
   );
 }
@@ -349,20 +334,20 @@ function insula(): THREE.BufferGeometry {
 
 function midbrain(): THREE.BufferGeometry {
   return polygonise(capsule([0, -0.014, -0.0125], [0, -0.034, -0.0145], 0.0095, 0.009), [-0.014, -0.046, -0.028], [0.014, -0.002, 0.0], {
-    cell: 0.0011,
+    cell: 0.0025,
   });
 }
 
 function pons(): THREE.BufferGeometry {
   // The anterior bulge of the pons carries the transverse fibres across to the cerebellum.
   return polygonise(ellipsoid([0, -0.0475, -0.007], [0.0145, 0.0105, 0.0125]), [-0.02, -0.06, -0.024], [0.02, -0.034, 0.01], {
-    cell: 0.0011,
+    cell: 0.0025,
   });
 }
 
 function medulla(): THREE.BufferGeometry {
   return polygonise(capsule([0, -0.0575, -0.019], [0, -0.084, -0.0255], 0.0078, 0.0055), [-0.012, -0.092, -0.036], [0.012, -0.05, -0.008], {
-    cell: 0.0009,
+    cell: 0.0022,
   });
 }
 
@@ -373,14 +358,14 @@ function cerebellum(): THREE.BufferGeometry {
   const vermis = ellipsoid([0, -0.043, -0.05], [0.0104, 0.0174, 0.0244]);
   const body = smoothUnion(0.008, lobe(1), lobe(-1), vermis);
   const folia = displaced(body, (_x, y, z) => 0.0008 * Math.sin((y + z * 0.35) * 950));
-  return polygonise(folia, [-0.062, -0.068, -0.078], [0.062, -0.022, -0.016], { cell: 0.0016 });
+  return polygonise(folia, [-0.062, -0.068, -0.078], [0.062, -0.022, -0.016], { cell: 0.004 });
 }
 
 /* ------------------------------------------------------------------- export */
 
 export const parts: PartBuilder = (): PartGeometry[] => {
   const g = (id: string, geometry: THREE.BufferGeometry): PartGeometry => ({ id, geometry });
-  const cell = 0.0026;
+  const cell = 0.0042;
   return [
     g('prefrontal_cortex', cortex(prefrontalRegion, [-0.03, 0.06], [0.0, 0.084], cell)),
     g('motor_cortex', cortex(motorRegion, [-0.01, 0.06], [-0.012, 0.03], cell)),
@@ -389,7 +374,7 @@ export const parts: PartBuilder = (): PartGeometry[] => {
     g('temporal_lobe', cortex(temporalRegion, [-0.056, 0.01], [-0.045, 0.062], cell)),
     g('occipital_lobe', cortex(occipitalRegion, [-0.04, 0.052], [-0.086, -0.036], cell)),
     g('insula', insula()),
-    g('cingulate_cortex', cingulate(0.0022)),
+    g('cingulate_cortex', cingulate(0.003)),
     g('corpus_callosum', corpusCallosum()),
     g('thalamus', thalamus()),
     g('hypothalamus', hypothalamus()),

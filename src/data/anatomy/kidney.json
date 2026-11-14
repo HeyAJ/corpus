@@ -1,6 +1,125 @@
 {
   "atlas": "kidney",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of a kidney, drawn once and used for both sides: capsule, cortex, medullary pyramids and renal columns, calyces and pelvis, the renal artery and vein with their branches, a scatter of glomeruli, and one nephron enlarged so that its course from glomerulus to collecting duct can be followed. Activity is the simulator's own filtration, flow and hormone signals pushing on each structure, shown as glow. The layout is schematic: nine pyramids, no arcuate or cortical radiate vessels, one nephron standing for about a million, and no dimension is a measurement.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "renal_capsule",
+      "label": "Renal Capsule",
+      "summary": "The tough fibrous skin that wraps the whole kidney",
+      "function": "The capsule is a thin fibrous layer that surrounds the kidney and gives it its smooth outline. It is open only at the hilum, where the vessels and the pelvis pass through. It is drawn as glass so that the structures inside can be seen through it.",
+      "color": "#b9a58a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "renal_cortex",
+      "label": "Renal Cortex",
+      "summary": "The outer layer, where blood is filtered in the glomeruli",
+      "function": "The cortex holds the glomeruli and the convoluted tubules, and it is where most of the filtering and reabsorbing is done. It also extends inward between the pyramids as the renal columns. It brightens when the simulated filtration rate rises and dims when it falls.",
+      "color": "#b5533f",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "filtrationRise", "weight": 0.45, "note": "A higher glomerular filtration rate means the cortical filters are working harder.", "source": "GH14" },
+        { "signal": "filtrationFall", "weight": -0.25, "note": "When filtration falls the cortical filters are passing less fluid.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "renal_medulla",
+      "label": "Medullary Pyramids",
+      "summary": "Cone-shaped tissue whose tips, the papillae, point at the calyces",
+      "function": "The pyramids contain the loops of Henle and the collecting ducts. The tissue around the loops is made very salty, and antidiuretic hormone lets the collecting ducts use that saltiness to pull water back and make concentrated urine. It brightens when the simulation's vasopressin activity rises or the body is dehydrated.",
+      "color": "#8f3a3a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "adh", "weight": 0.4, "note": "Vasopressin makes the collecting ducts permeable to water so the medulla can concentrate the urine.", "source": "GH14" },
+        { "signal": "dehydration", "weight": 0.3, "note": "A raised plasma osmolality raises vasopressin and so the concentrating work of the medulla.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "renal_columns",
+      "label": "Renal Columns",
+      "summary": "Cortex that dips down between the pyramids",
+      "function": "The columns are cortical tissue that reaches inward between neighbouring pyramids. They support the pyramids and carry the interlobar vessels toward the cortex.",
+      "color": "#c46a50",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "renal_pelvis",
+      "label": "Renal Pelvis and Calyces",
+      "summary": "The funnel that gathers urine from the papillae into the ureter",
+      "function": "A small cup, the minor calyx, wraps each papilla; the minor calyces join into three major calyces, and these open into the renal pelvis, which narrows into the ureter. Urine drips from the papillae into the cups and is carried down by gentle contractions of the walls. It brightens as urine flow rises.",
+      "color": "#d9b45a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "urineFlow", "weight": 0.35, "note": "The more urine the papillae deliver, the more the calyces and pelvis have to carry.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "renal_artery",
+      "label": "Renal Artery and Branches",
+      "summary": "Brings blood to the kidney; divides into segmental and interlobar arteries",
+      "function": "The renal artery enters the hilum and divides into segmental arteries, which give interlobar arteries that run in the columns between the pyramids. The juxtaglomerular cells that release renin sit on the smallest branches that feed the glomeruli. It brightens when cardiac output rises or renin release is driven, and dims when blood pressure falls.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.3, "note": "More cardiac output sends more blood down the renal artery.", "source": "GH14" },
+        { "signal": "hypotension", "weight": -0.2, "note": "A low arterial pressure reduces the flow the artery carries.", "source": "GH14" },
+        { "signal": "reninDrive", "weight": 0.3, "note": "Renin is released by the juxtaglomerular cells on the finest arterial branches.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "renal_vein",
+      "label": "Renal Vein",
+      "summary": "Carries filtered blood out of the kidney",
+      "function": "Blood that has passed through the glomerular and tubular capillaries drains through the interlobar veins into the renal vein, which leaves the hilum in front of the artery. It is drawn in the colour of venous blood, though kidney blood stays fairly oxygenated because the kidney receives far more blood than its own tissue needs.",
+      "color": "#6a4a7a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glomeruli",
+      "label": "Glomeruli",
+      "summary": "Tufts of capillaries in the cortex where blood is filtered",
+      "function": "Each glomerulus is a ball of capillaries inside a cup, Bowman's capsule, and fluid is pushed through its wall under blood pressure to form the filtrate. The simulation's glomerular filtration rate is the sum of this filtering. They glow more when filtration is above rest and less when it falls.",
+      "color": "#e08a8a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "filtrationRise", "weight": 0.45, "note": "Filtration is the glomeruli's work, so a higher rate means brighter glomeruli.", "source": "GH14" },
+        { "signal": "filtrationFall", "weight": -0.25, "note": "When filtration collapses the glomeruli are passing little fluid.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "nephron",
+      "label": "Nephron (enlarged)",
+      "summary": "One nephron drawn large: capsule, tubule, loop of Henle, collecting duct",
+      "function": "The filtrate leaves Bowman's capsule and passes through the proximal convoluted tubule, down and up the loop of Henle, through the distal convoluted tubule and into a collecting duct that runs down a pyramid to the papilla. Along the way water and salts are reclaimed and the urine is made; aldosterone acts on the later segments to retain sodium. The pale stream in it thins when filtration falls.",
+      "color": "#e6d28a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "filtrationRise", "weight": 0.4, "note": "More filtrate means more fluid passing through every nephron.", "source": "GH14" },
+        { "signal": "filtrationFall", "weight": -0.25, "note": "Less filtrate means less fluid in the tubule.", "source": "GH14" },
+        { "signal": "aldosterone", "weight": 0.3, "note": "Aldosterone acts on the distal nephron and collecting duct to retain sodium.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    }
+  ]
 }

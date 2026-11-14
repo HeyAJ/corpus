@@ -55,6 +55,22 @@ import type { DetailContext, FlowSpec, OrganDetailSpec, PartHandle } from './typ
  */
 
 const PART_RENDER_ORDER = 31;
+/**
+ * GLASS PARTS. Many organs are a wall around something: the cortex around the thalamus,
+ * a ventricle's muscle around its blood, a renal capsule around the pyramids. Drawn solid,
+ * the wall is all anyone would ever see. So a part whose opacity an atlas module sets
+ * below GLASS_BELOW is drawn as GLASS: it stops writing depth (so it cannot hide what is
+ * behind it or inside it) and it is drawn AFTER the solid parts, which is the order that
+ * makes it tint what lies behind it and be hidden by what lies in front of it. Its alpha
+ * is also weighted towards its silhouette in the shader (see PartMaterial), so the middle
+ * of a lobe is clear and its outline still reads. Two glass parts that overlap simply
+ * blend; that is not order-independent, and at these opacities nobody can tell.
+ *
+ * This also removed a real artefact: neighbouring cortical slabs share a surface, and two
+ * depth-writing meshes on one surface fight for every pixel in stripes.
+ */
+const GLASS_BELOW = 0.98;
+const GLASS_RENDER_ORDER = 33;
 const FLOW_RENDER_ORDER = 36;
 const FADE_IN_S = 0.3;
 const FADE_OUT_S = 0.2;
@@ -88,6 +104,8 @@ class PartEntry implements PartHandle {
   hl = 0;
   /** Smoothed 0..1: 1 while another part is picked and this one is dimmed. */
   dim = 0;
+  /** Whether the mesh is currently set up as glass (no depth write, drawn late). */
+  glass = false;
 
   constructor(
     readonly id: string,
@@ -520,7 +538,16 @@ export class OrganDetail {
       const u = p.material.uniforms;
       u.uGlow.value = p.glow;
       u.uHighlight.value = p.hl;
-      const opacity = p.opacity * fade * (1 - (1 - DIMMED) * p.dim);
+      // The picked part is never glass: picking a lobe from the list should show the lobe.
+      const own = p.opacity + (1 - p.opacity) * p.hl;
+      const glass = own < GLASS_BELOW;
+      if (glass !== p.glass) {
+        p.glass = glass;
+        p.material.depthWrite = !glass;
+        p.mesh.renderOrder = glass ? GLASS_RENDER_ORDER : PART_RENDER_ORDER;
+      }
+      u.uGlass.value = glass ? 1 : 0;
+      const opacity = own * fade * (1 - (1 - DIMMED) * p.dim);
       u.uOpacity.value = opacity;
       p.mesh.visible = p.visible && opacity > 0.003;
       p.applyTransform();
@@ -551,6 +578,13 @@ export class OrganDetail {
     if (targets.length === 0) return null;
     const hits = raycaster.intersectObjects(targets, false);
     if (hits.length === 0) return null;
+    // A tap goes to what the user SEES as a thing: the nearest solid part under the finger,
+    // through any glass in front of it. Only where there is nothing but glass does the tap
+    // pick the glass, so the cortex is still pickable everywhere a nucleus is not behind it.
+    for (const hit of hits) {
+      const id = hit.object.userData.partId as string | undefined;
+      if (id && interior.parts.get(id)?.glass === false) return id;
+    }
     return (hits[0].object.userData.partId as string | undefined) ?? null;
   }
 

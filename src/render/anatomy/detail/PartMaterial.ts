@@ -22,13 +22,17 @@ import { SOLID_VERT } from '../../materials/OrganSolid';
  *   3. SHOW WHICH PART THE USER PICKED. `uHighlight` adds a white rim. The part list in
  *      the UI and a tap on the body both drive it, so the same cue answers both.
  *
- * It uses normal alpha blending with the depth buffer ON, unlike the additive rim and
- * the multiply shell. That is a choice: parts must occlude each other (a ventricle in
+ * A SOLID part uses normal alpha blending with the depth buffer ON, unlike the additive rim
+ * and the multiply shell. That is a choice: parts must occlude each other (a ventricle in
  * front of an atrium hides it) or the interior turns into an undifferentiated smear, and
  * there are only a handful of them per organ, so the sorting problems that made the shell
  * buckets order-independent do not arise. The cost is that two semi-transparent parts
  * (during a fade) can blend in the wrong order for a few hundred milliseconds; nobody
  * will see it.
+ *
+ * A GLASS part - a wall around something, see OrganDetail - is the exception: `uGlass`
+ * weights its alpha towards its silhouette, and OrganDetail turns its depth write off and
+ * draws it after the solid parts.
  *
  * COLOUR SPACE. The output is written in the same LINEAR space as OrganSolid and the
  * absorption materials. The post chain (ACES, grade, dither) tone-maps and encodes; an
@@ -42,6 +46,7 @@ uniform vec3  uColor;
 uniform float uGlow;
 uniform float uOpacity;
 uniform float uHighlight;
+uniform float uGlass;
 
 varying vec3 vNormalW;
 varying vec3 vViewDirW;
@@ -63,7 +68,15 @@ void main() {
 
   lit += vec3(pow(1.0 - ndv, 1.5) * 0.9 * uHighlight);
 
-  gl_FragColor = vec4(lit, uOpacity);
+  // GLASS (see OrganDetail): a wall drawn so that what it encloses can be seen. uOpacity
+  // is the alpha where the surface faces the eye, and it rises towards the silhouette,
+  // where the eye looks along the surface and through more of it, exactly as a real glass
+  // vessel is clearest in the middle and darkest at the rim. So the number an atlas module
+  // passes to setOpacity is "how much of what is behind the middle of this part is tinted".
+  // The 1.9 at the rim was set by eye on the cortex and the heart.
+  float alpha = uOpacity * mix(1.0, mix(1.0, 1.9, pow(1.0 - ndv, 1.4)), uGlass);
+
+  gl_FragColor = vec4(lit, clamp(alpha, 0.0, 1.0));
 }
 `;
 
@@ -79,6 +92,7 @@ export function createPartMaterial(options: PartMaterialOptions = {}): THREE.Sha
       uGlow: { value: 0 },
       uOpacity: { value: 1 },
       uHighlight: { value: 0 },
+      uGlass: { value: 0 },
     },
     vertexShader: SOLID_VERT,
     fragmentShader: PART_FRAG,

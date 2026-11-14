@@ -176,7 +176,33 @@ const smoothstep = (lo: number, hi: number, v: number): number => {
   return t * t * (3 - 2 * t);
 };
 
+/**
+ * THE CORTEX IS DRAWN AS GLASS. The six lobes of the outer cortex wrap everything else in
+ * the brain, and drawn solid they hid all of it: the thalamus, the hypothalamus and
+ * pituitary, the hippocampus and amygdala, the basal ganglia, and every stream in this
+ * file. So each lobe is a tinted pane whose opacity rises with its own activity: a resting
+ * lobe is a faint wash of its colour over the deep structures, and a lobe that is busy (the
+ * motor strip in exercise, the temporal lobe in a seizure) fills in and reads as lit. The
+ * insula and the cingulate cortex are cortex too, but they are folded inside and hide
+ * nothing, so they stay solid. The two numbers are drawing choices, not physiology.
+ */
+const GLASS_LOBES = [
+  'prefrontal_cortex',
+  'motor_cortex',
+  'somatosensory_cortex',
+  'parietal_lobe',
+  'temporal_lobe',
+  'occipital_lobe',
+] as const;
+const LOBE_OPACITY_QUIET = 0.08;
+const LOBE_OPACITY_GAIN = 0.4;
+
 function animate(ctx: DetailContext): void {
+  for (let i = 0; i < GLASS_LOBES.length; i++) {
+    const id = GLASS_LOBES[i];
+    ctx.part(id)?.setOpacity(LOBE_OPACITY_QUIET + LOBE_OPACITY_GAIN * clamp01(ctx.activity(id)));
+  }
+
   // Consciousness gates the cortical streams: they are untouched while it is high and thin
   // out to nothing as it nears zero, so an anaesthetised or fainting brain visibly empties.
   const cons = ctx.lerp((s) => s.neuro.consciousness);

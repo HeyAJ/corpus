@@ -1,6 +1,163 @@
 {
   "atlas": "trachea",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the trachea: the larynx with its vocal folds and cricoid, the C-shaped rings, the trachealis, the air column, the carina and the two main bronchi. The cartilages are drawn as simple shapes, the larynx is shown without its epiglottis or hyoid, and nothing here models voice or cough; activity is a display index of the engine's breathing signals and of swallowing.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    },
+    "WEST10": {
+      "label": "West JB, Luks AM. West's Respiratory Physiology: The Essentials, 10th ed. Wolters Kluwer, 2016.",
+      "url": "https://shop.lww.com/West-s-Respiratory-Physiology/p/9781496339447"
+    }
+  },
+  "parts": [
+    {
+      "id": "larynx",
+      "label": "Larynx (Thyroid Cartilage)",
+      "summary": "The cartilage shield that guards the top of the airway",
+      "function": "The thyroid cartilage forms the front and sides of the larynx, open behind. During a swallow the larynx is pulled upward and forward and the airway closes beneath the epiglottis, so food passes behind it into the oesophagus. It rises in this view while something is being swallowed.",
+      "color": "#d9c7a8",
+      "rest": 0.15,
+      "source": "GRAYS42",
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "The larynx is drawn up and the airway closed during the pharyngeal phase of a swallow.",
+          "source": "GRAYS42"
+        }
+      ]
+    },
+    {
+      "id": "vocal_folds",
+      "label": "Vocal Folds",
+      "summary": "Two folds inside the larynx that narrow the glottis",
+      "function": "The vocal folds lie across the larynx and can be brought together to close the glottis or drawn apart to open it for breathing. They close protectively in a swallow, and their vibration in the outgoing breath makes the voice. They are not driven by the engine and are shown for orientation; they draw together while the larynx rises in a swallow.",
+      "color": "#e2a6a0",
+      "rest": 0.2,
+      "source": "GRAYS42",
+      "drives": []
+    },
+    {
+      "id": "cricoid_cartilage",
+      "label": "Cricoid Cartilage",
+      "summary": "The signet-shaped ring at the top of the trachea",
+      "function": "The cricoid is the only complete ring of cartilage in the airway: narrow in front and tall behind. It joins the larynx to the first tracheal ring and gives the airway a rigid start.",
+      "color": "#cdbb9a",
+      "rest": 0.2,
+      "source": "GRAYS42",
+      "drives": []
+    },
+    {
+      "id": "tracheal_rings",
+      "label": "Tracheal Rings",
+      "summary": "C-shaped cartilages that keep the airway open",
+      "function": "Sixteen to twenty C-shaped rings of cartilage hold the trachea open against the pressure changes of breathing. Each is open at the back, where the trachealis muscle closes the gap. They are passive and are shown for orientation.",
+      "color": "#e6dcc4",
+      "rest": 0.2,
+      "source": "GRAYS42",
+      "drives": []
+    },
+    {
+      "id": "trachealis",
+      "label": "Trachealis",
+      "summary": "The muscular back wall that closes each cartilage ring",
+      "function": "The trachealis is smooth muscle bridging the open back of the cartilage rings. Its tone narrows the airway a little, and in this simulator it brightens when the airways are narrowed, as in bronchospasm.",
+      "color": "#c8656a",
+      "rest": 0.2,
+      "source": "GRAYS42",
+      "drives": [
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.3,
+          "note": "Smooth muscle contraction narrows the airway, and the trachealis shares in it.",
+          "source": "GH14"
+        }
+      ]
+    },
+    {
+      "id": "airway_lumen",
+      "label": "Airway Lumen",
+      "summary": "The column of air running down the trachea",
+      "function": "The lumen is the air passage itself. Air runs down it on each inspiration and back up on each expiration, warmed and humidified on the way. The stream is drawn down while the lungs fill and up while they empty, and stops in apnoea.",
+      "color": "#9fd0e0",
+      "rest": 0.3,
+      "source": "WEST10",
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "More air moves along the airway when minute ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.2,
+          "note": "A narrowed airway shows as a more active, constricted passage.",
+          "source": "WEST10"
+        }
+      ]
+    },
+    {
+      "id": "carina",
+      "label": "Carina",
+      "summary": "The ridge where the trachea divides in two",
+      "function": "The carina is the keel-shaped ridge at the fork where the trachea divides into the right and left main bronchi. It is rich in nerve endings that provoke a cough.",
+      "color": "#d98f6a",
+      "rest": 0.2,
+      "source": "GRAYS42",
+      "drives": []
+    },
+    {
+      "id": "right_main_bronchus",
+      "label": "Right Main Bronchus",
+      "summary": "Wider, shorter and steeper than the left",
+      "function": "The right main bronchus is wider, shorter and runs more vertically than the left, so it takes the larger share of the air and is where inhaled objects most often lodge. It leads to the three lobar bronchi of the right lung.",
+      "color": "#d9a07a",
+      "rest": 0.3,
+      "source": "GRAYS42",
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "The airway carries more air when ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.4,
+          "note": "Bronchial smooth muscle narrows the airway.",
+          "source": "WEST10"
+        }
+      ]
+    },
+    {
+      "id": "left_main_bronchus",
+      "label": "Left Main Bronchus",
+      "summary": "Narrower and longer, angled towards the left lung",
+      "function": "The left main bronchus is narrower and longer than the right and passes beneath the aortic arch on its way to the two lobar bronchi of the left lung.",
+      "color": "#c98f8a",
+      "rest": 0.3,
+      "source": "GRAYS42",
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "The airway carries more air when ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.4,
+          "note": "Bronchial smooth muscle narrows the airway.",
+          "source": "WEST10"
+        }
+      ]
+    }
+  ]
 }

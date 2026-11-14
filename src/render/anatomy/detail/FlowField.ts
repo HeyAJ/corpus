@@ -45,9 +45,17 @@ import type { FlowHandle, FlowSpec } from './types';
  * moved off the clip volume rather than drawn at the floor, which is how density and
  * windows hide particles.
  *
- * BLENDING. Additive, depth-tested, no depth write: the same contract as the vascular
- * particles (bucket 2), so streams commute with each other and are hidden by an opaque
- * part in front of them but never hide anything themselves.
+ * BLENDING. Ordinary alpha blending, depth-tested, no depth write, so a stream is hidden by
+ * a solid part in front of it and never hides anything itself. It was ADDITIVE at first,
+ * the contract the vascular particles use, and that was wrong here: the vessels' particles
+ * sit on vessel walls the multiply pass has already darkened, but an organ's interior is
+ * drawn on a pale page and inside pale glass, and light added to a pale surface is a paler
+ * surface. Venous blood, which should be the darkest thing in the heart, drew as faint
+ * pink specks, and nothing could be darker than what it was drawn on. With alpha blending
+ * a particle is its own colour whatever is behind it: oxygenated blood is red, deoxygenated
+ * blood is dusky, a nerve impulse is bright. Each has a small pale core so that it reads as
+ * a wet droplet rather than a flat disc. Particles are not sorted; they are small, nearly
+ * opaque and the same colour within a stream, so their order cannot be seen.
  */
 
 /** Segments each stream's curve is tabulated into. */
@@ -237,11 +245,14 @@ export class FlowField {
           vec2 d = gl_PointCoord - vec2(0.5);
           float r = dot(d, d);
           if (r > 0.25) discard;
-          float falloff = 1.0 - smoothstep(0.0, 0.25, r);
-          gl_FragColor = vec4(vColor * falloff * uOpacity, 1.0);
+          // A disc with a soft edge and a pale core (see BLENDING in the header).
+          float edge = 1.0 - smoothstep(0.12, 0.25, r);
+          float core = 1.0 - smoothstep(0.0, 0.06, r);
+          vec3 colour = mix(vColor, vec3(1.0), core * 0.35);
+          gl_FragColor = vec4(colour, edge * uOpacity);
         }
       `,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.NormalBlending,
       depthWrite: false,
       depthTest: true,
       transparent: true,

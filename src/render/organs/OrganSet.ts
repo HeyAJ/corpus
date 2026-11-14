@@ -101,6 +101,24 @@ const ACTIVE_DENSITY_GAIN = 0.45;
 const PINK = new THREE.Color(0xffd2cc);
 const WHITE = new THREE.Color(0xffffff);
 
+/**
+ * WHILE AN ORGAN IS OPEN, ITS NEIGHBOURS RECEDE.
+ *
+ * Selecting an organ now shows its interior: chambers, lobes, nuclei, streams. But a heart
+ * sits between two lungs and behind a sternum's worth of thymus, and a kidney sits behind
+ * the bowel, so at the resting density the thing the user asked to see was looked at
+ * through two or three other organs and read as a smear. While anything is selected every
+ * OTHER organ's shell is therefore drawn at this fraction of its density and rim: still
+ * there, so the selected organ keeps its place in the body, but thin enough to see through.
+ * It is one factor on every unselected shell, so the overlap ratios and the
+ * order-independence argument above are untouched. The numbers were set by eye on the
+ * heart (the worst case) and are drawing choices.
+ */
+const RECEDE_DENSITY = 0.22;
+const RECEDE_RIM = 0.4;
+/** Time constant of the recede, ms. */
+const RECEDE_TAU_MS = 160;
+
 const TWEEN_MS = 250;
 /** How long a newly built organ takes to fade in. */
 const APPEAR_MS = 420;
@@ -140,6 +158,14 @@ export interface OrganHandle {
   tween: number;
   fromDensity: number;
   fromRim: number;
+  /**
+   * The shell's own density and rim this frame, BEFORE the fade-in and the recede are
+   * applied. A state change tweens from these, not from the uniforms: the uniforms carry
+   * those two factors, and tweening from them applied each factor twice (a visible dip
+   * when a receded organ was hovered).
+   */
+  ownDensity: number;
+  ownRim: number;
   /** Tint at the moment the state last changed, so the cross-fade starts from it. */
   fromTint: THREE.Color;
   /** The organ's own colour and its resting tint, precomputed. */
@@ -188,6 +214,8 @@ export class OrganSet {
   private body: BodyKind = { sex: 'male', pregnant: false, gestationWeeks: 0 };
   private readonly scratchColor = new THREE.Color();
   private readonly restTint = new THREE.Color();
+  /** 0..1, eased: 1 while some organ is selected. See RECEDE_DENSITY. */
+  private focus = 0;
   private disposed = false;
 
   constructor(private readonly factory: GeometryFactory = new GeometryFactory()) {
@@ -297,6 +325,8 @@ export class OrganSet {
       tween: 1,
       fromDensity: 0,
       fromRim: 0,
+      ownDensity: 0,
+      ownRim: 0,
       fromTint: tint.clone(),
       ownColor,
       centroid: basePosition.clone(),
@@ -435,9 +465,8 @@ export class OrganSet {
     const h = this.organs.get(id);
     if (!h || h.state === state) return;
     const abs = h.absorption.material as THREE.ShaderMaterial;
-    const rim = h.rim.material as THREE.ShaderMaterial;
-    h.fromDensity = abs.uniforms.uDensity.value as number;
-    h.fromRim = rim.uniforms.uRimGain.value as number;
+    h.fromDensity = h.ownDensity;
+    h.fromRim = h.ownRim;
     h.fromTint = (abs.uniforms.uTint.value as THREE.Color).clone();
     h.state = state;
     h.tween = 0;
@@ -463,6 +492,18 @@ export class OrganSet {
   update(dtMs: number): void {
     const activityBlend = 1 - Math.exp(-dtMs / ACTIVITY_TAU_MS);
 
+    // See RECEDE_DENSITY: 1 while some organ is open, eased so nothing pops.
+    let anySelected = false;
+    for (const h of this.organs.values()) {
+      if (h.built && h.wanted && h.state === 'selected') {
+        anySelected = true;
+        break;
+      }
+    }
+    this.focus += ((anySelected ? 1 : 0) - this.focus) * (1 - Math.exp(-dtMs / RECEDE_TAU_MS));
+    const recedeDensity = 1 - (1 - RECEDE_DENSITY) * this.focus;
+    const recedeRim = 1 - (1 - RECEDE_RIM) * this.focus;
+
     for (const h of this.organs.values()) {
       if (!h.built || !h.wanted) continue;
 
@@ -484,8 +525,11 @@ export class OrganSet {
       // draw order; bucket 3 owns its look.
       const activeGain = selected ? 0 : (1 + ACTIVE_DENSITY_GAIN * h.activity) * (h.def.shellDensity ?? 1);
       const density = h.fromDensity + (target.density * activeGain - h.fromDensity) * e;
-      abs.uniforms.uDensity.value = density * fade;
-      rim.uniforms.uRimGain.value = (h.fromRim + (target.rimGain - h.fromRim) * e) * fade;
+      const rimGain = h.fromRim + (target.rimGain - h.fromRim) * e;
+      h.ownDensity = density;
+      h.ownRim = rimGain;
+      abs.uniforms.uDensity.value = density * fade * (selected ? 1 : recedeDensity);
+      rim.uniforms.uRimGain.value = rimGain * fade * (selected ? 1 : recedeRim);
 
       this.restTint.copy(h.ownColor).lerp(PINK, REST_TINT_MIX + (ACTIVE_TINT_MIX - REST_TINT_MIX) * h.activity);
       (abs.uniforms.uTint.value as THREE.Color).lerpColors(h.fromTint, selected ? WHITE : this.restTint, e);

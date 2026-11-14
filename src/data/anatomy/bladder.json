@@ -1,6 +1,85 @@
 {
   "atlas": "bladder",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the bladder: the muscular wall, the smooth trigone on its base, the two ureteric openings, the sphincter ring at the neck, the first part of the urethra and the folded lining. The urine itself is not drawn, since the selected bladder already shows its fluid level. The layers of the wall, the nerves and the anatomy beyond the first of the urethra are left out, and the sizes are chosen to read clearly rather than measured.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "detrusor",
+      "label": "Detrusor Muscle",
+      "summary": "The smooth muscle wall that stretches to store urine and squeezes to empty it",
+      "function": "The detrusor is a thick coat of smooth muscle that relaxes and stretches as urine collects, so the pressure inside rises very little. When the bladder is emptied, parasympathetic nerves make the whole wall contract. It brightens as the bladder fills and when parasympathetic drive rises; as the bladder fills the wall is drawn thinner.",
+      "color": "#c9a227",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "bladderFill", "weight": 0.4, "note": "Stretch of the wall rises with filling, and the urge to void rises with it.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.3, "note": "The detrusor contracts under parasympathetic drive.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trigone",
+      "label": "Trigone",
+      "summary": "The smooth triangle on the floor between the two ureters and the neck",
+      "function": "The trigone is the triangle on the base of the bladder whose corners are the two ureteric openings and the opening of the urethra. Unlike the rest of the lining it does not fold, and it stays the same shape as the bladder fills.",
+      "color": "#e0c875",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ureteric_orifices",
+      "label": "Ureteric Orifices",
+      "summary": "Where the two ureters open into the bladder",
+      "function": "Each ureter ends in a small slit-like opening at an upper corner of the trigone. Urine enters in spurts as the waves of contraction in the ureter arrive, which you can see as brief jets of urine into the bladder.",
+      "color": "#d98a4a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "urineFlow", "weight": 0.3, "note": "More urine from the kidneys means more frequent jets from the openings.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_sphincter",
+      "label": "Internal Sphincter",
+      "summary": "The ring of muscle at the bladder neck that keeps it closed",
+      "function": "The internal sphincter is a ring of smooth muscle at the neck, where the bladder joins the urethra. Sympathetic nerves hold it closed while urine is stored, and it relaxes as the bladder is emptied. It brightens with sympathetic drive.",
+      "color": "#b04a5a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "sympathetic", "weight": 0.4, "note": "Sympathetic tone keeps the bladder neck closed during storage.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "urethra",
+      "label": "Urethra (first part)",
+      "summary": "The tube that leads urine out of the bladder neck",
+      "function": "The urethra carries urine from the bladder neck out of the body. Only its first part is drawn here. It is kept shut between voidings by the sphincters.",
+      "color": "#e0a06a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mucosa",
+      "label": "Mucosa (Rugae)",
+      "summary": "The folded lining; the folds flatten as the bladder fills",
+      "function": "The inner lining of the bladder is a membrane that is thrown into folds, called rugae, when the bladder is empty. As the bladder fills the folds flatten out, which is how the wall can stretch without tearing. In this view the folds fade as the bladder fills.",
+      "color": "#d98f9a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "bladderFill", "weight": 0.3, "note": "The lining is stretched and flattened as the bladder fills.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

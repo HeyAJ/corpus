@@ -1,6 +1,168 @@
 {
   "atlas": "lung_l",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the left lung: two lobes, the airway tree, the pulmonary arteries and veins, alveolar clusters and the pleura. The branching is a deterministic illustration of three divisions per lobe, not a traced bronchial atlas, the alveoli are drawn many times life size, and nothing here models gas exchange itself; activity is a display index of the engine's own breathing and circulation signals.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    },
+    "WEST10": {
+      "label": "West JB, Luks AM. West's Respiratory Physiology: The Essentials, 10th ed. Wolters Kluwer, 2016.",
+      "url": "https://shop.lww.com/West-s-Respiratory-Physiology/p/9781496339447"
+    }
+  },
+  "parts": [
+    {
+      "id": "upper_lobe",
+      "label": "Upper Lobe",
+      "summary": "Left upper lobe, including the lingula",
+      "function": "The left upper lobe lies above the oblique fissure and includes the lingula, a tongue of lung that hangs below the cardiac notch and corresponds to the right middle lobe. It has no horizontal fissure. Air reaches it through its own lobar bronchus. It brightens when breathing is deeper or faster, for example when the exercise level is raised, and dims when breathing is depressed.",
+      "color": "#d98a8f",
+      "rest": 0.3,
+      "source": "GRAYS42",
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.35,
+          "note": "A lobe is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "hypoventilation",
+          "weight": -0.2,
+          "note": "Shallow or slow breathing leaves the lobe less ventilated than at rest.",
+          "source": "WEST10"
+        }
+      ]
+    },
+    {
+      "id": "lower_lobe",
+      "label": "Lower Lobe",
+      "summary": "Left lower lobe, below the oblique fissure",
+      "function": "The left lower lobe lies below and behind the oblique fissure and rests on the diaphragm. It is the larger of the two left lobes. Air reaches it through its own lobar bronchus. It brightens when breathing is deeper or faster, for example when the exercise level is raised, and dims when breathing is depressed.",
+      "color": "#c97b86",
+      "rest": 0.3,
+      "source": "GRAYS42",
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.35,
+          "note": "A lobe is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "hypoventilation",
+          "weight": -0.2,
+          "note": "Shallow or slow breathing leaves the lobe less ventilated than at rest.",
+          "source": "WEST10"
+        }
+      ]
+    },
+    {
+      "id": "bronchial_tree",
+      "label": "Bronchial Tree",
+      "summary": "Lobar bronchi dividing into ever smaller airways",
+      "function": "The main bronchus divides into lobar bronchi, which divide again and again until the air reaches the terminal airways. These tubes carry air but do not exchange gas, so they make up the anatomical dead space. Air runs in from the hilum while the lung fills and back out while it empties; the stream stops in apnoea, thins when the airways narrow, and the tree takes a warm tint.",
+      "color": "#e8c9a0",
+      "rest": 0.3,
+      "source": "WEST10",
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "More air moves through the airways when minute ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.4,
+          "note": "Airway narrowing is a direct property of the bronchial smooth muscle.",
+          "source": "WEST10"
+        }
+      ]
+    },
+    {
+      "id": "pulmonary_arteries",
+      "label": "Pulmonary Arteries",
+      "summary": "Carry oxygen-poor blood from the right heart to the alveoli",
+      "function": "The pulmonary artery branches alongside the airways and carries all of the cardiac output, oxygen-poor blood from the right ventricle, out to the capillaries around the alveoli. In this view the blood is drawn in the venous colour and moves faster when cardiac output is higher; it stops if the heart stops.",
+      "color": "#6a4a7a",
+      "rest": 0.3,
+      "source": "GH14",
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.4,
+          "note": "The whole cardiac output passes through the lungs, so more flow when output rises.",
+          "source": "GH14"
+        }
+      ]
+    },
+    {
+      "id": "pulmonary_veins",
+      "label": "Pulmonary Veins",
+      "summary": "Carry oxygenated blood back to the left atrium",
+      "function": "The pulmonary veins run between the lung segments, away from the airways, and return freshly oxygenated blood to the left atrium. The stream is drawn in the colour of arterial blood, so it pales towards purple as the oxygen saturation falls.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "source": "GH14",
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.4,
+          "note": "Venous return from the lungs follows cardiac output.",
+          "source": "GH14"
+        },
+        {
+          "signal": "hypoxia",
+          "weight": -0.25,
+          "note": "With less oxygen taken up, the blood returning has less oxygen to carry.",
+          "source": "WEST10"
+        }
+      ]
+    },
+    {
+      "id": "alveoli",
+      "label": "Alveoli",
+      "summary": "Air sacs where oxygen and carbon dioxide are exchanged",
+      "function": "Each smallest airway ends in a cluster of alveoli, thin-walled sacs wrapped in capillaries, where oxygen passes into the blood and carbon dioxide passes out. They are drawn far larger than life so the clusters can be seen. They brighten with each inspiration, and dim where blood passes through unventilated lung, which is what a shunt is.",
+      "color": "#f0b6c0",
+      "rest": 0.3,
+      "source": "WEST10",
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "Alveolar ventilation is what refreshes the gas in the sacs.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "hypoxia",
+          "weight": 0.25,
+          "note": "Low arterial oxygen is the signal that the exchange surface is being asked to work harder.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shunt",
+          "weight": -0.3,
+          "note": "Blood that passes unventilated lung does not take part in exchange.",
+          "source": "WEST10"
+        }
+      ]
+    },
+    {
+      "id": "pleura",
+      "label": "Pleura",
+      "summary": "The smooth membrane that wraps the lung",
+      "function": "The visceral pleura covers the lung surface and slides against the lining of the chest wall on a thin film of fluid, which lets the lung follow the chest as it expands. It has no drive of its own in this simulation and is shown for orientation.",
+      "color": "#d8d2c4",
+      "rest": 0.15,
+      "source": "GRAYS42",
+      "drives": []
+    }
+  ]
 }

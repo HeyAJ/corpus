@@ -1,6 +1,245 @@
 {
   "atlas": "heart",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the heart: its four chambers, the septum, the four valves, the lumens of the great vessels, the coronary arteries and the conduction system, drawn inside the glass shell of the organ. Chamber size, valve state, blood colour and the beat-by-beat spread of the electrical impulse follow the simulation's own cardiac cycle. It leaves out the papillary muscles, chordae tendineae, trabeculae, coronary sinus and the fine structure of the valve cusps, and the shapes are adult-mean drawings, not anyone's scan. Activity is a display index of how hard the model's drives are pushing a structure; it is not a measurement and nothing here is clinical advice.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "right_atrium",
+      "label": "Right Atrium",
+      "summary": "Receives deoxygenated blood from the body",
+      "function": "The right atrium collects blood returning from the body through the superior and inferior venae cavae and passes it through the tricuspid valve into the right ventricle. Most filling is passive, with a small extra push from atrial contraction at the end of diastole. In this simulator it is drawn in the colour of venous blood and swells and shrinks with its live volume.",
+      "color": "#7a5a96",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.35, "note": "A faster rate means more atrial contractions each minute.", "source": "GH14" },
+        { "signal": "fibrillation", "weight": 0.3, "note": "Atrial fibrillation replaces organised contraction with chaotic electrical activity.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.3, "note": "With no organised output the chamber does no useful work.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "right_ventricle",
+      "label": "Right Ventricle",
+      "summary": "Pumps blood to the lungs",
+      "function": "The right ventricle is a thin-walled crescent wrapped round the front of the septum. It receives blood through the tricuspid valve and ejects it through the pulmonary valve into the pulmonary trunk, against the low resistance of the lungs. It brightens with each beat and with a stronger or faster heart.",
+      "color": "#8a4f8c",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.35, "note": "More beats per minute means more ejections.", "source": "GH14" },
+        { "signal": "inotropy", "weight": 0.3, "note": "Stronger contractility raises the work of each beat.", "source": "GH14" },
+        { "signal": "pumpFailure", "weight": -0.3, "note": "Weaker contractility lowers the work done.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.3, "note": "No organised beat means no pumping.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_atrium",
+      "label": "Left Atrium",
+      "summary": "Receives oxygenated blood from the lungs",
+      "function": "The left atrium lies at the back of the heart and receives oxygenated blood from the four pulmonary veins. It empties through the mitral valve into the left ventricle, adding a final push at the end of diastole. It is drawn in the colour of arterial blood, so a hypoxic body visibly darkens it.",
+      "color": "#c0524f",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.35, "note": "A faster rate means more atrial contractions each minute.", "source": "GH14" },
+        { "signal": "fibrillation", "weight": 0.3, "note": "Atrial fibrillation replaces organised contraction with chaotic electrical activity.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.3, "note": "With no organised output the chamber does no useful work.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_ventricle",
+      "label": "Left Ventricle",
+      "summary": "Pumps blood to the whole body",
+      "function": "The left ventricle has the thickest wall of the four chambers because it must drive blood round the entire systemic circulation. It fills through the mitral valve and ejects through the aortic valve into the aorta, and the apex points down, forward and to the left. Its cavity shrinks sharply in systole and refills slowly in diastole.",
+      "color": "#d2463f",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.35, "note": "More beats per minute means more ejections.", "source": "GH14" },
+        { "signal": "inotropy", "weight": 0.3, "note": "Stronger contractility raises the work of each beat.", "source": "GH14" },
+        { "signal": "pumpFailure", "weight": -0.3, "note": "Weaker contractility lowers the work done.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.3, "note": "No organised beat means no pumping.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interventricular_septum",
+      "label": "Interventricular Septum",
+      "summary": "Muscular wall between the two ventricles",
+      "function": "The septum separates the right and left ventricles so that deoxygenated and oxygenated blood never mix. It is mostly muscle, shares in the contraction of the left ventricle, and carries the bundle branches of the conduction system. It brightens as the heart works harder.",
+      "color": "#b8806a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The septum contracts with every beat, so a faster rate means more work.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.25, "note": "With no organised beat it does no work.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tricuspid_valve",
+      "label": "Tricuspid Valve",
+      "summary": "Three-cusped valve, right atrium to right ventricle",
+      "function": "The tricuspid valve lets blood pass from the right atrium to the right ventricle during diastole and closes when the ventricle contracts, so blood is not forced backwards. In the interior view it fades and shrinks towards its ring when open and returns when closed.",
+      "color": "#e0c27a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The valve opens and closes once per beat, so it works more at a faster rate.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.25, "note": "With no organised beat the valve is not cycling.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mitral_valve",
+      "label": "Mitral Valve",
+      "summary": "Two-cusped valve, left atrium to left ventricle",
+      "function": "The mitral valve lets oxygenated blood flow from the left atrium into the left ventricle in diastole and shuts firmly when the ventricle contracts against the high pressure of the systemic circulation. It is open in diastole and closed in systole.",
+      "color": "#e6b86a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The valve opens and closes once per beat, so it works more at a faster rate.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.25, "note": "With no organised beat the valve is not cycling.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pulmonary_valve",
+      "label": "Pulmonary Valve",
+      "summary": "Semilunar valve at the root of the pulmonary trunk",
+      "function": "The pulmonary valve opens when the right ventricle ejects and closes at the end of systole, stopping blood from falling back into the ventricle. It is the reverse of the atrioventricular valves: open in systole, closed in diastole.",
+      "color": "#d6a8c8",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The valve opens and closes once per beat, so it works more at a faster rate.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.25, "note": "With no organised beat the valve is not cycling.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "aortic_valve",
+      "label": "Aortic Valve",
+      "summary": "Semilunar valve at the root of the aorta",
+      "function": "The aortic valve opens while the left ventricle ejects and closes as it relaxes, which keeps the arterial pressure from draining back into the heart. In this simulator it is shown open only while the engine's aortic flow is positive.",
+      "color": "#e8d08a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The valve opens and closes once per beat, so it works more at a faster rate.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.25, "note": "With no organised beat the valve is not cycling.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "aorta",
+      "label": "Ascending Aorta",
+      "summary": "Carries oxygenated blood out of the left ventricle",
+      "function": "The ascending aorta rises from the aortic valve and carries oxygenated blood into the arch and on to the whole body. Its wall stretches with each ejection and recoils to keep flow going in diastole. It brightens when the cardiac output rises or the arterial pressure is high.",
+      "color": "#cf5a4a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.35, "note": "More blood is ejected through it per minute.", "source": "GH14" },
+        { "signal": "hypertension", "weight": 0.25, "note": "Higher arterial pressure loads the wall.", "source": "GH14" },
+        { "signal": "outputFall", "weight": -0.3, "note": "Less blood is ejected through it per minute.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pulmonary_trunk",
+      "label": "Pulmonary Trunk",
+      "summary": "Carries deoxygenated blood to the lungs",
+      "function": "The pulmonary trunk rises from the right ventricle and divides into the pulmonary arteries that take deoxygenated blood to the lungs. It carries the same volume per minute as the aorta, at much lower pressure. It is drawn in the colour of venous blood.",
+      "color": "#8c6aa6",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.35, "note": "The right ventricle ejects the same output as the left.", "source": "GH14" },
+        { "signal": "outputFall", "weight": -0.3, "note": "Less blood is ejected through it per minute.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "venae_cavae",
+      "label": "Venae Cavae",
+      "summary": "Bring blood from the body back to the heart",
+      "function": "The superior vena cava drains the head, neck and arms, and the inferior vena cava drains the trunk and legs. Both empty into the right atrium, and the flow they deliver is the venous return that sets how much the heart can eject. They are drawn in the colour of venous blood and dim when blood volume falls.",
+      "color": "#6e5a9c",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.3, "note": "A higher cardiac output requires a higher venous return.", "source": "GH14" },
+        { "signal": "hypovolaemia", "weight": -0.3, "note": "A smaller blood volume reduces venous return.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pulmonary_veins",
+      "label": "Pulmonary Veins",
+      "summary": "Four veins bringing oxygenated blood from the lungs",
+      "function": "Two pulmonary veins from each lung bring newly oxygenated blood into the back of the left atrium. They are unusual among veins in carrying oxygenated blood. They are drawn in the colour of arterial blood.",
+      "color": "#c86a6a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.3, "note": "A higher cardiac output requires a higher return from the lungs.", "source": "GH14" },
+        { "signal": "outputFall", "weight": -0.3, "note": "A lower cardiac output means a lower return from the lungs.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coronary_arteries",
+      "label": "Coronary Arteries",
+      "summary": "Supply the heart muscle itself with blood",
+      "function": "The left main coronary artery divides into the anterior interventricular branch, which runs down the front groove towards the apex, and the circumflex, which curves round the left atrioventricular groove. The right coronary artery runs round the right groove. Left coronary flow is squeezed off while the ventricle contracts and occurs mainly in diastole. They brighten as the heart works harder or its muscle is short of oxygen.",
+      "color": "#e06a5a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.25, "note": "A faster heart needs more blood to its muscle.", "source": "GH14" },
+        { "signal": "inotropy", "weight": 0.25, "note": "Stronger contraction raises the oxygen demand of the muscle.", "source": "GH14" },
+        { "signal": "myocardialHypoxia", "weight": 0.3, "note": "A shortage of oxygen in the muscle is a stimulus for coronary vasodilation.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sa_node",
+      "label": "Sinoatrial Node",
+      "summary": "The heart's natural pacemaker",
+      "function": "The sinoatrial node sits in the wall of the right atrium near the superior vena cava and sets the heart rate. Sympathetic activity speeds it up and vagal activity slows it. In the interior view it flashes about a fifth of a second before each ventricular beat.",
+      "color": "#f2d24a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.35, "note": "The node fires faster as the rate rises.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": 0.25, "note": "Sympathetic outflow speeds the pacemaker.", "source": "GH14" },
+        { "signal": "bradycardia", "weight": -0.3, "note": "A slower rate means slower node firing.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "av_node",
+      "label": "Atrioventricular Node",
+      "summary": "Delays the impulse between atria and ventricles",
+      "function": "The atrioventricular node lies low in the wall between the two atria. It slows the impulse briefly so that the atria finish emptying before the ventricles begin to contract. In the interior view it glows after the sinoatrial node and just before the bundle of His.",
+      "color": "#e8b04a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The node conducts once per beat, so it is used more at a faster rate.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "his_purkinje",
+      "label": "Bundle of His and Purkinje Fibres",
+      "summary": "Fast conduction fibres through the ventricles",
+      "function": "The bundle of His runs down the septum and divides into right and left bundle branches, which spread into fine Purkinje fibres over the ventricular walls. This fast network lets the ventricles contract almost together. In the interior view a bright impulse sweeps down it at the start of each ventricular beat, and it is disorganised in fibrillation.",
+      "color": "#f0e08a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The network conducts once per beat, so it is used more at a faster rate.", "source": "GH14" },
+        { "signal": "fibrillation", "weight": 0.3, "note": "Fibrillation makes the electrical activity chaotic and continuous.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

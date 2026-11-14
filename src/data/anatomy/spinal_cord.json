@@ -1,6 +1,180 @@
 {
   "atlas": "spinal_cord",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The spinal cord drawn as three lengths (cervical, thoracic, lumbar), its grey matter core, the cauda equina, ten levels of shortened dorsal and ventral roots and the sympathetic chains. Streams show descending motor traffic, ascending sensory and pain traffic and sympathetic outflow, scaled to the simulation's own nerve signals. Individual vertebral levels, the meninges, the tracts and the blood supply are left out.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    },
+    "KANDEL6": {
+      "label": "Kandel ER, Koester JD, Mack SH, Siegelbaum SA (eds). Principles of Neural Science, 6th ed. McGraw Hill, 2021.",
+      "url": "https://neurology.mhmedical.com/book.aspx?bookID=3024"
+    }
+  },
+  "parts": [
+    {
+      "id": "cervical_cord",
+      "label": "Cervical Cord",
+      "summary": "Upper cord, with the enlargement for the arms",
+      "function": "The cervical cord carries signals between the brain and the neck, shoulders and arms, and holds the extra motor neurons that supply the arm muscles, which is why it is thicker here. It dims only slightly with paralysis, because the cord still conducts.",
+      "color": "#e6d9a8",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "paralysis",
+          "weight": -0.05,
+          "note": "Only a slight dimming: the cord itself still conducts when muscle tone is lost at the nerve-muscle junction or in the muscle.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thoracic_cord",
+      "label": "Thoracic Cord",
+      "summary": "Mid cord, serving the trunk",
+      "function": "The thoracic cord relays signals to and from the chest and abdominal wall. Its sides also hold the cell bodies of the sympathetic outflow to the body. It dims only slightly with paralysis, because the cord still conducts.",
+      "color": "#d8cc9a",
+      "rest": 0.22,
+      "drives": [
+        {
+          "signal": "paralysis",
+          "weight": -0.05,
+          "note": "Only a slight dimming: the cord itself still conducts when muscle tone is lost at the nerve-muscle junction or in the muscle.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lumbar_cord",
+      "label": "Lumbar Cord",
+      "summary": "Lower cord, with the enlargement for the legs, ending in the conus",
+      "function": "The lumbar cord, with the sacral segments below it, serves the legs and pelvis and holds the extra motor neurons for the leg muscles. It tapers to the conus medullaris, where the cord proper ends. It dims only slightly with paralysis, because the cord still conducts.",
+      "color": "#cabf8e",
+      "rest": 0.22,
+      "drives": [
+        {
+          "signal": "paralysis",
+          "weight": -0.05,
+          "note": "Only a slight dimming: the cord itself still conducts when muscle tone is lost at the nerve-muscle junction or in the muscle.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "grey_matter",
+      "label": "Grey Matter",
+      "summary": "The butterfly-shaped core of nerve cell bodies",
+      "function": "The grey matter is the central core of the cord where nerve cell bodies and their connections lie. Dorsal horns receive sensory input and ventral horns hold the motor neurons for skeletal muscle. It brightens with exertion and with painful stimuli.",
+      "color": "#9aa0b8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Working muscle needs more motor neuron firing and more sensory feedback to the cord.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "nociception",
+          "weight": 0.25,
+          "note": "Painful stimuli excite the dorsal horn neurons that relay pain upwards.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "cauda_equina",
+      "label": "Cauda Equina",
+      "summary": "The spray of nerve roots below the end of the cord",
+      "function": "Below the conus medullaris the lower lumbar, sacral and coccygeal roots run down inside the spinal canal like a horse's tail. They carry motor and sensory signals for the legs, bladder and pelvic floor. It brightens a little as the bladder fills, because its sensory fibres report the fill.",
+      "color": "#c9b27a",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "bladderFill",
+          "weight": 0.15,
+          "note": "Bladder stretch is reported to the sacral cord through roots that run in this bundle.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dorsal_roots",
+      "label": "Dorsal Roots",
+      "summary": "Sensory roots, each with a ganglion",
+      "function": "Each dorsal root brings sensory fibres into the cord at its level; the swelling on it is the dorsal root ganglion, which holds the sensory nerve cell bodies. It brightens with painful stimuli. Here only about ten levels are drawn, and they are shortened.",
+      "color": "#6fb7d9",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "nociception",
+          "weight": 0.3,
+          "note": "Pain afferents enter the cord through the dorsal roots.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "pain",
+          "weight": 0.25,
+          "note": "Felt pain follows the same pathway into the cord.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "ventral_roots",
+      "label": "Ventral Roots",
+      "summary": "Motor roots carrying commands out to muscle",
+      "function": "Each ventral root carries the axons of motor neurons out of the cord to skeletal muscle. It brightens with exercise, a seizure and shivering, when more motor commands leave the cord. Only about ten levels are drawn, and they are shortened.",
+      "color": "#e8a74a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.4,
+          "note": "Exercise recruits more motor neurons.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.4,
+          "note": "A seizure drives intense motor output.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.3,
+          "note": "Shivering is rhythmic motor output to skeletal muscle.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "sympathetic_chain",
+      "label": "Sympathetic Chain",
+      "summary": "The beaded chains of ganglia beside the cord",
+      "function": "The sympathetic chains lie either side of the spine and are strings of ganglia where fibres from the thoracic and upper lumbar cord relay on to the organs and vessels of the body. They brighten when sympathetic outflow rises, for example with stress, exertion or a fall in blood pressure.",
+      "color": "#c58be0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "sympathetic",
+          "weight": 0.5,
+          "note": "Sympathetic outflow leaves the cord through these ganglia.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

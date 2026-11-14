@@ -24,6 +24,7 @@ import { PhysiologyPanel } from './panels/PhysiologyPanel';
 import { ImpactPanel } from './panels/ImpactPanel';
 import { EnvironmentPanel } from './panels/EnvironmentPanel';
 import { InfectionPanel } from './panels/InfectionPanel';
+import { ReproductionPanel } from './panels/ReproductionPanel';
 import { NoticeToasts } from './components/NoticeToasts';
 
 /**
@@ -54,6 +55,9 @@ export function App() {
   const setConnected = useStore((s) => s.setConnected);
   const setSelected = useStore((s) => s.setSelected);
   const setLabels = useStore((s) => s.setLabels);
+  const setSelectedPart = useStore((s) => s.setSelectedPart);
+  const setPartLabels = useStore((s) => s.setPartLabels);
+  const selectedPart = useStore((s) => s.selectedPart);
   const setShock = useStore((s) => s.setShock);
   const pushEvent = useStore((s) => s.pushEvent);
   const vascularVisible = useStore((s) => s.vascularVisible);
@@ -73,6 +77,8 @@ export function App() {
       s.labPanelOpen ||
       s.receptorPanelOpen ||
       s.bloodPanelOpen ||
+      s.reproductionPanelOpen ||
+      s.anatomyPanelOpen ||
       s.tool === 'body',
   );
   const reducedMotion = useStore((s) => s.reducedMotion);
@@ -112,8 +118,21 @@ export function App() {
     viewer.setCallbacks({
       onSelect: (id) => setSelected(id),
       onLabels: (l) => setLabels(l),
+      // A tap on a structure INSIDE the selected organ, and where each structure sits on
+      // screen. Both go to the store so the structures panel and the 3D view agree on
+      // which part is picked whichever of the two the user touched.
+      onPart: (p) => setSelectedPart(p ? p.part : null),
+      onPartLabels: (l) => setPartLabels(l),
     });
     viewer.start();
+
+    // DEVELOPMENT ONLY. The browser probes that check the renderer (.cache/probes) need to
+    // select an organ by name rather than by guessing where it is on screen, and to read
+    // the store. Vite removes this branch from a production build, so the live site never
+    // exposes the handle.
+    if (import.meta.env.DEV) {
+      (window as unknown as { __corpus?: unknown }).__corpus = { viewer, store: useStore };
+    }
 
     const client = new SimClient();
     clientRef.current = client;
@@ -189,11 +208,16 @@ export function App() {
       viewerRef.current = null;
       clientRef.current = null;
     };
-  }, [setConnected, setDispatch, setLabels, setSelected, setShock, setSnapshot, pushLog, pushEvent]);
+  }, [setConnected, setDispatch, setLabels, setSelected, setSelectedPart, setPartLabels, setShock, setSnapshot, pushLog, pushEvent]);
 
   useEffect(() => {
     if (viewerRef.current) viewerRef.current.reducedMotion = reducedMotion;
   }, [reducedMotion]);
+
+  /* ---- the picked structure is one fact with two views: the list and the body ---- */
+  useEffect(() => {
+    viewerRef.current?.highlightPart(selectedPart);
+  }, [selectedPart]);
 
   /* ---- vascular overlay follows the tool dock's blood-drop button ---- */
   useEffect(() => {
@@ -291,6 +315,7 @@ export function App() {
         <ImpactPanel />
         <PhysiologyPanel />
         <EnvironmentPanel />
+        <ReproductionPanel />
         <InfectionPanel />
         <EndocrinePanel />
         <LabPanel />
