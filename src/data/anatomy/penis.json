@@ -1,6 +1,126 @@
 {
   "atlas": "penis",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the penis: the tunica albuginea, the two corpora cavernosa, the corpus spongiosum with its bulb, the glans, the urethra, the paired deep arteries and dorsal arteries, and the deep dorsal vein. How full the erectile tissue is shows in colour, glow and the speed of the streams; the organ's size and pose are not changed here. The circumflex veins, the fascial layers, the nerves, the corona of the glans and the real cross-sectional shapes are left out, and the sizes are chosen to read clearly rather than measured.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "tunica_albuginea",
+      "label": "Tunica Albuginea",
+      "summary": "The tough fibrous sleeve round the erectile tissue of the shaft",
+      "function": "The tunica albuginea is a dense fibrous sheath round each corpus cavernosum. When the cavernous spaces fill with blood it limits the stretch of the tissue, and the pressure inside rises until the shaft is rigid. It also compresses the small veins that cross it, which restricts the outflow of blood. It is drawn as glass so that the parts inside can be seen.",
+      "color": "#e8dcc0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.4, "note": "The sleeve is stretched as the erectile tissue fills.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corpus_cavernosum_right",
+      "label": "Right Corpus Cavernosum",
+      "summary": "The right of the two main columns of erectile tissue",
+      "function": "Each corpus cavernosum is a column of spongy tissue made of blood-filled spaces lined by endothelium and separated by smooth muscle. At rest the muscle is contracted and the spaces are small. When the muscle relaxes and the arteries dilate, blood fills the spaces. It deepens in colour and glows more as the tissue fills.",
+      "color": "#c98a8a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.5, "note": "The tissue fills with blood as the vasocongestion rises.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.2, "note": "Erection is brought about mainly by parasympathetic nerves.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corpus_cavernosum_left",
+      "label": "Left Corpus Cavernosum",
+      "summary": "The left of the two main columns of erectile tissue",
+      "function": "The two corpora cavernosa lie side by side on the upper side of the shaft and are partly separated by a septum. Each begins at the back as a crus attached to the pubic bone. It deepens in colour and glows more as the tissue fills.",
+      "color": "#c98a8a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.5, "note": "The tissue fills with blood as the vasocongestion rises.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.2, "note": "Erection is brought about mainly by parasympathetic nerves.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corpus_spongiosum",
+      "label": "Corpus Spongiosum",
+      "summary": "The column of erectile tissue below the corpora that carries the urethra",
+      "function": "The corpus spongiosum lies on the underside of the shaft. It swells at the back into the bulb and at the front into the glans, and the urethra runs through it. Its tunica is thinner than that of the corpora cavernosa, so it stays softer and keeps the urethra open when the shaft is erect.",
+      "color": "#d9a0a0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.4, "note": "It fills with blood in erection, though less firmly than the corpora cavernosa.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glans_penis",
+      "label": "Glans Penis",
+      "summary": "The cap of erectile tissue at the tip of the penis",
+      "function": "The glans is the expanded end of the corpus spongiosum and caps the ends of the two corpora cavernosa. The urethra opens at its tip. It is richly supplied with sensory nerve endings. It is drawn as glass so that the urethra inside is visible.",
+      "color": "#d98a98",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.3, "note": "The glans fills with blood in erection.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "urethra",
+      "label": "Penile Urethra",
+      "summary": "The urethra within the corpus spongiosum, from the bulb to the tip",
+      "function": "The penile urethra is the longest part of the male urethra. It begins in the bulb, runs through the corpus spongiosum, and opens at the tip of the glans. It carries urine from the bladder and, at ejaculation, semen. It is drawn as glass.",
+      "color": "#e3c04a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "orgasm", "weight": 0.2, "note": "Semen passes along it at ejaculation.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cavernosal_arteries",
+      "label": "Deep (Cavernosal) Arteries",
+      "summary": "The paired arteries that run down the core of the corpora cavernosa",
+      "function": "Each corpus cavernosum is supplied by a deep artery that runs along its core and gives off small branches that open into the cavernous spaces. When the smooth muscle relaxes these arteries dilate. In the simulator, the stream in them speeds up and thickens as vasocongestion rises.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.4, "note": "Inflow rises as the arteries dilate.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dorsal_arteries",
+      "label": "Dorsal Arteries",
+      "summary": "The paired arteries on the upper surface of the shaft, supplying the glans",
+      "function": "Two dorsal arteries run along the upper surface of the shaft, one on each side of the deep dorsal vein, and supply the skin, the glans and the corpus spongiosum. Like the deep arteries they carry more blood as the tissue fills, which is shown by a faster, thicker stream.",
+      "color": "#d4545a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.3, "note": "Inflow rises with the filling of the tissue.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deep_dorsal_vein",
+      "label": "Deep Dorsal Vein",
+      "summary": "The single vein on the upper midline that drains the shaft",
+      "function": "The deep dorsal vein runs along the midline of the upper surface, between the two dorsal arteries, and drains blood from the glans and the cavernous tissue. As the corpora fill they press the small draining veins against the tunica, so the outflow falls and blood is held in the shaft. In the simulator, its stream thins as vasocongestion rises.",
+      "color": "#6a4a7a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "vasocongestion", "weight": -0.2, "note": "Outflow is restricted as the tissue fills and compresses the veins.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

@@ -1,6 +1,145 @@
 {
   "atlas": "liver",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the liver: its four lobes drawn as glass, the falciform ligament, the portal triad (portal vein, hepatic artery and bile duct) entering at the porta hepatis and branching, the hepatic veins converging on the inferior vena cava, and one hepatic lobule drawn enormously enlarged so its plan can be followed. The vessel trees are grown by a seeded rule to show the pattern of branching, not traced from an individual; the real liver has many more generations, and the lobule's size is chosen to be legible. Segments, lymphatics, nerves and the individual cell types are left out.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "right_lobe",
+      "label": "Right Lobe",
+      "summary": "The largest lobe, holding most of the liver's tissue",
+      "function": "The right lobe is the largest of the four and does the bulk of the liver's chemistry: storing and releasing glucose, making plasma proteins, and processing what the gut absorbs. It is drawn as glass so the vessels inside show through. It brightens when the liver is releasing glucose or when absorbed food is arriving from the gut.",
+      "color": "#a8503c",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "hepaticOutput", "weight": 0.35, "note": "The liver's glucose release is its most visible metabolic output.", "source": "GH14" },
+        { "signal": "absorption", "weight": 0.2, "note": "Absorbed nutrients reach the liver first, by the portal vein.", "source": "GH14" },
+        { "signal": "insulin", "weight": 0.1, "note": "Insulin switches the liver from releasing to storing glucose.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_lobe",
+      "label": "Left Lobe",
+      "summary": "The smaller lobe, running to the left over the stomach",
+      "function": "The left lobe is thinner and tapers towards the patient's left, lying over the stomach. It is separated from the right lobe, on the front, by the falciform ligament. It does the same work as the right lobe on a smaller scale and brightens with it.",
+      "color": "#b5604a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "hepaticOutput", "weight": 0.35, "note": "Same metabolic work as the right lobe.", "source": "GH14" },
+        { "signal": "absorption", "weight": 0.2, "note": "Receives portal blood carrying absorbed nutrients.", "source": "GH14" },
+        { "signal": "insulin", "weight": 0.1, "note": "Insulin switches the liver from releasing to storing glucose.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "caudate_lobe",
+      "label": "Caudate Lobe",
+      "summary": "The small lobe at the back, beside the vena cava",
+      "function": "The caudate lobe lies on the back of the liver between the inferior vena cava and the porta hepatis. It has its own blood supply and its own drainage straight into the cava, so it is described separately from the right and left lobes.",
+      "color": "#9a4a3a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "hepaticOutput", "weight": 0.3, "note": "Takes part in the liver's metabolic output.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "quadrate_lobe",
+      "label": "Quadrate Lobe",
+      "summary": "The small lobe on the underside, beside the gallbladder",
+      "function": "The quadrate lobe is the small square area on the underside of the liver, between the gallbladder and the falciform ligament, in front of the porta hepatis. Anatomically it belongs to the left lobe's territory, but it is conventionally named separately.",
+      "color": "#c06c54",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "hepaticOutput", "weight": 0.3, "note": "Takes part in the liver's metabolic output.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "falciform_ligament",
+      "label": "Falciform Ligament",
+      "summary": "The fold of peritoneum that divides right from left on the front",
+      "function": "The falciform ligament is a thin sickle-shaped fold of peritoneum that attaches the front of the liver to the diaphragm and the abdominal wall. On the front of the liver it marks the division between the right and left lobes. It has no activity of its own and stays at a constant dim glow.",
+      "color": "#d9c9a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "portal_vein",
+      "label": "Portal Vein",
+      "summary": "Brings nutrient-rich blood from the gut to the liver",
+      "function": "The portal vein collects venous blood from the stomach, intestines, spleen and pancreas and carries it to the liver, which supplies most of its blood. It enters at the porta hepatis beside the hepatic artery and bile duct, then divides into right and left branches that keep dividing. It brightens after a meal as absorbed glucose arrives, and its stream runs faster when cardiac output rises.",
+      "color": "#6f5a9a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "absorption", "weight": 0.4, "note": "Absorbed nutrients travel to the liver in portal blood.", "source": "GH14" },
+        { "signal": "digestion", "weight": 0.15, "note": "Gut blood flow rises during digestion.", "source": "GH14" },
+        { "signal": "hypovolaemia", "weight": -0.15, "note": "Blood loss reduces flow.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hepatic_artery",
+      "label": "Hepatic Artery",
+      "summary": "Brings oxygenated blood to the liver",
+      "function": "The hepatic artery carries oxygenated arterial blood to the liver, running beside the portal vein and bile duct inside the same sheath as they branch. It supplies the bile ducts and the liver tissue with oxygen. It is drawn in the arterial colour and its stream follows the oxygen saturation of arterial blood.",
+      "color": "#c8454a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "hypotension", "weight": -0.15, "note": "Falling arterial pressure reduces the flow.", "source": "GH14" },
+        { "signal": "hypovolaemia", "weight": -0.15, "note": "Blood loss reduces flow.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hepatic_veins",
+      "label": "Hepatic Veins",
+      "summary": "Carry blood from the liver up into the vena cava",
+      "function": "The right, middle and left hepatic veins drain blood out of the liver. They run up and back, between the segments rather than inside the portal triads, and join the inferior vena cava just below the diaphragm. Their stream is drawn running away from the lobes towards the cava.",
+      "color": "#5a4a8a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "hepaticOutput", "weight": 0.25, "note": "Glucose and other products leave the liver in this blood.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bile_ducts",
+      "label": "Intrahepatic Bile Ducts",
+      "summary": "Carry bile from the liver tissue towards the porta hepatis",
+      "function": "Bile made by the liver cells is collected by small ducts that join into larger ones, running alongside the portal vein and hepatic artery, and leave the liver at the porta hepatis. The stream in the ducts is drawn in a green-gold colour. It brightens when fat is in the gut, since bile is needed to digest it.",
+      "color": "#8aa83a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "fatLoad", "weight": 0.3, "note": "Bile salts are needed to digest and absorb fat.", "source": "GH14" },
+        { "signal": "digestion", "weight": 0.15, "note": "Bile secretion rises with digestion.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lobules",
+      "label": "Hepatic Lobule (enlarged)",
+      "summary": "The liver's working unit, drawn hugely enlarged so it can be followed",
+      "function": "A lobule is a hexagonal unit of liver tissue with a portal triad at each corner and a central vein in the middle. Blood from the portal vein and hepatic artery flows inwards through sinusoids between rows of liver cells to the central vein, while the bile the cells make runs the other way, in tiny canaliculi, to the bile ductule at the corner. This one is drawn many times larger than life. It brightens when the liver is releasing glucose, or when stress hormones are high.",
+      "color": "#d08a3c",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "hepaticOutput", "weight": 0.4, "note": "Liver cells release glucose into the sinusoid blood.", "source": "GH14" },
+        { "signal": "glucagon", "weight": 0.15, "note": "Glucagon makes liver cells release glucose.", "source": "GH14" },
+        { "signal": "insulin", "weight": -0.1, "note": "Insulin makes liver cells store glucose instead.", "source": "GH14" },
+        { "signal": "stressAxis", "weight": 0.1, "note": "Stress hormones raise glucose production.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

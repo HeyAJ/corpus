@@ -57,9 +57,26 @@ export function stepAcidBase(s: SimState, dt: number): void {
 
   // Renal compensation for a sustained PaCO2 change: the chronic slope minus the acute
   // one, because the acute buffering is already counted separately below.
+  //
+  // THE KIDNEY COMPENSATES FOR A CHANGE FROM THIS BODY'S OWN RESTING PaCO2, NOT FROM 40.
+  // This line used to read (paco2 - 40). The textbook 40 is the population mean; this
+  // model's chemoreflex loop settles a healthy resting body at about 37.3 mmHg (see the
+  // note on resp.restingPaco2_mmHg - the offset is a property of the loop, not a disease).
+  // Against 40, a perfectly healthy resting body therefore had a standing "chronic
+  // respiratory alkalosis" for the kidney to compensate, and the kidney obliged: over
+  // simulated days bicarbonate crept from 23.7 to about 22.8 mEq/L and pH from 7.425 to
+  // 7.41, in a body to which nothing had happened. A 24 h test hid it because the renal
+  // clock is about a day long. The reproductive time-lapse exposed it: slowClockScale
+  // runs this clock thousands of times faster during the catch-up after a jump, so merely
+  // switching the body to female, or setting a cycle day, moved bicarbonate and pH for no
+  // physiological reason. neuro.ts already references cerebral CO2 reactivity to the same
+  // constant for the same reason. The ACUTE buffering term below is deliberately left
+  // referenced to 40: it is an instantaneous chemical equilibrium of haemoglobin, it has
+  // no clock to drift on, and the resting bicarbonate this model boots with was settled
+  // with it as written.
   const acute = P('acidbase.acuteHco3PerPaco2');
   const chronic = P('acidbase.chronicHco3PerPaco2');
-  const compensationTarget = (chronic - acute) * (paco2 - 40);
+  const compensationTarget = (chronic - acute) * (paco2 - P('resp.restingPaco2_mmHg'));
   const kRen = 1 - Math.exp(-dtH / P('acidbase.renalCompensationTau_h'));
   ab.renalCompensation += (compensationTarget - ab.renalCompensation) * kRen;
 

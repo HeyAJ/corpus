@@ -138,6 +138,13 @@ export const EFFECT_TARGETS = [
   // isotonic volume. Both zero in every body that is not pregnant.
   'blood.plasmaVolume',
   'blood.redCellMass',
+  // Upward resetting of the arterial baroreflex's operating point by central command,
+  // as a FRACTION of the baseline set point (0.2 = defend a pressure 20 % higher).
+  // Consumed by baroreflex.ts, which adds `setpoint x value` to the defended pressure,
+  // exactly as exercise already resets it. Written by the sexual response in
+  // systems/reproductive.ts: without it the reflex met every pressor push with vagal
+  // slowing, so a pressure could not stay raised while heart rate was raised as well.
+  'reflex.setpointShift',
 ] as const;
 
 export type EffectTarget = (typeof EFFECT_TARGETS)[number];

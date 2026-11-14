@@ -1,6 +1,156 @@
 {
   "atlas": "fetus",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The inside of the fetus, drawn as anatomy and not simulated: the brain, heart, collapsed lungs and liver, the great vessels, the umbilical cord with its one vein and two arteries twisted round each other, and the three shunts of the fetal circulation (the ductus venosus, the foramen ovale and the ductus arteriosus). The engine does not model fetal physiology beyond a weight: there is no fetal heart rate, blood gas or movement, so the streams run at a steady drawing rate, the heart glows steadily and does not beat, and no rate or saturation is shown. The colours are the atlas convention (oxygenated blood and deoxygenated blood), fixed, and the sizes are chosen to read clearly rather than measured. The cord ends at the edge of the fetus on the side nearest the top of the uterus, where the placenta is drawn on the uterine wall. The valves, the limb vessels and the placenta itself are left out.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "brain",
+      "label": "Brain",
+      "summary": "The fetal brain, supplied first by the oxygen-rich blood from the aortic arch",
+      "function": "The brain is large in the fetus. The blood that the left ventricle pumps into the ascending aorta is the most oxygenated blood in the body, and the vessels to the head arise from the arch just beyond it, so the brain is among the first organs to receive it. Here it is drawn as anatomy, and its glow is a constant.",
+      "color": "#e3b7bf",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "heart",
+      "label": "Heart",
+      "summary": "Two atria and two ventricles, working in parallel before birth",
+      "function": "Before birth the two sides of the heart work side by side rather than in series: because the lungs are not yet used, the blood in the right atrium can cross to the left atrium through the foramen ovale, and the blood in the pulmonary trunk can pass to the aorta through the ductus arteriosus. The heart is drawn with its four chambers, the atria behind and above and the ventricles in front and below. It glows steadily and does not beat, because this simulator does not model the fetal heart.",
+      "color": "#b8545c",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lungs",
+      "label": "Lungs",
+      "summary": "Collapsed and fluid-filled; the placenta, not the lungs, exchanges gases",
+      "function": "The fetal lungs are not expanded and do not exchange gas, since the placenta does that. They offer a high resistance to blood flow, which is one reason that the output of the right ventricle goes mainly through the ductus arteriosus to the aorta instead of through the lungs. They are drawn small and set back in the chest.",
+      "color": "#d9a79f",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "liver",
+      "label": "Liver",
+      "summary": "Large in the fetus; most umbilical blood passes by it through the ductus venosus",
+      "function": "The umbilical vein carries blood from the placenta up to the liver. Part of that blood goes through the liver, and part passes by it through the ductus venosus to the inferior vena cava. The liver is drawn as a large organ filling the upper abdomen, as it does in the fetus.",
+      "color": "#8c4a3b",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "aortic_arch",
+      "label": "Aortic Arch",
+      "summary": "Carries the left ventricle's oxygen-rich blood on to the head and the body",
+      "function": "The ascending aorta rises from the left ventricle and arches back to become the descending aorta; the vessels to the head arise from the arch. Blood that has crossed the foramen ovale into the left atrium and so into the left ventricle leaves by this route. The vessel is drawn in the oxygenated colour, fixed, since the simulator has no fetal saturation to read.",
+      "color": "#c8323a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "descending_aorta",
+      "label": "Descending Aorta",
+      "summary": "Receives the ductus arteriosus and sends its blood to the umbilical arteries",
+      "function": "The descending aorta runs down in front of the spine. The ductus arteriosus joins it from the pulmonary trunk, so blood that has passed through the right side of the heart enters it. At its lower end it divides, and the two umbilical arteries, which arise from the vessels of the pelvis, take blood out of the body to the placenta. It is drawn in the deoxygenated colour, fixed.",
+      "color": "#6a4a7a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_vena_cava",
+      "label": "Inferior Vena Cava",
+      "summary": "Brings the ductus venosus blood, and the lower body's, to the right atrium",
+      "function": "The inferior vena cava carries blood from the lower body up to the right atrium, and in the fetus it also receives the blood that has passed through the ductus venosus. That blood is directed across the right atrium toward the foramen ovale. It is drawn in the oxygenated colour because that is the stream shown in it; in life it carries mixed blood.",
+      "color": "#c8323a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "superior_vena_cava",
+      "label": "Superior Vena Cava",
+      "summary": "Returns blood from the head and arms to the right atrium",
+      "function": "The superior vena cava drains the head and the arms into the right atrium. In the fetus the blood it brings is directed mainly toward the right ventricle and the pulmonary trunk instead of toward the foramen ovale.",
+      "color": "#6a4a7a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "pulmonary_trunk",
+      "label": "Pulmonary Trunk",
+      "summary": "Leaves the right ventricle; most of its blood goes on by the ductus arteriosus",
+      "function": "The pulmonary trunk rises from the right ventricle and divides into the two pulmonary arteries. Because the unexpanded lungs resist the flow of blood, most of what it carries passes through the ductus arteriosus into the aorta. It is drawn in the deoxygenated colour, fixed.",
+      "color": "#6a4a7a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "umbilical_vein",
+      "label": "Umbilical Vein",
+      "summary": "The one vein of the cord: carries oxygenated blood from the placenta to the fetus",
+      "function": "The cord contains one umbilical vein and two umbilical arteries, twisted round each other. The vein carries blood from the placenta, where it has taken up oxygen and nutrients, to the fetus: it enters at the umbilicus and runs up to the liver. This is the one place in the body where the most oxygenated blood runs in a vein. It is drawn in the oxygenated colour, fixed.",
+      "color": "#c8323a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "umbilical_arteries",
+      "label": "Umbilical Arteries",
+      "summary": "The two arteries of the cord: carry deoxygenated blood to the placenta",
+      "function": "The two umbilical arteries arise from the arteries of the pelvis, run up on either side of the lower abdomen to the umbilicus and out along the cord to the placenta. They carry the fetus's deoxygenated blood to be oxygenated again. In the cord they twist round the vein. They are drawn in the deoxygenated colour, fixed.",
+      "color": "#6a4a7a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ductus_venosus",
+      "label": "Ductus Venosus",
+      "summary": "Shunt: umbilical blood passes the liver to the inferior vena cava",
+      "function": "The ductus venosus is a short channel that joins the umbilical vein, inside the liver, to the inferior vena cava. It lets a part of the blood from the placenta pass by the liver straight on toward the heart. After birth it closes.",
+      "color": "#d9625f",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "foramen_ovale",
+      "label": "Foramen Ovale",
+      "summary": "Shunt: an opening that lets blood cross from the right atrium to the left",
+      "function": "The foramen ovale is an opening in the wall between the two atria. Blood from the inferior vena cava is directed through it from the right atrium to the left atrium, so that it goes on to the left ventricle and the aorta without passing through the lungs. After birth it normally closes.",
+      "color": "#e08a6a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "ductus_arteriosus",
+      "label": "Ductus Arteriosus",
+      "summary": "Shunt: joins the pulmonary trunk to the aorta, past the unexpanded lungs",
+      "function": "The ductus arteriosus is a vessel joining the pulmonary trunk to the descending aorta. It carries most of the right ventricle's output past the lungs and into the aorta. After birth it normally closes.",
+      "color": "#8a5a9a",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GH14"
+    }
+  ]
 }

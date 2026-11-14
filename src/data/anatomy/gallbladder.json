@@ -1,6 +1,199 @@
 {
   "atlas": "gallbladder",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the gallbladder: the glass wall in three pieces (fundus, body and neck), the stored bile drawn at a size that follows how full the bag is, the cystic duct with its spiral fold, and the first parts of the common hepatic duct and the common bile duct. Bile streams into the bag between meals and out to the duodenum after a fatty meal. The ducts are short stubs and the junction is drawn close to the neck so that everything stays inside the organ's outline; the sizes are chosen to read clearly rather than measured. The layers of the wall, the sphincter at the duodenal end and the liver's finer ducts are left out.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "fundus",
+      "label": "Fundus",
+      "summary": "The rounded blind end of the gallbladder",
+      "function": "The fundus is the rounded end of the gallbladder, the part that projects furthest from the liver. It is drawn as glass so the stored bile shows through. It contracts and brightens when fat reaches the duodenum, and the whole bag shrinks around its neck.",
+      "color": "#7fa05a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.5,
+          "note": "Fat in the duodenum releases a hormone that makes the gallbladder contract.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Contraction accompanies digestion of a meal.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.1,
+          "note": "Vagal drive adds to the contraction.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "body",
+      "label": "Body",
+      "summary": "The main part of the bag, where bile is stored",
+      "function": "The body is the main storage part of the gallbladder. Between meals it fills with bile from the liver and concentrates it by absorbing water. After a fatty meal its smooth muscle contracts and squeezes bile out. It is drawn as glass, brightens with fat in the gut, and shrinks as it empties.",
+      "color": "#8aae62",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.5,
+          "note": "Fat in the duodenum releases a hormone that makes the gallbladder contract.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Contraction accompanies digestion of a meal.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.1,
+          "note": "Vagal drive adds to the contraction.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "neck",
+      "label": "Neck",
+      "summary": "The narrowed end that bends into the cystic duct",
+      "function": "The neck is the tapering end of the gallbladder, which curves and narrows into the cystic duct. Bile enters and leaves the bag through it. It is drawn as glass and contracts with the rest of the wall.",
+      "color": "#779a50",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.5,
+          "note": "Fat in the duodenum releases a hormone that makes the gallbladder contract.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Contraction accompanies digestion of a meal.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.1,
+          "note": "Vagal drive adds to the contraction.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bile",
+      "label": "Stored Bile",
+      "summary": "The bile held in the gallbladder, drawn to show how full it is",
+      "function": "Bile made by the liver is stored in the gallbladder between meals and becomes more concentrated as water is absorbed. Its size here follows how full the bag is: it is full between meals and shrinks when the gallbladder squeezes after a fatty meal.",
+      "color": "#b5b83a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": -0.3,
+          "note": "Fat in the gut empties the gallbladder.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": -0.1,
+          "note": "Emptying accompanies digestion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cystic_duct",
+      "label": "Cystic Duct",
+      "summary": "The short duct joining the gallbladder to the main bile duct",
+      "function": "The cystic duct connects the neck of the gallbladder to the common hepatic duct. Bile flows along it in both directions: into the gallbladder between meals, and out of it after a fatty meal. It is drawn as glass so its stream can be seen.",
+      "color": "#9ab86a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.2,
+          "note": "Bile flows out through it after a fatty meal.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spiral_fold",
+      "label": "Spiral Fold",
+      "summary": "The helical fold inside the cystic duct",
+      "function": "The lining of the cystic duct is raised into a spiral fold, sometimes called the spiral valve. It helps keep the duct open as the gallbladder fills and empties.",
+      "color": "#d9c78a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "common_hepatic_duct",
+      "label": "Common Hepatic Duct",
+      "summary": "Carries bile down from the liver",
+      "function": "The right and left hepatic ducts leave the liver and join to form the common hepatic duct, which carries bile down towards the cystic duct. Its stream runs all the time, since the liver makes bile continuously, and brightens after a fatty meal.",
+      "color": "#a8bf3c",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.2,
+          "note": "Bile output is needed to digest fat.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.15,
+          "note": "Bile secretion rises with digestion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "common_bile_duct",
+      "label": "Common Bile Duct",
+      "summary": "Carries bile on to the duodenum",
+      "function": "The common bile duct is formed where the cystic duct joins the common hepatic duct. It runs down behind the first part of the duodenum to deliver bile into the gut. After a fatty meal bile streams along it, from the liver and from the gallbladder together.",
+      "color": "#98b030",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.4,
+          "note": "Bile flows to the duodenum when fat is present.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.15,
+          "note": "Bile delivery accompanies digestion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }
