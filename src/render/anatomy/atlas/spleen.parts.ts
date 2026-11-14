@@ -64,9 +64,9 @@ export function veinBranches(): V3[][] {
 }
 
 /** Where the hilum stem of the vein leaves the organ (flow ends here). */
-export const VEIN_EXIT: V3 = [0.0105, 0, 0.0075];
+export const VEIN_EXIT: V3 = [0.0095, 0, 0.0075];
 /** Where the artery enters (flow starts here). */
-export const ARTERY_ENTRY: V3 = [0.0105, 0, 0.011];
+export const ARTERY_ENTRY: V3 = [0.0085, 0, 0.011];
 
 const FOLLICLE_R = 0.0021;
 const MARGINAL_R = 0.0036;
