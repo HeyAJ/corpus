@@ -366,6 +366,11 @@ export class Viewer {
     this.detail.highlight(partId);
   }
 
+  /** The shared geometry factory, so the brain scan inset builds its meshes from the same cache. */
+  get geometryFactory() {
+    return this.organs.geometryFactory;
+  }
+
   /** True once the selected organ's interior has been built and is on screen. */
   get interiorReady(): boolean {
     return this.detail.ready;

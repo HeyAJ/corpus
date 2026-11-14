@@ -3,6 +3,7 @@ import { Viewer } from '../render/scene/Viewer';
 import { SimClient } from '../bridge/client';
 import { organDefs } from '../render/organs/OrganSet';
 import type { OrganId } from '../data/types';
+import { ANATOMY, atlasOf } from '../data/anatomy';
 import type { WaveformChannel } from '../bridge/types';
 import { useStore } from './store';
 import { ToolDock, VesselToggle } from './components/ToolDock';
@@ -26,6 +27,8 @@ import { EnvironmentPanel } from './panels/EnvironmentPanel';
 import { InfectionPanel } from './panels/InfectionPanel';
 import { ReproductionPanel } from './panels/ReproductionPanel';
 import { NoticeToasts } from './components/NoticeToasts';
+import { AnatomyPanel } from './panels/AnatomyPanel';
+import { BrainScanInset } from './components/BrainScanInset';
 
 /**
  * LAYER C — the application shell.
@@ -58,6 +61,7 @@ export function App() {
   const setSelectedPart = useStore((s) => s.setSelectedPart);
   const setPartLabels = useStore((s) => s.setPartLabels);
   const selectedPart = useStore((s) => s.selectedPart);
+  const selectedOrgan = useStore((s) => s.selectedOrgan);
   const setShock = useStore((s) => s.setShock);
   const pushEvent = useStore((s) => s.pushEvent);
   const vascularVisible = useStore((s) => s.vascularVisible);
@@ -219,6 +223,11 @@ export function App() {
     viewerRef.current?.highlightPart(selectedPart);
   }, [selectedPart]);
 
+  /* ---- the list in the structures panel selects in the 3D view (select is a no-op when unchanged) ---- */
+  useEffect(() => {
+    viewerRef.current?.select(selectedOrgan);
+  }, [selectedOrgan]);
+
   /* ---- vascular overlay follows the tool dock's blood-drop button ---- */
   useEffect(() => {
     viewerRef.current?.setVascularVisible(vascularVisible);
@@ -290,11 +299,13 @@ export function App() {
         />
 
         <OrganLabels />
+        <PartLabel />
         <Hud ready={ready} client={client} />
         <Conditions />
         <TimeScaleControl />
         <VesselToggle />
         <NoticeToasts />
+        <BrainScanInset viewerRef={viewerRef} ready={ready} />
 
         {/* The resuscitation flow is spatial — pads on the thorax, eyes on the chest —
             so it stays anchored to the body rather than joining the panel sheet. */}
@@ -316,6 +327,7 @@ export function App() {
         <PhysiologyPanel />
         <EnvironmentPanel />
         <ReproductionPanel />
+        <AnatomyPanel />
         <InfectionPanel />
         <EndocrinePanel />
         <LabPanel />
@@ -368,16 +380,35 @@ export function App() {
 /** Screen-space organ labels. Their own subscription, so moving labels re-render only them. */
 function OrganLabels() {
   const labels = useStore((s) => s.labels);
+  // The selected organ's own label is not drawn: the top-left chip already names it, and
+  // the label sat on top of the interior that is now the point of selecting it.
+  const selected = useStore((s) => s.selectedOrgan);
   return (
     <>
       {labels.map((l) =>
-        l.visible ? (
+        l.visible && l.id !== selected ? (
           <span key={l.id} className={styles.organLabel} style={{ transform: `translate(${l.x}px, ${l.y}px) translate(-50%, -50%)` }} aria-hidden="true">
             {ORGANS.find((o) => o.id === l.id)?.displayName}
           </span>
         ) : null,
       )}
     </>
+  );
+}
+
+/** The picked structure's name, pinned to its place in the interior. Its own subscription. */
+function PartLabel() {
+  const picked = useStore((s) => s.selectedPart);
+  const organ = useStore((s) => s.selectedOrgan);
+  const anchor = useStore((s) => (s.selectedPart ? s.partLabels.find((l) => l.id === s.selectedPart) : undefined));
+  if (!picked || !organ || !anchor || !anchor.visible) return null;
+  const organDef = ORGANS.find((o) => o.id === organ);
+  const part = organDef ? ANATOMY[atlasOf(organDef)]?.parts.find((p) => p.id === picked) : undefined;
+  if (!part) return null;
+  return (
+    <span className={styles.partLabel} style={{ transform: `translate(${anchor.x}px, ${anchor.y}px) translate(-50%, -50%)` }} aria-hidden="true">
+      {part.label}
+    </span>
   );
 }
 

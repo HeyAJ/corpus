@@ -1,0 +1,132 @@
+/*
+ * BRAIN SCAN INSET.
+ *
+ * A floating card, top-right of the stage, below the row of condition tags. On a wide
+ * screen the panel sheet occupies the right-hand column when it is open (root carries
+ * data-sheet="open"), so the card steps left of it by the sheet's own width; on a phone the
+ * sheet is at the bottom and the card stays in the corner. The card is sized by its
+ * canvas (a square), so the scan never stretches.
+ */
+
+.card {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
+  right: var(--inset-hud);
+  z-index: 20;
+  width: 176px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+}
+
+/* The sheet is min(380px, 38vw) wide at right: 16px; keep a 12px gap beside it. */
+:global([data-sheet='open']) .card {
+  right: calc(var(--inset-hud) + min(380px, 38vw) + 12px);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 4px;
+}
+
+.title {
+  margin: 0;
+  flex: 1 1 auto;
+  font-size: 11px;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.pin {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -4px -4px 0;
+  padding: 0;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.pin[aria-pressed='true'] {
+  color: var(--ink);
+  background: var(--chip-bg-strong);
+}
+
+.canvas {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--well-black);
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+}
+
+.ends {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+
+.caption {
+  margin: 0;
+  font-size: 10px;
+  color: var(--ink-faint);
+  text-align: center;
+}
+
+@media (max-width: 720px) {
+  .card {
+    width: 112px;
+    padding: 6px;
+    top: calc(env(safe-area-inset-top, 0px) + 56px);
+  }
+
+  /* The sheet is a bottom sheet here: the card does not move for it. */
+  :global([data-sheet='open']) .card {
+    right: var(--inset-hud);
+  }
+
+  .title {
+    font-size: 9px;
+  }
+
+  .caption,
+  .ends {
+    font-size: 9px;
+  }
+
+  /* 44 px touch target on the pin without growing the card: extend the hit area. */
+  .pin {
+    position: relative;
+  }
+
+  .pin::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+}

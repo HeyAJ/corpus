@@ -1,0 +1,352 @@
+/*
+ * STRUCTURES PANEL.
+ *
+ * A sheet card like the environment panel it is modelled on. It scrolls inside itself
+ * (the sheet gives it a bounded height) so a long atlas never pushes the header away, and
+ * every tappable row is at least 44 px tall.
+ */
+
+.panel {
+  width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--size-tag);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.close {
+  margin-left: auto;
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: -10px;
+  margin-top: -12px;
+  margin-bottom: -12px;
+  border: none;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: var(--ink-dim);
+  cursor: pointer;
+}
+
+.lead {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-mid);
+}
+
+/* ---------------------------------------------------------------- organ list */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.organs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.organButton {
+  min-height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+}
+
+.organButton:hover {
+  background: var(--chip-bg-strong);
+}
+
+/* --------------------------------------------------------------- organ atlas */
+
+.organHead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.back {
+  min-width: 44px;
+  min-height: 44px;
+  margin-left: -10px;
+  border: none;
+  background: none;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--ink-mid);
+  cursor: pointer;
+}
+
+.organTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+}
+
+.about {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-mid);
+}
+
+.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.more {
+  min-height: 32px;
+  padding: 0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.quiet {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-dim);
+}
+
+.active {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.activeTitle {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.swatchSmall {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ---------------------------------------------------------------------- parts */
+
+.parts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.partItem {
+  border-radius: var(--radius-chip);
+  background: var(--chip-bg);
+}
+
+.partItem[data-open='true'] {
+  background: var(--chip-bg-strong);
+}
+
+.partRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.swatch {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  margin-top: 3px;
+  border-radius: 4px;
+}
+
+.partText {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.partTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.partLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.meter {
+  flex: 0 0 64px;
+  height: 6px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-pill);
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  background: var(--ink-mid);
+  border-radius: var(--radius-pill);
+}
+
+.partSummary {
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+}
+
+.detail {
+  padding: 0 12px 12px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prose {
+  margin: 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-mid);
+}
+
+.subTitle {
+  margin: 4px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.drives,
+.sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--ink-mid);
+}
+
+.drive {
+  display: flex;
+  gap: 8px;
+}
+
+.up,
+.down {
+  flex: 0 0 auto;
+  font-size: 9px;
+  line-height: 1.9;
+}
+
+.up {
+  color: var(--organ-active);
+}
+
+.down {
+  color: var(--accent-violet);
+}
+
+.sources a {
+  color: var(--ink-mid);
+  overflow-wrap: anywhere;
+}

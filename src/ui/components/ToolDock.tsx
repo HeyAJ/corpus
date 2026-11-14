@@ -203,6 +203,16 @@ function Impact({ filled }: { filled: boolean }) {
   );
 }
 
+/** Stacked slices: the structures panel (what is inside an organ). */
+function Layers({ filled }: { filled: boolean }) {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4 21 9l-9 5-9-5Z" fill={filled ? '#1a1a1a' : 'none'} stroke="#1a1a1a" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="m3 13 9 5 9-5" fill="none" stroke="#1a1a1a" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** A mountain under a sun: the environment panel — altitude, temperature, oxygen. */
 function Mountain({ filled }: { filled: boolean }) {
   return (
@@ -314,6 +324,8 @@ export function ToolDock() {
   // on every snapshot, twenty times a second, for nothing.
   const st = useStore(
     useShallow((s) => ({
+      anatomyPanelOpen: s.anatomyPanelOpen,
+      toggleAnatomyPanel: s.toggleAnatomyPanel,
       statusPanelOpen: s.statusPanelOpen,
       toggleStatusPanel: s.toggleStatusPanel,
       impactPanelOpen: s.impactPanelOpen,
@@ -340,6 +352,7 @@ export function ToolDock() {
     { key: 'status', label: 'What is happening', hint: 'the body in plain words', icon: <Pulse />, active: st.statusPanelOpen, onClick: st.toggleStatusPanel },
     { key: 'impact', label: 'Impact', hint: 'what your actions changed', icon: <Impact filled={st.impactPanelOpen} />, active: st.impactPanelOpen, onClick: st.toggleImpactPanel },
     { key: 'physiology', label: 'Physiology', hint: 'sleep, exercise, stress, pain, bleeding', icon: <Runner filled={st.physiologyPanelOpen} />, active: st.physiologyPanelOpen, onClick: st.togglePhysiologyPanel },
+    { key: 'anatomy', label: 'Structures', hint: 'what is inside each organ', icon: <Layers filled={st.anatomyPanelOpen} />, active: st.anatomyPanelOpen, onClick: st.toggleAnatomyPanel },
     { key: 'environment', label: 'Environment', hint: 'temperature, altitude, oxygen, posture', icon: <Mountain filled={st.environmentPanelOpen} />, active: st.environmentPanelOpen, onClick: st.toggleEnvironmentPanel },
     { key: 'reproduction', label: 'Reproduction', hint: 'cycle, pregnancy, sexual response', icon: <Cycle filled={st.reproductionPanelOpen} />, active: st.reproductionPanelOpen, onClick: st.toggleReproductionPanel },
     { key: 'infection', label: 'Infection', hint: 'inoculate, watch and clear', icon: <Microbe filled={st.infectionPanelOpen} />, active: st.infectionPanelOpen, onClick: st.toggleInfectionPanel },
