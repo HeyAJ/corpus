@@ -19,7 +19,7 @@ import type { Sdf, V3 } from '../sdf';
 import { ridged } from '../noise';
 
 /**
- * INTERIOR OF THE BRAIN: twenty-two parts that sit inside the shell built by `brain()` in
+ * INTERIOR OF THE BRAIN: twenty-one parts that sit inside the shell built by `brain()` in
  * ../models.ts, in the same frame (origin at the organ's position, +x the patient's right,
  * +y cranial, +z anterior, metres).
  *

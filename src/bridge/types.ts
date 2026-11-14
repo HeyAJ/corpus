@@ -489,6 +489,12 @@ export interface SexualResponseSnapshot {
   vasocongestion: number;
   /** Orgasms since the run began. */
   orgasms: number;
+  /**
+   * 0..1: how far the post-orgasmic rise in prolactin has developed. A STATE, not a
+   * concentration: the rise is documented (it lasts an hour or more in both sexes) but
+   * no source available to this project gives its size, so no level is reported.
+   */
+  prolactinRaised?: number;
 }
 
 export interface ReproductiveSnapshot {

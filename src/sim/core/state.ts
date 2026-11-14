@@ -172,6 +172,15 @@ export interface FluidState {
   interstitial: number;
   /** Running net balance since the run began, mL. Positive is a gain. */
   balance_mL: number;
+  /**
+   * Plasma volume added to the circulation by the `blood.plasmaVolume` bus target, mL:
+   * the ACHIEVED expansion (pregnancy), which chases its moving target in fluids.ts.
+   * Raises the plasma level the transcapillary refill defends so the refill does not
+   * drain it away. Zero in a body that has no such effect.
+   */
+  plasmaExpansion_mL: number;
+  /** Red-cell volume added by the `blood.redCellMass` bus target, mL (achieved). */
+  redCellExpansion_mL: number;
 }
 
 /** Convenience top-level scratch the fluid system owns; declared here for the type. */
@@ -819,6 +828,8 @@ export function createInitialState(seed: number): SimState {
   const fluids: FluidState = {
     interstitial: P('fluid.interstitialVolume_mL'),
     balance_mL: 0,
+    plasmaExpansion_mL: 0,
+    redCellExpansion_mL: 0,
   };
 
   const gi: GiState = {

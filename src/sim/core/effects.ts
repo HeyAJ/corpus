@@ -130,6 +130,14 @@ export const EFFECT_TARGETS = [
   // Red-cell destruction, fraction of the red-cell mass per hour. Consumed by
   // fluids.ts, which lowers haematocrit.
   'blood.haemolysis_per_h',
+
+  /* ------------------------------------------------------ reproduction (2026-11) */
+  // Fractional expansion of plasma volume and of red-cell mass, written by the
+  // pregnancy adaptations in systems/reproductive.ts. Consumed by fluids.ts, which moves
+  // the achieved expansion toward `reference volume x value` and adds the difference as
+  // isotonic volume. Both zero in every body that is not pregnant.
+  'blood.plasmaVolume',
+  'blood.redCellMass',
 ] as const;
 
 export type EffectTarget = (typeof EFFECT_TARGETS)[number];

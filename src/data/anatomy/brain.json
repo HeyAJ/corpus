@@ -1,6 +1,351 @@
 {
   "atlas": "brain",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The interior of the brain in twenty-one parts: eight cortical regions, the corpus callosum, the deep midline and limbic structures, the basal ganglia and the brainstem and cerebellum. Each glows with an activity index built from the simulator's own signals (stress, pain, sleep, exertion, hormones and so on); the particle streams are the major tracts, and they thin or fill with the activity of the parts they join. Shapes are authored by eye from textbook proportions, not traced from a scan, and the ventricles and white-matter detail are not drawn. Activity is a display index, not a firing rate or a BOLD signal. The directions of the orgasm-related drives come from the imaging studies cited (qualitative region lists only; they disagree about the amygdala, so it is not given an orgasm drive). The adult human brain holds roughly 86 billion neurons (Azevedo and colleagues, 2009). Nothing here is clinical advice.",
+  "sources": {
+    "KANDEL6": {
+      "label": "Kandel ER, Koester JD, Mack SH, Siegelbaum SA (eds). Principles of Neural Science, 6th ed. McGraw Hill, 2021.",
+      "url": "https://neurology.mhmedical.com/book.aspx?bookID=3024"
+    },
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "AZEVEDO2009": {
+      "label": "Azevedo FAC et al. J Comp Neurol 2009;513:532-541.",
+      "url": "https://doi.org/10.1002/cne.21974"
+    },
+    "HOLSTEGE2003": {
+      "label": "Holstege G et al. J Neurosci 2003;23:9185-9193.",
+      "url": "https://doi.org/10.1523/jneurosci.23-27-09185.2003"
+    },
+    "GEORGIADIS2006": {
+      "label": "Georgiadis JR et al. Eur J Neurosci 2006;24:3305-3316.",
+      "url": "https://doi.org/10.1111/j.1460-9568.2006.05206.x"
+    },
+    "GEORGIADIS2007": {
+      "label": "Georgiadis JR et al. Neuroreport 2007;18:553-557.",
+      "url": "https://doi.org/10.1097/wnr.0b013e3280b10bfe"
+    },
+    "KOMISARUK2004": {
+      "label": "Komisaruk BR et al. Brain Res 2004;1024:77-88.",
+      "url": "https://doi.org/10.1016/j.brainres.2004.07.029"
+    },
+    "WISE2017": {
+      "label": "Wise NJ et al. J Sex Med 2017;14:1380-1391.",
+      "url": "https://doi.org/10.1016/j.jsxm.2017.08.014"
+    }
+  },
+  "parts": [
+    {
+      "id": "prefrontal_cortex",
+      "label": "Prefrontal Cortex",
+      "summary": "Anterior frontal lobe: planning, judgement and control of impulses",
+      "function": "The prefrontal cortex holds goals and rules in mind, plans ahead and restrains impulses, and it is the cortex most changed by sustained stress. Its activity is reported to fall at ejaculation. In this simulator it brightens when the stress slider is raised and dims in sleep, under sedatives and as consciousness is lost.",
+      "color": "#d9a066",
+      "rest": 0.4,
+      "drives": [
+        { "signal": "stress", "weight": 0.25, "note": "Sustained psychological load engages prefrontal control circuits.", "source": "KANDEL6" },
+        { "signal": "orgasm", "weight": -0.25, "note": "Prefrontal activity is deactivated at ejaculation.", "source": "GEORGIADIS2007" },
+        { "signal": "sleep", "weight": -0.2, "note": "Association cortex is least active in deep sleep.", "source": "KANDEL6" },
+        { "signal": "sedation", "weight": -0.2, "note": "Central depressants quieten the cortex.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.3, "note": "Cortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "motor_cortex",
+      "label": "Motor Cortex",
+      "summary": "Precentral gyrus: commands for voluntary movement",
+      "function": "The primary motor cortex lies in the precentral gyrus, just in front of the central sulcus. Its large pyramidal cells send the corticospinal tract down to the spinal cord to command voluntary muscles. It brightens with exercise and in a seizure, and dims in sleep and under sedation.",
+      "color": "#c98a5a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "exertion", "weight": 0.45, "note": "Voluntary muscular work is driven from the motor strip.", "source": "KANDEL6" },
+        { "signal": "seizure", "weight": 0.3, "note": "A cortical seizure discharges through the motor strip.", "source": "KANDEL6" },
+        { "signal": "sleep", "weight": -0.1, "note": "Cortical output falls in sleep.", "source": "KANDEL6" },
+        { "signal": "sedation", "weight": -0.1, "note": "Depressants reduce cortical excitability.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.15, "note": "Cortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "somatosensory_cortex",
+      "label": "Somatosensory Cortex",
+      "summary": "Postcentral gyrus: touch, pressure and the location of pain",
+      "function": "The primary somatosensory cortex lies in the postcentral gyrus, behind the central sulcus, and maps touch, pressure, temperature and pain from the body surface. Imaging shows genital stimulation activating it. It brightens with pain and with sexual arousal.",
+      "color": "#d4b86a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "pain", "weight": 0.25, "note": "Felt pain is localised in the sensory strip.", "source": "KANDEL6" },
+        { "signal": "nociception", "weight": 0.15, "note": "Noxious input reaches it by the spinothalamic route.", "source": "KANDEL6" },
+        { "signal": "sexualArousal", "weight": 0.25, "note": "Genital stimulation activates the somatosensory cortex.", "source": "GEORGIADIS2006" },
+        { "signal": "sleep", "weight": -0.1, "note": "Cortical responsiveness falls in sleep.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.15, "note": "Cortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "parietal_lobe",
+      "label": "Parietal Lobe",
+      "summary": "Posterior parietal cortex: spatial sense and body position",
+      "function": "The posterior parietal cortex combines vision, balance and body sense into a map of space and of where the body is within it. It helps direct attention and reaching. It brightens when the simulation reports vertigo, and dims in sleep and under sedation.",
+      "color": "#a8c46a",
+      "rest": 0.28,
+      "drives": [
+        { "signal": "vertigo", "weight": 0.3, "note": "Vestibular signals converge on parietal cortex.", "source": "KANDEL6" },
+        { "signal": "sleep", "weight": -0.1, "note": "Association cortex quietens in sleep.", "source": "KANDEL6" },
+        { "signal": "sedation", "weight": -0.1, "note": "Depressants reduce cortical activity.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.15, "note": "Cortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "temporal_lobe",
+      "label": "Temporal Lobe",
+      "summary": "Hearing, language comprehension and memory",
+      "function": "The temporal lobe lies below the lateral fissure. Its upper surface receives hearing, its lateral cortex takes part in language and recognition, and its medial part holds the hippocampus and amygdala. It is a common origin of seizures, so it brightens when a seizure is under way, and it dims in sleep and under sedation.",
+      "color": "#6aaed4",
+      "rest": 0.28,
+      "drives": [
+        { "signal": "seizure", "weight": 0.45, "note": "Temporal cortex is a frequent site of seizure activity.", "source": "KANDEL6" },
+        { "signal": "sleep", "weight": -0.1, "note": "Cortical activity falls in sleep.", "source": "KANDEL6" },
+        { "signal": "sedation", "weight": -0.1, "note": "Depressants reduce cortical activity.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.15, "note": "Cortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "occipital_lobe",
+      "label": "Occipital Lobe",
+      "summary": "Visual cortex at the back of the brain",
+      "function": "The occipital lobe receives vision from the eyes by way of the thalamus and builds it into edges, motion and form. It brightens in the simulator when a psychedelic is active, which alters visual experience, and dims in sleep and under sedation.",
+      "color": "#8a7fd0",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "psychedelia", "weight": 0.4, "note": "Visual cortex takes part in the altered perception these drugs produce.", "source": "KANDEL6" },
+        { "signal": "sleep", "weight": -0.1, "note": "Visual cortex is quiet with the eyes closed in deep sleep.", "source": "KANDEL6" },
+        { "signal": "sedation", "weight": -0.1, "note": "Depressants reduce cortical activity.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.15, "note": "Cortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "insula",
+      "label": "Insula",
+      "summary": "Cortex deep to the lateral fissure: body state and feeling",
+      "function": "The insula reads the internal state of the body (nausea, pain, heartbeat, visceral sensation) and links it to emotion. Imaging shows it active in sexual arousal and orgasm. It brightens with nausea, pain, anxiety and arousal.",
+      "color": "#c8789a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "nausea", "weight": 0.25, "note": "Visceral sensation is represented in the insula.", "source": "KANDEL6" },
+        { "signal": "pain", "weight": 0.25, "note": "The insula takes part in the felt quality of pain.", "source": "KANDEL6" },
+        { "signal": "anxiety", "weight": 0.15, "note": "Interoceptive awareness rises in anxiety.", "source": "KANDEL6" },
+        { "signal": "sexualArousal", "weight": 0.15, "note": "Insular activity rises with sexual arousal.", "source": "WISE2017" },
+        { "signal": "unconscious", "weight": -0.2, "note": "Cortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "cingulate_cortex",
+      "label": "Cingulate Cortex",
+      "summary": "Medial cortex arching over the corpus callosum: pain, effort, emotion",
+      "function": "The cingulate gyrus arches over the corpus callosum and joins emotion, attention and the unpleasantness of pain. Its anterior part is active in pain and in stress. Imaging shows it active at orgasm. It brightens with pain, stress and orgasm.",
+      "color": "#d98a8a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "pain", "weight": 0.25, "note": "The anterior cingulate carries the unpleasantness of pain.", "source": "KANDEL6" },
+        { "signal": "stress", "weight": 0.2, "note": "It monitors conflict and threat.", "source": "KANDEL6" },
+        { "signal": "orgasm", "weight": 0.25, "note": "Anterior cingulate activity rises at orgasm.", "source": "KOMISARUK2004" },
+        { "signal": "sleep", "weight": -0.1, "note": "Cortical activity falls in sleep.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.2, "note": "Cortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "corpus_callosum",
+      "label": "Corpus Callosum",
+      "summary": "The great C-shaped band of fibres joining the two hemispheres",
+      "function": "The corpus callosum is the largest bundle of nerve fibres in the brain. It lets the two hemispheres share information and coordinate. In this simulator it carries the callosal streams, and brightens when a seizure spreads across the brain.",
+      "color": "#e8e2d0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "seizure", "weight": 0.4, "note": "Seizure activity spreads between hemispheres through the callosum.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.1, "note": "Traffic between the cortices falls as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "thalamus",
+      "label": "Thalamus",
+      "summary": "The relay station between the senses and the cortex",
+      "function": "The thalamus relays almost all sensory information to the cortex and gates it with the state of arousal: in sleep and under sedatives the relay largely shuts. Pain pathways pass through it on the way to the cortex. It brightens with pain and dims in sleep and sedation.",
+      "color": "#7fb0c8",
+      "rest": 0.4,
+      "drives": [
+        { "signal": "pain", "weight": 0.2, "note": "Spinothalamic pain pathways synapse in the thalamus.", "source": "KANDEL6" },
+        { "signal": "sleep", "weight": -0.2, "note": "The thalamic relay is gated shut in sleep.", "source": "KANDEL6" },
+        { "signal": "sedation", "weight": -0.2, "note": "Sedatives suppress thalamocortical transmission.", "source": "KANDEL6" },
+        { "signal": "unconscious", "weight": -0.2, "note": "Thalamocortical activity fails as consciousness is lost.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "hypothalamus",
+      "label": "Hypothalamus",
+      "summary": "Small base-of-brain centre for temperature, thirst, hormones and drives",
+      "function": "The hypothalamus keeps the internal environment steady: it sets body temperature, senses osmolality and glucose, drives thirst and runs the stress axis through the pituitary. In this simulator it brightens with stress-axis drive, fever, dehydration, low glucose and at orgasm, when oxytocin-producing cells are active.",
+      "color": "#e0a050",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "stressAxis", "weight": 0.25, "note": "The paraventricular nucleus drives the stress axis.", "source": "GH14" },
+        { "signal": "fever", "weight": 0.25, "note": "The hypothalamic thermostat sets a raised temperature.", "source": "GH14" },
+        { "signal": "dehydration", "weight": 0.2, "note": "Osmoreceptors here drive thirst and vasopressin release.", "source": "GH14" },
+        { "signal": "hypoglycaemia", "weight": 0.15, "note": "Glucose-sensing neurons here raise counter-regulation.", "source": "GH14" },
+        { "signal": "orgasm", "weight": 0.2, "note": "The paraventricular nucleus is active at orgasm.", "source": "KOMISARUK2004" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "pituitary",
+      "label": "Pituitary Gland",
+      "summary": "The pea-sized master gland hanging below the hypothalamus",
+      "function": "The pituitary hangs from the hypothalamus on a stalk. The anterior lobe releases hormones such as ACTH, LH and prolactin under hypothalamic control, and the posterior lobe releases vasopressin and oxytocin made in the hypothalamus. It brightens when these hormones are raised.",
+      "color": "#f0c060",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "stressAxis", "weight": 0.25, "note": "ACTH is released in response to hypothalamic CRH.", "source": "GH14" },
+        { "signal": "adh", "weight": 0.2, "note": "The posterior lobe releases vasopressin.", "source": "GH14" },
+        { "signal": "lh", "weight": 0.15, "note": "The anterior lobe releases LH.", "source": "GH14" },
+        { "signal": "prolactin", "weight": 0.15, "note": "The anterior lobe releases prolactin.", "source": "GH14" },
+        { "signal": "oxytocin", "weight": 0.2, "note": "The posterior lobe releases oxytocin.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "pineal",
+      "label": "Pineal Gland",
+      "summary": "Small gland behind the thalamus that makes melatonin at night",
+      "function": "The pineal gland releases melatonin in darkness under the control of the body's circadian clock, signalling night to the rest of the body. In this simulator it brightens during the small hours and is dim by day.",
+      "color": "#9a7ac8",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "night", "weight": 0.5, "note": "Melatonin secretion rises in the dark phase of the clock.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "hippocampus",
+      "label": "Hippocampus",
+      "summary": "Curved structure of the medial temporal lobe: forming new memories",
+      "function": "The hippocampus is needed to lay down new memories of events and of places. It is sensitive to stress hormones, and imaging shows it active at orgasm. It brightens with stress and orgasm.",
+      "color": "#5fc0a0",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "stress", "weight": 0.2, "note": "The hippocampus is rich in stress-hormone receptors and engaged by stress.", "source": "KANDEL6" },
+        { "signal": "orgasm", "weight": 0.25, "note": "Hippocampal activity rises towards orgasm.", "source": "WISE2017" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "amygdala",
+      "label": "Amygdala",
+      "summary": "Almond-shaped nucleus that detects threat and gives events emotional weight",
+      "function": "The amygdala lies in front of the hippocampus and rapidly assesses threat, setting off fear responses through the hypothalamus and brainstem. It brightens with fright, anxiety, stress and pain. Imaging studies disagree about its behaviour at orgasm, so no drive is set for it.",
+      "color": "#d06060",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "fright", "weight": 0.3, "note": "Acute alarm engages the amygdala.", "source": "KANDEL6" },
+        { "signal": "anxiety", "weight": 0.2, "note": "Anxiety involves heightened amygdala activity.", "source": "KANDEL6" },
+        { "signal": "stress", "weight": 0.15, "note": "Sustained stress keeps it more active.", "source": "KANDEL6" },
+        { "signal": "pain", "weight": 0.15, "note": "The amygdala adds emotional weight to pain.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "basal_ganglia",
+      "label": "Basal Ganglia",
+      "summary": "Caudate and putamen: selecting and smoothing movement",
+      "function": "The caudate nucleus and putamen lie lateral to the thalamus. They help select wanted movements and suppress unwanted ones, and take part in habit and reward learning. They brighten with exertion.",
+      "color": "#b08ad0",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "exertion", "weight": 0.4, "note": "Movement selection loops are busier during physical activity.", "source": "KANDEL6" },
+        { "signal": "sedation", "weight": -0.1, "note": "Depressants reduce striatal activity.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "nucleus_accumbens",
+      "label": "Nucleus Accumbens",
+      "summary": "Ventral striatum: the brain's reward hub",
+      "function": "The nucleus accumbens receives dopamine from the midbrain and assigns value to rewarding events. It is active in reward, euphoria and orgasm. It brightens with these signals, and the gold mesolimbic stream runs to it.",
+      "color": "#e8b030",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "reward", "weight": 0.35, "note": "Reinforcement is signalled through accumbens dopamine.", "source": "KANDEL6" },
+        { "signal": "euphoria", "weight": 0.2, "note": "Euphoric states engage the reward circuit.", "source": "KANDEL6" },
+        { "signal": "orgasm", "weight": 0.25, "note": "Accumbens activity rises at orgasm.", "source": "WISE2017" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "midbrain",
+      "label": "Midbrain",
+      "summary": "Top of the brainstem: dopamine, pain control and eye movement",
+      "function": "The midbrain holds the ventral tegmental area, the source of the reward dopamine pathway, and the periaqueductal grey, which controls pain from above. It brightens with reward, orgasm and analgesia.",
+      "color": "#c0a070",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "reward", "weight": 0.25, "note": "The ventral tegmental area signals reward.", "source": "KANDEL6" },
+        { "signal": "orgasm", "weight": 0.25, "note": "The ventral tegmental region is active at ejaculation.", "source": "HOLSTEGE2003" },
+        { "signal": "analgesia", "weight": 0.25, "note": "The periaqueductal grey drives descending pain suppression.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "pons",
+      "label": "Pons",
+      "summary": "Bridge between the cerebrum and cerebellum; breathing rhythm and arousal",
+      "function": "The pons carries fibres across to the cerebellum, houses the locus coeruleus, the brain's main noradrenaline source for alertness and alarm, and shapes the rhythm of breathing. It brightens with fright, stress and respiratory drive.",
+      "color": "#8aa0b8",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "fright", "weight": 0.2, "note": "The locus coeruleus fires in alarm.", "source": "KANDEL6" },
+        { "signal": "stress", "weight": 0.2, "note": "Sustained load raises locus coeruleus activity.", "source": "KANDEL6" },
+        { "signal": "respDrive", "weight": 0.3, "note": "Pontine centres shape the breathing pattern.", "source": "GH14" }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "medulla",
+      "label": "Medulla Oblongata",
+      "summary": "Lowest brainstem: breathing, blood pressure and vomiting centres",
+      "function": "The medulla contains the respiratory centres, the cardiovascular control centres that receive the baroreceptor signal, and the vomiting centre. All descending motor fibres cross here on the way to the spinal cord. It brightens with respiratory drive, baroreflex action, nausea, vomiting and sympathetic outflow.",
+      "color": "#7a90a0",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "respDrive", "weight": 0.25, "note": "The medullary respiratory groups generate the breathing drive.", "source": "GH14" },
+        { "signal": "baroreflex", "weight": 0.15, "note": "Baroreceptor signals are integrated in the medulla.", "source": "GH14" },
+        { "signal": "nausea", "weight": 0.1, "note": "Nausea is processed by medullary centres.", "source": "GH14" },
+        { "signal": "vomiting", "weight": 0.1, "note": "The vomiting centre is in the medulla.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": 0.15, "note": "Sympathetic outflow originates in the rostral ventrolateral medulla.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "cerebellum",
+      "label": "Cerebellum",
+      "summary": "The little brain: coordination, balance and timing of movement",
+      "function": "The cerebellum compares intended with actual movement and corrects it, and keeps balance by working with the vestibular system. It brightens with exertion and vertigo. Imaging shows strong cerebellar activation at orgasm, and it joins in a seizure.",
+      "color": "#7a9a6a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "exertion", "weight": 0.25, "note": "Movement coordination is busier during exercise.", "source": "KANDEL6" },
+        { "signal": "vertigo", "weight": 0.15, "note": "The vestibulocerebellum receives balance signals.", "source": "KANDEL6" },
+        { "signal": "orgasm", "weight": 0.2, "note": "Strong cerebellar activation is reported at orgasm.", "source": "HOLSTEGE2003" },
+        { "signal": "seizure", "weight": 0.1, "note": "Generalised seizure activity reaches the cerebellum.", "source": "KANDEL6" }
+      ],
+      "source": "KANDEL6"
+    }
+  ]
 }

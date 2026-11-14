@@ -369,6 +369,16 @@ export class OrganDetail {
       }
     }
 
+    // DEBUG ONLY: OrganSet turns a shell to glass when the atlas DATA lists parts. While the
+    // data files are still empty that never happens and the opaque shell hides everything
+    // drawn inside it, so with the debug hook on the shell is made glass here, exactly as
+    // OrganSet does for an organ with parts. Without the hook this is never touched.
+    if (this.debugEnabled() && list.length > 0) {
+      const solid = handle.solid.material as THREE.ShaderMaterial;
+      solid.depthWrite = false;
+      solid.uniforms.uCore.value = 0.12;
+    }
+
     for (const p of list) {
       const material = createPartMaterial({ color: p.colour });
       const mesh = new THREE.Mesh(p.geometry, material);
