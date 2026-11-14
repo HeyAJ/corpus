@@ -645,3 +645,27 @@ computed number. The important caveats:
 - That the absence of a modelled adverse effect means the drug does not have it.
   Most adverse effects are not modelled at all.
 - That a successful resuscitation here says anything about a real one.
+
+---
+
+## 16. Calibration notes, 2026-11-14 (reproductive engine)
+
+- **Respiratory alkalosis uses the hypercapnia slope for its ACUTE buffering.** Only the
+  chronic renal slope is direction-specific (0.4 mEq/L per mmHg fall in PaCO2, Madias and
+  Adrogue 2003, retrieved and quoted in `acidbase.chronicHco3PerPaco2Alkalosis`). No page
+  stating Adrogue and Madias's own acute alkalosis figure could be retrieved (the 2010 JASN
+  paper is behind a subscription); a secondary source gave 1-2 mEq/L per 10 mmHg, which
+  brackets the 0.1 in use, so no new number was invented. Consequence: mid-pregnancy pH
+  sits at 7.4700, on the upper edge of the cited 7.40-7.47, and the test compares at the
+  cited two-decimal precision.
+- **The sexual response reproduces the cited MEAN-PRESSURE and heart-rate rises, not the
+  split between systolic and diastolic.** The baroreflex set point is reset by the cited
+  fractional rise in MAP; heart rate is fitted to the cited increments. Systolic rises
+  by about 11 mmHg and diastolic by about 22 in a man (cited +21 / +18), so the pulse
+  pressure narrows where the study found it widened slightly. Contractility and
+  resistance gains were tried and did not widen it (the reflex answered with heart rate),
+  and no source gives a magnitude for them, so they are zero. The orgasmic peak systolic
+  pressure is about 139 mmHg against about 162 cited for men (NEMEC1976); larger gains
+  pushed heart rate out of the cited band without lifting systolic pressure.
+- Recovery after stimulation stops reaches within 5 % of baseline in about 6-8 minutes;
+  the residual excursion is gone by the cited 10-20 minutes.

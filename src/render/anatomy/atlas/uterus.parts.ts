@@ -355,7 +355,7 @@ export const parts: PartBuilder = (params) => {
   const iz = zoneBox(OS_Y - 0.008, isthmusTop + 0.002);
   out.push({
     id: 'isthmus',
-    geometry: polygonise(intersect(intersect(layer, halfSpace([0, OS_Y - 0.007, 0], [0, 1, 0])), subtract(layer, halfSpace([0, isthmusTop, 0], [0, 1, 0]))), iz.min, iz.max, { cell: 0.0009 }),
+    geometry: polygonise(intersect(intersect(layer, halfSpace([0, OS_Y - 0.007, 0], [0, 1, 0])), subtract(layer, halfSpace([0, isthmusTop, 0], [0, 1, 0]))), iz.min, iz.max, { cell: 0.0013 }),
   });
 
   // CERVIX: the fibrous neck below the internal os, bored by the canal. Glass.

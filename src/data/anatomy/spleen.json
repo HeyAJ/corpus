@@ -1,6 +1,119 @@
 {
   "atlas": "spleen",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The inside of the spleen, drawn as anatomy: the fibrous capsule, the trabeculae that run in from it, the red pulp, the white pulp follicles with their marginal zone, the splenic artery and vein, and the hilum where they enter and leave. Arterial blood runs in at the hilum and filtered blood leaves by the vein, at a speed that follows the cardiac output; the white pulp brightens when the model reports immune activation, infection or inflammation, and the red pulp when it reports red cells being broken down. The branch paths, the number and size of the follicles (a couple of dozen beads, vastly larger and fewer than the real thing), the capsule thickness and the vessel sizes are drawing choices, not measurements. The splenic sinuses, the lymphatics, the nerves and the tiny red pulp cords are left out, and no cell counts or flow rates are shown.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "capsule",
+      "label": "Fibrous Capsule",
+      "summary": "The tough fibrous covering of the spleen",
+      "function": "The capsule is a thin, tough layer of connective tissue covered by peritoneum. It holds the soft pulp in shape and sends extensions, the trabeculae, into the organ. It is drawn as a faint glass skin, and the spleen's reservoir of blood can be released when the body needs it, as in blood loss.",
+      "color": "#c98a8f",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "bleeding", "weight": 0.2, "note": "The spleen holds a reservoir of blood that is released when blood is lost.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": 0.1, "note": "Sympathetic outflow squeezes blood out of the spleen's reservoir.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trabeculae",
+      "label": "Trabeculae",
+      "summary": "Fibrous cords that run in from the capsule and hilum",
+      "function": "The trabeculae are strands of connective tissue that run inwards from the capsule and the hilum, dividing the organ into compartments and carrying the larger vessels. They are drawn as thin solid cords from the hilum to the capsule so that they can be picked.",
+      "color": "#e3c6a6",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "sympathetic", "weight": 0.1, "note": "The supporting framework tightens a little when sympathetic outflow is raised.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "red_pulp",
+      "label": "Red Pulp",
+      "summary": "The blood-filled meshwork that filters and stores blood",
+      "function": "Red pulp makes up most of the spleen: cords and sinuses full of blood, lined with macrophages. It removes old and damaged red cells and particles from the blood passing through, and holds a reserve of blood. It is drawn as glass and brightens when red cells are being broken down.",
+      "color": "#a8323f",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "haemolysis", "weight": 0.35, "note": "Red pulp macrophages remove damaged or broken red cells.", "source": "GH14" },
+        { "signal": "infection", "weight": 0.15, "note": "The red pulp also filters microbes and debris from the blood.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "white_pulp",
+      "label": "White Pulp Follicles",
+      "summary": "Lymphoid follicles around the small central arterioles",
+      "function": "White pulp is lymphoid tissue, sheaths and follicles of lymphocytes round the branches of the splenic artery. It is where the spleen mounts an immune response to blood-borne microbes. The follicles are drawn as solid beads that brighten and whiten when the model reports immune activation or infection.",
+      "color": "#e8dfd0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "immune", "weight": 0.4, "note": "Lymphoid tissue is activated by an immune response.", "source": "GH14" },
+        { "signal": "infection", "weight": 0.3, "note": "Blood-borne pathogens are met by the white pulp.", "source": "GH14" },
+        { "signal": "inflammation", "weight": 0.1, "note": "Inflammation accompanies immune activation.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "marginal_zone",
+      "label": "Marginal Zone",
+      "summary": "The border where blood first meets the white pulp",
+      "function": "The marginal zone is a rim round each follicle where blood from the arterioles slows and filters through, so that its cells can sample what the blood carries. It is the spleen's first immune contact with blood-borne microbes. It is drawn as a glass shell round each follicle, more visible when the immune response is strong.",
+      "color": "#d99aa6",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "infection", "weight": 0.35, "note": "Blood-borne microbes are sampled here first.", "source": "GH14" },
+        { "signal": "immune", "weight": 0.25, "note": "Its cells take part in the early immune response.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "splenic_artery",
+      "label": "Splenic Artery",
+      "summary": "The artery that brings blood in at the hilum",
+      "function": "The splenic artery arrives at the hilum, divides into branches that follow the trabeculae, and gives off small central arterioles into the white pulp. Its blood is drawn in the arterial colour, running in at a speed that follows the cardiac output, so it slows when the output falls.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.25, "note": "More blood flows through the organ when cardiac output is higher.", "source": "GH14" },
+        { "signal": "outputFall", "weight": -0.2, "note": "Less blood flows through it when output falls.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "splenic_vein",
+      "label": "Splenic Vein",
+      "summary": "The vein that carries filtered blood out at the hilum",
+      "function": "Blood that has passed through the red pulp drains into veins that follow the arteries out of the hilum and join to form the splenic vein, which goes on to the portal vein. Its blood is drawn in the venous colour, leaving at the same speed as the inflow.",
+      "color": "#6a4a7a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.25, "note": "More blood drains from the organ when cardiac output is higher.", "source": "GH14" },
+        { "signal": "outputFall", "weight": -0.2, "note": "Less blood drains from it when output falls.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hilum",
+      "label": "Hilum",
+      "summary": "The cleft on the inner surface where vessels enter and leave",
+      "function": "The hilum is the slit on the visceral surface of the spleen where the splenic artery and vein, and the nerves, enter and leave the organ. The tail of the pancreas reaches it. It is drawn as a thin solid cord along the cleft.",
+      "color": "#8a5a6a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.15, "note": "More blood passes in and out when output is higher.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

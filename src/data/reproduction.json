@@ -695,7 +695,7 @@
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "TBD"
+      "note": "Fractional upward reset of the baroreflex defended pressure at full cardiovascular arousal (arm = 1, reached at the plateau threshold, where XUERUI2008 found the pressure peak). DERIVED from the cited rise in mean arterial pressure, start of orgasm versus baseline, in men: MAP = DBP + (SBP - DBP)/3, 72.9 + (120.1 - 72.9)/3 = 88.63 rising to 91.1 + (141.4 - 91.1)/3 = 107.87 mmHg, a fraction of 0.217. `arm` is already normalised to full value at plateau, so the cited fraction is used unscaled. The reflex has finite gain, so the realised MAP rise in the simulation is about 19-20 % rather than the full 21.7 %; the shortfall is left as the model's own result rather than inflated with a larger shift."
     },
     "sexual.setpointShift_female": {
       "value": 0.1341,
@@ -703,31 +703,31 @@
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "TBD"
+      "note": "Same derivation as sexual.setpointShift_male, from the women of XUERUI2008: MAP 67.2 + (109.4 - 67.2)/3 = 81.27 rising to 77.4 + (121.7 - 77.4)/3 = 92.17 mmHg, a fraction of 0.134. Used unscaled because `arm` is full at the plateau threshold. The realised MAP rise in the simulation is about 12 % (finite reflex gain)."
     },
     "sexual.hr_arousal_male_bpm": {
-      "value": 0,
+      "value": 16,
       "unit": "bpm",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "TBD"
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm per unit arousal), fitted so that the heart rate at the start of orgasm in a man rises by about 21 bpm over baseline (XUERUI2008: 75.4 to 96.4). Sized AFTER the baroreflex was allowed to move its set point (reflex.setpointShift): the earlier, much larger gain was sized for a reflex that fought it and overshot to 177 bpm once the reflex stopped fighting. The set-point reset itself supplies about 10 bpm of the rise; this term supplies the rest."
     },
     "sexual.hr_arousal_female_bpm": {
-      "value": 0,
+      "value": 19,
       "unit": "bpm",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "TBD"
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm per unit arousal), fitted so that the heart rate at the start of orgasm in a woman rises by about 19 bpm over baseline (XUERUI2008: 71.4 to 90.2, +18.8). The set-point reset supplies about 6-7 bpm; this term supplies the rest. Larger than the male gain because the female set-point shift is smaller."
     },
     "sexual.hr_orgasm_bpm": {
-      "value": 60,
+      "value": 3,
       "unit": "bpm",
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.heartRate, bpm over the 72 bpm baseline) per unit orgasm envelope, on top of the arousal term: set so the heart rate at the orgasmic peak is about 105-115 bpm against the 114-117 of NEMEC1976 (men during coitus); the baroreflex returns part of it."
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm) per unit orgasm envelope, on top of the arousal term: fitted so the male heart rate at the orgasmic peak lands inside the 114-117 bpm of NEMEC1976 (men during coitus). Re-fitted after the baroreflex set point was allowed to move: the previous value of 60 bpm was sized for a reflex that fought the push and gave a 178 bpm peak once it stopped. The orgasmic vasodilation and contractility terms already carry the heart rate most of the way through the reflex."
     },
     "sexual.contractility_arousal_male": {
       "value": 0,
@@ -735,7 +735,7 @@
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "TBD"
+      "note": "Zero on purpose. XUERUI2008 gives pressure and heart rate but no stroke-volume or contractility measurement, so no number for this gain can be cited. Trial values (up to 0.5) were run and did not help: they narrowed the pulse pressure and, through the baroreflex, raised heart rate further without raising systolic pressure. Left at zero rather than fitted to nothing; the pressure rise comes from the set-point reset."
     },
     "sexual.contractility_arousal_female": {
       "value": 0,
@@ -743,7 +743,7 @@
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "TBD"
+      "note": "Zero on purpose, for the reason given at sexual.contractility_arousal_male: no cited contractility measurement in XUERUI2008, and trial gains did not raise systolic pressure."
     },
     "sexual.resistance_arousal_male": {
       "value": 0,
@@ -751,7 +751,7 @@
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "TBD"
+      "note": "Zero on purpose. XUERUI2008 reports no vascular resistance. Trial negative values (down to -0.25) to widen the pulse pressure lowered mean pressure and drove heart rate up through the baroreflex without raising systolic pressure, so the pressure rise is carried by the set-point reset alone (sexual.setpointShift_male)."
     },
     "sexual.resistance_arousal_female": {
       "value": 0,
@@ -759,7 +759,7 @@
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "TBD"
+      "note": "Zero on purpose, for the reason given at sexual.resistance_arousal_male; no cited resistance measurement in XUERUI2008."
     },
     "sexual.contractility_orgasm": {
       "value": 0.5,
@@ -767,7 +767,7 @@
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.contractility) per unit orgasm envelope, toward the NEMEC1976 pressure of about 162/79 at orgasm. NOT REACHED for the reason given at sexual.contractility_arousal."
+      "note": "CALIBRATED bus gain (cardio.contractility) per unit orgasm envelope, toward the NEMEC1976 pressure of about 162/79 at orgasm. NOT REACHED: the model peaks near 140/102 at the orgasmic peak. Larger gains (tried up to 1.5) raised systolic pressure only to about 143 while pushing heart rate above the cited band, so the shortfall is stated here rather than bought with an unsupported gain."
     },
     "sexual.resistance_orgasm": {
       "value": -0.3,
@@ -775,7 +775,7 @@
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.systemicResistance) per unit orgasm envelope. See sexual.contractility_orgasm."
+      "note": "CALIBRATED bus gain (cardio.systemicResistance) per unit orgasm envelope. See sexual.contractility_orgasm; the value is carried over from the earlier calibration and was not changed because heart rate, not this gain, was the quantity that moved."
     },
     "sexual.painThresholdRise_stimulation": {
       "value": 0.53,

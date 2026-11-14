@@ -76,7 +76,19 @@ export function stepAcidBase(s: SimState, dt: number): void {
   // with it as written.
   const acute = P('acidbase.acuteHco3PerPaco2');
   const chronic = P('acidbase.chronicHco3PerPaco2');
-  const compensationTarget = (chronic - acute) * (paco2 - P('resp.restingPaco2_mmHg'));
+  //
+  // THE CHRONIC SLOPE IS DIRECTION-SPECIFIC. This used to apply the hypercapnia slope
+  // (0.35 mEq/L per mmHg) to a FALL in PaCO2 as well. Madias and Adrogue (2003) give about
+  // 0.4 for chronic hypocapnia in humans, and the difference showed up in pregnancy, where
+  // PaCO2 sits near 30 mmHg for months: the model's pH came out 7.477, just above the
+  // cited 7.40-7.47. The slope is switched about the model's own resting PaCO2 (the same
+  // reference as above), so the resting body, where the difference is zero, is untouched.
+  // Only the CHRONIC slope has a retrieved source for the alkalosis direction; the acute
+  // slope below is left at the hypercapnia value in both directions rather than filled
+  // in from memory (see the note on acidbase.chronicHco3PerPaco2Alkalosis).
+  const dPaco2 = paco2 - P('resp.restingPaco2_mmHg');
+  const chronicSlope = dPaco2 >= 0 ? chronic : P('acidbase.chronicHco3PerPaco2Alkalosis');
+  const compensationTarget = (chronicSlope - acute) * dPaco2;
   const kRen = 1 - Math.exp(-dtH / P('acidbase.renalCompensationTau_h'));
   ab.renalCompensation += (compensationTarget - ab.renalCompensation) * kRen;
 
