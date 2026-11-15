@@ -8,7 +8,7 @@ rendered as a stack of translucent 3D organs.
 > target is *"a medical student says that's roughly right"*, not *"a cardiologist
 > says that's clinically valid"*. See [`docs/MODEL_LIMITATIONS.md`](docs/MODEL_LIMITATIONS.md).
 
-Select an organ to read live telemetry from it. Administer any of **89 drugs** and
+Select an organ to read live telemetry from it. Administer any of **152 drugs** and
 **46 foods** by any of **twelve routes** — intravenous, intraosseous, intramuscular,
 subcutaneous, intranasal, sublingual, rectal, transdermal, inhaled, nebulised or oral —
 and watch the body respond through pharmacokinetics, receptor binding kinetics, hormonal
@@ -17,6 +17,12 @@ feedback and downstream physiology.
 Turn on the vascular overlay and watch the blood move: arteries and veins as real
 geometry, flow pulsing with the cardiac cycle, particles coloured by what is actually
 circulating. Give a drug and watch its colour appear in the stream.
+
+Open any organ and look inside it: every organ has an interior drawn as glass walls around
+solid contents, with parts that brighten as the model reports they are working harder. Switch
+on the Hormones, Nerves or Vessels overlays, watch a menstrual cycle or a pregnancy run in
+time-lapse, and see the heart, lungs and kidney respond. These interiors and overlays are
+illustrative drawings; see section 17 of [`docs/MODEL_LIMITATIONS.md`](docs/MODEL_LIMITATIONS.md).
 
 Run an arrest, do CPR, and find out why shocking asystole does nothing.
 

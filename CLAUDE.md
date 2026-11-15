@@ -26,9 +26,13 @@ Browser-based real-time human physiology simulator. Vite + TypeScript strict + t
 
 - **The engine SILENTLY REJECTS any dose that is not a declared preset.** A refused dose looks *exactly* like a broken drug. Always read `presetDoses` from `src/data/drugs.json` and use `route`/`amount`/`unit` verbatim, then confirm `e.state.drugs.find(d => d.drugId === id)?.cp > 0` before trusting any measurement. This has fooled several people.
 - **Never run `npx vitest` across the whole suite.** The machine is memory-constrained; the worker pool gets OOM-killed and takes concurrent work with it. Use `npx vite-node <script>` for probes (single process, lightest). If you must use vitest: one file, with `--pool=threads --poolOptions.threads.minThreads=1 --poolOptions.threads.maxThreads=2`.
-- **`src/data/drugs.json` and `receptors.json` are GENERATED.** Never hand-edit. Change `tools/ingest/*` then run `npm run ingest:offline`. It must still report 89 drugs, 56 receptors, **0 unadjudicated cross-check disagreements** (ADR-018).
+- **`src/data/drugs.json` and `receptors.json` are GENERATED.** Never hand-edit. Change `tools/ingest/*` then run `npm run ingest:offline`. It must still report 152 drugs, 56 receptors, **0 unadjudicated cross-check disagreements** (ADR-018).
 - **A dead effect-bus target is invisible.** A target written by a drug but read by no system makes that drug silently inert, with every test passing. Ten of these existed. Before adding a target, grep `effect(s, '<target>')` under `src/sim/` and confirm something consumes it.
 - **Heredocs mangle TypeScript.** Backticks and `\n` inside `bash <<'EOF'` get eaten. Use the Write tool for any file containing template literals.
+- **Several Vite dev servers at once corrupt `node_modules/.vite`.** Two copies of React, "Invalid hook call", a blank page while `tsc` is clean. Delete `node_modules/.vite` and start the servers one at a time, loading a page between starts.
+- **A git worktree created by the agent tool starts from the DEFAULT branch, not the working branch.** Reset it to the branch head before use.
+- **The snapshot's hormone list is runtime data.** `snapshot.endocrine.hormones` has different ids for different bodies; reading only the TypeScript type will make you conclude the sex hormones do not exist. Probe a male, a non-pregnant female and a pregnant female.
+- **A resting body is not a body with every signal at zero.** Anatomy state signals are legitimately non-zero at rest (see "The anatomy atlases"); read that before "fixing" one.
 
 ## Running a probe — the standard pattern
 
@@ -105,6 +109,39 @@ The body owns the WHOLE screen and is never resized by a panel. The dock is four
 ## Deployment (Vercel, 2026-09-27)
 
 Vercel builds the repo's DEFAULT BRANCH (`main`) to the production domain; every other pushed branch gets only a preview URL, so work on a feature branch is not live until it is merged. `vercel.json` sends the same COOP/COEP headers as `vite.config.ts` (without them there is no SharedArrayBuffer and the waveform channel degrades to 50 ms chunks — the footer then says "degraded waveform transport"), and `/docs/*` as text/plain. The `ship-limitations-doc` plugin in `vite.config.ts` copies `docs/MODEL_LIMITATIONS.md` into `dist/docs/` — a static host serves only `dist/`, and the footer's limitations link was a 404 on the live site.
+
+## The anatomy atlases (every organ has an interior)
+
+One **atlas** per organ, as data plus two render files. List them with `ls src/data/anatomy`; the two kidneys share one atlas (`kidney`), so do the two adrenals (`adrenal`), and the uterus atlas is rebuilt per gestational week.
+
+`src/data/anatomy/<atlas>.json` (parts: `id, label, summary, function, color, rest, drives, source`) -> the deriver `src/sim/derive/anatomy.ts` computes `activity = clamp01(rest + sum(weight x signal))` into `snapshot.anatomy.parts['<organId>.<partId>']` (plus `snapshot.anatomy.glands` and `snapshot.anatomy.nerves`) -> the renderer builds part geometry in a worker from `src/render/anatomy/atlas/<atlas>.parts.ts` and animates it with `<atlas>.detail.ts` (`flows(organId)`, `animate(ctx)`) -> `src/render/anatomy/detail/OrganDetail.ts` shows it while the organ is selected -> the Structures panel (`src/ui/panels/AnatomyPanel.tsx`) lists the parts.
+
+- **Glass parts.** A part whose opacity is below 0.98 (`GLASS_BELOW` in `OrganDetail.ts`) stops writing depth and is drawn after the solid parts. Walls, capsules, lobes and lumen-bearing tubes are glass; what they contain is solid. Picking prefers the nearest solid part through glass. Neighbouring organs recede (`RECEDE_DENSITY` = 0.22 in `src/render/organs/OrganSet.ts`) while any organ is selected, except the fetus while the uterus is open. Stream particles are alpha-blended droplets: additive ones were invisible on the pale page. Arterial and venous colours come from one shared ramp, `src/render/anatomy/detail/blood.ts`.
+- **Signals are departures from the settled resting body.** `captureAnatomyRest` (defined in `src/sim/derive/anatomy.ts`, called at the end of the engine warm-up in `src/sim/core/engine.ts`) records the rest once, so a resting part sits at its JSON `rest` and anything above it means something happened. Cortisol is referenced to its circadian expectation for the clock hour. **State signals are legitimately non-zero at rest:** night, bladder filling, ADH/dehydration in a body that has not drunk, and the menstrual-cycle state. `tests/sim/anatomy.test.ts` encodes this.
+- Part geometry is procedural and illustrative, not a traced atlas; counts such as breast lobes or splenic follicles are schematic.
+- The fetus is sized from the cited fetal weight by an isometric drawing rule, (W(w)/W(40))^(1/3), centred in the amniotic sac and clamped to fit it (`fetalFit` / `fetalScale` in `src/render/anatomy/models.ts`). ADR-032.
+
+## State as of 2026-11-15 (organ interiors, reproduction, overlays)
+
+**Reproductive engine** (`src/sim/systems/reproductive.ts`, data `src/data/reproduction.json`, `tests/sim/reproductive.test.ts`, 20 tests). Intents: `SET_BODY` (sex), `SET_CYCLE_DAY`, `SET_PREGNANCY` (`pregnant`, `weeks`), `SET_REPRODUCTIVE_LAPSE` (`days_per_s`), `SET_SEXUAL_STIMULATION` (`level`).
+- Male and female bodies; a menstrual cycle replayed from cited daily hormone medians; pregnancy by gestational week; a reproductive clock that can run ahead of real time (time-lapse); a sexual response (arousal, plateau, orgasm, resolution, a 10.8 min male refractory period, oxytocin, a post-orgasmic prolactin state).
+- All through the effect bus: `blood.plasmaVolume` and `blood.redCellMass` (consumed in `src/sim/systems/fluids.ts` as an isotonic expansion), `reflex.setpointShift` (consumed in `baroreflex.ts`), `cardio.venousTone`, `cardio.systemicResistance`, `cardio.heartRate`, `cardio.contractility`.
+- **`slowClockScale(s)`** makes the kidney's day-scale clocks (renal acid-base compensation, creatinine) follow the reproductive clock in a female body, at 20000x for a 90 s catch-up window after a jump. Side effect, stated plainly: **a jump also corrects, at once, any metabolic acid-base disturbance that happened to be present.** ADR-030.
+- **A jump to a gestational age is coherent:** the circulatory terms of pregnancy are scaled by the plasma expansion actually realised, so no condition fires after a jump (a jump to 36 weeks used to show hypotension, tachycardia and renal hypoperfusion for about a minute).
+- Acid-base compensation is referenced to the model's own resting PaCO2 (`resp.restingPaco2_mmHg`), not to 40, with a cited chronic respiratory-alkalosis slope of 0.4 mEq/L per mmHg; the acute alkalosis slope is unsourced so the acute term is unchanged. Pregnancy at 24 weeks reads PaCO2 29.6, HCO3 20.9, pH 7.47.
+- Sexual response, model vs cited at the start of orgasm (dSBP / dDBP / dHR): male +21.1 / +18.0 / +21.2 vs +21.3 / +18.2 / +21.0; female +11.6 / +11.3 / +19.6 vs +12.3 / +10.2 / +18.8. It is fitted with a baroreflex set-point shift, venous tone and a FALL in systemic resistance, not a forced heart rate (ADR-031). Do not "fix" it by forcing the rate: the excess pressure lands in diastolic.
+- Hormone ids in `snapshot.endocrine.hormones` depend on the body: always cortisol, aldosterone, adh, thyroxine, glucagon, epo, oxytocin; male adds testosterone; non-pregnant female adds lh, fsh, estradiol, progesterone; pregnant female adds hcg, progesterone, estradiol, prolactin, testosterone. Insulin is `snapshot.metabolic.insulin_uU_per_mL`.
+
+**Overlays and interface.**
+- `src/render/nervous/NervousSystem.ts`: somatic, sympathetic and parasympathetic pathways in three colours with travelling impulses whose rate follows autonomic tone. Courses are derived from the vessel centrelines (neurovascular bundles) and are illustrative; impulse speed is a display constant, not a conduction velocity.
+- `src/render/endocrine/HormoneTraffic.ts`: gland rings, source-to-target arcs and droplets whose rate follows level over resting level. The arcs are a diagram (hormones travel in the blood); a legend lists the hormones present.
+- Three labelled switches in the bottom-left corner: **Hormones, Nerves, Vessels** (`src/ui/components/ToolDock.tsx`), all off at start.
+- `src/render/scan/BrainScan.ts` with `src/ui/components/BrainScanInset.tsx`: a small rotating "glass brain" while the brain is selected (it can be pinned). A maximum-intensity projection of the activity index through a thermal ramp, captioned "activity index, not temperature"; it prints the region furthest above its own resting level. ADR-033.
+- The Structures panel and part labels; the selected organ's own big label is hidden; every organ has a live readout in `src/ui/panels/OrganPanels.tsx`; a Reproduction panel (`src/ui/panels/ReproductionPanel.tsx`).
+- With the heart selected, `Viewer.applyVascularVisibility` (`src/render/scene/Viewer.ts`) forces the vascular overlay on, so the blood is seen going round the body.
+- The camera frames the selected organ's bounding sphere (`FOCUS_FILL`, `minDistance` 0.07 in `src/render/camera/OrbitRig.ts`), small enough now to get in to an adrenal or a thyroid lobe.
+- The diaphragm's phrenic streams are gated by the breath (`diaphragm.detail.ts`); its sheet is NOT moved with breathing (the shell is a single undeformed surface). Do not describe it as moving.
+- In dev builds only, `window.__corpus = { viewer, store }` exists for render probes.
 
 ## Docs worth reading, when relevant
 

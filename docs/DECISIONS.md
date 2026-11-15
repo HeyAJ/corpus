@@ -598,3 +598,132 @@ secretion is solved for.
 inflammatory stimulus: cortisol's anti-inflammatory effect was applied symmetrically, so
 every afternoon a resting body ran a low fever, sweated, leaked plasma and was
 tachycardic by 21:00. Suppression by excess is now applied only above baseline.
+
+---
+
+## ADR-028 — Organ interiors are data-driven atlases, and walls are glass
+
+Selecting an organ used to show a shell with telemetry beside it. Every organ now has an
+interior, and there are thirty of them, so a per-organ bespoke pipeline was never an option.
+
+**The decision.** One atlas per organ (`src/data/anatomy/<atlas>.json`), with the same
+fields everywhere: part id, label, summary, function, colour, a resting activity, a list of
+weighted drives and a source. Geometry and animation sit in two render files per atlas
+(`src/render/anatomy/atlas/<atlas>.parts.ts` builds the parts in a worker,
+`<atlas>.detail.ts` supplies the flow streams and the per-frame animation) and
+`OrganDetail.ts` shows them while the organ is selected. The Structures panel is generated
+from the same JSON, so the text a person reads and the part they see cannot disagree. The two
+kidneys share one atlas and so do the two adrenals; the uterus atlas is rebuilt per
+gestational week. Part geometry is procedural and illustrative.
+
+Any part with opacity below 0.98 is GLASS: it stops writing depth and is drawn after the
+solid parts. Walls, capsules, lobes and lumen-bearing tubes are glass, and what they
+contain is solid, so a chamber can be seen into and a stream seen inside it. Picking prefers
+the nearest solid part through glass. Neighbouring organs recede while one is selected.
+Stream particles are alpha-blended droplets, and arterial and venous colours come from one
+shared ramp (`detail/blood.ts`) so no organ draws its own.
+
+**Rejected.** Hand-writing each organ's panel: thirty copies of the same logic, each able
+to drift from the model. Additive-blended particles: they were invisible on the pale page.
+Depth-writing walls: they hid the very thing the interior exists to show. Traced anatomical
+meshes: the repository deliberately has no binary assets (see `CREDITS.md`), so the
+geometry is stated to be a drawing, and counts such as breast lobes or splenic follicles are
+schematic.
+
+## ADR-029 — Anatomy activity is a departure from the settled resting body
+
+Each part's activity is `clamp01(rest + sum(weight x signal))`. If the signals were
+absolute levels, a perfectly healthy resting body would light parts up, because a resting
+body is not a body with every quantity at zero.
+
+**The decision.** Signals are departures from the settled resting body. `captureAnatomyRest`
+records them once at the end of the engine warm-up (ADR-022), so a resting part sits at its
+JSON `rest` and anything above it means something happened. Cortisol is referenced to its
+circadian expectation for the clock hour, as the hormone drivers were in ADR-027. Some
+signals are legitimately non-zero at rest and are left so: night, bladder filling,
+ADH and dehydration in a body that has not drunk, and the menstrual-cycle state.
+`tests/sim/anatomy.test.ts` encodes this.
+
+**Rejected.** Absolute signals with a per-part fudge: it hides, rather than states, what the
+body is being compared with. Forcing every signal to zero at rest: it would erase real state
+(it is night; the bladder is filling). **The cost.** The reference is the boot-time body
+(male, 08:00), so a change of sex, a pregnancy or a cycle day reads its difference from that
+body as activity. This is recorded in `docs/MODEL_LIMITATIONS.md` section 17.
+
+## ADR-030 — The reproductive clock, `slowClockScale`, and a jump that is coherent
+
+A menstrual cycle is a month and a pregnancy is forty weeks. Watching either at real
+time is impossible, so `src/sim/systems/reproductive.ts` keeps a reproductive clock that
+`SET_REPRODUCTIVE_LAPSE` can run ahead of real time. Two things followed.
+
+**The kidney.** Renal acid-base compensation and creatinine run on a day-scale clock. A
+pregnancy that arrives in seconds with a kidney that notices in days is an incoherent body.
+`slowClockScale(s)` makes those clocks follow the reproductive clock in a female body, and
+runs them at 20000x for a catch-up window of 90 s after a jump. **The side effect, stated
+plainly:** a jump also corrects, at once, any metabolic acid-base disturbance that happened to
+be present. Related, the kidney's compensation is now referenced to the model's own resting
+PaCO2 (`resp.restingPaco2_mmHg`) rather than 40, because the 40-referenced version made a
+healthy resting body drift over simulated days, which the time-lapse made visible within
+seconds.
+
+**The jump.** Plasma expansion is paced over seconds, while vasodilation, venous capacity,
+the heart-rate trim and the renal vascular terms used to apply at once, so a jump to
+36 weeks presented hypotension, tachycardia and renal hypoperfusion for about a minute.
+The circulatory terms are now scaled by the plasma expansion actually realised, and drain
+with the volume after a pregnancy ends.
+
+**Rejected.** Running the day-scale clocks at real time (the body would be wrong for days of
+simulated time). Applying the catch-up factor permanently (it would break every
+non-reproductive scenario). Applying the pregnancy terms at their settled size from the first
+tick: that was the bug.
+
+## ADR-031 — The sexual response is fitted through the set point, venous tone and vasodilation, not a forced heart rate
+
+The cited response to orgasm raises systolic and diastolic pressure and heart rate
+together. The first calibration wrote heart rate directly, against a baroreflex that was
+trying to slow it; mean pressure then rose above the shifted set point and the excess landed
+in diastolic.
+
+**The decision.** The response reaches the body the way exercise does: a baroreflex
+set-point shift (`reflex.setpointShift`), sympathetic venous tone (`cardio.venousTone`), a
+FALL in systemic resistance, with the direct heart-rate gain kept small. The reflex then
+holds mean pressure at the shifted set point and supplies the tachycardia itself. At the
+start of orgasm, model against cited (dSBP / dDBP / dHR): male +21.1 / +18.0 / +21.2 against
++21.3 / +18.2 / +21.0, female +11.6 / +11.3 / +19.6 against +12.3 / +10.2 / +18.8.
+
+**Rejected.** Forcing the rate (diastolic too high). Vasodilation alone (heart rate above
+200). A more negative resistance or larger venous push to cure the remaining male diastolic
+error (about 12 mmHg high at the peak): it only moves heart rate out of the cited band, so
+the best fit is reported rather than forced. See `docs/MODEL_LIMITATIONS.md` sections 16
+and 17.
+
+## ADR-032 — The fetus is sized by an isometric rule from the cited weight, and is not shrunk silently
+
+The repository cites fetal WEIGHT by week and no fetal length. The fetus is therefore drawn
+at a linear scale of (W(w) / W(40))^(1/3): isometric scaling, a drawing rule derived from
+the cited weight and not a measured length. Before 10 weeks the weight table does not apply,
+so the fetus is held at the 10-week size rather than extrapolated. It is centred in the
+amniotic sac and clamped to the largest uniform scale at which it lies inside the sac. The
+scale asked for and the scale allowed are both kept, so the shortfall can be reported
+(`docs/MODEL_LIMITATIONS.md` section 17). The fetus stays at full density while the uterus
+is selected, because it is the uterus's content.
+
+**Rejected.** A term-sized fetus at every week: it hung out of a smaller uterus. Shrinking
+the fetus to fit without saying so. Inventing a length-by-week table that the data does not
+hold.
+
+## ADR-033 — Overlays and the brain scan are honest diagrams
+
+The nerve, hormone and scan displays are the easiest place to show a measurement that
+does not exist.
+
+**The decision.** Each is labelled for what it is. Nerve courses are derived from the vessel
+centrelines and are illustrative, and impulse speed is a display constant, not a conduction
+velocity; rate follows autonomic tone. Hormone arcs are a diagram, since hormones travel in
+the blood, and droplet rate follows level over resting level. The brain scan is a
+maximum-intensity projection of the activity index (ADR-029) through a thermal ramp, cool at
+rest and warm when active, captioned "activity index, not temperature", with nothing on the
+card in degrees. Hormones, Nerves and Vessels are three labelled switches, all off at start.
+
+**Rejected.** A ramp that reads as a temperature or BOLD signal: neither is simulated.
+Showing a conduction speed: none is modelled. Always-on overlays: they would bury the body.

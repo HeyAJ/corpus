@@ -693,3 +693,48 @@ computed number. The important caveats:
   value and climbs to it (the body is still the non-pregnant one), and a pregnancy that
   has just ended keeps its raised heart rate for the roughly 20 s that its volume takes
   to leave.
+
+---
+
+## 17. Organ interiors, reproduction and the overlays (2026-11-15)
+
+Section 16 already states the male orgasmic diastolic error, the 6-7 minute recovery and
+the pH edge in pregnancy; they are not repeated here.
+
+**The interiors are drawings.**
+
+- Part geometry is procedural and illustrative, not a traced atlas. Counts such as breast
+  lobes or splenic follicles are schematic.
+- The fetal circulation is drawn, not simulated. The fetal heart glows but does not beat,
+  because no cited fetal heart rate is in the data.
+- The fetus is drawn at 41 to 64 percent of the size its weight implies, because the
+  model's uterine cavity is smaller than a real one at every week. Below 10 weeks it is held
+  at the 10-week size, because the weight table starts there (ADR-032).
+- The diaphragm's sheet does not move with breathing; only the phrenic impulse and the
+  costal glow follow the breath.
+
+**The activity index is not a measurement.**
+
+- It is a display derivation. No BOLD signal is simulated, and the brain scan's colour is
+  not a temperature.
+- The resting reference is the boot-time body (male, 08:00), so a change of sex, a
+  pregnancy or a cycle day reads its difference from that body as activity (ADR-029).
+- The nerve and hormone overlays are diagrams: impulse speed is a display constant and
+  hormone arcs are not routes (ADR-033).
+
+**Reproduction and hormones.**
+
+- hCG has no percentile range. The male hormone list has no LH or FSH. Adrenaline and
+  noradrenaline have no plasma level; the adrenal medulla is shown as output relative to
+  basal.
+- Creatinine production is not sex-specific: pregnancy creatinine reads 0.62 mg/dL against
+  about 0.50 cited. Blood volume in pregnancy rises 33 percent against a cited 45 percent.
+- Female orgasm increments are assumed from male data, and the female orgasm peak has no
+  cited figure.
+- A reproductive time-lapse jump also corrects, at once, any metabolic acid-base
+  disturbance that happened to be present (ADR-030).
+- Glucagon does not fall after a glucose load: it stays at 70 pg/mL while insulin rises from
+  15.8 to 41 uU/mL at 30 minutes.
+
+**Not modelled at all:** bile and gallbladder emptying, lactation, thymic involution, and
+calcium (the parathyroids and C cells have no drive).

@@ -90,7 +90,7 @@ export const DEFAULT_LIMITS: OrbitLimits = {
  * is looser than an elongated organ's own silhouette, so 0.55 lands the organ itself in
  * that band.
  */
-const FOCUS_FILL = 0.55;
+const FOCUS_FILL = 0.68;
 
 export class OrbitRig {
   readonly camera: THREE.PerspectiveCamera;
