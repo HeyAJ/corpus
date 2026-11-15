@@ -26,9 +26,55 @@
   pointer-events: auto;
 }
 
+/*
+ * The header is sticky inside the panel's own scroll, so it must be OPAQUE (the sheet's
+ * background is translucent and rows would show through it). The negative margins and the
+ * padding put it flush with the card's edges and give the 16px of breathing room back.
+ * #e8e8e8 is --sheet-bg without its alpha. z-index keeps rows and their meters beneath it.
+ */
 .header {
+  position: sticky;
+  top: -16px; /* the panel's 16px padding is inside the scrollport: cancel it so the header sits flush */
+  z-index: 5;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
+  gap: 4px;
+  margin: -16px -16px 0;
+  padding: 12px 16px 8px;
+  background: #e8e8e8;
+  border-bottom: 1px solid var(--chip-bg-strong);
+}
+
+/*
+ * PHONE: the bottom sheet (not this panel) is the scroll container, and a sticky child binds
+ * to the nearest ancestor that has overflow, so a panel with `overflow: auto` would capture
+ * the header against a scrollport that never scrolls and it would ride away with the list.
+ * Let the panel be plain content here; the header then sticks to the sheet's top edge
+ * (the sheet has no padding, so top is 0), with its own rounded top corners because the
+ * panel no longer clips it.
+ */
+@media (max-width: 720px) {
+  .panel {
+    overflow: visible;
+    max-height: none;
+  }
+
+  .header {
+    top: 0;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+  }
+}
+
+.headText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.partCount {
+  font-size: 11px;
+  color: var(--ink-dim);
 }
 
 .title {
@@ -103,12 +149,6 @@
 }
 
 /* --------------------------------------------------------------- organ atlas */
-
-.organHead {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
 
 .back {
   min-width: 44px;

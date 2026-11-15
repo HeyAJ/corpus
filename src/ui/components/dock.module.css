@@ -183,12 +183,13 @@ a.item {
 .vessels {
   position: absolute;
   left: var(--inset-hud);
-  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + var(--switch-slot, 0px));
   z-index: 14;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 36px;
+  /* 44 px touch target; the Nerves and Hormones switches stack above on a 50 px pitch. */
+  min-height: 44px;
   padding: 4px 12px 4px 9px;
   border: none;
   border-radius: var(--radius-pill);
@@ -200,6 +201,14 @@ a.item {
   color: var(--ink);
   cursor: pointer;
   transition: background 140ms ease;
+}
+
+.slot1 {
+  --switch-slot: 50px;
+}
+
+.slot2 {
+  --switch-slot: 100px;
 }
 
 .vessels:hover {

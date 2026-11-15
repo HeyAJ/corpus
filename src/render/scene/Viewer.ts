@@ -9,6 +9,8 @@ import { createDitherPass } from '../postfx/DitherPass';
 import { GiBolus } from '../organs/GiBolus';
 import { AirwayCue } from '../organs/AirwayCue';
 import { VascularSystem } from '../vascular/VascularSystem';
+import { NervousSystem } from '../nervous/NervousSystem';
+import { HormoneTraffic, type HormoneLegendEntry } from '../endocrine/HormoneTraffic';
 import { BODY_MIRROR_X } from '../anatomy/layout';
 import { OrganDetail } from '../anatomy/detail/OrganDetail';
 import type { OrganId } from '../../data/types';
@@ -81,6 +83,8 @@ export class Viewer {
   private bolus: GiBolus;
   private airway: AirwayCue;
   private vascular: VascularSystem;
+  private nerves: NervousSystem;
+  private hormones: HormoneTraffic;
   /**
    * The inside of the selected organ: part meshes and particle streams, drawn through the
    * organ's glass shell. Owned and animated by OrganDetail; this class only selects, ticks,
@@ -187,6 +191,13 @@ export class Viewer {
     // guarantee is untouched: both land in buckets that already exist.
     this.vascular = new VascularSystem();
     this.body.add(this.vascular.root);
+
+    // The nervous-system and hormone-traffic overlays: both hidden at start, both in the
+    // same two buckets as the vessels (multiply 12 for tubes, additive 22 for points).
+    this.nerves = new NervousSystem();
+    this.body.add(this.nerves.root);
+    this.hormones = new HormoneTraffic();
+    this.body.add(this.hormones.root);
 
     // The interiors share the organ set's geometry worker, so one worker serves both.
     this.detail = new OrganDetail(this.organs.geometryFactory);
@@ -428,6 +439,21 @@ export class Viewer {
     this.vascular.setVisible(on);
   }
 
+  /** Show or hide the nervous-system overlay ("Nerves" switch). */
+  setNervesVisible(on: boolean): void {
+    this.nerves.setVisible(on);
+  }
+
+  /** Show or hide the hormone-traffic overlay ("Hormones" switch). */
+  setHormonesVisible(on: boolean): void {
+    this.hormones.setVisible(on);
+  }
+
+  /** Hormones above or below resting, for the legend. Empty until a snapshot has arrived. */
+  hormoneLegend(): HormoneLegendEntry[] {
+    return this.hormones.legend();
+  }
+
   /** Triangles the vascular overlay adds, for the performance report. */
   get vascularTriangles(): number {
     return this.vascular.triangleCount;
@@ -436,6 +462,8 @@ export class Viewer {
   pushSnapshot(s: SimSnapshot): void {
     const now = performance.now();
     this.vascular.pushSnapshot(s);
+    this.nerves.pushSnapshot(s);
+    this.hormones.pushSnapshot(s);
     // Which organs this body has: the reproductive set follows its sex, the fetus and
     // the size of the uterus follow the pregnancy.
     this.organs.setBody({
@@ -529,6 +557,8 @@ export class Viewer {
 
     this.organs.update(dtMs);
     this.vascular.update(dtMs / 1000);
+    this.nerves.update(dtMs / 1000);
+    this.hormones.update(dtMs / 1000);
     this.airway.update(dtMs / 1000, this.snapshots.current);
     this.rig.update(dtMs);
     this.applySnapshotToScene(now);
@@ -703,6 +733,8 @@ export class Viewer {
     // Was leaking: VascularSystem builds sixty tube geometries and their shader
     // materials plus a large point cloud, and none of it was being freed on teardown.
     this.vascular.dispose();
+    this.nerves.dispose();
+    this.hormones.dispose();
     this.composer.dispose();
     this.renderer.dispose();
   }

@@ -6,7 +6,7 @@ import type { OrganId } from '../data/types';
 import { ANATOMY, atlasOf } from '../data/anatomy';
 import type { WaveformChannel } from '../bridge/types';
 import { useStore } from './store';
-import { ToolDock, VesselToggle } from './components/ToolDock';
+import { ToolDock, VesselToggle, NervesToggle, HormonesToggle } from './components/ToolDock';
 import { DrugDrawer } from './panels/DrugDrawer';
 import { ReceptorPanel } from './panels/ReceptorPanel';
 import { ProcedurePanel } from './panels/ProcedurePanel';
@@ -65,6 +65,8 @@ export function App() {
   const setShock = useStore((s) => s.setShock);
   const pushEvent = useStore((s) => s.pushEvent);
   const vascularVisible = useStore((s) => s.vascularVisible);
+  const nervesVisible = useStore((s) => s.nervesVisible);
+  const hormonesVisible = useStore((s) => s.hormonesVisible);
   const pushLog = useStore((s) => s.pushLog);
 
   // The shell no longer subscribes to the snapshot or the organ labels: the HUD, the
@@ -233,6 +235,14 @@ export function App() {
     viewerRef.current?.setVascularVisible(vascularVisible);
   }, [vascularVisible]);
 
+  /* ---- nervous-system and hormone-traffic overlays follow their stage switches ---- */
+  useEffect(() => {
+    viewerRef.current?.setNervesVisible(nervesVisible);
+  }, [nervesVisible]);
+  useEffect(() => {
+    viewerRef.current?.setHormonesVisible(hormonesVisible);
+  }, [hormonesVisible]);
+
   /* ---------------------------------------------------------------- input */
 
   const pointer = useRef({ down: false, moved: false, x: 0, y: 0 });
@@ -304,6 +314,8 @@ export function App() {
         <Conditions />
         <TimeScaleControl />
         <VesselToggle />
+        <NervesToggle />
+        <HormonesToggle />
         <NoticeToasts />
         <BrainScanInset viewerRef={viewerRef} ready={ready} />
 

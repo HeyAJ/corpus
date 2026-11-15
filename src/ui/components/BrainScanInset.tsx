@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { Viewer } from '../../render/scene/Viewer';
-import { BrainScan } from '../../render/scan/BrainScan';
-import { thermalColor } from '../../render/anatomy/detail/thermal';
+import { BrainScan, SCAN_LEGEND } from '../../render/scan/BrainScan';
+import { SCAN_STOPS, thermalColor } from '../../render/anatomy/detail/thermal';
+import { ANATOMY } from '../../data/anatomy';
 import { useStore } from '../store';
 import styles from './brainscan.module.css';
 
@@ -20,26 +21,51 @@ import styles from './brainscan.module.css';
  * card (and re-measure it) for no change in what it shows. The card therefore renders
  * once, and a store subscription feeds the renderer directly.
  *
+ * THE "FURTHEST ABOVE REST" LINE under the legend is what lets a user track change: it names
+ * the region whose activity index is highest above its own resting level (`rest` in the
+ * brain atlas) right now, or says "steady" when none is more than 5 points above rest. The
+ * selector returns a string, so the card re-renders only when the text itself changes.
+ *
  * WHY THE SCAN LIVES ONLY WHILE THE CARD IS SHOWN. `ScanCard` is mounted when the brain is
  * selected or the card is pinned and unmounted otherwise, so the second WebGL context and
  * its geometry are released when nobody is looking at them rather than kept spinning
  * behind a hidden element.
  */
 
-/** Samples of the thermal ramp in the colour bar; eight is smooth enough for a gradient. */
-const BAR_STOPS = 8;
+/** Samples of the thermal ramp in the colour bar; sixteen keeps the hue bands of the scan ramp from banding for a gradient. */
+const BAR_STOPS = 16;
 
-/** The bar, built once: a CSS gradient of eight samples of the very ramp the scan uses. */
+/** The bar, built once: a CSS gradient of sixteen samples of the very ramp the scan uses. */
 const BAR_GRADIENT = (() => {
   const c = new THREE.Color();
   const stops: string[] = [];
-  for (let i = 0; i < BAR_STOPS; i++) stops.push(thermalColor(i / (BAR_STOPS - 1), c).getStyle());
+  for (let i = 0; i < BAR_STOPS; i++) stops.push(thermalColor(i / (BAR_STOPS - 1), c, SCAN_STOPS).getStyle());
   return `linear-gradient(to right, ${stops.join(', ')})`;
 })();
 
+/** Points of activity index above rest below which the line says "steady". */
+const STEADY_MARGIN = 0.05;
+
+const BRAIN_PARTS = ANATOMY.brain?.parts ?? [];
+
+function topChange(parts: Record<string, number> | undefined): string {
+  if (!parts) return 'steady';
+  let best = STEADY_MARGIN;
+  let text = 'steady';
+  for (const p of BRAIN_PARTS) {
+    const v = parts['brain.' + p.id];
+    if (v === undefined || v !== v) continue;
+    if (v - p.rest > best) {
+      best = v - p.rest;
+      text = `\u25B2 ${p.label} ${Math.round(Math.max(0, Math.min(1, v)) * 100)} %`;
+    }
+  }
+  return text;
+}
+
 function ScanCard({ viewer }: { viewer: Viewer }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [legend, setLegend] = useState<{ low: string; high: string }>({ low: '', high: '' });
+    const change = useStore((s) => topChange(s.snapshot?.anatomy?.parts));
   const pinned = useStore((s) => s.scanPinned);
   const togglePinned = useStore((s) => s.toggleScanPinned);
   const selected = useStore((s) => s.selectedOrgan);
@@ -51,9 +77,6 @@ function ScanCard({ viewer }: { viewer: Viewer }) {
     const scan = new BrainScan(canvas, viewer.geometryFactory);
     scan.reducedMotion = useStore.getState().reducedMotion;
     scan.setRunning(true);
-    const first = scan.legend[0];
-    const last = scan.legend[scan.legend.length - 1];
-    setLegend({ low: first?.label ?? '', high: last?.label ?? '' });
 
     const size = () => {
       const r = canvas.getBoundingClientRect();
@@ -110,10 +133,16 @@ function ScanCard({ viewer }: { viewer: Viewer }) {
         }}
       />
       <div className={styles.bar} style={{ background: BAR_GRADIENT }} aria-hidden="true" />
-      <div className={styles.ends} aria-hidden="true">
-        <span>{legend.low}</span>
-        <span>{legend.high}</span>
+      <div className={styles.ticks} aria-hidden="true">
+        {SCAN_LEGEND.map((l) => (
+          <span key={l.label} className={styles.tick} style={{ left: `${l.t * 100}%` }}>
+            {l.label}
+          </span>
+        ))}
       </div>
+      <p className={styles.change} aria-live="polite" data-steady={change === 'steady'}>
+        {change}
+      </p>
       <p className={styles.caption}>activity index, not temperature</p>
     </aside>
   );

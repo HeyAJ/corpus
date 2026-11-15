@@ -13,7 +13,7 @@
   top: calc(env(safe-area-inset-top, 0px) + 64px);
   right: var(--inset-hud);
   z-index: 20;
-  width: 176px;
+  width: fit-content;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -68,10 +68,11 @@
   background: var(--chip-bg-strong);
 }
 
+/* 168 px on screens at least 900 px wide, 116 px below (display sizes). */
 .canvas {
   display: block;
-  width: 100%;
-  aspect-ratio: 1 / 1;
+  width: 116px;
+  height: 116px;
   background: var(--well-black);
   border-radius: var(--radius-chip);
   cursor: pointer;
@@ -83,12 +84,35 @@
   border-radius: var(--radius-pill);
 }
 
-.ends {
-  display: flex;
-  justify-content: space-between;
+/* Legend ticks sit at their true position along the bar (left = t of the ramp). */
+.ticks {
+  position: relative;
+  height: 12px;
   font-size: 10px;
   font-weight: 600;
   color: var(--ink-dim);
+}
+
+.tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.change {
+  margin: 0;
+  min-height: 14px;
+  font-size: 11px;
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.change[data-steady='true'] {
+  color: var(--ink-faint);
+  font-weight: 600;
 }
 
 .caption {
@@ -98,9 +122,15 @@
   text-align: center;
 }
 
+@media (min-width: 900px) {
+  .canvas {
+    width: 168px;
+    height: 168px;
+  }
+}
+
 @media (max-width: 720px) {
   .card {
-    width: 112px;
     padding: 6px;
     top: calc(env(safe-area-inset-top, 0px) + 56px);
   }
@@ -115,8 +145,12 @@
   }
 
   .caption,
-  .ends {
-    font-size: 9px;
+  .ticks {
+    font-size: 8px;
+  }
+
+  .change {
+    font-size: 10px;
   }
 
   /* 44 px touch target on the pin without growing the card: extend the hit area. */

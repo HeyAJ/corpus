@@ -194,7 +194,6 @@ function OrganList() {
 }
 
 function OrganAtlas({ organ }: { organ: OrganDef }) {
-  const setSelected = useStore((s) => s.setSelected);
   const selectedPart = useStore((s) => s.selectedPart);
   const reducedMotion = useStore((s) => s.reducedMotion);
   const atlas = atlasFor(organ);
@@ -214,13 +213,6 @@ function OrganAtlas({ organ }: { organ: OrganDef }) {
 
   return (
     <>
-      <div className={styles.organHead}>
-        <button className={styles.back} onClick={() => setSelected(null)} aria-label="Back to the list of organs">
-          {'‹'}
-        </button>
-        <h3 className={styles.organTitle}>{organ.displayName}</h3>
-      </div>
-
       {!atlas || atlas.parts.length === 0 ? (
         <p className={styles.quiet}>The inside of this organ has not been drawn yet.</p>
       ) : (
@@ -250,12 +242,32 @@ export function AnatomyPanel() {
   const setAnatomyAuto = useStore((s) => s.setAnatomyAuto);
   const organ = useMemo(() => ORGANS.find((o) => o.id === selectedOrgan) ?? null, [selectedOrgan]);
 
+  const setSelected = useStore((s) => s.setSelected);
+  const partCount = organ ? (atlasFor(organ)?.parts.length ?? 0) : 0;
+
   if (!open) return null;
 
   return (
     <section className={styles.panel} role="region" aria-label="Structures" data-panel="anatomy">
+      {/* One sticky header for both states: the panel itself is the scroll container, so the
+          organ name, its part count, the way back and the close button stay put while the list
+          scrolls (sticky + an opaque background; see .header in the stylesheet). */}
       <header className={styles.header}>
-        <h2 className={styles.title}>Structures</h2>
+        {organ && (
+          <button className={styles.back} onClick={() => setSelected(null)} aria-label="Back to the list of organs">
+            {'‹'}
+          </button>
+        )}
+        {organ ? (
+          <div className={styles.headText}>
+            <h2 className={styles.organTitle}>{organ.displayName}</h2>
+            <span className={styles.partCount}>
+              Structures{partCount > 0 ? ` \u00B7 ${partCount} parts` : ''}
+            </span>
+          </div>
+        ) : (
+          <h2 className={styles.title}>Structures</h2>
+        )}
         <button
           className={styles.close}
           onClick={() => {

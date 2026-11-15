@@ -128,7 +128,7 @@ const RHYTHM_LABEL: Record<SimSnapshot['cardio']['rhythm'], string> = {
 
 /* ----------------------------------------------------------- respiratory */
 
-export function RespiratoryPanel({ snapshot, organ, ring, channelIndex }: PanelProps) {
+function LungPanel({ snapshot, organ, ring, channelIndex }: PanelProps) {
   const r = snapshot.resp;
   const spo2 = useSeries(r.spo2 * 100);
   const paco2 = useSeries(r.paco2_mmHg);
@@ -332,7 +332,7 @@ export function NeuroPanel({ snapshot, organ, ring, channelIndex }: PanelProps) 
 
 /* --------------------------------------------------------------- hepatic */
 
-export function HepaticPanel({ snapshot, organ }: PanelProps) {
+function LiverPanel({ snapshot, organ }: PanelProps) {
   const m = snapshot.metabolic;
   const glucose = useSeries(m.glucose_mg_per_dL);
   const lactate = useSeries(snapshot.chem.lactate_mmol_per_L);
@@ -366,7 +366,7 @@ export function HepaticPanel({ snapshot, organ }: PanelProps) {
 
 /* -------------------------------------------------------------------- gi */
 
-export function GiPanel({ snapshot, organ }: PanelProps) {
+function TractPanel({ snapshot, organ }: PanelProps) {
   const g = snapshot.gi;
   return (
     <>
@@ -418,25 +418,299 @@ export function BladderPanel({ snapshot, organ }: PanelProps) {
   );
 }
 
-/* --------------------------------------------------------------- generic */
+/* ------------------------------------------------- organs without a rig of their own */
 
-export function GenericPanel({ snapshot, organ }: PanelProps) {
+/**
+ * ORGAN TELEMETRY FOR THE ORGANS THAT HAVE NO DEDICATED PANEL.
+ *
+ * Most organs used to show one apologetic sentence. The engine does know something
+ * about almost all of them, just not in a block named after the organ: the pupil lives
+ * in `mind`, the thyroid's hormone in `endocrine.hormones`, the ovary's follicle in
+ * `reproductive.cycle`. This table says which existing snapshot fields speak for
+ * which organ. A field appears here only if SimSnapshot really carries it, with the
+ * unit the type documents; where the engine has no number (oestradiol, testosterone,
+ * LH, FSH, oxytocin, adrenaline levels, metabolic rate) the panel leaves it out
+ * rather than inventing one, and says so in one line where that is the main story.
+ * No reference ranges are drawn: none were supplied for these fields.
+ */
+interface Chip {
+  label: string;
+  value: number | null | undefined;
+  digits?: number;
+  unit?: string;
+}
+interface Telemetry {
+  /** At most four, shown two to a row. */
+  chips: Chip[];
+  /** State words (a phase, not an enum code), shown in the small detail line. */
+  words?: string[];
+  caption?: string;
+}
+
+const CYCLE_WORD: Record<SimSnapshot['reproductive']['cycle']['phase'], string> = {
+  menstrual: 'menstrual',
+  follicular: 'follicular',
+  ovulation: 'ovulatory',
+  luteal: 'luteal',
+};
+
+function hormone(s: SimSnapshot, id: string): { level: number; unit: string } | null {
+  const h = s.endocrine.hormones.find((x) => x.id === id);
+  return h ? { level: h.level, unit: h.unit } : null;
+}
+
+function hormoneChip(s: SimSnapshot, id: string, label: string, digits: number): Chip {
+  const h = hormone(s, id);
+  return { label, value: h ? h.level : null, digits, unit: h?.unit };
+}
+
+/**
+ * Hormone chips for the ids that exist in THIS body. The hormone list is runtime data:
+ * a male body carries testosterone but no LH, FSH or oestradiol; a cycling female
+ * carries LH, FSH, oestradiol and progesterone; a pregnant one swaps in hCG and
+ * prolactin. A hormone the list lacks is simply not drawn, never shown as a dash.
+ */
+function presentHormones(s: SimSnapshot, spec: [id: string, label: string, digits: number][]): Chip[] {
+  return spec.filter(([id]) => hormone(s, id) !== null).map(([id, label, d]) => hormoneChip(s, id, label, d));
+}
+
+function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
+  const repro = s.reproductive;
+  const sex = repro.sexual;
+  const cycle = repro.cycle;
+  const preg = repro.pregnancy;
+  const glands = s.anatomy.glands;
+  const nerves = s.anatomy.nerves;
+  const pct = (x: number) => x * 100;
+  switch (id) {
+    case 'eyes':
+      return {
+        chips: [
+          { label: 'Pupil', value: s.mind.pupil_mm, digits: 1, unit: 'mm' },
+          { label: 'Consc', value: pct(s.neuro.consciousness), digits: 0, unit: '%' },
+        ],
+      };
+    case 'spinal_cord':
+      return {
+        chips: [
+          { label: 'Tone', value: s.mind.muscleTone, digits: 2 },
+          { label: 'Motor', value: pct(nerves.motor), digits: 0, unit: '%' },
+          { label: 'Symp', value: pct(nerves.sympathetic), digits: 0, unit: '%' },
+          { label: 'Para', value: pct(nerves.parasympathetic), digits: 0, unit: '%' },
+        ],
+        caption: 'Tone: -1 flaccid, 0 normal, +1 rigid. Outflow is above rest.',
+      };
+    case 'trachea':
+      return {
+        chips: [
+          { label: 'Narrowing', value: pct(s.fluids.bronchoconstriction), digits: 0, unit: '%' },
+          { label: 'FiO2', value: pct(s.environment.fio2), digits: 0, unit: '%' },
+          { label: 'RR', value: s.resp.rate_per_min, digits: 0, unit: '/min' },
+        ],
+      };
+    case 'diaphragm':
+      return {
+        chips: [
+          { label: 'RR', value: s.resp.rate_per_min, digits: 0, unit: '/min' },
+          { label: 'Vt', value: s.resp.tidalVolume_mL, digits: 0, unit: 'mL' },
+          { label: 'MV', value: s.resp.minuteVentilation_L_per_min, digits: 1, unit: 'L/min' },
+          { label: 'Tone', value: s.mind.muscleTone, digits: 2 },
+        ],
+        words: s.resp.apnoeic ? ['apnoeic'] : undefined,
+      };
+    case 'oesophagus':
+      return {
+        chips: [
+          { label: 'Nausea', value: pct(s.mind.nausea), digits: 0, unit: '%' },
+          { label: 'Vomited', value: s.mind.vomitus_mL, digits: 0, unit: 'mL' },
+        ],
+        words: [s.mind.vomiting ? 'vomiting now' : 'not vomiting'],
+      };
+    case 'pancreas':
+      return {
+        chips: [
+          { label: 'Glu', value: s.metabolic.glucose_mg_per_dL, digits: 0, unit: 'mg/dL' },
+          { label: 'Ins', value: s.metabolic.insulin_uU_per_mL, digits: 1, unit: 'uU/mL' },
+          hormoneChip(s, 'glucagon', 'Glucagon', 0),
+        ],
+      };
+    case 'spleen':
+      return {
+        chips: [
+          { label: 'Plt', value: s.coagulation.platelets_10e9_per_L, digits: 0, unit: 'x10^9/L' },
+          { label: 'Hct', value: pct(s.chem.haematocrit), digits: 0, unit: '%' },
+          { label: 'WBC', value: s.infection.wbc_10e9_per_L, digits: 1, unit: 'x10^9/L' },
+        ],
+      };
+    case 'thyroid':
+      return {
+        chips: [
+          hormoneChip(s, 'thyroxine', 'fT4', 2),
+          { label: 'Output', value: glands.thyroid, digits: 2, unit: 'x basal' },
+          { label: 'Core', value: s.metabolic.coreTemp_C, digits: 1, unit: 'C' },
+        ],
+      };
+    case 'thymus':
+      return {
+        chips: [
+          { label: 'WBC', value: s.infection.wbc_10e9_per_L, digits: 1, unit: 'x10^9/L' },
+          { label: 'CD4', value: s.infection.cd4_per_uL, digits: 0, unit: '/uL' },
+          { label: 'Immune', value: pct(s.infection.immuneActivation), digits: 0, unit: '%' },
+        ],
+        words: [`${s.infection.active.length} active infection${s.infection.active.length === 1 ? '' : 's'}`],
+      };
+    case 'adrenal_l':
+    case 'adrenal_r':
+      return {
+        chips: [
+          hormoneChip(s, 'cortisol', 'Cortisol', 1),
+          hormoneChip(s, 'aldosterone', 'Aldo', 1),
+          { label: 'Medulla', value: glands.adrenal_medulla, digits: 2, unit: 'x basal' },
+        ],
+        caption: 'Catecholamine levels are not reported; medulla is secretion against its own rest.',
+      };
+    case 'ureters':
+      return {
+        chips: [
+          { label: 'Urine', value: s.renal.urineOutput_mL_per_min * 60, digits: 0, unit: 'mL/h' },
+          { label: 'GFR', value: s.renal.gfr_mL_per_min, digits: 0, unit: 'mL/min' },
+        ],
+      };
+    case 'ovaries':
+      return {
+        chips: presentHormones(s, [['estradiol', 'E2', 0], ['progesterone', 'P4', 1], ['lh', 'LH', 1], ['fsh', 'FSH', 1]]),
+        // Follicle and corpus luteum are 0..1 growth states, so they sit in the detail line
+        // to keep the chips to two rows.
+        words: cycle.active
+          ? [`day ${cycle.day.toFixed(0)}`, `phase: ${CYCLE_WORD[cycle.phase]}`, `follicle ${pct(cycle.follicle).toFixed(0)} %`, `luteum ${pct(cycle.corpusLuteum).toFixed(0)} %`]
+          : [preg.pregnant ? 'cycle suspended: pregnant' : 'cycle not active'],
+      };
+    case 'uterus':
+      return preg.pregnant
+        ? {
+            chips: presentHormones(s, [['hcg', 'hCG', 0], ['progesterone', 'P4', 1], ['oxytocin', 'Oxt', 1]]),
+            words: [`${preg.gestationWeeks.toFixed(1)} wk`, `trimester ${preg.trimester}`, ...(preg.amnioticFluid_mL === null ? [] : [`amniotic ${preg.amnioticFluid_mL.toFixed(0)} mL`])],
+          }
+        : {
+            chips: [
+              { label: 'Endometrium', value: cycle.active ? pct(cycle.endometrium) : null, digits: 0, unit: '%' },
+              ...presentHormones(s, [['oxytocin', 'Oxt', 1]]),
+            ],
+            words: [cycle.active ? `day ${cycle.day.toFixed(0)}` : 'cycle not active', ...(cycle.active ? [`phase: ${CYCLE_WORD[cycle.phase]}`] : []), ...(cycle.menstruating ? ['menstruating'] : [])],
+          };
+    case 'vagina':
+      return {
+        chips: [
+          { label: 'Vasocongestion', value: pct(sex.vasocongestion), digits: 0, unit: '%' },
+          ...presentHormones(s, [['estradiol', 'E2', 0]]),
+        ],
+        words: [`phase: ${sex.phase}`, `arousal ${pct(sex.arousal).toFixed(0)} %`],
+      };
+    case 'breasts':
+      return {
+        chips: presentHormones(s, [['prolactin', 'PRL', 1], ['oxytocin', 'Oxt', 1], ['estradiol', 'E2', 0], ['progesterone', 'P4', 1]]),
+        words: [
+          cycle.active ? `cycle: ${CYCLE_WORD[cycle.phase]}` : preg.pregnant ? `gestation ${preg.gestationWeeks.toFixed(0)} wk` : 'cycle not active',
+          ...(sex.prolactinRaised === undefined ? [] : [`post-orgasmic prolactin rise ${pct(sex.prolactinRaised).toFixed(0)} %`]),
+        ],
+      };
+    case 'testes':
+      return {
+        chips: presentHormones(s, [['testosterone', 'T', 0], ['lh', 'LH', 1], ['fsh', 'FSH', 1]]),
+      };
+    case 'prostate':
+      return {
+        chips: [
+          ...presentHormones(s, [['testosterone', 'T', 0]]),
+          { label: 'Arousal', value: pct(sex.arousal), digits: 0, unit: '%' },
+        ],
+        words: [`phase: ${sex.phase}`, `orgasms ${sex.orgasms}`],
+      };
+    case 'penis':
+      return {
+        chips: [
+          { label: 'Vasocongestion', value: pct(sex.vasocongestion), digits: 0, unit: '%' },
+          { label: 'Refractory', value: sex.refractory_s, digits: 0, unit: 's' },
+        ],
+        words: [`phase: ${sex.phase}`],
+      };
+    case 'fetus':
+      return {
+        chips: [
+          { label: 'Gestation', value: preg.gestationWeeks, digits: 1, unit: 'wk' },
+          { label: 'Weight', value: preg.fetalWeight_g, digits: 0, unit: 'g' },
+        ],
+        caption: 'Fetal circulation is drawn, not simulated.',
+      };
+    default:
+      return null;
+  }
+}
+
+/** Shown for organs the snapshot says nothing specific about. */
+const QUIET_NOTE: Record<string, string> = {
+  gallbladder: 'No bile or gallbladder state is simulated. Digestive load shows in the stomach and gut panels.',
+};
+
+export function OrganTelemetryPanel({ snapshot, organ }: PanelProps) {
+  const t = telemetryFor(organ.id, snapshot);
+  if (!t) {
+    return (
+      <>
+        <div className={styles.row}>
+          <OrganChip name={organ.displayName} />
+        </div>
+        <div className={styles.detail}>
+          <span>MAP {formatMetric(snapshot.cardio.map_mmHg, 0)} mmHg</span>
+          <span>SpO2 {formatMetric(snapshot.resp.spo2 * 100, 0)} %</span>
+          <span className={styles.noteText}>
+            {QUIET_NOTE[organ.id] ?? 'Nothing organ-specific is simulated; perfusion and oxygenation above apply.'}
+          </span>
+        </div>
+      </>
+    );
+  }
+  // Two chips to a row keeps this to two rows at 390 px, as the heart and lung panels do.
+  const rows: Chip[][] = [];
+  for (let i = 0; i < t.chips.length; i += 2) rows.push(t.chips.slice(i, i + 2));
   return (
     <>
       <div className={styles.row}>
         <OrganChip name={organ.displayName} />
       </div>
-      <div className={styles.detail}>
-        <span>MAP {formatMetric(snapshot.cardio.map_mmHg, 0)} mmHg</span>
-        <span>SpO2 {formatMetric(snapshot.resp.spo2 * 100, 0)} %</span>
-        <span className={styles.noteText}>
-          No dedicated telemetry is modelled for this organ. It is shown so the anatomy is complete,
-          and the whole-body numbers above still apply to it.
-        </span>
-      </div>
+      {rows.map((r) => (
+        <div className={styles.row} key={r[0].label}>
+          {r.map((c) => (
+            <MetricPill key={c.label} label={c.label} value={c.value} digits={c.digits ?? 0} unit={c.unit} />
+          ))}
+        </div>
+      ))}
+      {(t.words?.length || t.caption) && (
+        <div className={styles.detail}>
+          {t.words?.map((w) => (
+            <span key={w}>{w}</span>
+          ))}
+          {t.caption && <span>{t.caption}</span>}
+        </div>
+      )}
     </>
   );
 }
+
+/** Organs that share a panel name with a richer sibling choose by id. */
+const TELEMETRY_ONLY = new Set(['trachea', 'diaphragm', 'oesophagus', 'gallbladder']);
+
+export function RespiratoryPanel(p: PanelProps) {
+  return TELEMETRY_ONLY.has(p.organ.id) ? <OrganTelemetryPanel {...p} /> : <LungPanel {...p} />;
+}
+export function HepaticPanel(p: PanelProps) {
+  return TELEMETRY_ONLY.has(p.organ.id) ? <OrganTelemetryPanel {...p} /> : <LiverPanel {...p} />;
+}
+export function GiPanel(p: PanelProps) {
+  return TELEMETRY_ONLY.has(p.organ.id) ? <OrganTelemetryPanel {...p} /> : <TractPanel {...p} />;
+}
+
+export const GenericPanel = OrganTelemetryPanel;
 
 export const PANELS = {
   cardiac: CardiacPanel,
@@ -448,6 +722,13 @@ export const PANELS = {
   gi: GiPanel,
   bladder: BladderPanel,
   generic: GenericPanel,
+  // Panel names organs.json uses that had no entry and so fell to generic.
+  ocular: OrganTelemetryPanel,
+  spinal: OrganTelemetryPanel,
+  endocrine: OrganTelemetryPanel,
+  pancreatic: OrganTelemetryPanel,
+  reproductive: OrganTelemetryPanel,
+  fetal: OrganTelemetryPanel,
 } as const;
 
 export function ConditionStack({ conditions }: { conditions: SimSnapshot['conditions'] }) {

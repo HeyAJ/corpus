@@ -63,6 +63,68 @@ export function VesselToggle() {
   );
 }
 
+/**
+ * THE NERVES AND HORMONES SWITCHES. The same component and style as Vessels, stacked
+ * above it in the bottom-left corner (slot 1 and slot 2 in the CSS). Each overlay is
+ * off at start and costs nothing per frame while off.
+ */
+export function NervesToggle() {
+  const on = useStore((s) => s.nervesVisible);
+  const toggle = useStore((s) => s.toggleNerves);
+  return (
+    <button
+      className={`${styles.vessels} ${styles.slot1} ${on ? styles.vesselsOn : ''}`}
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label={on ? 'Hide nervous system' : 'Show nervous system'}
+      title={on ? 'Hide nervous system' : 'Show nervous system'}
+    >
+      <NerveGlyph on={on} />
+      <span>Nerves</span>
+      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
+    </button>
+  );
+}
+
+export function HormonesToggle() {
+  const on = useStore((s) => s.hormonesVisible);
+  const toggle = useStore((s) => s.toggleHormones);
+  return (
+    <button
+      className={`${styles.vessels} ${styles.slot2} ${on ? styles.vesselsOn : ''}`}
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label={on ? 'Hide hormone traffic' : 'Show hormone traffic'}
+      title={on ? 'Hide hormone traffic' : 'Show hormone traffic'}
+    >
+      <HormoneGlyph on={on} />
+      <span>Hormones</span>
+      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
+    </button>
+  );
+}
+
+function NerveGlyph({ on }: { on: boolean }) {
+  const c = '#d08a1c';
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3v7m0 0-6 5m6-5 6 5m-6-5v11" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="10" r="2.2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+function HormoneGlyph({ on }: { on: boolean }) {
+  const c = '#7a4fb0';
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="8" cy="9" r="3.2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
+      <circle cx="16.5" cy="7" r="2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
+      <circle cx="15" cy="16.5" r="2.6" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
+    </svg>
+  );
+}
+
 function BloodDrop({ filled }: { filled: boolean }) {
   return (
     <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
