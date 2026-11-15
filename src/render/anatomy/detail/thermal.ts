@@ -30,13 +30,39 @@ const STOPS: readonly (readonly [number, number, number, number])[] = [
   [1.0, 1.0, 0.95, 0.9], // near-white
 ];
 
+type Stops = readonly (readonly [number, number, number, number])[];
+
+/**
+ * THE SCAN RAMP: the same hue order as the ramp above, with the stops moved to where a
+ * RESTING brain actually sits. Measured at rest, the engine's activity index for the 21
+ * brain regions runs from 0.15 (pineal) to 0.40 (prefrontal cortex, thalamus); the 3D
+ * organ ramp spends that whole span between cyan and green, so a resting scan looked like
+ * one colour. A first revision then spread rest over blue..yellow, which made a QUIET brain
+ * look hot. In a thermal map quiet must read cool so that activation is what turns warm:
+ * here the whole resting range 0.15..0.40 runs blue, cyan, green (to yellow-green at its very
+ * top, the prefrontal cortex and thalamus), and warm colours begin only above it. A part
+ * lifted to about 0.52 is yellow, 0.64 orange, 0.8 red, and one driven to 1.0 is near-white.
+ * Display constants, not physiology. Kept separate from STOPS so the organ interior is untouched.
+ */
+export const SCAN_STOPS: Stops = [
+  [0.0, 0.04, 0.06, 0.35], // navy
+  [0.15, 0.12, 0.3, 0.95], // blue
+  [0.24, 0.0, 0.8, 0.92], // cyan
+  [0.32, 0.2, 0.8, 0.3], // green
+  [0.42, 0.65, 0.85, 0.2], // yellow-green
+  [0.52, 0.96, 0.9, 0.2], // yellow
+  [0.64, 0.98, 0.55, 0.1], // orange
+  [0.8, 0.88, 0.1, 0.08], // red
+  [1.0, 1.0, 0.97, 0.95], // near-white
+];
+
 /** Write the ramp colour for `t` (clamped to 0..1) into `out` and return it. */
-export function thermalColor(t: number, out: THREE.Color): THREE.Color {
+export function thermalColor(t: number, out: THREE.Color, stops: Stops = STOPS): THREE.Color {
   const x = t !== t ? 0 : t < 0 ? 0 : t > 1 ? 1 : t; // NaN reads as the cold end
   let i = 1;
-  while (i < STOPS.length - 1 && x > STOPS[i][0]) i++;
-  const a = STOPS[i - 1];
-  const b = STOPS[i];
+  while (i < stops.length - 1 && x > stops[i][0]) i++;
+  const a = stops[i - 1];
+  const b = stops[i];
   const f = (x - a[0]) / (b[0] - a[0]);
   return out.setRGB(
     a[1] + (b[1] - a[1]) * f,

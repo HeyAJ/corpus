@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import type { Viewer } from '../../render/scene/Viewer';
+import { LEGEND_HIGH, LEGEND_LOW, type HormoneLegendEntry } from '../../render/endocrine/HormoneTraffic';
 import { useStore, type ToolMode } from '../store';
 import styles from './dock.module.css';
 import { useVitalsAudio } from '../audio/useVitalsAudio';
@@ -60,6 +63,107 @@ export function VesselToggle() {
       <span>Vessels</span>
       <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
     </button>
+  );
+}
+
+/**
+ * THE NERVES AND HORMONES SWITCHES. The same component and style as Vessels, stacked
+ * above it in the bottom-left corner (slot 1 and slot 2 in the CSS, a 48 px pitch: 44 px
+ * touch height plus a 4 px gap). Each overlay is
+ * off at start and costs nothing per frame while off.
+ */
+export function NervesToggle() {
+  const on = useStore((s) => s.nervesVisible);
+  const toggle = useStore((s) => s.toggleNerves);
+  return (
+    <button
+      className={`${styles.vessels} ${styles.slot1} ${on ? styles.vesselsOn : ''}`}
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label={on ? 'Hide nervous system' : 'Show nervous system'}
+      title={on ? 'Hide nervous system' : 'Show nervous system'}
+    >
+      <NerveGlyph on={on} />
+      <span>Nerves</span>
+      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
+    </button>
+  );
+}
+
+export function HormonesToggle() {
+  const on = useStore((s) => s.hormonesVisible);
+  const toggle = useStore((s) => s.toggleHormones);
+  return (
+    <button
+      className={`${styles.vessels} ${styles.slot2} ${on ? styles.vesselsOn : ''}`}
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label={on ? 'Hide hormone traffic' : 'Show hormone traffic'}
+      title={on ? 'Hide hormone traffic' : 'Show hormone traffic'}
+    >
+      <HormoneGlyph on={on} />
+      <span>Hormones</span>
+      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
+    </button>
+  );
+}
+
+/**
+ * THE HORMONE LEGEND. Shown whenever the Hormones switch is on, above the three switches.
+ * It lists every hormone present in the snapshot right now (the overlay's own legend()), so
+ * the list follows the body: a woman's shows oestradiol, a man's testosterone. A colour dot
+ * says which colour on the body is which; the mark says whether the level is above (up
+ * arrow), below (down arrow) or near (dash) its own resting value. It states no reference
+ * range and no advice. It polls twice a second: levels move over minutes, and a React
+ * render per frame would be waste. Two columns, at most 170 px, so at 390 px it stays left
+ * of the body's midline.
+ */
+export function HormoneLegend({ viewerRef, ready }: { viewerRef: React.MutableRefObject<Viewer | null>; ready: boolean }) {
+  const on = useStore((s) => s.hormonesVisible);
+  const [rows, setRows] = useState<HormoneLegendEntry[]>([]);
+  useEffect(() => {
+    if (!on || !ready) return;
+    const read = () => setRows(viewerRef.current?.hormoneLegend() ?? []);
+    read();
+    const id = window.setInterval(read, 500);
+    return () => window.clearInterval(id);
+  }, [on, ready, viewerRef]);
+  if (!on || rows.length === 0) return null;
+  return (
+    <div className={styles.hormLegend} role="list" aria-label="Hormone colours">
+      {rows.map((r) => {
+        const mark = r.ratio > LEGEND_HIGH ? '\u2191' : r.ratio < LEGEND_LOW ? '\u2193' : '\u2013';
+        const word = r.ratio > LEGEND_HIGH ? 'above its resting level' : r.ratio < LEGEND_LOW ? 'below its resting level' : 'near its resting level';
+        return (
+          <div key={r.id} className={styles.hormRow} role="listitem" title={`${r.label}: ${word}`}>
+            <span className={styles.hormDot} style={{ background: r.colour }} />
+            <span className={styles.hormName}>{r.label}</span>
+            <span className={`${styles.hormMark} ${mark === '\u2013' ? '' : styles.hormMarkOn}`} aria-label={word}>{mark}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function NerveGlyph({ on }: { on: boolean }) {
+  const c = '#d08a1c';
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3v7m0 0-6 5m6-5 6 5m-6-5v11" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="12" cy="10" r="2.2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
+    </svg>
+  );
+}
+
+function HormoneGlyph({ on }: { on: boolean }) {
+  const c = '#7a4fb0';
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="8" cy="9" r="3.2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
+      <circle cx="16.5" cy="7" r="2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
+      <circle cx="15" cy="16.5" r="2.6" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
+    </svg>
   );
 }
 
@@ -203,6 +307,16 @@ function Impact({ filled }: { filled: boolean }) {
   );
 }
 
+/** Stacked slices: the structures panel (what is inside an organ). */
+function Layers({ filled }: { filled: boolean }) {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4 21 9l-9 5-9-5Z" fill={filled ? '#1a1a1a' : 'none'} stroke="#1a1a1a" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="m3 13 9 5 9-5" fill="none" stroke="#1a1a1a" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** A mountain under a sun: the environment panel — altitude, temperature, oxygen. */
 function Mountain({ filled }: { filled: boolean }) {
   return (
@@ -314,6 +428,8 @@ export function ToolDock() {
   // on every snapshot, twenty times a second, for nothing.
   const st = useStore(
     useShallow((s) => ({
+      anatomyPanelOpen: s.anatomyPanelOpen,
+      toggleAnatomyPanel: s.toggleAnatomyPanel,
       statusPanelOpen: s.statusPanelOpen,
       toggleStatusPanel: s.toggleStatusPanel,
       impactPanelOpen: s.impactPanelOpen,
@@ -340,6 +456,7 @@ export function ToolDock() {
     { key: 'status', label: 'What is happening', hint: 'the body in plain words', icon: <Pulse />, active: st.statusPanelOpen, onClick: st.toggleStatusPanel },
     { key: 'impact', label: 'Impact', hint: 'what your actions changed', icon: <Impact filled={st.impactPanelOpen} />, active: st.impactPanelOpen, onClick: st.toggleImpactPanel },
     { key: 'physiology', label: 'Physiology', hint: 'sleep, exercise, stress, pain, bleeding', icon: <Runner filled={st.physiologyPanelOpen} />, active: st.physiologyPanelOpen, onClick: st.togglePhysiologyPanel },
+    { key: 'anatomy', label: 'Structures', hint: 'what is inside each organ', icon: <Layers filled={st.anatomyPanelOpen} />, active: st.anatomyPanelOpen, onClick: st.toggleAnatomyPanel },
     { key: 'environment', label: 'Environment', hint: 'temperature, altitude, oxygen, posture', icon: <Mountain filled={st.environmentPanelOpen} />, active: st.environmentPanelOpen, onClick: st.toggleEnvironmentPanel },
     { key: 'reproduction', label: 'Reproduction', hint: 'cycle, pregnancy, sexual response', icon: <Cycle filled={st.reproductionPanelOpen} />, active: st.reproductionPanelOpen, onClick: st.toggleReproductionPanel },
     { key: 'infection', label: 'Infection', hint: 'inoculate, watch and clear', icon: <Microbe filled={st.infectionPanelOpen} />, active: st.infectionPanelOpen, onClick: st.toggleInfectionPanel },

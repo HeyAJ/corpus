@@ -183,12 +183,13 @@ a.item {
 .vessels {
   position: absolute;
   left: var(--inset-hud);
-  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + var(--switch-slot, 0px));
   z-index: 14;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 36px;
+  /* 44 px touch target; the Nerves and Hormones switches stack above on a 48 px pitch. */
+  min-height: 44px;
   padding: 4px 12px 4px 9px;
   border: none;
   border-radius: var(--radius-pill);
@@ -200,6 +201,14 @@ a.item {
   color: var(--ink);
   cursor: pointer;
   transition: background 140ms ease;
+}
+
+.slot1 {
+  --switch-slot: 48px;
+}
+
+.slot2 {
+  --switch-slot: 96px;
 }
 
 .vessels:hover {
@@ -221,4 +230,69 @@ a.item {
 
 .vesselsOn .vesselsState {
   color: #d63a2f;
+}
+
+/* ------------------------------------------------------------ hormone legend */
+
+/*
+ * Above the three switches (3 x 44 px plus two 4 px gaps, plus 8 px of air), left-aligned
+ * with them. Two columns, at most 170 px, small type. If the list outgrows 40 % of the
+ * viewport it scrolls inside itself rather than climbing into the readouts.
+ */
+.hormLegend {
+  position: absolute;
+  left: var(--inset-hud);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + 144px);
+  z-index: 14;
+  box-sizing: border-box;
+  width: 170px;
+  max-height: 40vh;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 4px;
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(255, 253, 248, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  font-size: 9.5px;
+  line-height: 1.2;
+  color: var(--ink);
+  overscroll-behavior: contain;
+}
+
+.hormRow {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.hormDot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.hormName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.hormMark {
+  flex: none;
+  color: var(--ink-faint);
+  font-weight: 700;
+}
+
+.hormMarkOn {
+  color: var(--ink);
 }
