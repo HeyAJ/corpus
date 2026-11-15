@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import type { Viewer } from '../../render/scene/Viewer';
+import { LEGEND_HIGH, LEGEND_LOW, type HormoneLegendEntry } from '../../render/endocrine/HormoneTraffic';
 import { useStore, type ToolMode } from '../store';
 import styles from './dock.module.css';
 import { useVitalsAudio } from '../audio/useVitalsAudio';
@@ -65,7 +68,8 @@ export function VesselToggle() {
 
 /**
  * THE NERVES AND HORMONES SWITCHES. The same component and style as Vessels, stacked
- * above it in the bottom-left corner (slot 1 and slot 2 in the CSS). Each overlay is
+ * above it in the bottom-left corner (slot 1 and slot 2 in the CSS, a 48 px pitch: 44 px
+ * touch height plus a 4 px gap). Each overlay is
  * off at start and costs nothing per frame while off.
  */
 export function NervesToggle() {
@@ -101,6 +105,44 @@ export function HormonesToggle() {
       <span>Hormones</span>
       <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
     </button>
+  );
+}
+
+/**
+ * THE HORMONE LEGEND. Shown whenever the Hormones switch is on, above the three switches.
+ * It lists every hormone present in the snapshot right now (the overlay's own legend()), so
+ * the list follows the body: a woman's shows oestradiol, a man's testosterone. A colour dot
+ * says which colour on the body is which; the mark says whether the level is above (up
+ * arrow), below (down arrow) or near (dash) its own resting value. It states no reference
+ * range and no advice. It polls twice a second: levels move over minutes, and a React
+ * render per frame would be waste. Two columns, at most 170 px, so at 390 px it stays left
+ * of the body's midline.
+ */
+export function HormoneLegend({ viewerRef, ready }: { viewerRef: React.MutableRefObject<Viewer | null>; ready: boolean }) {
+  const on = useStore((s) => s.hormonesVisible);
+  const [rows, setRows] = useState<HormoneLegendEntry[]>([]);
+  useEffect(() => {
+    if (!on || !ready) return;
+    const read = () => setRows(viewerRef.current?.hormoneLegend() ?? []);
+    read();
+    const id = window.setInterval(read, 500);
+    return () => window.clearInterval(id);
+  }, [on, ready, viewerRef]);
+  if (!on || rows.length === 0) return null;
+  return (
+    <div className={styles.hormLegend} role="list" aria-label="Hormone colours">
+      {rows.map((r) => {
+        const mark = r.ratio > LEGEND_HIGH ? '\u2191' : r.ratio < LEGEND_LOW ? '\u2193' : '\u2013';
+        const word = r.ratio > LEGEND_HIGH ? 'above its resting level' : r.ratio < LEGEND_LOW ? 'below its resting level' : 'near its resting level';
+        return (
+          <div key={r.id} className={styles.hormRow} role="listitem" title={`${r.label}: ${word}`}>
+            <span className={styles.hormDot} style={{ background: r.colour }} />
+            <span className={styles.hormName}>{r.label}</span>
+            <span className={`${styles.hormMark} ${mark === '\u2013' ? '' : styles.hormMarkOn}`} aria-label={word}>{mark}</span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

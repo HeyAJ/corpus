@@ -20,22 +20,29 @@ import { SCAN_STOPS, thermalColor } from '../anatomy/detail/thermal';
  * scene, a second camera and a scissor inside that chain. A second small WebGLRenderer on
  * the inset's own canvas touches none of it, and costs a few hundred kilobytes.
  *
- * LOOK: A GLASS BRAIN. The six cortical lobes and the cerebellum are translucent shells:
- * additive blending (right on a near-black ground), no depth write and no depth test, so
- * they can never hide what is inside them. Their opacity is a fresnel term, about 0.10
- * where the surface faces the eye and rising to about 0.75 at the silhouette, which is
- * what makes the outline read as a brain from every angle. Every other region (thalamus,
+ * LOOK: A GLASS BRAIN. The six cortical lobes and the cerebellum are translucent shells
+ * blended with a MAXIMUM, not a sum: a glass brain is a maximum-intensity projection, and
+ * a maximum cannot saturate, whereas additive shells stacked along one line of sight wash
+ * the map to white. They have no depth write and no depth test, so they can never hide
+ * what is inside them. Their opacity is a fresnel term, about 0.05
+ * where the surface faces the eye and rising to about 0.5 at the silhouette, which is
+ * what makes the outline read as a brain from every angle. The shells are drawn first and
+ * the solids after them, so a deep structure is never tinted by the glass in front of it. Every other region (thalamus,
  * hippocampus, amygdala, brainstem...) is solid and bright, depth-tested against the other
  * solids only, with a darker rim so two neighbours of similar colour stay separable. Each
  * piece is tinted by its own activity colour. The opacities are display constants.
+ * The one exception to "depth-tested": a deep structure driven well above rest (see HOT_FROM)
+ * is also drawn see-through, because a glass brain is a projection and the amygdala would
+ * otherwise be hidden behind its neighbours exactly when it matters.
  * A faint horizontal line sweeps top to bottom every few seconds and brightens whatever it
  * crosses. THAT LINE IS DECORATIVE: it is not an acquisition, it encodes nothing, and it
  * exists only so the picture reads as a live scan and not a model on a stand.
  *
  * WHY THE SCAN HAS ITS OWN COLOUR STOPS. The 3D organ ramp puts the whole resting range of
  * the activity index (measured 0.15 to 0.40) between cyan and green, which made a resting
- * brain one colour. `SCAN_STOPS` (thermal.ts) spreads rest over blue, cyan, green and
- * yellow and keeps red and white for strongly driven regions. The scan, the legend bar and
+ * brain one colour. `SCAN_STOPS` (thermal.ts) spreads rest over blue, cyan and green, so a
+ * quiet brain looks cool, and keeps yellow, orange, red and white for regions driven above
+ * rest, so activation is what turns warm. The scan, the legend bar and
  * the legend ticks all use that one ramp, so the legend is true.
  *
  * MOTION. One turn in about 30 s about the vertical axis, while the whole brain nods
@@ -76,10 +83,10 @@ const RETRY_LIMIT = 30;
  * "resting" sits where the measured resting regions cluster (0.15..0.40, median ~0.28).
  */
 export const SCAN_LEGEND: { label: string; t: number }[] = [
-  { label: 'quiet', t: 0.05 },
+  { label: 'quiet', t: 0.08 },
   { label: 'resting', t: 0.28 },
-  { label: 'active', t: 0.6 },
-  { label: 'intense', t: 0.92 },
+  { label: 'active', t: 0.58 },
+  { label: 'intense', t: 0.9 },
 ];
 
 /**
@@ -109,7 +116,11 @@ const VERTEX = /* glsl */ `
   }
 `;
 
-/** Glass shell: alpha is a fresnel term, ~0.10 face-on rising to ~0.75 at the silhouette. */
+/**
+ * Glass shell: alpha is a fresnel term, ~0.05 face-on rising to ~0.5 at the silhouette
+ * (display constants). The colour is pre-multiplied by it because the blend is MAX with
+ * One/One factors, which keeps the larger of shell and ground per channel.
+ */
 const GHOST_FRAGMENT = /* glsl */ `
   uniform vec3 uColor;
   uniform float uScan;
@@ -119,9 +130,9 @@ const GHOST_FRAGMENT = /* glsl */ `
   varying float vNdcY;
   void main() {
     float f = 1.0 - abs(dot(normalize(vN), normalize(vV)));
-    float a = 0.10 + 0.65 * pow(f, 3.2);
+    float a = 0.05 + 0.45 * pow(f, 3.2);
     float d = (vNdcY - uScan) / 0.07;
-    a *= 1.0 + 1.2 * uScanOn * exp(-d * d);
+    a *= 1.0 + 0.8 * uScanOn * exp(-d * d);
     gl_FragColor = vec4(uColor * a, 1.0);
     #include <colorspace_fragment>
   }
@@ -162,7 +173,7 @@ const SCAN_FRAGMENT = /* glsl */ `
 `;
 
 function makeMaterial(ghost: boolean): THREE.ShaderMaterial {
-  return new THREE.ShaderMaterial({
+  const m = new THREE.ShaderMaterial({
     uniforms: {
       uColor: { value: new THREE.Color() },
       uScan: { value: 2 },
@@ -170,17 +181,55 @@ function makeMaterial(ghost: boolean): THREE.ShaderMaterial {
     },
     vertexShader: VERTEX,
     fragmentShader: ghost ? GHOST_FRAGMENT : SOLID_FRAGMENT,
-    blending: ghost ? THREE.AdditiveBlending : THREE.NoBlending,
-    transparent: ghost,
+    blending: ghost ? THREE.CustomBlending : THREE.NoBlending,
+    // Not flagged transparent on purpose: three draws every opaque-list object before any
+    // transparent one whatever its renderOrder, and the shells must come FIRST so the solid
+    // structures overwrite them. Custom blending still applies to an opaque-list material.
+    transparent: false,
     depthTest: !ghost,
     depthWrite: !ghost,
     side: THREE.FrontSide,
   });
+  if (ghost) {
+    // Maximum, not sum: see the header. With MaxEquation the factors are ignored by GL but
+    // set to One so the intent is explicit.
+    m.blendEquation = THREE.MaxEquation;
+    m.blendSrc = THREE.OneFactor;
+    m.blendDst = THREE.OneFactor;
+  }
+  return m;
 }
+
+/**
+ * See-through overlay for a strongly driven deep structure. The amygdala is about a
+ * centimetre across and sits low and forward behind the insula and hippocampus, so from most
+ * angles the solid pass hides the one region the picture exists to show when a person is
+ * frightened. A glass brain is a projection: a hot region should show through. The overlay
+ * is the same mesh drawn again with no depth test and ordinary alpha, only while the region
+ * is above HOT_FROM (just over the resting ceiling of 0.40), fading in to HOT_FULL. At rest
+ * nothing is drawn, so the resting picture is unchanged. Display constants.
+ */
+const HOT_FROM = 0.45;
+const HOT_FULL = 0.62;
+const HOT_ALPHA = 0.7;
+const HOT_FRAGMENT = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uAlpha;
+  varying vec3 vN;
+  varying vec3 vV;
+  varying float vNdcY;
+  void main() {
+    float ndv = abs(dot(normalize(vN), normalize(vV)));
+    gl_FragColor = vec4(uColor * (0.7 + 0.3 * ndv), uAlpha);
+    #include <colorspace_fragment>
+  }
+`;
 
 interface Region {
   key: string;
   mesh: THREE.Mesh;
+  /** Present on deep structures only: the see-through overlay (see HOT_FROM). */
+  hot: THREE.Mesh | null;
   material: THREE.ShaderMaterial;
   color: THREE.Color;
   target: number;
@@ -307,6 +356,7 @@ export class BrainScan {
     for (const r of this.regions) {
       r.mesh.geometry.dispose();
       r.material.dispose();
+      if (r.hot) (r.hot.material as THREE.ShaderMaterial).dispose();
     }
     this.regions.length = 0;
     this.scanMesh.geometry.dispose();
@@ -344,10 +394,29 @@ export class BrainScan {
       const material = makeMaterial(ghost);
       const mesh = new THREE.Mesh(p.geometry, material);
       mesh.frustumCulled = false;
-      // Solids first (they write depth), then the glass over them, then the scan line.
-      mesh.renderOrder = ghost ? 2 : 1;
-      const region: Region = { key: 'brain.' + p.id, mesh, material, color: new THREE.Color(), target: 0, value: 0, seen: false };
+      // Glass first, solids over it, then the scan line. A solid overwrites the pixels it
+      // covers, so a deep structure's colour is never tinted by a shell in front of it
+      // (a max against the shell would brighten it); the shells still make the outline.
+      mesh.renderOrder = ghost ? 1 : 2;
+      const region: Region = { key: 'brain.' + p.id, mesh, hot: null, material, color: new THREE.Color(), target: 0, value: 0, seen: false };
       material.uniforms.uColor.value = region.color;
+      if (!ghost) {
+        const hotMaterial = new THREE.ShaderMaterial({
+          uniforms: { uColor: { value: region.color }, uAlpha: { value: 0 } },
+          vertexShader: VERTEX,
+          fragmentShader: HOT_FRAGMENT,
+          transparent: true,
+          depthTest: false,
+          depthWrite: false,
+          side: THREE.FrontSide,
+        });
+        const hot = new THREE.Mesh(p.geometry, hotMaterial);
+        hot.frustumCulled = false;
+        hot.visible = false;
+        hot.renderOrder = 3;
+        region.hot = hot;
+        this.mirror.add(hot);
+      }
       this.regions.push(region);
       this.mirror.add(mesh);
     }
@@ -407,6 +476,12 @@ export class BrainScan {
       const r = this.regions[i];
       r.value += (r.target - r.value) * k;
       thermalColor(r.value, r.color, SCAN_STOPS);
+      if (r.hot) {
+        const h = (r.value - HOT_FROM) / (HOT_FULL - HOT_FROM);
+        const a = h <= 0 ? 0 : (h > 1 ? 1 : h) * HOT_ALPHA;
+        r.hot.visible = a > 0;
+        (r.hot.material as THREE.ShaderMaterial).uniforms.uAlpha.value = a;
+      }
     }
 
     const held = this.reducedMotion;

@@ -37,20 +37,22 @@ type Stops = readonly (readonly [number, number, number, number])[];
  * RESTING brain actually sits. Measured at rest, the engine's activity index for the 21
  * brain regions runs from 0.15 (pineal) to 0.40 (prefrontal cortex, thalamus); the 3D
  * organ ramp spends that whole span between cyan and green, so a resting scan looked like
- * one colour. Here the resting 0.15..0.40 spans blue, cyan, green, yellow and orange (most regions
- * sit at 0.25..0.31, so that is where the stops are densest), a part lifted to about
- * 0.6 is red, and one driven to 0.9 reads red-to-white. Display constants, not physiology.
- * Kept separate from STOPS so the organ interior is untouched.
+ * one colour. A first revision then spread rest over blue..yellow, which made a QUIET brain
+ * look hot. In a thermal map quiet must read cool so that activation is what turns warm:
+ * here the whole resting range 0.15..0.40 runs blue, cyan, green (to yellow-green at its very
+ * top, the prefrontal cortex and thalamus), and warm colours begin only above it. A part
+ * lifted to about 0.52 is yellow, 0.64 orange, 0.8 red, and one driven to 1.0 is near-white.
+ * Display constants, not physiology. Kept separate from STOPS so the organ interior is untouched.
  */
 export const SCAN_STOPS: Stops = [
-  [0.0, 0.05, 0.08, 0.45], // dark blue
-  [0.12, 0.12, 0.3, 0.95], // blue
-  [0.2, 0.0, 0.8, 0.92], // cyan
-  [0.25, 0.2, 0.82, 0.3], // green
-  [0.33, 0.96, 0.9, 0.2], // yellow
-  [0.42, 0.98, 0.55, 0.1], // orange
-  [0.58, 0.88, 0.1, 0.08], // red
-  [0.9, 1.0, 0.6, 0.5], // red toward white
+  [0.0, 0.04, 0.06, 0.35], // navy
+  [0.15, 0.12, 0.3, 0.95], // blue
+  [0.24, 0.0, 0.8, 0.92], // cyan
+  [0.32, 0.2, 0.8, 0.3], // green
+  [0.42, 0.65, 0.85, 0.2], // yellow-green
+  [0.52, 0.96, 0.9, 0.2], // yellow
+  [0.64, 0.98, 0.55, 0.1], // orange
+  [0.8, 0.88, 0.1, 0.08], // red
   [1.0, 1.0, 0.97, 0.95], // near-white
 ];
 

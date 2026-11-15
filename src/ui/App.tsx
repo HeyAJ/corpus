@@ -6,7 +6,7 @@ import type { OrganId } from '../data/types';
 import { ANATOMY, atlasOf } from '../data/anatomy';
 import type { WaveformChannel } from '../bridge/types';
 import { useStore } from './store';
-import { ToolDock, VesselToggle, NervesToggle, HormonesToggle } from './components/ToolDock';
+import { ToolDock, VesselToggle, NervesToggle, HormonesToggle, HormoneLegend } from './components/ToolDock';
 import { DrugDrawer } from './panels/DrugDrawer';
 import { ReceptorPanel } from './panels/ReceptorPanel';
 import { ProcedurePanel } from './panels/ProcedurePanel';
@@ -316,6 +316,7 @@ export function App() {
         <VesselToggle />
         <NervesToggle />
         <HormonesToggle />
+        <HormoneLegend viewerRef={viewerRef} ready={ready} />
         <NoticeToasts />
         <BrainScanInset viewerRef={viewerRef} ready={ready} />
 
