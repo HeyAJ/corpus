@@ -4,7 +4,7 @@ import { P } from '../core/constants';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
 import { ANATOMY_SIGNALS, type AnatomySignal } from '../../data/anatomy-types';
 import organsFile from '../../data/organs.json';
-import { HORMONE_BY_ID } from '../systems/endocrine';
+import { HORMONE_BY_ID, periodicSteadyLevel } from '../systems/endocrine';
 import { SEGMENTS, gastricVolume } from '../systems/gi';
 import { reproductiveSignals } from '../systems/reproductive';
 
@@ -70,27 +70,85 @@ function nightFactor(h: number): number {
 }
 
 /**
- * Hormone activity above the activity its own baseline produces, rescaled so that
- * "fully saturated" is 1. The baseline activity is the same Hill transform the endocrine
- * system applies, so a hormone sitting at baseline reads exactly 0 here as it does on the
+ * Hormone activity above the activity its reference level produces, rescaled so that
+ * "fully saturated" is 1. The reference is the hormone's own baseline for a hormone with
+ * no rhythm, so a hormone sitting at baseline reads exactly 0 here as it does on the
  * effect bus. A hormone that is not seeded yet reads 0.
+ *
+ * CIRCADIAN HORMONES ARE REFERENCED TO THE EXPECTED LEVEL FOR THE CLOCK HOUR, not to
+ * the daily mean and not to the 08:00 value. WHAT WAS WRONG: cortisol was referenced to
+ * its mean baseline, and the body starts at the 08:00 peak (17.3 against a mean of 12),
+ * so the adrenal cortex glowed at 0.18 in a perfectly resting body and the test hid it
+ * behind a loosened limit. Referencing the 08:00 value instead would have fixed the
+ * morning and broken the rest of the day (the signal would sit pinned at zero for the
+ * fall to the evening trough, so a 3 a.m. stress response would have to climb past the
+ * morning peak before it showed). `periodicSteadyLevel` is the endocrine system's own
+ * exact periodic steady state of the secretion rhythm, so "no departure" means "exactly
+ * what a rested body would have at this hour", whatever the hour, and nothing is typed in
+ * a second time here. Exogenous hormone is not in the reference, so a hydrocortisone dose
+ * still reads as a rise.
  */
 const HORMONE_BASE_ACTIVITY = new Map<string, number>();
 function hormoneAbove(s: SimState, id: string): number {
-  let base = HORMONE_BASE_ACTIVITY.get(id);
-  if (base === undefined) {
-    const def = HORMONE_BY_ID.get(id);
-    if (def) {
+  const def = HORMONE_BY_ID.get(id);
+  const h = s.endocrine.hormones[id];
+  if (!def || !h) return 0;
+  let base: number | undefined;
+  if (def.circadianAmplitude) {
+    const x = Math.pow(periodicSteadyLevel(def, s.endocrine.clockHour), def.hill);
+    base = x / (x + Math.pow(def.ec50, def.hill));
+  } else {
+    base = HORMONE_BASE_ACTIVITY.get(id);
+    if (base === undefined) {
       const x = Math.pow(def.baseline, def.hill);
       base = x / (x + Math.pow(def.ec50, def.hill));
-    } else {
-      base = 0;
+      HORMONE_BASE_ACTIVITY.set(id, base);
     }
-    HORMONE_BASE_ACTIVITY.set(id, base);
   }
-  const h = s.endocrine.hormones[id];
-  if (!h) return 0;
   return clamp01((h.activity - base) / (1 - base));
+}
+
+/* ------------------------------------------------------ this body's own resting values */
+
+/**
+ * RAW LEVELS OF THE SIGNALS THAT ARE NOT ZERO IN A RESTING BODY, captured once from the
+ * settled state at the end of the engine's warm-up (`captureAnatomyRest`, called from
+ * engine.ts). WHAT WAS WRONG: these signals were absolute levels (baroreceptor firing
+ * about 0.25, vagal outflow 0.1, insulin 0.08, hepatic output 0.06) measured from the
+ * mid-point or the minimal model's constant rather than from where this body actually
+ * rests, so the medulla, vagal nuclei, islets and liver glowed with nothing happening. A
+ * part's activity is now `rest + weight * signal`, so a signal has to mean DEPARTURE from
+ * rest or the stated resting level of the part is a lie.
+ *
+ * Each is rescaled as (x - r) / (1 - r) so it still reaches 1 at the same raw level it
+ * always did. The reference is the boot-time resting body: a different sex, a pregnancy or
+ * a cycle day changes what rest is for some of these (hepatic glucose output, say), and
+ * that is deliberately NOT chased here; such a body reads its difference from the default
+ * adult as activity. Never written back to the simulation.
+ */
+interface RestRef { baroAfferent: number; vagal: number; insulin: number; hepatic: number }
+let restRef: RestRef | null = null;
+
+function rawInsulin(s: SimState): number {
+  return clamp01((s.metabolic.I + s.metabolic.exogenousInsulin_uU_per_mL - P('metabolic.insulinBasal_uU_per_mL')) / 60);
+}
+function rawHepatic(s: SimState): number {
+  return clamp01(eff(s, 'metabolic.hepaticGlucoseOutput') + eff(s, 'metabolic.glycogenolysis'));
+}
+
+/** Record the resting body. Called once, on the settled warm-up state. */
+export function captureAnatomyRest(s: SimState): void {
+  restRef = {
+    baroAfferent: s.reflex.afferent,
+    vagal: clamp01((s.reflex.vagal - 0.5) * 2),
+    insulin: rawInsulin(s),
+    hepatic: rawHepatic(s),
+  };
+}
+
+/** Rise above the resting value r, scaled so the top of the raw range is still 1. */
+function above(x: number, r: number): number {
+  return r < 1 ? clamp01((x - r) / (1 - r)) : 0;
 }
 
 /* ------------------------------------------------------------ the scratch space */
@@ -212,8 +270,18 @@ function signal(name: AnatomySignal, s: SimState, rep: ReturnType<typeof reprodu
         0.6 * C.sexualArousal, C.orgasm,
       ));
     case 'parasympathetic':
-      return clamp01(Math.max((s.reflex.vagal - 0.5) * 2, 0.6 * C.sleep, 0.5 * C.digestion));
-    case 'baroreflex': return clamp01(Math.abs(s.reflex.afferent - 0.5) * 2);
+      return clamp01(Math.max(
+        above(clamp01((s.reflex.vagal - 0.5) * 2), restRef ? restRef.vagal : 0), 0.6 * C.sleep, 0.5 * C.digestion,
+      ));
+    case 'baroreflex': {
+      // Departure of baroreceptor firing from this body's own resting firing, in either
+      // direction (the paired rise/fall convention, folded into one magnitude): a rise
+      // is scaled to the distance to full firing, a fall to the distance to silence, so
+      // 1 is still "pinned at either end".
+      const a = s.reflex.afferent;
+      const a0 = restRef ? restRef.baroAfferent : 0.5;
+      return clamp01(Math.max(a0 < 1 ? (a - a0) / (1 - a0) : 0, a0 > 0 ? (a0 - a) / a0 : 0));
+    }
     /* --- heart and circulation --- */
     case 'beat': return clamp01(s.cardio.activation);
     case 'heartRate': {
@@ -278,10 +346,9 @@ function signal(name: AnatomySignal, s: SimState, rep: ReturnType<typeof reprodu
     case 'motilityFall': return clamp01(-eff(s, 'gi.motility'));
     case 'hyperglycaemia': return clamp01((s.metabolic.G - 110) / 150);
     case 'hypoglycaemia': return clamp01((70 - s.metabolic.G) / 40);
-    case 'insulin':
-      return clamp01((s.metabolic.I + s.metabolic.exogenousInsulin_uU_per_mL - P('metabolic.insulinBasal_uU_per_mL')) / 60);
+    case 'insulin': return above(rawInsulin(s), restRef ? restRef.insulin : 0);
     case 'glucagon': return hormoneAbove(s, 'glucagon');
-    case 'hepaticOutput': return clamp01(eff(s, 'metabolic.hepaticGlucoseOutput') + eff(s, 'metabolic.glycogenolysis'));
+    case 'hepaticOutput': return above(rawHepatic(s), restRef ? restRef.hepatic : 0);
     case 'lactate': return clamp01((s.chem.lactate - 1) / 8);
     case 'ketosis': return clamp01(s.acidBase.ketones / 5);
     case 'fever': return clamp01((s.metabolic.coreTemp - 37.5) / 3);

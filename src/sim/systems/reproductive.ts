@@ -518,6 +518,16 @@ function stepSexual(s: SimState, dt: number): void {
     addEffect(s.effects, 'cardio.heartRate', (R(`sexual.hr_arousal_${sx}_bpm`) * a + R('sexual.hr_orgasm_bpm') * env) / P('cardio.heartRateBaseline_bpm'));
     addEffect(s.effects, 'cardio.contractility', R(`sexual.contractility_arousal_${sx}`) * arm + R('sexual.contractility_orgasm') * env);
     addEffect(s.effects, 'cardio.systemicResistance', R(`sexual.resistance_arousal_${sx}`) * arm + R('sexual.resistance_orgasm') * env);
+    // THE PRELOAD SIDE OF THE RESPONSE, AND WHAT WENT WRONG WITHOUT IT. The first
+    // calibration reached the cited pressures' MEAN with the set-point reset and a faster
+    // heart, but nothing in it returned blood to the heart: the quicker ventricle ejected a
+    // SMALLER stroke against a higher resistance, so diastolic pressure rose about twice as
+    // much as systolic (+22 / +11 mmHg in a man) where XUERUI2008 found the reverse
+    // (+18 / +21) and the pulse pressure widened. Contractility gains could not repair it
+    // because this ventricle is preload-limited. Sympathetic venoconstriction is the
+    // textbook mechanism (shrinks unstressed venous volume, raises venous return), and
+    // cardio.venousTone is the bus target that already carries it for exercise.
+    addEffect(s.effects, 'cardio.venousTone', R(`sexual.venousTone_arousal_${sx}`) * arm + R('sexual.venousTone_orgasm') * env);
     // pathology.ts: felt pain = nociception x (1 - analgesia). The stimulus needed to
     // reach a fixed felt pain is therefore proportional to 1 / (1 - analgesia), so a
     // threshold raised by a fraction q needs analgesia = 1 - 1 / (1 + q) (WHIPPLE1985).

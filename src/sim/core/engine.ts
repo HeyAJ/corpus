@@ -57,7 +57,7 @@ import {
   reproductiveSnapshot,
   reproductiveHormones,
 } from '../systems/reproductive';
-import { buildAnatomy } from '../derive/anatomy';
+import { buildAnatomy, captureAnatomyRest } from '../derive/anatomy';
 import { inspiredPo2 } from '../systems/environment';
 import { voidBladder } from '../systems/fluids';
 import {
@@ -203,6 +203,8 @@ function createRestingState(seed: number): SimState {
       // run to its own fixed point separately (see settleGlucoseInsulin for why).
       settleGlucoseInsulin(warm.state);
       warm.state.t = 0;
+      // The anatomy display measures departure from THIS settled body (derive/anatomy.ts).
+      captureAnatomyRest(warm.state);
       restingBaseline = structuredClone(warm.state);
     } finally {
       settling = false;

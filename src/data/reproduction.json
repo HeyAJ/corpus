@@ -777,6 +777,30 @@
       "confidence": "derived",
       "note": "CALIBRATED bus gain (cardio.systemicResistance) per unit orgasm envelope. See sexual.contractility_orgasm; the value is carried over from the earlier calibration and was not changed because heart rate, not this gain, was the quantity that moved."
     },
+    "sexual.venousTone_arousal_male": {
+      "value": 0.0,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "FITTED (not measured): PLACEHOLDER. MECHANISM (GH14, the Guyton and Hall venous-return teaching, with SUNAGAWA2017): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses. WHY IT IS HERE: the earlier calibration moved only the baroreflex set point, heart rate, contractility and resistance, none of which returns blood to the heart, so the faster ventricle ejected a smaller stroke against a higher resistance and the pulse pressure narrowed where the cited studies found it widen (model +11/+22 mmHg systolic/diastolic against cited +21/+18). Contractility gains could not fix this because the ventricle is preload-limited."
+    },
+    "sexual.venousTone_arousal_female": {
+      "value": 0.0,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "FITTED (not measured): PLACEHOLDER. MECHANISM (GH14, the Guyton and Hall venous-return teaching, with SUNAGAWA2017): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses. WHY IT IS HERE: the earlier calibration moved only the baroreflex set point, heart rate, contractility and resistance, none of which returns blood to the heart, so the faster ventricle ejected a smaller stroke against a higher resistance and the pulse pressure narrowed where the cited studies found it widen (model +11/+22 mmHg systolic/diastolic against cited +21/+18). Contractility gains could not fix this because the ventricle is preload-limited."
+    },
+    "sexual.venousTone_orgasm": {
+      "value": 0.0,
+      "unit": "fraction",
+      "source": "NEMEC1976",
+      "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
+      "confidence": "derived",
+      "note": "FITTED (not measured): PLACEHOLDER. MECHANISM (GH14, the Guyton and Hall venous-return teaching, with SUNAGAWA2017): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses. WHY IT IS HERE: the earlier calibration moved only the baroreflex set point, heart rate, contractility and resistance, none of which returns blood to the heart, so the faster ventricle ejected a smaller stroke against a higher resistance and the pulse pressure narrowed where the cited studies found it widen (model +11/+22 mmHg systolic/diastolic against cited +21/+18). Contractility gains could not fix this because the ventricle is preload-limited."
+    },
     "sexual.painThresholdRise_stimulation": {
       "value": 0.53,
       "unit": "fraction",
