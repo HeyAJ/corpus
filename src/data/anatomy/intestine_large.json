@@ -1,6 +1,161 @@
 {
   "atlas": "intestine_large",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The inside of the large intestine, drawn as anatomy: the caecum with its appendix, the ascending, transverse, descending and sigmoid colon and the rectum, the three taeniae coli, the folds that mark the haustra, a mucosal lining and the faecal contents. Contents creep towards the rectum, and water is drawn from the lumen into the wall. It leaves out the rectal folds, the anal sphincters, the crypts, the gut bacteria and the movement of the haustra themselves. The model has no separate diarrhoea signal for this view, so faster transit is shown through the gut-motility signals, and the water stream thins when motility is raised. Activity bars are display indices, not measurements.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "caecum",
+      "label": "Caecum",
+      "summary": "Blind pouch at the start of the colon that receives the ileal chyme",
+      "function": "The caecum is the wide blind pouch below the ileocaecal junction. It receives liquid chyme from the ileum and begins the absorption of water and salts. The appendix opens from its lower end. It brightens as contents reach the colon.",
+      "color": "#c98b7a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.3, "note": "Contents reaching the colon arrive here first.", "source": "GH14" },
+        { "signal": "intestinalTransit", "weight": 0.2, "note": "Chyme leaving the ileum is delivered to the caecum.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "appendix",
+      "label": "Appendix",
+      "summary": "Narrow blind tube off the caecum with lymphoid tissue in its wall",
+      "function": "The vermiform appendix is a narrow blind-ended tube that opens from the caecum. Its wall is rich in lymphoid tissue and it takes part in mucosal immunity. It brightens when the simulator reports immune activation or infection.",
+      "color": "#d6a08f",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "immune", "weight": 0.3, "note": "Lymphoid tissue in its wall responds to immune activation.", "source": "GH14" },
+        { "signal": "infection", "weight": 0.3, "note": "A pathogen burden engages gut-associated lymphoid tissue.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "colon_ascending",
+      "label": "Ascending Colon",
+      "summary": "Rises on the right; absorbs much of the water and salt",
+      "function": "The ascending colon passes up the right side of the abdomen to the right colic flexure. Its contents are still fluid, and it is where most water and salt absorption takes place. It brightens with colonic transit and with the mucosal absorption of water.",
+      "color": "#d4917a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.35, "note": "Contents in the colon mean the segment is working.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "colon_transverse",
+      "label": "Transverse Colon",
+      "summary": "Crosses the abdomen from right to left; the most mobile part",
+      "function": "The transverse colon crosses the abdomen between the right and left colic flexures, hanging on its own mesentery. Water absorption continues here and the contents become more solid. Mass movements that sweep contents along begin in this segment. It brightens with colonic transit.",
+      "color": "#c97f6e",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.35, "note": "Contents in the colon mean the segment is working.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "colon_descending",
+      "label": "Descending Colon",
+      "summary": "Runs down the left side and stores the formed stool",
+      "function": "The descending colon runs down the left side of the abdomen. It is narrower than the ascending colon and mainly stores and conducts faecal matter towards the sigmoid. It brightens with colonic transit.",
+      "color": "#bd7466",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.35, "note": "Contents in the colon mean the segment is working.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "colon_sigmoid",
+      "label": "Sigmoid Colon",
+      "summary": "S-shaped loop that leads to the rectum",
+      "function": "The sigmoid colon is an S-shaped loop between the descending colon and the rectum. Its strong muscle holds the stool and moves it on into the rectum. It brightens with colonic transit.",
+      "color": "#b06a63",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.35, "note": "Contents in the colon mean the segment is working.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rectum",
+      "label": "Rectum",
+      "summary": "Final straight part; holds stool until it is passed",
+      "function": "The rectum is the last part of the large bowel, ending in the anal canal. It stretches to hold stool until it is passed, and has no haustra or separate taeniae. It brightens with colonic transit.",
+      "color": "#a35f5a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.3, "note": "Contents reaching the end of the colon collect here.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.15, "note": "Parasympathetic outflow from the sacral cord drives emptying.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "taeniae_coli",
+      "label": "Taeniae Coli",
+      "summary": "Three longitudinal muscle bands that gather the colon into pouches",
+      "function": "The taeniae coli are three bands of longitudinal smooth muscle that run along the colon from the caecum to the rectum. Because they are shorter than the bowel they gather it into pouches, the haustra. They brighten with gut motility.",
+      "color": "#8f4f55",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "motilityRise", "weight": 0.4, "note": "Raised motility is carried out by this muscle.", "source": "GH14" },
+        { "signal": "motilityFall", "weight": -0.3, "note": "Reduced motility quietens it.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.2, "note": "Parasympathetic outflow excites colonic smooth muscle.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "haustra",
+      "label": "Haustra",
+      "summary": "Semilunar folds between the pouches of the colon wall",
+      "function": "Haustra are the sacculations of the colon wall. Each is separated from the next by a semilunar fold, drawn here as a ring. Contractions of the haustra slowly knead the contents, which exposes them to the lining so that water can be absorbed. They brighten with colonic transit and motility.",
+      "color": "#d9b08c",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.3, "note": "Contents in the colon are kneaded by haustral contractions.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.3, "note": "Raised motility increases haustral activity.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "lumen_contents",
+      "label": "Faecal Contents",
+      "summary": "Solid and semi-solid contents moving slowly towards the rectum",
+      "function": "The contents of the colon are the undigested residue, bacteria and the water not yet absorbed. They move slowly, with occasional mass movements. They are drawn as a string of masses that brightens with the amount of material in the colon.",
+      "color": "#9c7a4a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.6, "note": "More material in the colon means more contents to show.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": 0.2, "note": "Faster motility carries contents along sooner.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "mucosa",
+      "label": "Mucosa",
+      "summary": "Lining that absorbs water and salts from the contents",
+      "function": "The colonic mucosa is the lining that absorbs water and electrolytes from the contents and secretes mucus to lubricate their passage. The more slowly the contents travel the more water is taken back. It brightens with colonic transit and dims when motility is raised, because faster transit leaves less time for absorption.",
+      "color": "#e0a0a8",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "colonTransit", "weight": 0.3, "note": "Contents in the colon give the lining something to absorb.", "source": "GH14" },
+        { "signal": "motilityRise", "weight": -0.25, "note": "Faster transit leaves less time for water absorption.", "source": "GH14" },
+        { "signal": "motilityFall", "weight": 0.2, "note": "Slower transit allows more water to be absorbed.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

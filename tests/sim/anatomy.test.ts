@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { Engine } from '../../src/sim/core/engine';
 import { P } from '../../src/sim/core/constants';
 import { anatomySignals, buildAnatomy } from '../../src/sim/derive/anatomy';
+import organsFile from '../../src/data/organs.json';
+import { ANATOMY, atlasOf } from '../../src/data/anatomy';
 import { ANATOMY_SIGNALS, type AnatomySignal } from '../../src/data/anatomy-types';
 
 /**
@@ -31,26 +33,6 @@ function sample(e: Engine): Record<AnatomySignal, number> {
 /** Signals marked (tonic) or (cyclic) in anatomy-types.ts: allowed to be non-zero at rest. */
 const TONIC = new Set<AnatomySignal>(['awake', 'consciousness', 'night', 'bladderFill', 'beat', 'inspiration']);
 
-/**
- * Signals that are NOT marked tonic but read above 0.06 at rest, each with the reason and
- * a looser ceiling that still catches a real regression. They are honest readings of the
- * model, not errors of the definition:
- *  - parasympathetic, baroreflex: resting vagal tone and resting baroreceptor firing sit
- *    away from the 0.5 mid-point the formulas centre on; they are tonic by nature.
- *  - cortisol: the run starts at 08:00, the circadian peak, which is above the hormone's
- *    mean baseline that the "above baseline" reference uses.
- *  - insulin: the settled resting insulin sits a little above the minimal model's basal
- *    constant that the display reference uses.
- *  - hepaticOutput: borderline (about 0.06) from the resting glycogenolysis term.
- */
-const REST_EXEMPT = new Map<AnatomySignal, number>([
-  ['parasympathetic', 0.3],
-  ['baroreflex', 0.4],
-  ['cortisol', 0.3],
-  ['insulin', 0.15],
-  ['hepaticOutput', 0.15],
-]);
-
 describe('anatomy signals at rest', () => {
   it('are finite, in range, and near zero unless tonic', () => {
     const e = new Engine(0x5eed);
@@ -62,7 +44,7 @@ describe('anatomy signals at rest', () => {
       expect(v, name).toBeGreaterThanOrEqual(0);
       expect(v, name).toBeLessThanOrEqual(1);
       if (TONIC.has(name)) continue;
-      expect(v, `${name} at rest`).toBeLessThan(REST_EXEMPT.get(name) ?? 0.06);
+      expect(v, `${name} at rest`).toBeLessThan(0.06);
     }
     expect(sig.awake).toBe(1);
     expect(sig.consciousness).toBeGreaterThan(0.95);
@@ -134,4 +116,42 @@ describe('anatomy signals respond to the body', () => {
     advance(e, 60);
     expect(sample(e).hypovolaemia).toBeGreaterThan(rest.hypovolaemia + 0.1);
   });
+});
+
+describe('every part of a resting body sits at its own resting level', () => {
+  // WHAT WAS WRONG: five signals (baroreflex, parasympathetic, cortisol, insulin,
+  // hepaticOutput) read 0.06 to 0.28 in a resting body and the test above hid it behind a
+  // looser limit, so the medulla, vagal nuclei, adrenal cortex, islets and liver glowed
+  // with nothing happening. They now measure departure from the settled body's own rest
+  // (cortisol from the circadian expectation for the hour), so this must hold all day.
+  it('is within 0.03 of the JSON rest at boot, 2 h, 8 h and 16 h', () => {
+    const e = new Engine(0x5eed);
+    const check = (label: string): void => {
+      const a = buildAnatomy(e.state);
+      let n = 0;
+      const bad: string[] = [];
+      for (const o of organsFile.organs as unknown as { id: string; atlas?: string; sex?: string; pregnancyOnly?: boolean }[]) {
+        const file = ANATOMY[atlasOf(o)];
+        for (const p of file ? file.parts : []) {
+          const v = a.parts[`${o.id}.${p.id}`];
+          if (v === undefined) continue; // other sex, or pregnancy-only
+          // A part driven by `night` follows the pineal's light-dark cycle by design (the
+          // signal is marked cyclic in anatomy-types.ts), so at 16 h (midnight) it is
+          // rightly away from its daytime rest. It is the only such part.
+          if (p.drives.some((d) => d.signal === 'night')) continue;
+          n++;
+          if (Math.abs(v - p.rest) > 0.03) bad.push(`${o.id}.${p.id} ${v.toFixed(3)} vs rest ${p.rest}`);
+        }
+      }
+      expect(bad, `${label}: parts away from rest`).toEqual([]);
+      expect(n, `${label} parts checked`).toBeGreaterThan(50);
+    };
+    check('boot');
+    let done = 0;
+    for (const h of [2, 8, 16]) {
+      advance(e, (h - done) * 3600);
+      done = h;
+      check(`${h} h`);
+    }
+  }, 900_000);
 });

@@ -1,6 +1,104 @@
 {
   "atlas": "thymus",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The thymus as an anatomy textbook draws it in its active form: two lobes, a capsule, a cortex round a medulla, Hassall's corpuscles, septa dividing the lobules, and the vessels. In an adult the thymus is largely involuted, with most of its lymphoid tissue replaced by fat; the simulator does not model that involution, so this is the structure, not the size, of the adult organ. Septa are drawn as spokes, not plates. Activity is a display index driven by the engine's immune, infection and cortisol signals; it is not a measure of T-cell output.",
+  "sources": {
+    "GH14": { "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.", "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8" },
+    "GRAYS42": { "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.", "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0" }
+  },
+  "parts": [
+    {
+      "id": "right_lobe",
+      "label": "Right Lobe",
+      "summary": "Right half of the gland, behind the breastbone",
+      "function": "The thymus lies in the front of the upper chest behind the breastbone, in two lobes. It is where T lymphocytes mature after arriving from the bone marrow. It is largest in childhood and in the adult is largely replaced by fat. It brightens with the immune signal.",
+      "color": "#c98a6b",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "immune", "weight": 0.3, "note": "T-cell maturation in the thymus is part of the immune response.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_lobe",
+      "label": "Left Lobe",
+      "summary": "Left half of the gland",
+      "function": "The left lobe mirrors the right and has the same cortex and medulla. The two are joined by connective tissue in front of the great vessels. It brightens with the immune signal.",
+      "color": "#c98a6b",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "immune", "weight": 0.3, "note": "T-cell maturation in the thymus is part of the immune response.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "capsule",
+      "label": "Capsule",
+      "summary": "Thin connective-tissue covering",
+      "function": "A thin capsule of connective tissue covers the gland and sends septa into it. It is drawn as glass so the cortex and medulla show through.",
+      "color": "#d8c3a0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cortex",
+      "label": "Cortex",
+      "summary": "Outer zone packed with developing T cells",
+      "function": "The dense outer cortex holds immature T lymphocytes in great numbers, where they are tested for usefulness. Glucocorticoids such as cortisol shrink the cortex, and prolonged stress thins the gland. It brightens with the immune signal and dims with high cortisol.",
+      "color": "#b8685a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "immune", "weight": 0.3, "note": "Developing T cells are produced in the cortex during immune demand.", "source": "GH14" },
+        { "signal": "cortisol", "weight": -0.2, "note": "Glucocorticoids cause cortical lymphocytes to be lost and the gland to shrink.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "medulla",
+      "label": "Medulla",
+      "summary": "Inner zone where T cells finish maturing",
+      "function": "The paler inner medulla contains the more mature T cells and the epithelial cells that remove those that would react against the body's own tissue. Mature cells leave from here into the blood. It brightens with the immune signal.",
+      "color": "#e8b49a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "immune", "weight": 0.2, "note": "Mature T cells leave from the medulla to join the immune response.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thymic_corpuscles",
+      "label": "Thymic (Hassall's) Corpuscles",
+      "summary": "Whorled epithelial bodies in the medulla",
+      "function": "Hassall's corpuscles are small whorls of flattened epithelial cells found only in the medulla, and they are a mark of thymic tissue under the microscope. Their exact function is still debated and they are drawn as beads. They brighten slightly with the immune signal.",
+      "color": "#f2e0a8",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "immune", "weight": 0.15, "note": "They sit in the medulla, which is active in the immune response.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "septa",
+      "label": "Septa",
+      "summary": "Fibrous partitions that divide the lobules",
+      "function": "Septa run inwards from the capsule and divide each lobe into many lobules, each with its own cortex and a share of the medulla. They carry the vessels into the gland. They are drawn as short spokes.",
+      "color": "#c8c0a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vessels",
+      "label": "Thymic Vessels",
+      "summary": "Arteries and veins running with the septa",
+      "function": "The thymus is supplied by small branches of the internal thoracic and inferior thyroid arteries, and its veins drain mostly to the left brachiocephalic vein. Blood runs in at the lower outer edge and out at the top. Their glow follows cardiac output.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.3, "note": "Arterial inflow follows the output of the heart.", "source": "GH14" },
+        { "signal": "outputFall", "weight": -0.2, "note": "A falling output means less inflow.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
 }

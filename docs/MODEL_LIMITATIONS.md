@@ -658,14 +658,36 @@ computed number. The important caveats:
   brackets the 0.1 in use, so no new number was invented. Consequence: mid-pregnancy pH
   sits at 7.4700, on the upper edge of the cited 7.40-7.47, and the test compares at the
   cited two-decimal precision.
-- **The sexual response reproduces the cited MEAN-PRESSURE and heart-rate rises, not the
-  split between systolic and diastolic.** The baroreflex set point is reset by the cited
-  fractional rise in MAP; heart rate is fitted to the cited increments. Systolic rises
-  by about 11 mmHg and diastolic by about 22 in a man (cited +21 / +18), so the pulse
-  pressure narrows where the study found it widened slightly. Contractility and
-  resistance gains were tried and did not widen it (the reflex answered with heart rate),
-  and no source gives a magnitude for them, so they are zero. The orgasmic peak systolic
-  pressure is about 139 mmHg against about 162 cited for men (NEMEC1976); larger gains
-  pushed heart rate out of the cited band without lifting systolic pressure.
+- **The sexual response now reproduces the cited systolic and heart-rate rises, not the
+  diastolic.** The earlier calibration moved only the baroreflex set point, heart rate,
+  contractility and resistance, none of which returns blood to the heart, so the faster
+  ventricle ejected a smaller stroke and diastolic rose twice as much as systolic (men
+  +11 / +22 against cited +21 / +18). Sympathetic venoconstriction (`cardio.venousTone`,
+  the target exercise already uses; fitted constants `sexual.venousTone_*`) restores the
+  preload. At the start of orgasm the model is now: men +21 systolic / +24 diastolic /
+  +21 bpm (cited +21.3 / +18.2 / +21.0), women +12.5 / +16 / +19 (cited +12.3 / +10.2 /
+  +18.8). The systolic and heart-rate figures are within 3 of the cited ones and at the
+  plateau the systolic rise exceeds the diastolic in both sexes; the diastolic rise stays
+  about 6 mmHg too high because the set-point shift, derived from the cited mean
+  pressure and left unchanged, already puts the mean about 3-4 mmHg above the cited rise.
+  Heart rate has to be pushed harder than before (`sexual.hr_*` gains were refitted
+  upward) because the venous return makes the baroreflex slow the heart. The male
+  orgasmic peak is about 148/102 mmHg at 115 bpm against about 162/79 cited (NEMEC1976):
+  a larger venous push lifts systolic but lets the reflex drag the heart rate out of the
+  cited 114-117 band, and a more negative orgasmic resistance runs away to rates above
+  200, so the best fit is reported rather than forced. Contractility during arousal is
+  now a small fitted gain (it was zero while the ventricle was preload-limited and could
+  not help).
 - Recovery after stimulation stops reaches within 5 % of baseline in about 6-8 minutes;
   the residual excursion is gone by the cited 10-20 minutes.
+- **A jump to a gestational age no longer shows a false tachycardia.** The volume
+  expansion is paced over a few seconds while the vasodilation, venous capacity, heart-rate
+  trim and renal vascular terms used to apply at once, so for about twenty seconds after a
+  jump to week 24 or 36 the body was relatively hypovolaemic (HR 115-145, hypotension,
+  even renal failure at week 36). Those terms are now scaled by the realised fraction of
+  the target plasma expansion, and after ending a pregnancy they drain with the volume
+  (`endedWeeks`), so a jump presents a coherent body throughout; the settled values do
+  not change. During the first seconds the heart rate is therefore BELOW its settled
+  value and climbs to it (the body is still the non-pregnant one), and a pregnancy that
+  has just ended keeps its raised heart rate for the roughly 20 s that its volume takes
+  to leave.

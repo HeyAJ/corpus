@@ -137,6 +137,13 @@ export interface ReproductiveState {
   gestationWeeks: number;
   /** Simulated seconds of the post-jump catch-up window still to run. */
   catchUp_s: number;
+  /**
+   * Gestational age a pregnancy was ENDED at, while the blood volume it expanded is still
+   * draining away; 0 otherwise. The circulatory adaptations are tied to the realised
+   * volume (see applyPregnancy), so a body that has just stopped being pregnant must keep
+   * them for exactly as long as it still carries the volume that they serve.
+   */
+  endedWeeks: number;
 
   arousal: number;
   phase: SexualPhase;
@@ -190,6 +197,7 @@ export function createReproductiveState(): ReproductiveState {
     pregnant: false,
     gestationWeeks: 0,
     catchUp_s: 0,
+    endedWeeks: 0,
     arousal: 0,
     phase: 'rest',
     orgasm: 0,
@@ -337,8 +345,15 @@ export function stepReproductive(s: SimState, dt: number): void {
     const days = r.lapse_days_per_s * dt;
     if (r.pregnant) {
       r.gestationWeeks = Math.min(R('pregnancy.maxWeeks'), r.gestationWeeks + days / 7);
-      applyPregnancy(s);
+      r.endedWeeks = 0;
+      applyPregnancy(s, r.gestationWeeks);
     } else {
+      // A pregnancy that has just ended leaves its plasma expansion to drain over the
+      // pacing time constant; the circulation's adaptations drain with it (applyPregnancy).
+      if (r.endedWeeks > 0) {
+        if (realisedVolumeFraction(s, r.endedWeeks) < 1e-3) r.endedWeeks = 0;
+        else applyPregnancy(s, r.endedWeeks, true);
+      }
       r.cycleDay += days;
       const len = cycleLength();
       while (r.cycleDay >= 1 + len) r.cycleDay -= len;
@@ -375,21 +390,52 @@ function pulseShift_bpm(cycleDay: number): number {
   return lerpTable(xs, ys, cycleDay);
 }
 
-function applyPregnancy(s: SimState): void {
-  const w = s.reproductive.gestationWeeks;
-  addEffect(s.effects, 'blood.plasmaVolume', R('pregnancy.plasmaVolume.maxGain') * shape('plasmaVolume', w));
-  addEffect(s.effects, 'blood.redCellMass', R('pregnancy.redCellMass.maxGain') * shape('redCellMass', w));
-  addEffect(s.effects, 'cardio.systemicResistance', R('pregnancy.systemicResistance.gain') * shape('systemicResistance', w));
+/**
+ * How much of the volume expansion this gestational age calls for the body has actually
+ * grown, 0..1. Read from the fluids state (reading is allowed; nothing is written).
+ * Returns 1 when the age calls for no expansion, so the early weeks are untouched.
+ */
+function realisedVolumeFraction(s: SimState, weeks: number): number {
+  const target = referenceBloodVolume(s) * (1 - P('blood.haematocrit')) * R('pregnancy.plasmaVolume.maxGain') * shape('plasmaVolume', weeks);
+  if (target < 1) return 1;
+  return Math.max(0, Math.min(1, s.fluids.plasmaExpansion_mL / target));
+}
+
+function applyPregnancy(s: SimState, w: number, ended = false): void {
+  // WHAT WENT WRONG, AND WHY THE CIRCULATORY TERMS ARE SCALED. The volume expansion is
+  // paced (pregnancy.plasmaPacingTau_s) but the vasodilation, venous capacity and heart
+  // rate used to apply at once. After a jump to week 24 or 36 the arterial tree was
+  // already dilated and the veins already roomy while the plasma that fills them was
+  // still being added: for about twenty seconds the body had a relative hypovolaemia no
+  // pregnancy at that age has (observed in the browser: HR 121 with "Sinus tachycardia",
+  // stroke volume 51 mL; at week 36 hypotension and even renal failure fired). A real
+  // pregnancy grows the vessels' capacity and the volume together, so the demand side
+  // is made to follow the realised volume: the adaptations that are only meaningful
+  // WITH the extra volume (resistance, venous capacity, the heart-rate trim and the
+  // renal vascular terms) are multiplied by the fraction of the target expansion that
+  // exists. At rest at any age that fraction is 1 and nothing changes.
+  const rho = realisedVolumeFraction(s, w);
+  // After an ended pregnancy the volume TARGET is zero (the expansion drains away); only
+  // the circulatory terms below are kept, fading with it.
+  if (!ended) {
+    addEffect(s.effects, 'blood.plasmaVolume', R('pregnancy.plasmaVolume.maxGain') * shape('plasmaVolume', w));
+    addEffect(s.effects, 'blood.redCellMass', R('pregnancy.redCellMass.maxGain') * shape('redCellMass', w));
+  }
+  addEffect(s.effects, 'cardio.systemicResistance', R('pregnancy.systemicResistance.gain') * shape('systemicResistance', w) * rho);
   addEffect(
     s.effects,
     'cardio.venousTone',
-    R('pregnancy.venousTone.gain') * shape('systemicResistance', w) + R('pregnancy.venousTone.volumeGain') * shape('plasmaVolume', w),
+    (R('pregnancy.venousTone.gain') * shape('systemicResistance', w) + R('pregnancy.venousTone.volumeGain') * shape('plasmaVolume', w)) * rho,
   );
-  addEffect(s.effects, 'cardio.heartRate', R('pregnancy.heartRate.gain') * shape('heartRate', w));
+  addEffect(s.effects, 'cardio.heartRate', R('pregnancy.heartRate.gain') * shape('heartRate', w) * rho);
+  addEffect(s.effects, 'renal.vascularResistance', R('pregnancy.renalVascularResistance.gain') * shape('systemicResistance', w) * rho);
+  addEffect(s.effects, 'renal.sodiumReabsorption', R('pregnancy.renalSodiumReabsorption.gain') * shape('systemicResistance', w) * rho);
+  // Ventilation, heat and glucose are hormonal and metabolic, not tied to the volume, and
+  // they stop the moment the pregnancy does (an ended pregnancy keeps only the circulatory
+  // terms above).
+  if (ended) return;
   addEffect(s.effects, 'resp.drive', R('pregnancy.resp.drive.gain') * shape('ventilation', w));
   addEffect(s.effects, 'thermal.heatProduction', R('pregnancy.heatProduction.gain') * shape('metabolicRate', w));
-  addEffect(s.effects, 'renal.vascularResistance', R('pregnancy.renalVascularResistance.gain') * shape('systemicResistance', w));
-  addEffect(s.effects, 'renal.sodiumReabsorption', R('pregnancy.renalSodiumReabsorption.gain') * shape('systemicResistance', w));
   const ir = shape('insulinResistance', w);
   if (ir > 0) {
     addEffect(s.effects, 'metabolic.glucoseUptake', R('pregnancy.glucoseUptake.gain') * ir);
@@ -591,6 +637,7 @@ export function applyReproductiveIntent(s: SimState, intent: SimIntent): string 
       if (!intent.pregnant) {
         if (r.pregnant) {
           r.pregnant = false;
+          r.endedWeeks = r.gestationWeeks;
           r.gestationWeeks = 0;
           r.cycleDay = 1;
           r.catchUp_s = CATCH_UP_S;
@@ -794,7 +841,11 @@ export function reproductiveSignals(s: SimState): ReproductiveSignals {
     fsh: 0,
     testosterone: 0,
     prolactin: 0,
-    oxytocin: clamp01(oxytocinLevel(r) / R('sexual.oxytocinPeak_pmol_L')),
+    // DEPARTURE FROM BASAL, NOT LEVEL. This used to be level / peak, which reads
+    // basal / peak = 0.19 in every resting body; the anatomy deriver requires a display
+    // signal to be about zero at rest so that anything above it means something happened.
+    // (level - basal) / (peak - basal) from the measured MURPHY1987 basal and peak.
+    oxytocin: clamp01((oxytocinLevel(r) - R('sexual.oxytocinBasal_pmol_L')) / (R('sexual.oxytocinPeak_pmol_L') - R('sexual.oxytocinBasal_pmol_L'))),
     hcg: 0,
     follicle: 0,
     corpusLuteum: 0,
@@ -806,7 +857,15 @@ export function reproductiveSignals(s: SimState): ReproductiveSignals {
     vasocongestion: r.vasocongestion,
   };
   if (!female) {
-    sig.testosterone = clamp01(maleTestosterone(s) / R('male.testosteroneRefHigh_ng_dL'));
+    // EXCESS OVER THE RESTING LEVEL. The old level / reference-high read 0.58 in a resting
+    // man (the 531 ng/dL start is mid-range), which the anatomy deriver treated as an
+    // event. This body's own resting level is its circadian curve, which peaks at 08:00 at
+    // R('male.testosteroneAt0800_ng_dL') and only falls after, so the signal is the amount
+    // above that peak as a fraction of the room left under the reference-range ceiling.
+    // It is exactly 0 at rest at every hour of the day; nothing in the model raises
+    // testosterone yet, and when something does (an exogenous dose) it will show here.
+    const t0800 = R('male.testosteroneAt0800_ng_dL');
+    sig.testosterone = clamp01((maleTestosterone(s) - t0800) / (R('male.testosteroneRefHigh_ng_dL') - t0800));
   } else if (r.pregnant) {
     const w = r.gestationWeeks;
     sig.pregnancy = clamp01(w / 40);
@@ -816,6 +875,11 @@ export function reproductiveSignals(s: SimState): ReproductiveSignals {
     sig.prolactin = clamp01(pregnancyLevel('prolactin', w, 'p50') / pregnancyDisplayMax('prolactin'));
     sig.testosterone = clamp01(pregnancyLevel('testosterone', w, 'p50') / pregnancyDisplayMax('testosterone'));
   } else {
+    // CYCLE AND PREGNANCY SIGNALS ARE EVENTS, NOT REST. A non-pregnant woman is always
+    // somewhere in her cycle, and at day 1 (the start state) she is menstruating: FSH
+    // about 0.43, endometrium about 0.52, estradiol about 0.1 of their ranges are the
+    // cycle's own state, not a resting level that should read zero. They were audited for
+    // the anatomy-at-rest requirement and deliberately left as levels.
     const t = REPRO.tables.strickerDaily;
     const d = dayFromLh(r.cycleDay);
     sig.lh = clamp01(circular(t.lh_IU_L, d) / R('cycle.lhRefHigh_IU_L'));

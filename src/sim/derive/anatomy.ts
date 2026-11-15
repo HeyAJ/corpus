@@ -126,7 +126,7 @@ function hormoneAbove(s: SimState, id: string): number {
  * that is deliberately NOT chased here; such a body reads its difference from the default
  * adult as activity. Never written back to the simulation.
  */
-interface RestRef { baroAfferent: number; vagal: number; insulin: number; hepatic: number }
+interface RestRef { baroDrive: number; vagal: number; insulin: number; hepatic: number }
 let restRef: RestRef | null = null;
 
 function rawInsulin(s: SimState): number {
@@ -139,7 +139,7 @@ function rawHepatic(s: SimState): number {
 /** Record the resting body. Called once, on the settled warm-up state. */
 export function captureAnatomyRest(s: SimState): void {
   restRef = {
-    baroAfferent: s.reflex.afferent,
+    baroDrive: s.reflex.symp,
     vagal: clamp01((s.reflex.vagal - 0.5) * 2),
     insulin: rawInsulin(s),
     hepatic: rawHepatic(s),
@@ -274,12 +274,18 @@ function signal(name: AnatomySignal, s: SimState, rep: ReturnType<typeof reprodu
         above(clamp01((s.reflex.vagal - 0.5) * 2), restRef ? restRef.vagal : 0), 0.6 * C.sleep, 0.5 * C.digestion,
       ));
     case 'baroreflex': {
-      // Departure of baroreceptor firing from this body's own resting firing, in either
-      // direction (the paired rise/fall convention, folded into one magnitude): a rise
-      // is scaled to the distance to full firing, a fall to the distance to silence, so
-      // 1 is still "pinned at either end".
-      const a = s.reflex.afferent;
-      const a0 = restRef ? restRef.baroAfferent : 0.5;
+      // Departure of the reflex's command from this body's own resting command, in either
+      // direction (the paired rise/fall convention folded into one magnitude): a rise is
+      // scaled to the distance to full drive, a fall to the distance to none, so 1 is still
+      // "pinned at either end". WHAT WAS WRONG, second layer: the first attempt referenced
+      // the raw afferent firing, but that is PHASIC. It follows the arterial pressure wave
+      // beat by beat (0.29 to 0.66 in a resting body), so no single resting value exists
+      // and the part flickered between 0 and 0.45. The efferent sympathetic limb
+      // (1 - afferent after the transport delay and the first-order lag) is the same
+      // baroreceptor information with the beat-to-beat swing filtered out, which is also
+      // what the heart and vessels actually receive, so it is the right thing to display.
+      const a = s.reflex.symp;
+      const a0 = restRef ? restRef.baroDrive : 0.5;
       return clamp01(Math.max(a0 < 1 ? (a - a0) / (1 - a0) : 0, a0 > 0 ? (a0 - a) / a0 : 0));
     }
     /* --- heart and circulation --- */

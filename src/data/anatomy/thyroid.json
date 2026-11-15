@@ -1,6 +1,113 @@
 {
   "atlas": "thyroid",
-  "about": "",
-  "sources": {},
-  "parts": []
+  "about": "The thyroid gland as an anatomy textbook draws it: two lobes joined by an isthmus, colloid-filled follicles, the calcitonin-making C cells, the capsule, the arterial supply and venous drainage, and the four parathyroid glands on the back. Follicles and C cells are drawn as representative beads, not counted. Activity is a display index driven by the engine's thyroid-hormone signal; it is not a hormone secretion rate. Calcium handling, parathyroid hormone and calcitonin are not simulated, so the C cells and parathyroids have no live drive.",
+  "sources": {
+    "GH14": { "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.", "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8" },
+    "GRAYS42": { "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.", "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0" }
+  },
+  "parts": [
+    {
+      "id": "right_lobe",
+      "label": "Right Lobe",
+      "summary": "Larger lobe, beside the trachea and larynx",
+      "function": "Each lobe lies against the side of the trachea and the lower larynx, and holds the follicles that make thyroid hormone. The right lobe is usually the larger. Thyroid hormone sets the metabolic rate of nearly every tissue. It brightens when the simulated thyroid signal rises.",
+      "color": "#b8553c",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "thyroid", "weight": 0.35, "note": "The lobe is the source of thyroid hormone.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_lobe",
+      "label": "Left Lobe",
+      "summary": "Left lobe, mirror of the right",
+      "function": "The left lobe has the same structure as the right and makes the same hormones. Together the lobes form the gland that sits in front of the trachea below the larynx. It brightens when the simulated thyroid signal rises.",
+      "color": "#b8553c",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "thyroid", "weight": 0.35, "note": "The lobe is the source of thyroid hormone.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "isthmus",
+      "label": "Isthmus",
+      "summary": "Bridge of tissue across the front of the trachea",
+      "function": "A narrow band of thyroid tissue joins the two lobes in front of the trachea, a little below the cricoid cartilage. It is made of the same follicular tissue as the lobes.",
+      "color": "#c4694a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "thyroid", "weight": 0.35, "note": "It is follicular tissue making thyroid hormone.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "follicles",
+      "label": "Follicles and Colloid",
+      "summary": "Colloid-filled spheres that store thyroid hormone",
+      "function": "Each follicle is a ring of epithelial cells around a store of colloid, which holds thyroglobulin carrying thyroid hormone ready for release. Pituitary TSH makes the cells take up iodide and release hormone into the blood. Here they are drawn as representative beads; they brighten with the simulated thyroid signal.",
+      "color": "#e8c56a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "thyroid", "weight": 0.4, "note": "Follicular cells make and release thyroid hormone.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "c_cells",
+      "label": "Parafollicular C Cells",
+      "summary": "Sparse cells between follicles; make calcitonin",
+      "function": "Scattered between the follicles are the parafollicular cells, which secrete calcitonin, a hormone that tends to lower plasma calcium. They are a separate cell line from the follicular cells. The simulator has no calcium signal, so they do not change.",
+      "color": "#6fa8c9",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "capsule",
+      "label": "Capsule",
+      "summary": "Thin fibrous covering of the gland",
+      "function": "A thin fibrous capsule covers the gland and sends septa inwards that divide it into lobules. The gland is held close to the trachea by the pretracheal fascia around it. It is drawn as glass so the contents show through.",
+      "color": "#d8c3a0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thyroid_arteries",
+      "label": "Superior and Inferior Thyroid Arteries",
+      "summary": "Arterial supply from above and from below",
+      "function": "The superior thyroid artery comes from the external carotid and reaches the upper pole of each lobe. The inferior thyroid artery comes from the thyrocervical trunk and reaches the lower back of the lobe. The gland is among the most richly supplied organs for its size. Their glow follows cardiac output.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "outputRise", "weight": 0.3, "note": "Arterial inflow follows the output of the heart.", "source": "GH14" },
+        { "signal": "outputFall", "weight": -0.2, "note": "A falling output means less inflow.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thyroid_veins",
+      "label": "Thyroid Veins",
+      "summary": "Superior, middle and inferior veins carry hormone out",
+      "function": "The superior and middle thyroid veins drain to the internal jugular vein and the inferior thyroid veins to the brachiocephalic veins. Thyroid hormone leaves the gland in this venous blood. In the interior view an amber stream of hormone runs along them faster when the thyroid signal is high.",
+      "color": "#6a4a7a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "thyroid", "weight": 0.3, "note": "Hormone leaves the gland in these veins.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parathyroids",
+      "label": "Parathyroid Glands",
+      "summary": "Four small glands on the back of the lobes",
+      "function": "Four small glands, two on each side, lie on the back of the thyroid lobes, and they are separate organs from the thyroid. They make parathyroid hormone, which raises plasma calcium. The simulator does not model calcium, so they do not change.",
+      "color": "#9a7fb5",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    }
+  ]
 }

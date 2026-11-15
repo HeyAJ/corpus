@@ -319,6 +319,28 @@ describe('maternal adaptations (SOMAPILLAY2016, ROBSON1989, HYTTEN1985, CATALANO
     expect(b.conds).toBe(0);
   });
 
+  it('a jump to week 24 presents a coherent body throughout: no condition, no false tachycardia', () => {
+    // WHAT WENT WRONG: the vasodilation and venous capacity of week 24 applied at once while
+    // the plasma that fills them was still being added, so five seconds after the jump the
+    // display read HR 121 with "Sinus tachycardia". The circulatory terms are now scaled by
+    // the realised fraction of the volume expansion (applyPregnancy in reproductive.ts).
+    const ref = pregnant(24);
+    const settled = avg(ref, 30).hr;
+    const e = woman();
+    run(e, 30);
+    e.applyIntent({ type: 'SET_PREGNANCY', pregnant: true, weeks: 24 } as never);
+    let maxHr = 0;
+    const seen = new Set<string>();
+    for (let t = 0; t < 120; t++) {
+      run(e, 1);
+      const s = e.snapshot();
+      maxHr = Math.max(maxHr, s.cardio.heartRateDisplay_bpm);
+      for (const c of s.conditions) seen.add(JSON.stringify(c));
+    }
+    expect([...seen]).toEqual([]);
+    expect(maxHr - settled).toBeLessThanOrEqual(6);
+  });
+
   it('ending a pregnancy, and a change of sex, return the body to baseline', () => {
     const ctl = woman();
     run(ctl, 200);
@@ -386,6 +408,57 @@ describe('sexual response (NEMEC1976, XUERUI2008, MURPHY1987, AVERSA2000, WHIPPL
     // Prolactin raised (EXTON1999, KRUGER1998), exposed only as a state.
     expect(e.snapshot().reproductive.sexual.prolactinRaised).toBe(1);
     expect(reproductiveSignals(e.state).prolactin).toBe(1);
+  });
+
+  it('raises systolic pressure more than diastolic at the plateau and lands the start-of-orgasm deltas on XUERUI2008 (venous return, not only heart rate)', () => {
+    // Cited rises, start of orgasm over baseline (XUERUI2008): men +21.3 / +18.2 mmHg
+    // systolic / diastolic, +21.0 bpm; women +12.3 / +10.2, +18.8 bpm. The model reaches the
+    // systolic and heart-rate figures; its diastolic rise stays about 6 mmHg too high because
+    // the set-point shift (derived from the cited mean pressure) is left alone, so the
+    // diastolic is asserted only as a bound, not as a match (MODEL_LIMITATIONS section 16).
+    const cited = {
+      male: { sbp: 21.3, hr: 21.0 },
+      female: { sbp: 12.3, hr: 18.8 },
+    };
+    for (const sex of ['male', 'female'] as const) {
+      const e = sex === 'male' ? new Engine(0x5eed) : woman();
+      run(e, 60);
+      const base = avg(e, 10);
+      const rd = (): { sbp: number; dbp: number; hr: number } => {
+        const c = e.snapshot().cardio;
+        return { sbp: c.systolic_mmHg, dbp: c.diastolic_mmHg, hr: c.heartRateDisplay_bpm };
+      };
+      // Baseline systolic and diastolic need their own mean (avg() does not carry them).
+      let bs = 0;
+      let bd = 0;
+      for (let i = 0; i < 40; i++) {
+        run(e, 0.25);
+        bs += rd().sbp / 40;
+        bd += rd().dbp / 40;
+      }
+      e.applyIntent({ type: 'SET_SEXUAL_STIMULATION', level: 1 } as never);
+      let plateau: { sbp: number; dbp: number; hr: number } | null = null;
+      let last = rd();
+      let reached = false;
+      for (let t = 0; t < 400; t += 0.25) {
+        run(e, 0.25);
+        const ph = e.snapshot().reproductive.sexual.phase;
+        if (ph === 'plateau' && !plateau) plateau = rd();
+        if (ph === 'orgasm') {
+          reached = true;
+          break;
+        }
+        last = rd();
+      }
+      expect(reached, sex + ' reached orgasm').toBe(true);
+      expect(plateau, sex + ' plateau').not.toBeNull();
+      // The pulse pressure widens at the plateau: systolic rises by more than diastolic.
+      expect(plateau!.sbp - bs, sex + ' plateau dSBP exceeds dDBP').toBeGreaterThan(plateau!.dbp - bd);
+      // Start-of-orgasm deltas, within 3 mmHg or 3 /min of the cited ones.
+      expect(Math.abs(last.sbp - bs - cited[sex].sbp), sex + ' dSBP').toBeLessThanOrEqual(3);
+      expect(Math.abs(last.hr - base.hr - cited[sex].hr), sex + ' dHR').toBeLessThanOrEqual(3);
+      expect(last.dbp - bd, sex + ' dDBP bound').toBeLessThan(28);
+    }
   });
 
   it('has no refractory period in a woman, and the response resolves to baseline once stimulation stops', () => {
