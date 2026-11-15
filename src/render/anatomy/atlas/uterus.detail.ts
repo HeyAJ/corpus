@@ -55,7 +55,7 @@ const GLASS: readonly [string, number][] = [
   ['tube_ampulla', 0.4],
   ['infundibulum_fimbriae', 0.4],
   ['uterine_arteries', 0.45],
-  ['amniotic_sac', 0.25],
+  ['amniotic_sac', 0.12],
 ];
 
 const THIN = new THREE.Color(0xe3b4b0);

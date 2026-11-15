@@ -6,6 +6,8 @@ import { createOrganRimMaterial, assertRimOrderIndependent } from '../materials/
 import { createOrganSolidMaterial, createFluidMaterial } from '../materials/OrganSolid';
 import { GeometryFactory } from '../anatomy/GeometryFactory';
 import { GI_CENTRELINES, ORGAN_DEFS, groupOffset as layoutGroupOffset, organPosition } from '../anatomy/layout';
+import { fetalFit, gravidBody, type FetalFit } from '../anatomy/models';
+import { amnioticSacRadii } from '../anatomy/atlas/uterus.parts';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
 
 /**
@@ -199,6 +201,15 @@ export interface OrganHandle {
   hasInterior: boolean;
   /** Which gestational week the current geometry was built for (the uterus only). */
   builtForWeek: number;
+  /**
+   * The fetus only: its size and place for the current week (see `fetalFit`), the week
+   * that was computed for, and the bounding sphere of the UNSCALED term-size shell, from
+   * which the centroid and radius that the camera and labels read are derived.
+   */
+  fit: FetalFit | null;
+  fitWeek: number;
+  rawCentre: THREE.Vector3;
+  rawRadius: number;
 }
 
 export class OrganSet {
@@ -213,6 +224,7 @@ export class OrganSet {
 
   private body: BodyKind = { sex: 'male', pregnant: false, gestationWeeks: 0 };
   private readonly scratchColor = new THREE.Color();
+  private readonly scratchFit = new THREE.Vector3();
   private readonly restTint = new THREE.Color();
   /** 0..1, eased: 1 while some organ is selected. See RECEDE_DENSITY. */
   private focus = 0;
@@ -344,6 +356,10 @@ export class OrganSet {
       activityTarget: 0,
       hasInterior,
       builtForWeek: -1,
+      fit: null,
+      fitWeek: -1,
+      rawCentre: new THREE.Vector3(),
+      rawRadius: 0.05,
     };
   }
 
@@ -437,6 +453,9 @@ export class OrganSet {
     const sphere = geometry.boundingSphere ?? new THREE.Sphere(new THREE.Vector3(), 0.05);
     h.centroid.copy(h.basePosition).add(sphere.center);
     h.boundingRadius = sphere.radius;
+    h.rawCentre.copy(sphere.center);
+    h.rawRadius = sphere.radius;
+    h.fitWeek = -1; // a new shell: the fetal fit is recomputed against its vertices
     h.built = true;
     h.builtForWeek = week;
     if (firstTime) h.appear = 0;
@@ -528,8 +547,12 @@ export class OrganSet {
       const rimGain = h.fromRim + (target.rimGain - h.fromRim) * e;
       h.ownDensity = density;
       h.ownRim = rimGain;
-      abs.uniforms.uDensity.value = density * fade * (selected ? 1 : recedeDensity);
-      rim.uniforms.uRimGain.value = rimGain * fade * (selected ? 1 : recedeRim);
+      // The fetus is the CONTENT of the uterus: while the uterus is open it is the thing the
+      // glass is there to show, so it keeps its full density instead of receding with the
+      // other neighbours. While the fetus itself is open the uterus recedes as usual.
+      const exempt = h.id === 'fetus' && this.organs.get('uterus')?.state === 'selected';
+      abs.uniforms.uDensity.value = density * fade * (selected || exempt ? 1 : recedeDensity);
+      rim.uniforms.uRimGain.value = rimGain * fade * (selected || exempt ? 1 : recedeRim);
 
       this.restTint.copy(h.ownColor).lerp(PINK, REST_TINT_MIX + (ACTIVE_TINT_MIX - REST_TINT_MIX) * h.activity);
       (abs.uniforms.uTint.value as THREE.Color).lerpColors(h.fromTint, selected ? WHITE : this.restTint, e);
@@ -569,14 +592,43 @@ export class OrganSet {
     h.poseRotationX = rotationX;
   }
 
+  /**
+   * THE FETUS'S SIZE AND PLACE. The shell is built once at term size about the external os
+   * and is scaled and moved as a whole to the current week's amniotic sac (`fetalFit`,
+   * models.ts, which has the rule and its source). Because OrganDetail copies this mesh's
+   * live position, rotation and scale onto the interior group, the 14 parts and 11 streams
+   * authored in the term frame follow without being re-authored. Before this the figure
+   * was drawn term-sized at every week and hung out of the bottom of the uterus.
+   */
+  private fetalTransform(h: OrganHandle): void {
+    const week = this.body.pregnant ? Math.max(0, Math.round(this.body.gestationWeeks)) : 0;
+    if (h.fitWeek === week && h.fit) return;
+    const position = h.geometry.getAttribute('position');
+    if (!position || position.count === 0) return;
+    h.fitWeek = week;
+    h.fit = fetalFit(week, position.array, gravidBody(week).centre, amnioticSacRadii(week));
+    // The camera and the labels read these: the scaled, moved shell's bounding sphere.
+    const s = h.fit.scale;
+    h.centroid.set(
+      h.basePosition.x + h.fit.offset[0] + s * h.rawCentre.x,
+      h.basePosition.y + h.fit.offset[1] + s * h.rawCentre.y,
+      h.basePosition.z + h.fit.offset[2] + s * h.rawCentre.z,
+    );
+    h.boundingRadius = s * h.rawRadius;
+  }
+
   private applyTransform(h: OrganHandle): void {
+    if (h.id === 'fetus') this.fetalTransform(h);
+    const fit = h.id === 'fetus' ? h.fit : null;
+    const fs = fit ? fit.scale : 1;
     const rx = (h.def.rotation?.[0] ?? 0) + h.poseRotationX;
     const ry = h.def.rotation?.[1] ?? 0;
     const rz = h.def.rotation?.[2] ?? 0;
     for (const mesh of [h.absorption, h.rim, h.solid]) {
       mesh.position.copy(h.basePosition).add(h.offset);
+      if (fit) mesh.position.add(this.scratchFit.set(fit.offset[0], fit.offset[1], fit.offset[2]));
       mesh.rotation.set(rx, ry, rz);
-      mesh.scale.copy(h.poseScale).multiplyScalar(h.pulse);
+      mesh.scale.copy(h.poseScale).multiplyScalar(h.pulse * fs);
     }
     if (h.fluid) {
       h.fluid.position.copy(h.basePosition).add(h.offset);

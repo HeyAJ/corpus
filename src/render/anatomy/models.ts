@@ -788,9 +788,13 @@ function uterus(params: ModelParams): THREE.BufferGeometry {
   const { centre, radii } = gravidBody(weeks);
   const wall = smoothUnion(0.014, cervix, ellipsoid(centre, radii));
   const cell = Math.max(0.0024, radii[1] / 26);
+  // The lower z bound was `centre[2] - radii[2] - 0.004`, which for a body that has come
+  // forward (centre z = 0.02 + 0.2h) is above the cervix's back wall (z = -0.0125 at the
+  // external os) and sliced the cervix off flat. The atlas builder's `boxOf` already
+  // takes the lower of -0.014 and that bound; this box now does the same.
   const body = polygonise(
     wall,
-    [-radii[0] - 0.004, -0.014, centre[2] - radii[2] - 0.004],
+    [-radii[0] - 0.004, -0.014, Math.min(-0.014, centre[2] - radii[2] - 0.004)],
     [radii[0] + 0.004, centre[1] + radii[1] + 0.004, centre[2] + radii[2] + 0.004],
     { cell },
   );
@@ -899,11 +903,85 @@ export function fetalScale(weeks: number): number {
   return Math.cbrt(fetalWeight_g(weeks) / TERM_WEIGHT_G);
 }
 
+export interface FetalFit {
+  /** The scale the cited weight asks for: `fetalScale(weeks)`. */
+  wanted: number;
+  /** The largest uniform scale at which every vertex, cord included, is inside the sac. */
+  fitMax: number;
+  /** The scale actually used: min(wanted, clearance * fitMax). */
+  scale: number;
+  /** True when the cavity, not the weight, set the scale. */
+  clamped: boolean;
+  /** Where the term-frame origin goes, in the uterus frame (the fetus shares its origin). */
+  offset: V3;
+}
+
+/** Fraction of the exact vertex fit that is used, so the polygonised sac's cell error cannot let a vertex through. */
+const FETAL_CLEARANCE = 0.97;
+
+/**
+ * SIZE AND PLACE OF THE FETUS FOR A GESTATIONAL AGE.
+ *
+ * WHAT WAS WRONG. `fetus()` builds the one term-sized, head-down figure and nothing ever
+ * scaled or moved it: `fetalScale` was referenced by no caller, and OrganSet rebuilt only
+ * the uterus per week. So at 24 weeks a term-sized fetus, authored about the external os,
+ * hung out of the bottom of a uterus a third its size, through the pelvis, head below the
+ * body. The shell is not rebuilt per week any more; the WHOLE organ (shell, and by
+ * following the shell's transform every interior part and flow stream authored in the
+ * term frame) is given one uniform scale and one offset.
+ *
+ * THE SIZE RULE. The repository cites a fetal WEIGHT by week (Hadlock 1991, via
+ * `fetalWeight_g`) and no fetal length by week. The linear scale is therefore
+ * `fetalScale(weeks)` = (weight(w) / weight(40 wk))^(1/3): isometric scaling, a drawing
+ * rule derived from the cited weight, NOT a measured length. Before 10 weeks Hadlock's
+ * regression does not apply, so the embryo is drawn at the 10-week size, not extrapolated.
+ *
+ * THE FIT. The scale the weight asks for is larger than the sac the uterus model draws at
+ * EVERY week (the model's gravid body is about 16 cm deep at term, a flexed term fetus is
+ * about 15 cm deep in the figure's own frame, and the sac is smaller than the body by the
+ * wall and the lining). It is not shrunk silently: `wanted` and `fitMax` are both
+ * returned so callers and the report can say by how much, and the result is clamped to
+ * the largest uniform scale at which every vertex, the cord included, lies inside the
+ * sac ellipsoid (the same radii the uterus atlas draws, passed in as `sac`), centred on
+ * the middle of the figure's bounding box. That is closed form: for the ellipsoid
+ * sum((s(v-c)/R)^2) <= 1, s = 1 / max_v |(v - c)/R|.
+ */
+export function fetalFit(weeks: number, positions: ArrayLike<number>, sacCentre: V3, sac: V3): FetalFit {
+  const wanted = fetalScale(weeks);
+  const lo: V3 = [Infinity, Infinity, Infinity];
+  const hi: V3 = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i + 2 < positions.length; i += 3) {
+    for (let k = 0; k < 3; k++) {
+      const v = positions[i + k];
+      if (v < lo[k]) lo[k] = v;
+      if (v > hi[k]) hi[k] = v;
+    }
+  }
+  const c: V3 = [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2];
+  let worst = 0;
+  for (let i = 0; i + 2 < positions.length; i += 3) {
+    const dx = (positions[i] - c[0]) / sac[0];
+    const dy = (positions[i + 1] - c[1]) / sac[1];
+    const dz = (positions[i + 2] - c[2]) / sac[2];
+    worst = Math.max(worst, dx * dx + dy * dy + dz * dz);
+  }
+  const fitMax = worst > 0 ? 1 / Math.sqrt(worst) : wanted;
+  const scale = Math.min(wanted, FETAL_CLEARANCE * fitMax);
+  return {
+    wanted,
+    fitMax,
+    scale,
+    clamped: scale < wanted,
+    offset: [sacCentre[0] - scale * c[0], sacCentre[1] - scale * c[1], sacCentre[2] - scale * c[2]],
+  };
+}
+
 /**
  * A fetus at term size, head down (the usual presentation at term), curled into the
  * flexed attitude a uterus holds it in, with the first of its cord.
- * Scaled with gestational age by `fetalScale`; it is a figure, not a growth model, so
- * the proportions of a 12-week fetus are those of a small term baby.
+ * The shell is always built at term size; its size and place for a given week are
+ * applied to the whole organ by `fetalFit` (see there). It is a figure, not a growth
+ * model, so the proportions of a 12-week fetus are those of a small term baby.
  */
 function fetus(): THREE.BufferGeometry {
   const limb = (s: number): Sdf =>

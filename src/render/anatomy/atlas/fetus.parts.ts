@@ -15,16 +15,14 @@ import { capsule, ellipsoid, mergeParts, polygonise, smoothUnion, tubeAlong, typ
  * structure). Everything here is drawn as anatomy; the engine models no fetal circulation.
  *
  * WHAT THE SHELL IS, AND WHY NOTHING HERE DEPENDS ON THE WEEK. `models.ts` `fetus()` takes
- * no parameters: it always builds the term-sized, head-down figure, and `fetalScale` is not
- * applied by the shell, by `OrganSet` or by the viewer at the time of writing (grep finds
- * it only inside models.ts). So the shell does NOT shrink with the week, and these parts
- * are authored in that same unscaled frame, which is also the only way the particle
- * streams can line up with them: `OrganDetailSpec.flows` is called with the organ id alone,
- * so a flow path cannot know the week and cannot be scaled to it. `gestationWeeks` is
- * therefore accepted and deliberately ignored. If the shell is later scaled by
- * `fetalScale`, the contract must grow a week argument to `flows` and both modules should
- * then scale about the frame origin; until then, fitting the parts to a smaller shell would
- * pull them away from their own streams, which is the worse error.
+ * no parameters and always builds the term-sized, head-down figure. The week enters in
+ * ONE place: OrganSet scales and moves the WHOLE organ uniformly (`fetalFit`, models.ts)
+ * to sit inside the week's amniotic sac, and OrganDetail copies that live transform onto
+ * the interior group. So these parts and their particle streams, authored in the term
+ * frame, shrink and travel with the shell and stay lined up with each other without being
+ * re-authored; `gestationWeeks` is accepted and deliberately ignored. (This note used to
+ * say the shell was never scaled, which was why a term-sized fetus hung out of a
+ * 24-week uterus.)
  *
  * FRAME AND THE FLIP. The shell is head DOWN: the head is at y = -0.13 and the pelvis at
  * y = +0.10, so the fetal "up" is the frame's -y, and, because the front stays +z, the

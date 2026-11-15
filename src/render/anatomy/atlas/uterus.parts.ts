@@ -96,14 +96,35 @@ export function uterusGeo(weeks: number): UterusGeo {
       centre: NONPREG_CENTRE,
       radii: NONPREG_RADII,
       wall,
-      cell: 0.002,
+      cell: 0.0026,
       cavR: [NONPREG_RADII[0] - wall, NONPREG_RADII[1] - wall, NONPREG_RADII[2] - wall],
     };
   }
   const { centre, radii } = gravidBody(weeks);
-  const cell = Math.max(0.0024, radii[1] / 18);
+  // The grid was radii[1]/18 (non-pregnant 2 mm, cervix and isthmus 1.3 mm), which put the
+  // interior at 38k triangles at week 0 and 66k from week 24 (the isthmus alone 12k, being a
+  // thin zone cut across the whole width of the cavity). Coarsened to /12, 2.6 mm and 1.7 mm
+  // so every week is under 30k; the layers' thicknesses are tied to the cell, so the wall
+  // and lining read a little thicker, no more.
+  const cell = Math.max(0.0024, radii[1] / 12);
   const wall = Math.max(1.6 * cell, 0.0085 * (1 - (0.5 * (Math.min(weeks, 40) - 6)) / 34));
   return { weeks, gravid, centre, radii, wall, cell, cavR: [radii[0] - wall, radii[1] - wall, radii[2] - wall] };
+}
+
+/** Thickness of the drawn lining, metres: the same for the lining layer and the sac that sits inside it. */
+function liningThickness(g: UterusGeo): number {
+  return Math.max(0.0035, 1.3 * g.cell);
+}
+
+/**
+ * Semi-axes of the amniotic sac this atlas draws (centred on `uterusGeo(weeks).centre`):
+ * the cavity ellipsoid pulled in by the lining and a millimetre. The fetus is fitted
+ * inside exactly this ellipsoid (`fetalFit` in models.ts), so it is written once.
+ */
+export function amnioticSacRadii(weeks: number): V3 {
+  const g = uterusGeo(weeks);
+  const d = liningThickness(g) + 0.001;
+  return [g.cavR[0] - d, g.cavR[1] - d, g.cavR[2] - d];
 }
 
 /** The shell's own field (negative inside), the same expression models.ts polygonises. */
@@ -292,7 +313,7 @@ export const parts: PartBuilder = (params) => {
   const canalRadius = g.gravid ? 0.0013 : 0.0021;
   const canal = chain(CANAL, canalRadius);
   const hasPlacenta = g.gravid && weeks >= 8;
-  const lining = Math.max(0.0035, 1.3 * g.cell);
+  const lining = liningThickness(g);
 
   // PERIMETRIUM: a closed membrane just inside the shell, glass in the detail module.
   out.push({ id: 'perimetrium', geometry: polygonise(inward(f, 0.0008), box.min, box.max, { cell: g.cell }) });
@@ -355,7 +376,7 @@ export const parts: PartBuilder = (params) => {
   const iz = zoneBox(OS_Y - 0.008, isthmusTop + 0.002);
   out.push({
     id: 'isthmus',
-    geometry: polygonise(intersect(intersect(layer, halfSpace([0, OS_Y - 0.007, 0], [0, 1, 0])), subtract(layer, halfSpace([0, isthmusTop, 0], [0, 1, 0]))), iz.min, iz.max, { cell: 0.0013 }),
+    geometry: polygonise(intersect(intersect(layer, halfSpace([0, OS_Y - 0.007, 0], [0, 1, 0])), subtract(layer, halfSpace([0, isthmusTop, 0], [0, 1, 0]))), iz.min, iz.max, { cell: g.gravid ? Math.min(g.cell, layerT * 0.8) : 0.0017 }),
   });
 
   // CERVIX: the fibrous neck below the internal os, bored by the canal. Glass.
@@ -366,7 +387,7 @@ export const parts: PartBuilder = (params) => {
       intersect(subtract(inward(cervixCap, 0.0016), canal), halfSpace([0, OS_Y - 0.0015, 0], [0, -1, 0])),
       [-0.014, -0.014, -0.012],
       [0.014, OS_Y, 0.02],
-      { cell: 0.0013 },
+      { cell: 0.0017 },
     ),
   });
   out.push({ id: 'cervical_canal', geometry: tubeAlong(CANAL, () => canalRadius, { tubular: 24, radial: 10 }) });
@@ -408,7 +429,7 @@ export const parts: PartBuilder = (params) => {
         { cell: Math.max(0.0015, pj.thick / 5) },
       ),
     });
-    const sac = subtract(ellipsoid(g.centre, [g.cavR[0] - lining - 0.001, g.cavR[1] - lining - 0.001, g.cavR[2] - lining - 0.001]), placentaLens(g, 0.001));
+    const sac = subtract(ellipsoid(g.centre, amnioticSacRadii(weeks)), placentaLens(g, 0.001));
     out.push({
       id: 'amniotic_sac',
       geometry: polygonise(sac, [cx - g.cavR[0], cy - g.cavR[1], cz - g.cavR[2]], [cx + g.cavR[0], cy + g.cavR[1], cz + g.cavR[2]], { cell: g.cell }),
