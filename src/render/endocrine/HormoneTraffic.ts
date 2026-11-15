@@ -149,7 +149,7 @@ const DEFS: HormoneDef[] = [
   { id: 'adh', short: 'ADH', colour: 0x00bcd4, glandLabel: 'pituitary', src: () => ['pituitary'], tgt: () => ['kidneyR', 'kidneyL'] },
   { id: 'aldosterone', short: 'Aldosterone', colour: 0x7b4a12, glandLabel: 'adrenal cortex', src: () => ['adrenalR', 'adrenalL'], tgt: () => ['kidneyR', 'kidneyL'] },
   // Thyroid hormone: heart, liver, brain and muscle stand for "widely".
-  { id: 'thyroxine', short: 'Thyroid hormone', colour: 0x4527a0, glandLabel: 'thyroid', src: () => ['thyroid'], tgt: () => ['heart', 'liver', 'brain', ...MUSCLE] },
+  { id: 'thyroxine', short: 'Thyroxine', colour: 0x4527a0, glandLabel: 'thyroid', src: () => ['thyroid'], tgt: () => ['heart', 'liver', 'brain', ...MUSCLE] },
   { id: 'oxytocin', short: 'Oxytocin', colour: 0xff6fb5, glandLabel: 'pituitary', src: () => ['pituitary'], tgt: (f) => (f ? ['uterus', 'breastR', 'breastL'] : ['prostate']) },
   { id: 'prolactin', short: 'Prolactin', colour: 0x9c27b0, glandLabel: 'pituitary', src: () => ['pituitary'], tgt: () => ['breastR', 'breastL'] },
   { id: 'lh', short: 'LH', colour: 0x8bc400, glandLabel: 'pituitary', src: () => ['pituitary'], tgt: () => ['ovaryR', 'ovaryL'] },

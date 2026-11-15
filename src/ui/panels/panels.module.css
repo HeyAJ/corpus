@@ -31,8 +31,11 @@
   max-width: 240px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--ink-dim);
-  padding: 2px 2px 0;
+  /* Same backing as the metric chips, so the line does not depend on the organ behind it. */
+  color: var(--ink-mid);
+  padding: 4px 8px;
+  border-radius: var(--radius-chip);
+  background: linear-gradient(var(--chip-bg), var(--chip-bg)), rgba(244, 244, 244, 0.92);
 }
 
 /* On a short stage (a phone with the rail panels open) the secondary detail lines no
@@ -54,7 +57,7 @@
 .noteText {
   font-weight: 500;
   line-height: 1.4;
-  color: var(--ink-faint);
+  color: var(--ink-mid);
   max-width: 230px;
 }
 

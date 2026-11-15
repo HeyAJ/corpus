@@ -6,7 +6,9 @@
   gap: 6px;
   padding: 6px 12px;
   min-height: 32px;
-  background: var(--chip-bg);
+  /* The readouts sit over whatever organ is behind them (red shells included); a light
+     base under the usual 5 % tint keeps the text's contrast independent of the organ. */
+  background: linear-gradient(var(--chip-bg), var(--chip-bg)), rgba(244, 244, 244, 0.92);
   border-radius: var(--radius-chip);
   font-size: var(--size-chip);
   font-weight: var(--weight-bold);
@@ -21,7 +23,8 @@
 }
 
 .chipUnit {
-  color: var(--ink-faint);
+  /* --ink-mid (#4a4a4a) is about 6.5:1 on the chip; the old --ink-faint was about 1.9:1. */
+  color: var(--ink-mid);
   font-weight: var(--weight-bold);
   font-size: 0.85em;
 }

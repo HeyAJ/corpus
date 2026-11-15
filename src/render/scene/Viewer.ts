@@ -120,6 +120,8 @@ export class Viewer {
 
   private hovered: OrganId | null = null;
   private selected: OrganId | null = null;
+  /** The user's own Vessels switch; the heart can force the overlay on above it. */
+  private vascularSwitch = false;
   private callbacks: ViewerCallbacks = {};
   private backgroundMode: BackgroundMode = 'idle';
   private backgroundColor = new THREE.Color(BACKGROUNDS.idle);
@@ -396,6 +398,7 @@ export class Viewer {
   select(id: OrganId | null): void {
     if (this.selected === id) return;
     this.selected = id;
+    this.applyVascularVisibility();
     this.organs.clearStates(id ?? undefined);
     if (id) {
       const h = this.organs.organs.get(id);
@@ -436,7 +439,20 @@ export class Viewer {
 
   /** Show or hide the vascular overlay. Wired to the blood-drop tool button. */
   setVascularVisible(on: boolean): void {
-    this.vascular.setVisible(on);
+    this.vascularSwitch = on;
+    this.applyVascularVisibility();
+  }
+
+  /**
+   * The overlay is on when the user's switch says so OR when the heart is the open organ.
+   * WHY: with the heart selected the interior streams showed blood inside the chambers and
+   * nothing leaving them, because the vessel tree (hidden at start by user choice) was
+   * off. Blood that goes round the body is the point of selecting the heart, so the heart
+   * borrows the overlay for as long as it is open and gives it back to the switch when
+   * deselected. The UI reads the same rule (ToolDock VesselToggle) so the switch shows ON.
+   */
+  private applyVascularVisibility(): void {
+    this.vascular.setVisible(this.vascularSwitch || this.selected === 'heart');
   }
 
   /** Show or hide the nervous-system overlay ("Nerves" switch). */
@@ -590,6 +606,7 @@ export class Viewer {
       this.organs.setScale('heart', 1);
       this.organs.setScale('lung_l', 1);
       this.organs.setScale('lung_r', 1);
+      this.organs.setOffset('diaphragm', 0, 0, 0); // frozen with the lungs
     } else {
       // HEART. Scale follows chamber volume, so systolic contraction is fast and
       // diastolic filling is slow — which is what makes it look alive. A symmetric
@@ -607,6 +624,20 @@ export class Viewer {
       const lungScale = 1 + 0.055 * Math.max(0, Math.min(1.4, inflation));
       this.organs.setScale('lung_l', lungScale);
       this.organs.setScale('lung_r', lungScale);
+
+      // DIAPHRAGM. It used to sit still while the lungs swelled above it, which read as
+      // lungs inflating by magic. It now descends on the same inflation signal the lungs
+      // use (so the two stay in step by construction) and rises on expiration. The travel
+      // is a DISPLAY amplitude (0.016 m of scene height, chosen to be visible beside the
+      // 5.5 % lung swell), not a measured excursion. Going through setOffset means the
+      // interior parts follow the shell (OrganDetail copies the shell's position).
+      const DIAPHRAGM_DISPLAY_TRAVEL_M = 0.016;
+      this.organs.setOffset(
+        'diaphragm',
+        0,
+        -DIAPHRAGM_DISPLAY_TRAVEL_M * Math.max(0, Math.min(1.4, inflation)),
+        0,
+      );
     }
 
     // STOMACH and BLADDER fluid levels.

@@ -49,19 +49,24 @@ const S = 20;
  * anyone. A word and an on/off state does.
  */
 export function VesselToggle() {
-  const on = useStore((s) => s.vascularVisible);
+  const userOn = useStore((s) => s.vascularVisible);
   const toggle = useStore((s) => s.toggleVascular);
+  // The Viewer forces the overlay on while the heart is open (Viewer.applyVascularVisibility),
+  // so the switch must read ON then, with the reason, rather than claim "off" over a
+  // screen full of vessels. Pressing it still flips the user's own state underneath.
+  const withHeart = useStore((s) => s.selectedOrgan === 'heart') && !userOn;
+  const on = userOn || withHeart;
   return (
     <button
       className={`${styles.vessels} ${on ? styles.vesselsOn : ''}`}
       onClick={toggle}
       aria-pressed={on}
-      aria-label={on ? 'Hide blood vessels' : 'Show blood vessels'}
-      title={on ? 'Hide blood vessels' : 'Show blood vessels'}
+      aria-label={withHeart ? 'Blood vessels shown while the heart is open' : on ? 'Hide blood vessels' : 'Show blood vessels'}
+      title={withHeart ? 'Shown while the heart is open' : on ? 'Hide blood vessels' : 'Show blood vessels'}
     >
       <BloodDrop filled={on} />
       <span>Vessels</span>
-      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
+      <span className={styles.vesselsState}>{withHeart ? 'on, with heart' : on ? 'on' : 'off'}</span>
     </button>
   );
 }

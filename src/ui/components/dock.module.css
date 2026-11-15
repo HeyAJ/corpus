@@ -245,7 +245,7 @@ a.item {
   bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + 144px);
   z-index: 14;
   box-sizing: border-box;
-  width: 170px;
+  width: 190px;
   max-height: 40vh;
   overflow-y: auto;
   display: grid;
@@ -281,15 +281,14 @@ a.item {
 .hormName {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Never an ellipsis: a long name wraps between words instead of being cut. */
+  white-space: normal;
   font-weight: 600;
 }
 
 .hormMark {
   flex: none;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
   font-weight: 700;
 }
 

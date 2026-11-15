@@ -141,8 +141,10 @@ describe('every part of a resting body sits at its own resting level', () => {
           if (p.drives.some((d) => d.signal === 'night')) continue;
           // bladderFill is bladder volume over capacity, and a living bladder is never empty: it fills continuously, so it is state, not a defect.
           if (p.drives.some((d) => d.signal === 'bladderFill')) continue;
+          // After hours without drinking the body conserves water, so adh and dehydration rise by design: slowly changing state, strict only at boot.
+          if (label !== 'boot' && p.drives.some((d) => d.signal === 'adh' || d.signal === 'dehydration')) continue;
           n++;
-          if (Math.abs(v - p.rest) > 0.03) bad.push(`${o.id}.${p.id} ${v.toFixed(3)} vs rest ${p.rest}`);
+          if (Math.abs(v - p.rest) > 0.03) bad.push(`${o.id}.${p.id} ${v.toFixed(3)} vs rest ${p.rest} drives ${p.drives.map((d) => d.signal).join(',')}`);
         }
       }
       expect(bad, `${label}: parts away from rest`).toEqual([]);
