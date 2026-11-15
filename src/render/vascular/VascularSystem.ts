@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { bloodColour } from '../anatomy/detail/blood';
 import type { SimSnapshot } from '../../bridge/types';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
@@ -89,9 +90,6 @@ const HEART_ORIGIN = new THREE.Vector3(-0.016, 0.168, 0.016);
 
 /** Markers that are steady-state properties of the blood rather than injected boluses. */
 const STEADY_MARKERS = new Set(['glucose', 'lactate']);
-
-const OXY_COLOUR = new THREE.Color(0xc8323a);
-const DEOXY_COLOUR = new THREE.Color(0x6a4a7a);
 
 interface Particle {
   line: number;
@@ -426,7 +424,10 @@ export class VascularSystem {
     for (const p of this.particles) {
       const side = this.lines[p.line].side;
       const sat = saturationFor(side, this.arterialSat, this.venousSat);
-      p.base.copy(DEOXY_COLOUR).lerp(OXY_COLOUR, Math.max(0, Math.min(1, (sat - 0.5) / 0.5)));
+      // The ONE blood ramp (anatomy/detail/blood.ts), so a vessel and the heart stream that
+      // feeds it are the same red/violet at the aorta and the venae cavae. This used its own
+      // 0.5..1.0 ramp against the heart's 0.65..0.95 and the two disagreed in hue.
+      bloodColour(p.base, sat);
     }
   }
 
@@ -486,7 +487,7 @@ export class VascularSystem {
         this.venousSat,
       );
       const tint = this.wallMaterials[i].uniforms.uTint.value as THREE.Color;
-      tint.copy(DEOXY_COLOUR).lerp(OXY_COLOUR, Math.max(0, Math.min(1, (sat - 0.5) / 0.5)));
+      bloodColour(tint, sat);
     }
   }
 

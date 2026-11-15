@@ -20,5 +20,5 @@
       "@data/*": ["src/data/*"]
     }
   },
-  "include": ["vite.config.ts", "vitest.config.ts", "tools", "src/data/pharma-types.ts", "src/data/types.ts", "src/bridge/types.ts", "src/render/organs/placeholder.ts"]
+  "include": ["vite.config.ts", "vitest.config.ts", "tools", "src/data/pharma-types.ts", "src/data/types.ts", "src/bridge/types.ts", "src/render/organs/placeholder.ts", "src/render/anatomy/models.ts", "src/render/anatomy/sdf.ts", "src/render/anatomy/noise.ts", "src/render/anatomy/layout.ts"]
 }

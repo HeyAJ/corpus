@@ -13,8 +13,11 @@ import { NERVE_LIFT, phrenicRoute, sheetPath } from './diaphragm.parts';
  * between breaths. The costal muscle glows a little more at the height of each inspiration
  * on top of its respiratory-drive activity.
  *
- * The sheet itself is not moved: the shell is a single surface that this view does not
- * deform, and a part that left it would stand outside the organ.
+ * The sheet is not DEFORMED by this file: the shell is a single surface this view does not
+ * reshape, and a part that left it would stand outside the organ. The whole organ, shell and
+ * parts together, is instead carried down and up with the breath by the viewer
+ * (`Viewer.applySnapshotToScene` offsets it by a display amplitude on `resp.inflation`), so
+ * nothing here needs to move it.
  */
 
 const BRANCHES = ['anterior', 'lateral', 'posterior'];

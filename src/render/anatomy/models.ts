@@ -800,23 +800,11 @@ function uterus(params: ModelParams): THREE.BufferGeometry {
   );
   const parts = [body];
 
-  if (weeks >= 10) {
-    // The placenta: a disc on the upper posterior wall. Drawn as its own closed surface
-    // inside the uterus, so it shows through the wall as a denser patch.
-    const thickness = 0.006 + 0.012 * (fundalHeight(weeks) / 0.36);
-    const placenta = ellipsoid(
-      [0, centre[1] + 0.42 * radii[1], centre[2] - radii[2] + thickness + 0.004],
-      [0.58 * radii[0], 0.4 * radii[1], thickness],
-    );
-    parts.push(
-      polygonise(
-        placenta,
-        [-0.6 * radii[0], centre[1], centre[2] - radii[2]],
-        [0.6 * radii[0], centre[1] + 0.86 * radii[1], centre[2] - radii[2] + 2 * thickness + 0.01],
-        { cell: Math.max(0.002, thickness / 2.2) },
-      ),
-    );
-  }
+  // THE PLACENTA IS NOT PART OF THE SHELL. A disc was merged in here as a "denser patch"
+  // seen through the wall, but the shell is drawn as glass with a bright rim, so the disc
+  // read as a white ring (a lens) floating in the uterus, and the atlas draws its own
+  // placenta as a solid dark-red part (uterus.parts.ts / uterus.detail.ts), exactly on the
+  // posterior wall, whenever the uterus is open. Drawing it twice, once wrongly, is gone.
   for (const s of [1, -1]) {
     // The tubes are carried up with the fundus.
     const lift = centre[1] + 0.55 * radii[1] - 0.074;
@@ -948,8 +936,9 @@ const FETAL_CLEARANCE = 0.97;
  */
 export function fetalFit(weeks: number, positions: ArrayLike<number>, sacCentre: V3, sac: V3): FetalFit {
   const wanted = fetalScale(weeks);
-  const lo: V3 = [Infinity, Infinity, Infinity];
-  const hi: V3 = [-Infinity, -Infinity, -Infinity];
+  // Mutable tuples, not V3: V3 is readonly (sdf.ts) and these two bounds are written in the loop below.
+  const lo: [number, number, number] = [Infinity, Infinity, Infinity];
+  const hi: [number, number, number] = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i + 2 < positions.length; i += 3) {
     for (let k = 0; k < 3; k++) {
       const v = positions[i + k];

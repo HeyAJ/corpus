@@ -710,8 +710,12 @@ the pH edge in pregnancy; they are not repeated here.
 - The fetus is drawn at 41 to 64 percent of the size its weight implies, because the
   model's uterine cavity is smaller than a real one at every week. Below 10 weeks it is held
   at the 10-week size, because the weight table starts there (ADR-032).
-- The diaphragm's sheet does not move with breathing; only the phrenic impulse and the
-  costal glow follow the breath.
+- The diaphragm moves as a rigid sheet, down on inspiration and up on expiration, by a
+  display amplitude (0.016 m of scene height) on the same inflation signal that swells the
+  lungs. The amplitude is chosen to be visible, not measured, and the dome does not flatten
+  as a real diaphragm does when it contracts.
+- The placenta is drawn only while the uterus is selected, because it is a part of the
+  uterus's interior atlas and not of the organ's outer shell.
 
 **The activity index is not a measurement.**
 

@@ -2,7 +2,7 @@
 
 Browser-based real-time human physiology simulator. Vite + TypeScript strict + three.js r170 + React 18 + Zustand + Comlink/SharedArrayBuffer + Vitest. Now tracked in git, but generated data and long probes are easy to clobber — read before you overwrite.
 
-**Read this file instead of exploring the repo.** It exists so you do not have to re-derive the architecture from 27 ADRs and 40 source files. If something here is wrong, fix it here as well as in the code.
+**Read this file instead of exploring the repo.** It exists so you do not have to re-derive the architecture from 33 ADRs and 40 source files. If something here is wrong, fix it here as well as in the code.
 
 ---
 
@@ -33,6 +33,7 @@ Browser-based real-time human physiology simulator. Vite + TypeScript strict + t
 - **A git worktree created by the agent tool starts from the DEFAULT branch, not the working branch.** Reset it to the branch head before use.
 - **The snapshot's hormone list is runtime data.** `snapshot.endocrine.hormones` has different ids for different bodies; reading only the TypeScript type will make you conclude the sex hormones do not exist. Probe a male, a non-pregnant female and a pregnant female.
 - **A resting body is not a body with every signal at zero.** Anatomy state signals are legitimately non-zero at rest (see "The anatomy atlases"); read that before "fixing" one.
+- **`npx tsc --noEmit -p .` checks NOTHING.** The root `tsconfig.json` has `"files": []` and only project references, so without `-b` it type-checks zero files and exits 0 whatever the code looks like. The real check is `npm run typecheck` (`tsc -b --force`). The production build (`npm run build` = `tsc -b && vite build`, which is what Vercel runs) fails on any type error AND on any file the node project reaches by import but does not list in `tsconfig.node.json` (TS6307): `tools/placeholder-organs.ts` imports `src/render/organs/placeholder.ts`, so anything that file imports must be listed there. This let a broken production build sit on the branch behind a green "tsc exit 0".
 
 ## Running a probe — the standard pattern
 
@@ -139,10 +140,12 @@ One **atlas** per organ, as data plus two render files. List them with `ls src/d
 - `src/render/scan/BrainScan.ts` with `src/ui/components/BrainScanInset.tsx`: a small rotating "glass brain" while the brain is selected (it can be pinned). A maximum-intensity projection of the activity index through a thermal ramp, captioned "activity index, not temperature"; it prints the region furthest above its own resting level. ADR-033.
 - The Structures panel and part labels; the selected organ's own big label is hidden; every organ has a live readout in `src/ui/panels/OrganPanels.tsx`; a Reproduction panel (`src/ui/panels/ReproductionPanel.tsx`).
 - With the heart selected, `Viewer.applyVascularVisibility` (`src/render/scene/Viewer.ts`) forces the vascular overlay on, so the blood is seen going round the body.
-- The camera frames the selected organ's bounding sphere (`FOCUS_FILL`, `minDistance` 0.07 in `src/render/camera/OrbitRig.ts`), small enough now to get in to an adrenal or a thyroid lobe.
-- The diaphragm's phrenic streams are gated by the breath (`diaphragm.detail.ts`); its sheet is NOT moved with breathing (the shell is a single undeformed surface). Do not describe it as moving.
+- The camera frames the selected organ's bounding sphere (`FOCUS_FILL`, `minDistance` 0.07 in `src/render/camera/OrbitRig.ts`), small enough now to get in to an adrenal or a thyroid lobe. `Viewer.measureViewport` measures how much of the stage the open panel covers (right strip on a wide screen, bottom strip on a phone) and hands it to `OrbitRig.setViewport`, so a selected organ is framed in the free part of the stage instead of behind the panel.
+- The diaphragm's phrenic streams are gated by the breath (`diaphragm.detail.ts`). The whole organ, shell and parts together, is carried down on inspiration and up on expiration by a rigid display offset from `resp.inflation` in `Viewer.applySnapshotToScene` (`DIAPHRAGM_DISPLAY_TRAVEL_M`, 0.016 m of scene height: a display amplitude, not a measured excursion; frozen at zero under reduced motion, with the lungs). The dome is NOT reshaped, so do not describe it as flattening or contracting.
+- The vessel overlay takes its colours from the one shared blood ramp: `src/render/vascular/VascularSystem.ts` imports `bloodColour` from `src/render/anatomy/detail/blood.ts` for both flow particles and vessel-wall tint (its private OXY/DEOXY pair and 0.5-1.0 ramp were deleted), so a vessel and the heart stream that feeds it are the same colour at the aorta and the venae cavae.
+- The placenta is NOT part of the uterus's outer shell (`uterus` in `src/render/anatomy/models.ts`; a merged disc read as a white ring and was removed). It is drawn only by the uterus atlas, as a solid dark-red part (`PLACENTA_RED` in `src/render/anatomy/atlas/uterus.detail.ts`), so it is visible only while the uterus is selected, not on the unselected body.
 - In dev builds only, `window.__corpus = { viewer, store }` exists for render probes.
 
 ## Docs worth reading, when relevant
 
-`docs/DECISIONS.md` (27 ADRs — the reasoning behind every non-obvious choice) · `docs/MODEL_LIMITATIONS.md` (what the model does *not* do; §15 is the tone for any new limitation) · `docs/MISSING_CONSTANTS.md` (generated; every unsourced field and every adjudicated data disagreement) · `docs/VISUAL_AUDIT.md` (the reference frames the renderer is calibrated against).
+`docs/DECISIONS.md` (33 ADRs — the reasoning behind every non-obvious choice) · `docs/MODEL_LIMITATIONS.md` (what the model does *not* do; §15 is the tone for any new limitation) · `docs/MISSING_CONSTANTS.md` (generated; every unsourced field and every adjudicated data disagreement) · `docs/VISUAL_AUDIT.md` (the reference frames the renderer is calibrated against).
