@@ -62,6 +62,8 @@ const THIN = new THREE.Color(0xe3b4b0);
 const THICK = new THREE.Color(0xb23a4c);
 const SHED = new THREE.Color(0x5e1a24);
 const DECIDUA = new THREE.Color(0xb86b76);
+/** Display colour of the placental disc: deep red so it reads as perfused tissue. */
+const PLACENTA_RED = new THREE.Color(0x6e1420);
 const tmp = new THREE.Color();
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 
@@ -102,7 +104,18 @@ export const detail: OrganDetailSpec = {
     // GLASS walls, every frame.
     for (const [id, o] of GLASS) ctx.part(id)?.setOpacity(o);
     ctx.part('myometrium')?.setOpacity(0.2 + 0.3 * ctx.activity('myometrium'));
-    ctx.part('placenta')?.setVisible(placenta);
+    // THE PLACENTA IS TISSUE, NOT GLASS. It carries no GLASS entry, so it was drawn at the
+    // default opacity, but in the pale, pink-washed shell and behind the glass sac and wall
+    // its rim read as a white ring, like a lens. It is a solid disc in a dark red (a
+    // drawing choice: the dark liver-like red of a perfused organ, not a measured colour);
+    // opacity 1 keeps it out of the glass pass (OrganDetail GLASS_BELOW) and so it writes
+    // depth and hides what is behind it, as tissue does.
+    const pl = ctx.part('placenta');
+    if (pl) {
+      pl.setOpacity(1);
+      pl.setColor(PLACENTA_RED);
+      pl.setVisible(placenta);
+    }
     ctx.part('amniotic_sac')?.setVisible(placenta);
 
     // LINING: thickness and colour follow the cycle, or the decidua in pregnancy.

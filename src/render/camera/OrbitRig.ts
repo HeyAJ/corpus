@@ -76,9 +76,21 @@ export const DEFAULT_LIMITS: OrbitLimits = {
   // singularity where lookAt's up-vector flips and the view rolls.
   minPolar: 15 * DEG,
   maxPolar: 165 * DEG,
-  minDistance: 0.45,
+  // 0.45 was a leftover from when the smallest organ was a kidney. At that floor an adrenal
+  // (bounding radius a couple of centimetres) could never be framed closer than about 6 %
+  // of the frame width, so its cortical layers were unreadable. 0.07 lets the rig get in
+  // to a thyroid lobe or an ovary; the user can still dolly out to the whole body.
+  minDistance: 0.07,
   maxDistance: 3.6,
 };
+
+/**
+ * DISPLAY CONSTANT: the share of the smaller free viewport dimension a focused organ's
+ * bounding sphere should span. 40-60 % was asked for, for every organ. A bounding sphere
+ * is looser than an elongated organ's own silhouette, so 0.55 lands the organ itself in
+ * that band.
+ */
+const FOCUS_FILL = 0.55;
 
 export class OrbitRig {
   readonly camera: THREE.PerspectiveCamera;
@@ -99,6 +111,13 @@ export class OrbitRig {
   private focusToDistance = 2.63;
   private focusT = 1;
   private focusDurationMs = 600;
+  /** Bounding radius of the organ being framed, 0 once the user has moved the camera or reset. */
+  private focusRadius = 0;
+  /** Canvas size and the strips a panel covers, in CSS px (see setViewport). */
+  private viewW = 0;
+  private viewH = 0;
+  private insetRight = 0;
+  private insetBottom = 0;
 
   limits: OrbitLimits = { ...DEFAULT_LIMITS };
 
@@ -110,7 +129,9 @@ export class OrbitRig {
   private atHome = true;
 
   constructor(aspect: number, fovDegrees = 21) {
-    this.camera = new THREE.PerspectiveCamera(fovDegrees, aspect, 0.05, 50);
+    // Near plane 0.02: the closest framing is now 0.07 m from the target, and an organ's
+    // near wall must not be clipped at that range.
+    this.camera = new THREE.PerspectiveCamera(fovDegrees, aspect, 0.02, 50);
     this.distance = this.homeDistance();
     this.focusFromDistance = this.focusToDistance = this.distance;
     this.apply();
@@ -159,11 +180,17 @@ export class OrbitRig {
     this.azimuthVel = dx * AZIMUTH_PER_UNIT * FLING;
     this.polarVel = dy * POLAR_PER_UNIT * FLING;
     this.focusT = 1; // a manual drag cancels any running focus animation
+    this.focusRadius = 0;
     this.atHome = false;
   }
 
   dolly(delta: number): void {
-    this.distanceVel += delta * 0.9;
+    // The step scales with the distance below 1.2 m. A fixed 0.9 m/s per notch was right
+    // for the whole body but threw the camera clean through a 0.1 m organ in one notch.
+    // Whole-body distances (2.6 m) are unchanged. Floor 0.3 so zooming out stays brisk.
+    const step = THREE.MathUtils.clamp(this.distance / 1.2, 0.3, 1);
+    this.distanceVel += delta * 0.9 * step;
+    this.focusRadius = 0;
     this.focusT = 1; // likewise: a running focus animation would overwrite the distance
     this.atHome = false;
   }
@@ -178,6 +205,7 @@ export class OrbitRig {
     this.distance = THREE.MathUtils.clamp(this.distance / spreadRatio, this.limits.minDistance, this.limits.maxDistance);
     this.distanceVel = 0;
     this.focusT = 1;
+    this.focusRadius = 0;
     this.atHome = false;
   }
 
@@ -192,7 +220,8 @@ export class OrbitRig {
     // Frame the bounding sphere so it fills FILL of the viewport half-height. At a
     // 21 degree FOV the tangent is small, so the distance is large and the
     // projection is nearly orthographic — which is the point of the low FOV.
-    this.focusToDistance = this.fitDistance(boundingRadius);
+    this.focusRadius = boundingRadius;
+    this.focusToDistance = this.focusDistance(boundingRadius);
     this.focusT = 0;
     this.atHome = false;
     this.focusDurationMs = durationMs;
@@ -202,7 +231,58 @@ export class OrbitRig {
   reset(durationMs = 600): void {
     this.focus(new THREE.Vector3(0, BODY_CENTRE_Y, 0), BODY_FRAMING_RADIUS, durationMs);
     this.focusToDistance = this.homeDistance();
+    this.focusRadius = 0;
     this.atHome = true;
+  }
+
+  /**
+   * Distance at which a sphere of this radius spans FOCUS_FILL of the smaller free
+   * dimension. Its projected diameter in pixels is r * H / (d * tan(halfFov)), H being the
+   * full canvas height the vertical FOV spans, so d follows directly. "Free" means not
+   * under the open panel: the old rule fitted the radius to the whole canvas HEIGHT, which
+   * on a portrait phone filled the height while the organ was still narrow, and made every
+   * small organ tiny because the 0.45 distance floor stopped it getting closer.
+   */
+  private focusDistance(boundingRadius: number): number {
+    const halfFov = (this.camera.fov * DEG) / 2;
+    const H = this.viewH || 1;
+    const freeMin = Math.max(1, Math.min(this.viewW - this.insetRight, H - this.insetBottom));
+    const d = (boundingRadius * H) / (Math.tan(halfFov) * FOCUS_FILL * freeMin);
+    return THREE.MathUtils.clamp(d, this.limits.minDistance, this.limits.maxDistance);
+  }
+
+  /**
+   * Tell the rig the canvas size and how much of it an open panel covers (right strip on a
+   * wide screen, bottom strip on a phone). The camera's view offset shifts the principal
+   * point so the TARGET lands in the middle of the uncovered area, and a focused organ is
+   * re-fitted if the panel arrived after the focus began (the panel opens a React render
+   * after the selection, so the first fit was made against the wrong free area).
+   */
+  setViewport(width: number, height: number, insetRight: number, insetBottom: number): void {
+    const same =
+      width === this.viewW && height === this.viewH && insetRight === this.insetRight && insetBottom === this.insetBottom;
+    if (same) return;
+    this.viewW = width;
+    this.viewH = height;
+    this.insetRight = insetRight;
+    this.insetBottom = insetBottom;
+    if (insetRight > 0 || insetBottom > 0) {
+      // A window of the full image, starting half the covered strip in, puts the target
+      // at the centre of the free rectangle.
+      this.camera.setViewOffset(width, height, insetRight / 2, insetBottom / 2, width, height);
+    } else {
+      this.camera.clearViewOffset();
+    }
+    if (this.focusRadius > 0) {
+      // focusTo is kept as the organ's centre. (desiredTarget is NOT it: it still holds the
+      // old target until the first animation frame, so re-fitting from it sent the camera
+      // to the wrong place whenever the panel arrived before that frame.)
+      this.focusFrom.copy(this.target);
+      this.focusFromDistance = this.distance;
+      this.focusToDistance = this.focusDistance(this.focusRadius);
+      this.focusT = 0;
+      this.focusDurationMs = 400;
+    }
   }
 
   update(dtMs: number): void {

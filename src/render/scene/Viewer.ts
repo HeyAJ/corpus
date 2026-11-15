@@ -576,6 +576,7 @@ export class Viewer {
     this.nerves.update(dtMs / 1000);
     this.hormones.update(dtMs / 1000);
     this.airway.update(dtMs / 1000, this.snapshots.current);
+    this.measureViewport(now);
     this.rig.update(dtMs);
     this.applySnapshotToScene(now);
     // After the shells have taken this frame's pulse and pose: the interior copies them.
@@ -723,6 +724,39 @@ export class Viewer {
       this.lastDprChange = now;
       this.resize();
     }
+  }
+
+  private lastViewportMeasure = -1e9;
+
+  /**
+   * How much of the canvas the open panel covers, so the camera can centre an organ in what
+   * is left. The Viewer has no other way to know: the panel is React's, the canvas is ours.
+   * The App root carries data-sheet="open" while a panel is up and the panel sheet is its
+   * <aside>; a sheet wider than half the canvas is the phone's bottom sheet, anything
+   * narrower is the wide screen's right-hand card. Measured at ~5 Hz because
+   * getBoundingClientRect forces layout, and the answer changes only when a panel opens.
+   */
+  private measureViewport(now: number): void {
+    if (now - this.lastViewportMeasure < 200) return;
+    this.lastViewportMeasure = now;
+    const canvas = this.renderer.domElement;
+    const w = canvas.clientWidth || 1;
+    const h = canvas.clientHeight || 1;
+    let right = 0;
+    let bottom = 0;
+    const root = canvas.closest('[data-sheet]');
+    if (root && root.getAttribute('data-sheet') === 'open') {
+      const sheet = root.querySelector('aside');
+      if (sheet) {
+        const r = sheet.getBoundingClientRect();
+        const c = canvas.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          if (r.width > 0.6 * w) bottom = Math.max(0, Math.min(0.6 * h, c.bottom - r.top));
+          else right = Math.max(0, Math.min(0.6 * w, c.right - r.left));
+        }
+      }
+    }
+    this.rig.setViewport(w, h, Math.round(right), Math.round(bottom));
   }
 
   resize(): void {
