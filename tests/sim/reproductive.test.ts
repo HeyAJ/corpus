@@ -392,8 +392,8 @@ describe('sexual response (NEMEC1976, XUERUI2008, MURPHY1987, AVERSA2000, WHIPPL
     for (const p of ['excitement', 'plateau', 'orgasm', 'resolution']) expect(phases.has(p)).toBe(true);
     // NEMEC1976: 114-117 bpm at orgasm. The baroreflex trims the push, so allow the
     // model's own result a band around it.
-    expect(peakHr).toBeGreaterThan(100);
-    expect(peakHr).toBeLessThan(135);
+    expect(peakHr).toBeGreaterThanOrEqual(114);
+    expect(peakHr).toBeLessThanOrEqual(117);
     expect(peakHr - base.hr).toBeGreaterThan(30);
     // MURPHY1987: 7.3 pmol/L at ejaculation (about 95 % of the way by the end of the phase).
     expect(peakOxytocin).toBeGreaterThan(6.5);
@@ -412,13 +412,14 @@ describe('sexual response (NEMEC1976, XUERUI2008, MURPHY1987, AVERSA2000, WHIPPL
 
   it('raises systolic pressure more than diastolic at the plateau and lands the start-of-orgasm deltas on XUERUI2008 (venous return, not only heart rate)', () => {
     // Cited rises, start of orgasm over baseline (XUERUI2008): men +21.3 / +18.2 mmHg
-    // systolic / diastolic, +21.0 bpm; women +12.3 / +10.2, +18.8 bpm. The model reaches the
-    // systolic and heart-rate figures; its diastolic rise stays about 6 mmHg too high because
-    // the set-point shift (derived from the cited mean pressure) is left alone, so the
-    // diastolic is asserted only as a bound, not as a match (MODEL_LIMITATIONS section 16).
+    // systolic / diastolic, +21.0 bpm; women +12.3 / +10.2, +18.8 bpm. With the sexual
+    // response carried by a fall in systemic resistance plus venous return (rather than by
+    // a large direct heart-rate push against the baroreflex) all three land within 3 of the
+    // cited figures in both sexes, and the realised mean-pressure rise within 2 percentage
+    // points of the cited 21.7 % (men) and 13.4 % (women) (MODEL_LIMITATIONS section 16).
     const cited = {
-      male: { sbp: 21.3, hr: 21.0 },
-      female: { sbp: 12.3, hr: 18.8 },
+      male: { sbp: 21.3, dbp: 18.2, hr: 21.0, map: 21.7 },
+      female: { sbp: 12.3, dbp: 10.2, hr: 18.8, map: 13.4 },
     };
     for (const sex of ['male', 'female'] as const) {
       const e = sex === 'male' ? new Engine(0x5eed) : woman();
@@ -439,6 +440,7 @@ describe('sexual response (NEMEC1976, XUERUI2008, MURPHY1987, AVERSA2000, WHIPPL
       e.applyIntent({ type: 'SET_SEXUAL_STIMULATION', level: 1 } as never);
       let plateau: { sbp: number; dbp: number; hr: number } | null = null;
       let last = rd();
+      let lastMap = base.map;
       let reached = false;
       for (let t = 0; t < 400; t += 0.25) {
         run(e, 0.25);
@@ -449,6 +451,7 @@ describe('sexual response (NEMEC1976, XUERUI2008, MURPHY1987, AVERSA2000, WHIPPL
           break;
         }
         last = rd();
+        lastMap = e.snapshot().cardio.map_mmHg;
       }
       expect(reached, sex + ' reached orgasm').toBe(true);
       expect(plateau, sex + ' plateau').not.toBeNull();
@@ -457,7 +460,8 @@ describe('sexual response (NEMEC1976, XUERUI2008, MURPHY1987, AVERSA2000, WHIPPL
       // Start-of-orgasm deltas, within 3 mmHg or 3 /min of the cited ones.
       expect(Math.abs(last.sbp - bs - cited[sex].sbp), sex + ' dSBP').toBeLessThanOrEqual(3);
       expect(Math.abs(last.hr - base.hr - cited[sex].hr), sex + ' dHR').toBeLessThanOrEqual(3);
-      expect(last.dbp - bd, sex + ' dDBP bound').toBeLessThan(28);
+      expect(Math.abs(last.dbp - bd - cited[sex].dbp), sex + ' dDBP').toBeLessThanOrEqual(3);
+      expect(Math.abs(100 * (lastMap / base.map - 1) - cited[sex].map), sex + ' MAP rise (percentage points)').toBeLessThanOrEqual(2);
     }
   });
 

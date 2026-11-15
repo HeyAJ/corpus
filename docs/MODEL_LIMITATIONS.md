@@ -658,27 +658,29 @@ computed number. The important caveats:
   brackets the 0.1 in use, so no new number was invented. Consequence: mid-pregnancy pH
   sits at 7.4700, on the upper edge of the cited 7.40-7.47, and the test compares at the
   cited two-decimal precision.
-- **The sexual response now reproduces the cited systolic and heart-rate rises, not the
-  diastolic.** The earlier calibration moved only the baroreflex set point, heart rate,
-  contractility and resistance, none of which returns blood to the heart, so the faster
-  ventricle ejected a smaller stroke and diastolic rose twice as much as systolic (men
-  +11 / +22 against cited +21 / +18). Sympathetic venoconstriction (`cardio.venousTone`,
-  the target exercise already uses; fitted constants `sexual.venousTone_*`) restores the
-  preload. At the start of orgasm the model is now: men +21 systolic / +24 diastolic /
-  +21 bpm (cited +21.3 / +18.2 / +21.0), women +12.5 / +16 / +19 (cited +12.3 / +10.2 /
-  +18.8). The systolic and heart-rate figures are within 3 of the cited ones and at the
-  plateau the systolic rise exceeds the diastolic in both sexes; the diastolic rise stays
-  about 6 mmHg too high because the set-point shift, derived from the cited mean
-  pressure and left unchanged, already puts the mean about 3-4 mmHg above the cited rise.
-  Heart rate has to be pushed harder than before (`sexual.hr_*` gains were refitted
-  upward) because the venous return makes the baroreflex slow the heart. The male
-  orgasmic peak is about 148/102 mmHg at 115 bpm against about 162/79 cited (NEMEC1976):
-  a larger venous push lifts systolic but lets the reflex drag the heart rate out of the
-  cited 114-117 band, and a more negative orgasmic resistance runs away to rates above
-  200, so the best fit is reported rather than forced. Contractility during arousal is
-  now a small fitted gain (it was zero while the ventricle was preload-limited and could
-  not help).
-- Recovery after stimulation stops reaches within 5 % of baseline in about 6-8 minutes;
+- **The sexual response now reproduces the cited systolic, diastolic and heart-rate rises
+  at the start of orgasm, in both sexes; the male orgasmic diastolic is still about 12
+  mmHg high.** The earlier calibration drove heart rate directly (+43 bpm) against a
+  baroreflex that was trying to slow it, which pushed mean pressure above the shifted set
+  point and the excess landed in diastolic (men +24 against cited +18). In the body the
+  tachycardia of sexual activity comes with falling resistance, and the fix is the same
+  in the model: negative `sexual.resistance_arousal_*` (about -0.23) lets the reflex hold
+  mean pressure at the shifted set point and supply the tachycardia itself, so the direct
+  heart-rate gains fell to about 20 bpm; sympathetic venoconstriction (`cardio.venousTone`,
+  as in exercise) and contractility keep stroke volume up so the pulse pressure widens.
+  The gains were found by a joint search (`.cache/probes/sexsearch.ts`), not one at a
+  time; vasodilation on its own still runs heart rate above 200. Start of orgasm, model
+  against cited (XUERUI2008): men +21.1 / +18.0 mmHg systolic / diastolic, +21.2 bpm,
+  mean pressure +20.9 % (cited +21.3 / +18.2 / +21.0, +21.7 %); women +11.6 / +11.3 /
+  +19.6 bpm, +12.8 % (cited +12.3 / +10.2 / +18.8, +13.4 %). The set-point shifts were not
+  changed. All differences are within 3 mmHg or bpm and 2 percentage points of mean
+  pressure. The male orgasmic peak is about 161/91 mmHg at 115 bpm against about 162/79
+  and 114-117 cited (NEMEC1976): systolic and heart rate match, but diastolic stays about
+  12 mmHg high, because a more negative orgasmic resistance or a larger venous push
+  lowers it only by dragging heart rate out of the cited band, so the best fit is
+  reported rather than forced. The orgasmic venous-tone gain (0.36) is above what exercise
+  writes at full exertion (0.28); it is fitted, not measured, and applies for seconds.
+- Recovery after stimulation stops reaches within 5 % of baseline in about 6-7 minutes (men 6.6, women 5.9);
   the residual excursion is gone by the cited 10-20 minutes.
 - **A jump to a gestational age no longer shows a false tachycardia.** The volume
   expansion is paced over a few seconds while the vasodilation, venous capacity, heart-rate

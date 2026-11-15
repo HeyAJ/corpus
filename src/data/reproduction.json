@@ -695,7 +695,7 @@
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "Fractional upward reset of the baroreflex defended pressure at full cardiovascular arousal (arm = 1, reached at the plateau threshold, where XUERUI2008 found the pressure peak). DERIVED from the cited rise in mean arterial pressure, start of orgasm versus baseline, in men: MAP = DBP + (SBP - DBP)/3, 72.9 + (120.1 - 72.9)/3 = 88.63 rising to 91.1 + (141.4 - 91.1)/3 = 107.87 mmHg, a fraction of 0.217. `arm` is already normalised to full value at plateau, so the cited fraction is used unscaled. The reflex has finite gain, so the realised MAP rise in the simulation is about 19-20 % rather than the full 21.7 %; the shortfall is left as the model's own result rather than inflated with a larger shift."
+      "note": "Fractional upward reset of the baroreflex defended pressure at full cardiovascular arousal (arm = 1, reached at the plateau threshold, where XUERUI2008 found the pressure peak). DERIVED from the cited rise in mean arterial pressure, start of orgasm versus baseline, in men: MAP = DBP + (SBP - DBP)/3, 72.9 + (120.1 - 72.9)/3 = 88.63 rising to 91.1 + (141.4 - 91.1)/3 = 107.87 mmHg, a fraction of 0.217. `arm` is already normalised to full value at plateau, so the cited fraction is used unscaled. The reflex has finite gain, so the realised MAP rise in the simulation is about 21 % (20.9 %) at the start of orgasm rather than the full 21.7 %; the shortfall is left as the model's own result rather than inflated with a larger shift."
     },
     "sexual.setpointShift_female": {
       "value": 0.1341,
@@ -703,103 +703,103 @@
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "Same derivation as sexual.setpointShift_male, from the women of XUERUI2008: MAP 67.2 + (109.4 - 67.2)/3 = 81.27 rising to 77.4 + (121.7 - 77.4)/3 = 92.17 mmHg, a fraction of 0.134. Used unscaled because `arm` is full at the plateau threshold. The realised MAP rise in the simulation is about 12 % (finite reflex gain)."
+      "note": "Same derivation as sexual.setpointShift_male, from the women of XUERUI2008: MAP 67.2 + (109.4 - 67.2)/3 = 81.27 rising to 77.4 + (121.7 - 77.4)/3 = 92.17 mmHg, a fraction of 0.134. Used unscaled because `arm` is full at the plateau threshold. The realised MAP rise at the start of orgasm is now about 12.8 % against the cited 13.4 %; the shift is unchanged."
     },
     "sexual.hr_arousal_male_bpm": {
-      "value": 43,
+      "value": 20.3,
       "unit": "bpm",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.heartRate, bpm per unit arousal), fitted so that the heart rate at the start of orgasm in a man rises by about 21 bpm over baseline (XUERUI2008: 75.4 to 96.4). RE-FITTED when sexual.venousTone_arousal_male was added (16 to 43 bpm): the venoconstriction returns blood to the heart and the baroreflex answers it by slowing the heart, so the direct push has to be larger to hold the cited rate; the realised rise is about +21 bpm. Sized AFTER the baroreflex was allowed to move its set point (reflex.setpointShift): the earlier, much larger gain was sized for a reflex that fought it and overshot to 177 bpm once the reflex stopped fighting. The set-point reset itself supplies about 10 bpm of the rise; this term supplies the rest."
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm per unit arousal), fitted so the heart rate at the start of orgasm in a man rises by about 21 bpm over baseline (XUERUI2008: 75.4 to 96.4). RE-FITTED 43 to 20 bpm when sexual.resistance_arousal_male went negative: the fall in resistance makes the baroreflex raise the rate itself, so the direct push that used to fight the reflex (and overshoot mean pressure into the diastolic) is no longer needed. Fitted jointly with the resistance, venous-tone and contractility gains by .cache/probes/sexsearch.ts. The set-point reset also supplies part of the rise."
     },
     "sexual.hr_arousal_female_bpm": {
-      "value": 36,
+      "value": 19.3,
       "unit": "bpm",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.heartRate, bpm per unit arousal), fitted so that the heart rate at the start of orgasm in a woman rises by about 19 bpm over baseline (XUERUI2008: 71.4 to 90.2, +18.8). RE-FITTED with the venous-tone and contractility terms (19 to 36 bpm) for the reason given at sexual.hr_arousal_male_bpm. The set-point reset supplies about 6-7 bpm; this term supplies the rest. Larger than the male gain because the female set-point shift is smaller."
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm per unit arousal), fitted so the heart rate at the start of orgasm in a woman rises by about 19 bpm over baseline (XUERUI2008: 71.4 to 90.2, +18.8). RE-FITTED 36 to 19 bpm for the reason given at sexual.hr_arousal_male_bpm and sexual.resistance_arousal_female; fitted jointly by .cache/probes/sexsearch.ts."
     },
     "sexual.hr_orgasm_bpm": {
-      "value": 60,
+      "value": 25.4,
       "unit": "bpm",
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.heartRate, bpm) per unit orgasm envelope, on top of the arousal term: fitted so the male heart rate at the orgasmic peak lands inside the 114-117 bpm of NEMEC1976 (men during coitus); 3 to 60 bpm when sexual.venousTone_orgasm was added, because the extra venous return makes the reflex slow the heart (male peak now about 115). Re-fitted after the baroreflex set point was allowed to move: the previous value of 60 bpm was sized for a reflex that fought the push and gave a 178 bpm peak once it stopped. The orgasmic vasodilation and contractility terms already carry the heart rate most of the way through the reflex."
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm) per unit orgasm envelope, on top of the arousal term: fitted so the male heart rate at the orgasmic peak lands inside the 114-117 bpm of NEMEC1976 (men during coitus). RE-FITTED 60 to 25 bpm together with the orgasmic resistance (-0.37), venous-tone (0.36) and contractility (0.21) gains by .cache/probes/sexsearch.ts (STAGE=orgasm): the orgasmic vasodilation now lets the reflex carry most of the rate. Male peak about 115 bpm."
     },
     "sexual.contractility_arousal_male": {
-      "value": 0.2,
+      "value": 0.55,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "FITTED (not measured), confidence as for the neighbouring calibrated gains. XUERUI2008 gives no stroke-volume or contractility measurement, so the magnitude is fitted, not cited: it is chosen so that the plateau-start systolic rise exceeds the diastolic rise as XUERUI2008 found (pulse pressure widens). It used to be ZERO because, before sexual.venousTone_arousal_male existed, the ventricle was preload-limited and contractility only narrowed the pulse pressure and pushed heart rate up through the reflex (trial values up to 0.5 did nothing useful). With venous return restored it does widen the pulse pressure, which overturns the reason for the zero. Fitted jointly with sexual.venousTone_arousal_male and sexual.hr_arousal_male_bpm by .cache/probes/sexfit.ts."
+      "note": "FITTED (not measured), confidence as for the neighbouring calibrated gains. XUERUI2008 gives no stroke-volume or contractility measurement, so the magnitude is fitted: with resistance falling, the contractility and venous return keep the stroke volume up so that the pulse pressure widens (systolic rise exceeds diastolic) as XUERUI2008 found. 0.2 to 0.55 in the joint refit of sexual.resistance_arousal_male, sexual.hr_arousal_male_bpm and sexual.venousTone_arousal_male by .cache/probes/sexsearch.ts."
     },
     "sexual.contractility_arousal_female": {
-      "value": 0.7,
+      "value": 0.07,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "FITTED (not measured), same reasoning as sexual.contractility_arousal_male; larger because the female pulse pressure needs more widening than the smaller venous push provides (0.2 left the plateau-start diastolic rise above the systolic). Fitted jointly with sexual.venousTone_arousal_female and sexual.hr_arousal_female_bpm by .cache/probes/sexfit.ts against the XUERUI2008 women (+12.3 systolic, +18.8 bpm at the start of orgasm)."
+      "note": "FITTED (not measured), same reasoning as sexual.contractility_arousal_male. 0.7 to 0.07: the earlier large value existed to widen a pulse pressure that the direct heart-rate drive had narrowed; with falling resistance (sexual.resistance_arousal_female) the pulse pressure widens without it. Fitted jointly by .cache/probes/sexsearch.ts against the XUERUI2008 women."
     },
     "sexual.resistance_arousal_male": {
-      "value": 0,
+      "value": -0.23,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "Zero on purpose. XUERUI2008 reports no vascular resistance. Trial negative values (down to -0.25) to widen the pulse pressure lowered mean pressure and drove heart rate up through the baroreflex without raising systolic pressure, so the pressure rise is carried by the set-point reset alone (sexual.setpointShift_male)."
+      "note": "FITTED (not measured), confidence as for the neighbouring calibrated gains; XUERUI2008 reports no resistance. NEGATIVE on purpose, and it is the term that fixed the diastolic overshoot. The earlier zero left the heart-rate gain (43 bpm) fighting a baroreflex that wanted to slow the heart, which pushed mean pressure above the shifted set point and the excess landed in diastolic (+24 against the cited +18.2). In the body the tachycardia of sexual activity comes with falling resistance (muscle and skin vasodilation, as in exertion): output rises, pulse pressure widens, diastolic rises little. With -0.23 the reflex holds mean pressure at the shifted set point and supplies much of the tachycardia itself, so the direct heart-rate gain fell from 43 to 20 bpm. The earlier trials that ran away used vasodilation alone with a large direct heart-rate drive and no venous push; here it is paired with venous tone (sexual.venousTone_arousal_male) and a lower heart-rate gain. Fitted jointly (resistance, heart rate, venous tone, contractility together, never one at a time) by .cache/probes/sexsearch.ts, a random search plus shrinking refinement scored on the XUERUI2008 deltas with a small penalty on gain size, so the smallest set that fits was preferred. Realised at the start of orgasm: +21.1 systolic, +18.0 diastolic, +21.2 bpm, mean pressure +20.9 % (cited +21.3, +18.2, +21.0, +21.7 %)."
     },
     "sexual.resistance_arousal_female": {
-      "value": 0,
+      "value": -0.24,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "Zero on purpose, for the reason given at sexual.resistance_arousal_male; no cited resistance measurement in XUERUI2008."
+      "note": "FITTED (not measured), same reasoning and same sign as sexual.resistance_arousal_male: vasodilation lets the reflex hold the shifted mean pressure and supply the tachycardia, so far less direct heart-rate drive is needed (36 to 19 bpm). Fitted jointly (resistance, heart rate, venous tone, contractility together, never one at a time) by .cache/probes/sexsearch.ts, a random search plus shrinking refinement scored on the XUERUI2008 deltas with a small penalty on gain size, so the smallest set that fits was preferred. Realised at the start of orgasm: +11.6 systolic, +11.3 diastolic, +19.6 bpm, mean pressure +12.8 % (cited +12.3, +10.2, +18.8, +13.4 %)."
     },
     "sexual.contractility_orgasm": {
-      "value": 0.5,
+      "value": 0.21,
       "unit": "fraction",
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.contractility) per unit orgasm envelope, toward the NEMEC1976 pressure of about 162/79 at orgasm. NOT REACHED: before the venous-tone terms the model peaked near 140/102 at the orgasmic peak; it now peaks near 148/102 (see sexual.venousTone_orgasm). Larger gains (tried up to 1.5) raised systolic pressure only to about 143 while pushing heart rate above the cited band, so the shortfall is stated here rather than bought with an unsupported gain."
+      "note": "CALIBRATED bus gain (cardio.contractility) per unit orgasm envelope, toward the NEMEC1976 pressure of about 162/79 at orgasm. RE-FITTED 0.5 to 0.21 with the orgasmic resistance, venous tone and heart-rate gains (.cache/probes/sexsearch.ts, STAGE=orgasm). The male orgasmic peak is now about 161/91 at 115 bpm: systolic and heart rate reach the cited values (162, 114-117); diastolic is about 12 mmHg above the cited 79. The remainder is not bought with a larger gain: a more negative resistance or larger venous push lowers diastolic further only by dragging heart rate out of the cited band."
     },
     "sexual.resistance_orgasm": {
-      "value": -0.3,
+      "value": -0.37,
       "unit": "fraction",
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "CALIBRATED bus gain (cardio.systemicResistance) per unit orgasm envelope. See sexual.contractility_orgasm; the value is carried over from the earlier calibration and was not changed because heart rate, not this gain, was the quantity that moved."
+      "note": "CALIBRATED bus gain (cardio.systemicResistance) per unit orgasm envelope. RE-FITTED -0.3 to -0.37 jointly with sexual.hr_orgasm_bpm, sexual.venousTone_orgasm and sexual.contractility_orgasm by .cache/probes/sexsearch.ts (STAGE=orgasm). The earlier run-away to heart rates above 200 happened with a strongly negative value ON ITS OWN, because the reflex answers vasodilation with rate; paired with the venous push and a lower direct heart-rate gain (25 bpm) it holds the cited 114-117 bpm."
     },
     "sexual.venousTone_arousal_male": {
-      "value": 0.14,
+      "value": 0.11,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "FITTED (not measured) with sexual.hr_arousal_male_bpm, jointly, by .cache/probes/sexfit.ts so that the male pressure at the start of orgasm rises by about +21 mmHg systolic (XUERUI2008: 120.1 to 141.4, +21.3) with heart rate +21 bpm, together with sexual.contractility_arousal_male. Venoconstriction is also what the reflex answers with, so the fit is coupled: more venous return raises systolic pressure but lets the reflex slow the heart, hence the larger heart-rate gain. For scale, exercise writes 0.28 at full exertion. Residual: diastolic rises about +24 mmHg against the cited +18, because the set-point shift (left alone) already carries mean pressure about 4 points above the cited rise. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses. WHY IT IS HERE: the earlier calibration moved only the baroreflex set point, heart rate, contractility and resistance, none of which returns blood to the heart, so the faster ventricle ejected a smaller stroke against a higher resistance and the pulse pressure narrowed where the cited studies found it widen (model +11/+22 mmHg systolic/diastolic against cited +21/+18). Contractility gains could not fix this because the ventricle is preload-limited."
+      "note": "FITTED (not measured), jointly with sexual.resistance_arousal_male, sexual.hr_arousal_male_bpm and sexual.contractility_arousal_male by .cache/probes/sexsearch.ts against XUERUI2008 (start of orgasm). Venous return keeps the stroke volume up while resistance falls, so the pulse pressure widens and the diastolic rises little. Realised start of orgasm: +21.1 / +18.0 mmHg, +21.2 bpm. The earlier diastolic residual (+24 men, +16 women) is gone: it came from a large direct heart-rate drive fighting the reflex, not from the set-point shift. For scale, exercise writes 0.28 at full exertion. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses."
     },
     "sexual.venousTone_arousal_female": {
-      "value": 0.05,
+      "value": 0.12,
       "unit": "fraction",
       "source": "XUERUI2008",
       "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
       "confidence": "derived",
-      "note": "FITTED (not measured) with sexual.hr_arousal_female_bpm, jointly, by .cache/probes/sexfit.ts so that the female pressure at the start of orgasm rises by about +12 mmHg systolic (XUERUI2008: 121.7 vs 109.4, +12.3) with heart rate +19 bpm (+18.8). Residual: diastolic rises about +16 against the cited +10.2, for the reason given at sexual.venousTone_arousal_male. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses. WHY IT IS HERE: the earlier calibration moved only the baroreflex set point, heart rate, contractility and resistance, none of which returns blood to the heart, so the faster ventricle ejected a smaller stroke against a higher resistance and the pulse pressure narrowed where the cited studies found it widen (model +11/+22 mmHg systolic/diastolic against cited +21/+18). Contractility gains could not fix this because the ventricle is preload-limited."
+      "note": "FITTED (not measured), jointly with sexual.resistance_arousal_female, sexual.hr_arousal_female_bpm and sexual.contractility_arousal_female by .cache/probes/sexsearch.ts against XUERUI2008 (start of orgasm). Venous return keeps the stroke volume up while resistance falls, so the pulse pressure widens and the diastolic rises little. Realised start of orgasm: +11.6 / +11.3 mmHg, +19.6 bpm. The earlier diastolic residual (+24 men, +16 women) is gone: it came from a large direct heart-rate drive fighting the reflex, not from the set-point shift. For scale, exercise writes 0.28 at full exertion. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses."
     },
     "sexual.venousTone_orgasm": {
-      "value": 0.2,
+      "value": 0.36,
       "unit": "fraction",
       "source": "NEMEC1976",
       "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
       "confidence": "derived",
-      "note": "FITTED (not measured) toward the NEMEC1976 orgasm systolic of about 162 mmHg, jointly with sexual.hr_orgasm_bpm: a venous push alone lets the reflex slow the heart (0.2 with no heart-rate help gave 158 systolic at 87 bpm), so heart rate had to be held inside 114-117 bpm with its own gain. Best fit reached: about 148 systolic at 115 bpm. Larger values lose heart rate faster than they gain pressure, and the diastolic stays near 100 against the cited 79 for the reason given at sexual.venousTone_arousal_male; a more negative sexual.resistance_orgasm was tried and ran away to heart rates above 200 through the reflex, so it was not used. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses. WHY IT IS HERE: the earlier calibration moved only the baroreflex set point, heart rate, contractility and resistance, none of which returns blood to the heart, so the faster ventricle ejected a smaller stroke against a higher resistance and the pulse pressure narrowed where the cited studies found it widen (model +11/+22 mmHg systolic/diastolic against cited +21/+18). Contractility gains could not fix this because the ventricle is preload-limited."
+      "note": "FITTED (not measured) jointly with sexual.hr_orgasm_bpm, sexual.resistance_orgasm and sexual.contractility_orgasm by .cache/probes/sexsearch.ts (STAGE=orgasm) toward the NEMEC1976 orgasm of about 162/79 at 114-117 bpm. Re-fitted 0.2 to 0.36 because it is the venous return that keeps the stroke volume up while resistance falls. Best fit: about 161/91 at 115 bpm. For scale, exercise writes 0.28 at full exertion, so this is above exercise for the few seconds of the orgasm envelope; it is the largest gain in the set and the one a later source should be allowed to challenge. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and sign convention (positive = smaller unstressed volume) that exercise uses."
     },
     "sexual.painThresholdRise_stimulation": {
       "value": 0.53,

@@ -139,6 +139,8 @@ describe('every part of a resting body sits at its own resting level', () => {
           // signal is marked cyclic in anatomy-types.ts), so at 16 h (midnight) it is
           // rightly away from its daytime rest. It is the only such part.
           if (p.drives.some((d) => d.signal === 'night')) continue;
+          // bladderFill is bladder volume over capacity, and a living bladder is never empty: it fills continuously, so it is state, not a defect.
+          if (p.drives.some((d) => d.signal === 'bladderFill')) continue;
           n++;
           if (Math.abs(v - p.rest) > 0.03) bad.push(`${o.id}.${p.id} ${v.toFixed(3)} vs rest ${p.rest}`);
         }
