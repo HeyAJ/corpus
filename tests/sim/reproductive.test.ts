@@ -3,6 +3,7 @@ import { Engine } from '../../src/sim/core/engine';
 import { P } from '../../src/sim/core/constants';
 import {
   R,
+  fetalHeartRate,
   reproductionConstants,
   reproductiveSignals,
   slowClockScale,
@@ -510,5 +511,55 @@ describe('sexual response (NEMEC1976, XUERUI2008, MURPHY1987, AVERSA2000, WHIPPL
     run(e, 200);
     expect(r.prolactinRaised).toBeLessThan(1);
     expect(r.prolactinRaised).toBeGreaterThan(0.9);
+  });
+});
+
+/**
+ * FETAL HEART RATE. A replay of population means (Hyett 1996 at 10-14 weeks, Ursem 1999's
+ * slope carried on from 14 to 20, Pildner 2013's interval midpoints from 20), so the
+ * expected numbers are the arithmetic of those sources, computed by hand here and not
+ * read back from the implementation. The tolerance is 1e-3 because the snapshot week is
+ * the float the engine holds after the jump, not the integer typed in.
+ */
+describe('fetal heart rate', () => {
+  const rateAt = (weeks: number): number | null => {
+    const e = woman();
+    e.applyIntent({ type: 'SET_PREGNANCY', pregnant: true, weeks } as never);
+    return e.snapshot().reproductive.pregnancy.fetalHeartRate_bpm;
+  };
+
+  it('is null for a male body, a non-pregnant woman and under 10 weeks', () => {
+    const m = new Engine(0x5eed);
+    m.applyIntent({ type: 'SET_BODY', sex: 'male' } as never);
+    expect(m.snapshot().reproductive.pregnancy.fetalHeartRate_bpm).toBeNull();
+    expect(woman().snapshot().reproductive.pregnancy.fetalHeartRate_bpm).toBeNull();
+    expect(rateAt(8)).toBeNull();
+  });
+
+  it('follows the two Hyett means between 10 and 14 weeks', () => {
+    expect(rateAt(10)).toBeCloseTo(171, 2);
+    expect(rateAt(12)).toBeCloseTo(163.5, 2);
+    expect(rateAt(14)).toBeCloseTo(156, 2);
+  });
+
+  it('carries the 14-week mean on with the Ursem slope to 20 weeks', () => {
+    expect(rateAt(17)).toBeCloseTo(148.44, 2);
+  });
+
+  it('is the midpoint of the Pildner band from 20 weeks', () => {
+    expect(rateAt(20)).toBeCloseTo(141.348, 2);
+    expect(rateAt(24)).toBeCloseTo(141.348, 2);
+    expect(rateAt(30)).toBeCloseTo(139.7715, 2);
+    expect(rateAt(34)).toBeCloseTo(138.54485, 2);
+    expect(rateAt(37)).toBeCloseTo(137.2882, 2);
+    expect(rateAt(40)).toBeCloseTo(135.61695, 2);
+  });
+
+  it('agrees at 20 weeks between the derived join and the independent Pildner band', () => {
+    // The 14-20 line evaluated at 20 weeks, against the first Pildner band's midpoint:
+    // 156 - 2.52 x 6 = 140.88 versus 141.348. This is what justifies the derived join.
+    const join = 156 + -2.52 * (20 - 14);
+    const band = fetalHeartRate(20) as number;
+    expect(Math.abs(join - band)).toBeLessThan(1);
   });
 });

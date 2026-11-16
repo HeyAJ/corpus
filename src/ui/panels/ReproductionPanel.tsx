@@ -538,6 +538,10 @@ export function ReproductionPanel() {
                     value={pregnancy.fetalWeight_g === null ? '—' : `${pregnancy.fetalWeight_g.toFixed(0)} g`}
                   />
                   <Readout
+                    label="Fetal heart rate"
+                    value={pregnancy.fetalHeartRate_bpm === null ? '—' : `${pregnancy.fetalHeartRate_bpm.toFixed(0)} bpm`}
+                  />
+                  <Readout
                     label="Amniotic fluid"
                     value={pregnancy.amnioticFluid_mL === null ? '—' : `${pregnancy.amnioticFluid_mL.toFixed(0)} mL`}
                   />

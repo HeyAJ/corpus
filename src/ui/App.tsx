@@ -87,6 +87,30 @@ export function App() {
       s.anatomyPanelOpen ||
       s.tool === 'body',
   );
+  // The HUD folds to its first line while ANY floating sheet is showing (phones only, in
+  // CSS). anyPanelOpen above covers the menu panels, Structures and the body tool; the
+  // drug drawer is its own flag and the procedure / defib / circulation tools are the
+  // remaining modes. Derived from the same store flags those components render from, so
+  // the fold and the sheet can never disagree.
+  const sheetOpen = useStore(
+    (s) =>
+      s.drawerOpen ||
+      s.tool === 'body' ||
+      s.tool === 'procedure' ||
+      s.tool === 'defib' ||
+      s.tool === 'circulation' ||
+      s.statusPanelOpen ||
+      s.impactPanelOpen ||
+      s.physiologyPanelOpen ||
+      s.environmentPanelOpen ||
+      s.infectionPanelOpen ||
+      s.endocrinePanelOpen ||
+      s.labPanelOpen ||
+      s.receptorPanelOpen ||
+      s.bloodPanelOpen ||
+      s.reproductionPanelOpen ||
+      s.anatomyPanelOpen,
+  );
   const reducedMotion = useStore((s) => s.reducedMotion);
   const firstRunAccepted = useStore((s) => s.firstRunAccepted);
   const sharedArrayBuffer = useStore((s) => s.sharedArrayBuffer);
@@ -310,7 +334,7 @@ export function App() {
 
         <OrganLabels />
         <PartLabel />
-        <Hud ready={ready} client={client} />
+        <Hud ready={ready} client={client} folded={sheetOpen} />
         <Conditions />
         <TimeScaleControl />
         <VesselToggle />
@@ -334,7 +358,7 @@ export function App() {
         blood-contents legend is one of those panels now, opened from the menu, because
         the vessels it describes are always on and it would otherwise own the sheet.
       */}
-      <aside className={styles.sheet} aria-label="Panels">
+      <aside className={styles.sheet} aria-label="Panels" data-stage-cover>
         <StatusPanel />
         <ImpactPanel />
         <PhysiologyPanel />
@@ -426,7 +450,7 @@ function PartLabel() {
 }
 
 /** The metric cluster, top-left: the selected organ's readouts, or the heart's. */
-function Hud({ ready, client }: { ready: boolean; client: SimClient | null }) {
+function Hud({ ready, client, folded }: { ready: boolean; client: SimClient | null; folded: boolean }) {
   const snapshot = useStore((s) => s.snapshot);
   const selected = useStore((s) => s.selectedOrgan);
   const selectedDef = useMemo(() => ORGANS.find((o) => o.id === selected) ?? null, [selected]);
@@ -436,7 +460,7 @@ function Hud({ ready, client }: { ready: boolean; client: SimClient | null }) {
   const channelIndex = (c: WaveformChannel) => (client ? client.channelIndex(c) : 0);
   const heartDef = ORGANS.find((o) => o.id === 'heart')!;
   return (
-    <div className={styles.hud} data-hud>
+    <div className={styles.hud} data-hud data-folded={folded ? 'true' : undefined}>
       {!ready && <div className={styles.booting}>Starting body engine{'…'}</div>}
       {ready && snapshot && (
         <>

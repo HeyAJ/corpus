@@ -94,6 +94,21 @@
 }
 
 /*
+ * FOLDED WHILE A SHEET IS OPEN, PHONES ONLY. Selecting an organ on a phone opens the
+ * bottom sheet and frames the organ in the band above it, but the readouts (ECG strip,
+ * EF, waveform, detail lines) hung over the upper-left of that very organ. The owner chose
+ * folding over moving or shrinking them (2026-11-16): only the first row (the organ chip
+ * and whatever shares its line) stays; every later row is display: none, so it is instant
+ * and leaves no invisible box to swallow touches. Closing the sheet drops data-folded and
+ * the full readouts return exactly as before. Desktop has room and is untouched.
+ */
+@media (max-width: 720px) {
+  .hud[data-folded='true'] > :not(:first-child) {
+    display: none;
+  }
+}
+
+/*
  * THE HUD IS A READOUT, NOT A CONTROL. On a touch screen it overlays the body - on a
  * phone its detail lines reach past the middle of the stage - and it used to take pointer
  * events on every child, so a finger landing on it never reached the canvas: one-finger

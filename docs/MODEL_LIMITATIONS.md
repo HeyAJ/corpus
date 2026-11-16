@@ -705,8 +705,11 @@ the pH edge in pregnancy; they are not repeated here.
 
 - Part geometry is procedural and illustrative, not a traced atlas. Counts such as breast
   lobes or splenic follicles are schematic.
-- The fetal circulation is drawn, not simulated. The fetal heart glows but does not beat,
-  because no cited fetal heart rate is in the data.
+- The fetal circulation is drawn, not simulated. The fetal heart beats at the mean rate of
+  the cited populations for the gestational week, from 10 weeks (ADR-034). That rate is
+  pieced from three studies with one derived join at 14 to 20 weeks, and it is a replay of
+  means, not a simulation: no beat-to-beat variability, no accelerations, no response to
+  the mother's state. Below 10 weeks no rate is shown, because no source retrieved covers it.
 - The fetus is drawn at 41 to 64 percent of the size its weight implies, because the
   model's uterine cavity is smaller than a real one at every week. Below 10 weeks it is held
   at the 10-week size, because the weight table starts there (ADR-032).

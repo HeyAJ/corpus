@@ -102,7 +102,7 @@ function ScanCard({ viewer }: { viewer: Viewer }) {
   }, [viewer]);
 
   return (
-    <aside className={styles.card} aria-label="Brain activity scan" data-scan>
+    <aside className={styles.card} aria-label="Brain activity scan" data-scan data-stage-cover>
       <div className={styles.head}>
         <h2 className={styles.title}>Brain activity</h2>
         <button

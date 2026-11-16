@@ -727,3 +727,37 @@ card in degrees. Hormones, Nerves and Vessels are three labelled switches, all o
 
 **Rejected.** A ramp that reads as a temperature or BOLD signal: neither is simulated.
 Showing a conduction speed: none is modelled. Always-on overlays: they would bury the body.
+
+## ADR-034 — The fetal heart beats at a cited mean rate, replayed
+
+The fetal heart used to be drawn still because no cited rate was in the data. Three studies,
+each read on the retrieved source, now supply one.
+
+**The decision.** `fetalHeartRate(w)` in `src/sim/systems/reproductive.ts` returns null for a
+male body, a non-pregnant woman and gestational age under 10 weeks. From 10 to 14 weeks it is
+the straight line between the two Hyett (1996) means, 171 bpm at 10 weeks and 156 bpm at 14
+(6903 normal singleton pregnancies). From 14 to 20 weeks it is 156 plus Ursem's (1999) slope of
+-2.52 per week times the weeks since 14 (55 healthy women; the paper prints no unit, and weeks
+is the only reading that is physiologically possible). From 20 weeks it is the midpoint of the
+Pildner (2013) 95 percent confidence interval of the mean baseline rate for the band
+containing the week (13,015 cardiotocograph tracings); the paper prints the interval and not
+the mean, and the midpoint of a symmetric interval is the sample mean. The last band
+continues past 42 weeks. The result is a snapshot field, `fetalHeartRate_bpm`, shown in the
+Reproduction panel and as an FHR chip for the uterus and the fetus, and the fetal heart part
+pulses at it with a quick contraction and a slower filling, its phase accumulated from the
+rate so a change of rate never makes the beat jump. The amplitude is a display amplitude, not
+a wall motion. It is not on the effect bus, because nothing in the mother consumes it.
+
+**Why the 14-20 join is acceptable.** It is two cited numbers combined, labelled derived in the
+code. It reaches 140.88 bpm at 20 weeks, and the independent Pildner band that starts there has
+midpoint 141.348: they differ by less than 0.5 bpm, and a test asserts that they differ by
+less than 1. Two studies of different design that meet within that margin are better evidence
+than either alone.
+
+**Why nothing is shown below 10 weeks.** No source retrieved covers 9 to 10 weeks, and
+extending Hyett's line backwards would be an invented number. The fetus is drawn at its
+10-week size below 10 weeks (ADR-032) for the same reason.
+
+**Rejected.** Simulating a fetal circulation: nothing here would constrain it. Beat-to-beat
+variability or accelerations: no cited model of them is in the data. Putting the rate on the
+effect bus: the mother does not read it. A sine beat: a heart contracts faster than it fills.

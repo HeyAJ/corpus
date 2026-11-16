@@ -468,6 +468,12 @@ export interface PregnancySnapshot {
   trimester: 0 | 1 | 2 | 3;
   /** Estimated fetal weight, g; null before the cited growth curve begins (10 weeks). */
   fetalWeight_g: number | null;
+  /**
+   * Fetal heart rate, beats/min: the mean of the cited populations for this gestational
+   * week (Hyett 1996, Ursem 1999, Pildner 2013), replayed, not simulated. No variability,
+   * no response to the mother. Null when not pregnant, in a male body, or under 10 weeks.
+   */
+  fetalHeartRate_bpm: number | null;
   /** Amniotic fluid volume, mL; null outside the gestational range the citation covers. */
   amnioticFluid_mL: number | null;
   /** Fractional expansion of plasma volume and of red-cell mass currently applied. */

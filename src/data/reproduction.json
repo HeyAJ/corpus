@@ -118,6 +118,18 @@
     "BRIEF": {
       "label": "A figure fixed by the task brief for this subsystem (a convention or a landmark chosen by the author of the brief), not read by the implementer from a primary source.",
       "url": "https://github.com/"
+    },
+    "HYETT1996": {
+      "label": "Hyett JA, Noble PL, Snijders RJ, Montenegro N, Nicolaides KH. Fetal heart rate in trisomy 21 and other chromosomal abnormalities at 10-14 weeks of gestation. Ultrasound Obstet Gynecol 1996;7(4):239-244. PMID 8726874. n = 6903 normal singleton pregnancies. Abstract: \"In 6903 normal singleton pregnancies the fetal heart rate decreased from a mean of 171 bpm at 10 weeks of gestation to 156 bpm at 14 weeks (r = 0.413, p < 0.0001).\"",
+      "url": "https://europepmc.org/article/MED/8726874"
+    },
+    "URSEM1999": {
+      "label": "Ursem NTC, Clark EB, Keller BB, Hop WCJ, Wladimiroff JW. Assessment of fetal heart rate variability and velocity variability by Doppler velocimetry of the descending aorta at 10-20 weeks of gestation. Ultrasound Obstet Gynecol 1999;14:397-401. PMID 10658278. 55 healthy women with normal singleton pregnancies at 10-20 weeks. Full text: \"the instantaneous fetal heart rate decreased (slope = −2.52, r = 0.71, p < 0.001)\".",
+      "url": "https://repub.eur.nl/pub/72957/"
+    },
+    "PILDNER2013": {
+      "label": "Pildner von Steinburg S, et al. What is the \"normal\" fetal heart rate? PeerJ 2013;1:e82. doi 10.7717/peerj.82. Computerised cardiotocography, 13,015 tracings with a known gestational age collected between 20 and 42 weeks. Table 4 prints the 95% confidence interval of the MEAN baseline rate, not the mean itself.",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3678114/"
     }
   },
   "constants": {
@@ -864,9 +876,45 @@
       "sourceUrl": "https://github.com/",
       "confidence": "assumed",
       "note": "How the raised state falls after its 60 min plateau. No decay time was read; this only ends the flag smoothly."
+    },
+    "fetus.heartRateAt10Weeks_bpm": {
+      "value": 171,
+      "unit": "beats/min",
+      "source": "HYETT1996",
+      "sourceUrl": "https://europepmc.org/article/MED/8726874",
+      "confidence": "measured",
+      "note": "Mean fetal heart rate at 10 weeks of gestation in 6903 normal singleton pregnancies (abstract). Read 2026-11-16."
+    },
+    "fetus.heartRateAt14Weeks_bpm": {
+      "value": 156,
+      "unit": "beats/min",
+      "source": "HYETT1996",
+      "sourceUrl": "https://europepmc.org/article/MED/8726874",
+      "confidence": "measured",
+      "note": "Mean fetal heart rate at 14 weeks of gestation, same 6903 pregnancies (abstract). Read 2026-11-16."
+    },
+    "fetus.heartRateSlope10to20Weeks_bpm_per_week": {
+      "value": -2.52,
+      "unit": "beats/min per week",
+      "source": "URSEM1999",
+      "sourceUrl": "https://repub.eur.nl/pub/72957/",
+      "confidence": "measured",
+      "note": "Slope of instantaneous fetal heart rate against gestational age, 55 healthy women at 10-20 weeks (r = 0.71). The paper does not print the slope's unit; gestational age is in weeks throughout the paper and a per-day reading would be physiologically impossible, so it is read as beats/min per week."
     }
   },
   "tables": {
+    "pildnerFetalHeartRate": {
+      "source": "PILDNER2013",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3678114/",
+      "confidence": "measured",
+      "unit": "beats/min (ci); weeks (bands); tracings (n)",
+      "note": "Table 4 of PILDNER2013: the 95% confidence interval of the MEAN baseline fetal heart rate by gestational-age band, computerised cardiotocography, 13,015 tracings with a known gestational age (20-42 weeks; the first band, '<28 weeks', starts at 20). The paper prints the interval and NOT the mean. The model uses the midpoint, which is the sample mean for a symmetric interval. Band k covers fromWeek[k] <= w < toWeek[k]; the last band (week 42) is carried on past 42 weeks.",
+      "fromWeek": [20, 28, 32, 37, 38, 39, 40, 41, 42],
+      "toWeek": [28, 32, 37, 38, 39, 40, 41, 42, 43],
+      "n": [1230, 1059, 2248, 1090, 1793, 1962, 2325, 1199, 109],
+      "ciLow_bpm": [140.7538, 139.1587, 138.1575, 136.7176, 135.5575, 135.9786, 135.2181, 135.9135, 133.2492],
+      "ciHigh_bpm": [141.9422, 140.3843, 138.9322, 137.8588, 136.472, 136.8404, 136.0158, 137.0438, 137.8009]
+    },
     "strickerDaily": {
       "source": "STRICKER2006",
       "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",

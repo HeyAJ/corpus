@@ -729,11 +729,21 @@ export class Viewer {
   private lastViewportMeasure = -1e9;
 
   /**
-   * How much of the canvas the open panel covers, so the camera can centre an organ in what
-   * is left. The Viewer has no other way to know: the panel is React's, the canvas is ours.
-   * The App root carries data-sheet="open" while a panel is up and the panel sheet is its
-   * <aside>; a sheet wider than half the canvas is the phone's bottom sheet, anything
-   * narrower is the wide screen's right-hand card. Measured at ~5 Hz because
+   * How much of the canvas is covered, so the camera can centre an organ in what is left.
+   * The Viewer has no other way to know: the panels are React's, the canvas is ours.
+   * The App root carries data-sheet="open" while a panel is up. Exactly two kinds of element
+   * hide the stage and each carries a data-stage-cover marker: the floating panel sheet
+   * (App.tsx) and the brain-scan inset (BrainScanInset.tsx). Legends and toasts are
+   * deliberately unmarked. An earlier version took root.querySelector('aside'), the FIRST
+   * <aside> by tag, and that was wrong twice over: tag order is not a statement about what
+   * covers the stage, and with the brain selected the inset is on screen and was found
+   * first, so the real bottom sheet was never measured and on a 390x844 phone the camera
+   * framed the brain as if nothing were open, leaving it behind the sheet. Every marked
+   * element now contributes. One wider than 0.6 of the canvas is the phone's bottom sheet
+   * and adds to `bottom`; a narrower one is the wide screen's right-hand card or the inset
+   * and adds to `right`; each strip is the largest of its contributors. On a phone with the
+   * brain selected that yields a bottom strip from the sheet AND a right strip from the
+   * inset, so the brain is framed in the free top-left area. Measured at ~5 Hz because
    * getBoundingClientRect forces layout, and the answer changes only when a panel opens.
    */
   private measureViewport(now: number): void {
@@ -746,15 +756,13 @@ export class Viewer {
     let bottom = 0;
     const root = canvas.closest('[data-sheet]');
     if (root && root.getAttribute('data-sheet') === 'open') {
-      const sheet = root.querySelector('aside');
-      if (sheet) {
-        const r = sheet.getBoundingClientRect();
-        const c = canvas.getBoundingClientRect();
-        if (r.width > 0 && r.height > 0) {
-          if (r.width > 0.6 * w) bottom = Math.max(0, Math.min(0.6 * h, c.bottom - r.top));
-          else right = Math.max(0, Math.min(0.6 * w, c.right - r.left));
-        }
-      }
+      const c = canvas.getBoundingClientRect();
+      root.querySelectorAll('[data-stage-cover]').forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (r.width <= 0 || r.height <= 0) return;
+        if (r.width > 0.6 * w) bottom = Math.max(bottom, Math.max(0, Math.min(0.6 * h, c.bottom - r.top)));
+        else right = Math.max(right, Math.max(0, Math.min(0.6 * w, c.right - r.left)));
+      });
     }
     this.rig.setViewport(w, h, Math.round(right), Math.round(bottom));
   }

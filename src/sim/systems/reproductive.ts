@@ -101,6 +101,13 @@ interface ReproductionFile {
       };
     };
     shapes: { curves: Record<string, { points: number[][] }> };
+    pildnerFetalHeartRate: {
+      fromWeek: number[];
+      toWeek: number[];
+      n: number[];
+      ciLow_bpm: number[];
+      ciHigh_bpm: number[];
+    };
   };
 }
 
@@ -739,6 +746,48 @@ function fetalWeight(w: number): number | null {
   return Math.exp(R('pregnancy.hadlockIntercept') + R('pregnancy.hadlockLinear') * ga + R('pregnancy.hadlockQuadratic') * ga * ga);
 }
 
+/**
+ * Fetal heart rate, beats/min, for a gestational age in weeks, or null where no cited rate
+ * exists. This is a REPLAY of population means, nothing more, pieced from three studies:
+ *
+ *   w < 10            null. The model holds its fetus at the 10-week drawing below 10 weeks
+ *                     and no source retrieved covers 9 to 10 weeks, so no rate is shown
+ *                     rather than a plausible extrapolation of Hyett's line backwards.
+ *   10 <= w < 14      the straight line between the two Hyett (1996) means, 171 bpm at 10
+ *                     weeks and 156 bpm at 14 (6903 normal singleton pregnancies).
+ *   14 <= w < 20      156 + slope x (w - 14), with the slope of Ursem (1999), -2.52 bpm per
+ *                     week (55 healthy women, 10-20 weeks). This is a DERIVED join of two
+ *                     cited numbers from two studies, not a measurement in its own right.
+ *                     It reaches 140.88 at 20 weeks, and the independent Pildner (2013)
+ *                     band that starts at 20 weeks has midpoint 141.348: the two agree to
+ *                     0.47 bpm, which is the check that the join is acceptable. The test
+ *                     suite asserts that agreement so a change to either end shows up.
+ *   w >= 20           the midpoint of the Pildner interval of the band that contains w
+ *                     (computerised CTG, 13,015 tracings). The paper prints the 95%
+ *                     confidence interval of the MEAN, not the mean, and the midpoint of a
+ *                     symmetric interval is the sample mean. The last band (week 42)
+ *                     continues past 42 weeks, where the model's pregnancy ends anyway.
+ *
+ * What it is NOT: not a simulated fetal circulation. There is no beat-to-beat variability,
+ * no accelerations or decelerations, no response to the mother's state, and the steps
+ * between Pildner bands are steps in the data, not physiology. It is a display quantity
+ * of the fetus only and therefore deliberately does NOT go on the effect bus: nothing in
+ * the mother consumes it (CLAUDE.md rule 2 is about what reaches the body).
+ */
+export function fetalHeartRate(w: number): number | null {
+  if (!(w >= 10)) return null;
+  if (w < 14) {
+    const a = R('fetus.heartRateAt10Weeks_bpm');
+    const b = R('fetus.heartRateAt14Weeks_bpm');
+    return a + ((b - a) * (w - 10)) / 4;
+  }
+  if (w < 20) return R('fetus.heartRateAt14Weeks_bpm') + R('fetus.heartRateSlope10to20Weeks_bpm_per_week') * (w - 14);
+  const t = REPRO.tables.pildnerFetalHeartRate;
+  let k = 0;
+  for (let i = 0; i < t.fromWeek.length; i++) if (w >= t.fromWeek[i]) k = i;
+  return (t.ciLow_bpm[k] + t.ciHigh_bpm[k]) / 2;
+}
+
 export function reproductiveSnapshot(s: SimState): ReproductiveSnapshot {
   const r = s.reproductive;
   const female = s.body.sex === 'female';
@@ -767,6 +816,7 @@ export function reproductiveSnapshot(s: SimState): ReproductiveSnapshot {
       gestationWeeks: female && r.pregnant ? w : 0,
       trimester: female && r.pregnant ? trimesterOf(w) : 0,
       fetalWeight_g: female && r.pregnant ? fetalWeight(w) : null,
+      fetalHeartRate_bpm: female && r.pregnant ? fetalHeartRate(w) : null,
       amnioticFluid_mL:
         female && r.pregnant && w >= R('pregnancy.amnioticFirstWeek') && w <= R('pregnancy.amnioticLastWeek')
           ? R('pregnancy.amnioticFluid_mL')

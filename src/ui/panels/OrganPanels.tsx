@@ -588,7 +588,10 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
     case 'uterus':
       return preg.pregnant
         ? {
-            chips: presentHormones(s, [['hcg', 'hCG', 0], ['progesterone', 'P4', 1], ['oxytocin', 'Oxt', 1]]),
+            chips: [
+              ...presentHormones(s, [['hcg', 'hCG', 0], ['progesterone', 'P4', 1], ['oxytocin', 'Oxt', 1]]),
+              { label: 'FHR', value: preg.fetalHeartRate_bpm, digits: 0, unit: '/min' },
+            ],
             words: [`${preg.gestationWeeks.toFixed(1)} wk`, `trimester ${preg.trimester}`, ...(preg.amnioticFluid_mL === null ? [] : [`amniotic ${preg.amnioticFluid_mL.toFixed(0)} mL`])],
           }
         : {
@@ -639,6 +642,7 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
         chips: [
           { label: 'Gestation', value: preg.gestationWeeks, digits: 1, unit: 'wk' },
           { label: 'Weight', value: preg.fetalWeight_g, digits: 0, unit: 'g' },
+          { label: 'FHR', value: preg.fetalHeartRate_bpm, digits: 0, unit: '/min' },
         ],
         caption: 'Fetal circulation is drawn, not simulated.',
       };
