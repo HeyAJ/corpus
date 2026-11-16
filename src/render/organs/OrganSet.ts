@@ -7,6 +7,8 @@ import { createOrganSolidMaterial, createFluidMaterial } from '../materials/Orga
 import { GeometryFactory } from '../anatomy/GeometryFactory';
 import { GI_CENTRELINES, ORGAN_DEFS, groupOffset as layoutGroupOffset, organPosition } from '../anatomy/layout';
 import { fetalFit, gravidBody, type FetalFit } from '../anatomy/models';
+import { activityColour } from './activityRamp';
+import { ALARM_HEX } from './alarmOrgans';
 import { amnioticSacRadii } from '../anatomy/atlas/uterus.parts';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
 
@@ -86,18 +88,29 @@ const STATE_STYLE: Record<OrganState, { density: number; rimGain: number }> = {
 /**
  * How far an organ's dormant tint is pulled from its own colour toward the shared pink.
  *
- * 0.84 keeps every resting organ in one pink family, with just enough of its own hue
- * left that a liver is recognisably warmer than a lung when you look for it (the
- * reference lets only the SELECTED organ take its own colour). A working organ gives
- * some of that back: at full engagement it is drawn 0.5 of the way, plainly its own
- * colour but still translucent tissue rather than the solid of a selected organ.
+ * At rest an organ keeps about half of its own hue (see REST_TINT_MIX below), so the
+ * organs can be told apart in a whole-body view while the look stays soft glass (the
+ * reference lets only the SELECTED organ take its full colour). A working organ gives
+ * more of it back: at full engagement it is drawn ACTIVE_TINT_MIX of the way toward pink,
+ * plainly its own colour but still translucent tissue rather than the solid of a
+ * selected organ.
  *
  * WHY THIS IS SAFE FOR THE ORDER-INDEPENDENCE GUARANTEE: the tint enters as
  * `exp(-sigma * (1 - tint))`, so a per-organ tint is still a per-organ transmittance,
  * and a product of transmittances is commutative whatever the individual values are.
  */
-const REST_TINT_MIX = 0.84;
-const ACTIVE_TINT_MIX = 0.5;
+/*
+ * REST_TINT_MIX WAS 0.84 AND THAT WAS WRONG (changed 2026-11-16). Mixing every organ's own
+ * colour 84 % toward one shared pink left only 16 % of the organ's identity, so liver,
+ * stomach, lungs and bowel all read as one pink mass in the whole-body view. Three
+ * candidates were rendered (rest/active 0.6/0.3, 0.45/0.2, 0.3/0.1) and compared: 0.6 was
+ * still close to pink, 0.3 began to go muddy and lilac (the lungs and brain turned
+ * saturated), and 0.45 gives a brown liver, mauve lungs, salmon stomach and a pinker
+ * bowel while staying soft glass. ACTIVE_TINT_MIX moves with it so an engaged organ is
+ * still clearly richer than a resting one. Both are display choices.
+ */
+const REST_TINT_MIX = 0.45;
+const ACTIVE_TINT_MIX = 0.2;
 /** A fully engaged organ is also drawn this much denser. */
 const ACTIVE_DENSITY_GAIN = 0.45;
 const PINK = new THREE.Color(0xffd2cc);
@@ -126,6 +139,27 @@ const TWEEN_MS = 250;
 const APPEAR_MS = 420;
 /** Organ engagement is smoothed over about this long so a noisy index does not flicker. */
 const ACTIVITY_TAU_MS = 350;
+
+/**
+ * ACTIVITY MODE DENSITY (display choices). In the mode a quiet organ is drawn at
+ * ACTIVITY_QUIET_DENSITY of its normal density so it recedes toward the page, and a fully
+ * engaged one at QUIET + SPAN (about 1.45x), so engagement reads as darker AND denser.
+ */
+const ACTIVITY_QUIET_DENSITY = 0.55;
+const ACTIVITY_DENSITY_SPAN = 0.9;
+
+/**
+ * ALARM PULSE (display choices). The shells behind a warn or critical condition swing
+ * toward the interface's alarm red (ALARM_HEX in alarmOrgans.ts) at about 1 Hz. That
+ * rhythm is a DISPLAY rhythm, not the heart rate. Tint, not light, because additive glow
+ * is almost invisible on the pale page. Under reduced motion the swing is replaced by a
+ * steady emphasis at ALARM_STEADY of the full swing.
+ */
+const ALARM_PULSE_HZ = 1;
+const ALARM_STEADY = 0.6;
+const ALARM_TINT_MIX = 0.75;
+const ALARM_DENSITY_GAIN = 0.6;
+const ALARM_TAU_MS = 200;
 
 /**
  * The order organs are asked for, so the body assembles the same way every load and
@@ -197,6 +231,9 @@ export interface OrganHandle {
   /** Smoothed engagement above rest, 0..1, and the value it is heading for. */
   activity: number;
   activityTarget: number;
+  /** 0..1 eased alarm emphasis and where it is heading (see setAlarmOrgans). */
+  alarm: number;
+  alarmTarget: number;
   /** The organ has interior parts, so it turns to glass when selected. */
   hasInterior: boolean;
   /** Which gestational week the current geometry was built for (the uterus only). */
@@ -226,6 +263,16 @@ export class OrganSet {
   private readonly scratchColor = new THREE.Color();
   private readonly scratchFit = new THREE.Vector3();
   private readonly restTint = new THREE.Color();
+  private readonly rampRgb = { r: 0, g: 0, b: 0 };
+  private readonly rampColor = new THREE.Color();
+  private readonly alarmColor = new THREE.Color(ALARM_HEX);
+  /** Activity display mode (setActivityMode) and its eased 0..1 cross-fade. */
+  private activityMode = false;
+  private activityMix = 0;
+  /** Display clock of the alarm pulse, ms, advanced only while something is alarming. */
+  private alarmClockMs = 0;
+  /** Under reduced motion the alarm is a steady emphasis, not a swing. */
+  reducedMotion = false;
   /** 0..1, eased: 1 while some organ is selected. See RECEDE_DENSITY. */
   private focus = 0;
   private disposed = false;
@@ -354,6 +401,8 @@ export class OrganSet {
       appear: 0,
       activity: 0,
       activityTarget: 0,
+      alarm: 0,
+      alarmTarget: 0,
       hasInterior,
       builtForWeek: -1,
       fit: null,
@@ -507,6 +556,20 @@ export class OrganSet {
     if (h) h.activityTarget = Number.isFinite(activity) ? Math.max(0, Math.min(1, activity)) : 0;
   }
 
+  /** Switch the Activity display mode: shell colour from the one sequential ramp. */
+  setActivityMode(on: boolean): void {
+    this.activityMode = on;
+  }
+
+  /** The organ ids to pulse toward alarm red; every other organ eases back to calm. */
+  setAlarmOrgans(ids: readonly string[]): void {
+    for (const h of this.organs.values()) h.alarmTarget = 0;
+    for (let i = 0; i < ids.length; i++) {
+      const h = this.organs.get(ids[i] as OrganId);
+      if (h) h.alarmTarget = 1;
+    }
+  }
+
   /** Advance the state tweens, the fade-in and the activity tint. `dtMs` is real time. */
   update(dtMs: number): void {
     const activityBlend = 1 - Math.exp(-dtMs / ACTIVITY_TAU_MS);
@@ -523,9 +586,23 @@ export class OrganSet {
     const recedeDensity = 1 - (1 - RECEDE_DENSITY) * this.focus;
     const recedeRim = 1 - (1 - RECEDE_RIM) * this.focus;
 
+    // The Activity mode cross-fades over the same time as the activity smoothing, so
+    // switching it never pops.
+    this.activityMix += ((this.activityMode ? 1 : 0) - this.activityMix) * activityBlend;
+    const mode = this.activityMix;
+
+    // The alarm swing runs on its own display clock. ALARM_PULSE_HZ is a display rhythm,
+    // not the heart rate; the clock advances only when real time does (dtMs).
+    this.alarmClockMs += dtMs;
+    const swing = this.reducedMotion
+      ? ALARM_STEADY
+      : 0.5 - 0.5 * Math.cos((this.alarmClockMs * ALARM_PULSE_HZ * 2 * Math.PI) / 1000);
+    const alarmBlend = 1 - Math.exp(-dtMs / ALARM_TAU_MS);
+
     for (const h of this.organs.values()) {
       if (!h.built || !h.wanted) continue;
 
+      h.alarm += (h.alarmTarget - h.alarm) * alarmBlend;
       h.activity += (h.activityTarget - h.activity) * activityBlend;
       if (h.appear < 1) h.appear = Math.min(1, h.appear + dtMs / APPEAR_MS);
       if (h.tween < 1) h.tween = Math.min(1, h.tween + dtMs / TWEEN_MS);
@@ -542,7 +619,12 @@ export class OrganSet {
       // organ is working. A selected organ's shell goes to the multiply identity (white,
       // density 0) rather than being switched off, so there is no pop and no change in
       // draw order; bucket 3 owns its look.
-      const activeGain = selected ? 0 : (1 + ACTIVE_DENSITY_GAIN * h.activity) * (h.def.shellDensity ?? 1);
+      // In Activity mode the density gain is the ramp's own (quiet recedes, engaged is dense).
+      const gain = (1 - mode) * (1 + ACTIVE_DENSITY_GAIN * h.activity)
+        + mode * (ACTIVITY_QUIET_DENSITY + ACTIVITY_DENSITY_SPAN * h.activity);
+      // An alarming organ is also denser at the top of its swing, so it reads on the pale page.
+      const alarmAmount = h.alarm * swing;
+      const activeGain = selected ? 0 : (gain + ALARM_DENSITY_GAIN * alarmAmount) * (h.def.shellDensity ?? 1);
       const density = h.fromDensity + (target.density * activeGain - h.fromDensity) * e;
       const rimGain = h.fromRim + (target.rimGain - h.fromRim) * e;
       h.ownDensity = density;
@@ -555,6 +637,14 @@ export class OrganSet {
       rim.uniforms.uRimGain.value = rimGain * fade * (selected || exempt ? 1 : recedeRim);
 
       this.restTint.copy(h.ownColor).lerp(PINK, REST_TINT_MIX + (ACTIVE_TINT_MIX - REST_TINT_MIX) * h.activity);
+      if (mode > 0.001) {
+        // The ramp replaces the organ's own colour. Authored in sRGB, so it is set with
+        // the colour space named; the working space is linear.
+        activityColour(h.activity, this.rampRgb);
+        this.rampColor.setRGB(this.rampRgb.r, this.rampRgb.g, this.rampRgb.b, THREE.SRGBColorSpace);
+        this.restTint.lerp(this.rampColor, mode);
+      }
+      if (alarmAmount > 0.001 && !selected) this.restTint.lerp(this.alarmColor, ALARM_TINT_MIX * alarmAmount);
       (abs.uniforms.uTint.value as THREE.Color).lerpColors(h.fromTint, selected ? WHITE : this.restTint, e);
       // Once the cross-fade is over the tint simply follows the activity.
       if (h.tween >= 1 && !selected) {

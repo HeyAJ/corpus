@@ -1,3 +1,4 @@
+import { collectAlarmOrgans } from '../organs/alarmOrgans';
 import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
@@ -138,6 +139,22 @@ export class Viewer {
 
   /** Set from the store; freezes organ motion but leaves numbers live (spec 10.6). */
   reducedMotion = false;
+
+  /** Activity display mode: unselected shells coloured by engagement (see OrganSet). */
+  private activityOn = false;
+  get activityVisible(): boolean {
+    return this.activityOn;
+  }
+  setActivityVisible(on: boolean): void {
+    this.activityOn = on;
+    this.organs.setActivityMode(on);
+  }
+
+  /** The organ ids pulsing toward alarm red right now (read-only view). */
+  private alarming: string[] = [];
+  get alarmOrgans(): readonly string[] {
+    return this.alarming;
+  }
 
   frameTimes: number[] = [];
 
@@ -503,6 +520,10 @@ export class Viewer {
       if (this.organs.organs.has(id)) this.organs.setActivity(id, engagement[key]);
     }
 
+    // Organs behind a warn or critical condition pulse; `watch` does not.
+    collectAlarmOrgans(s.conditions, this.alarming);
+    this.organs.setAlarmOrgans(this.alarming);
+
     // The uterus and the fetus are rebuilt as the weeks pass; show() is a no-op for every
     // other organ and for an unchanged week.
     if (this.selected) {
@@ -571,6 +592,7 @@ export class Viewer {
       this.setHover(this.pick());
     }
 
+    this.organs.reducedMotion = this.reducedMotion;
     this.organs.update(dtMs);
     this.vascular.update(dtMs / 1000);
     this.nerves.update(dtMs / 1000);
