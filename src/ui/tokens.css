@@ -64,7 +64,7 @@
   --corpus-bar-h: 92px;
 
   /* --- type ----------------------------------------------------------- */
-  --font-ui: 'Nunito', 'Varela Round', 'M PLUS Rounded 1c', ui-rounded,
+  --font-ui: 'Nunito Variable', 'Nunito', 'Varela Round', 'M PLUS Rounded 1c', ui-rounded,
     -apple-system, 'Segoe UI', system-ui, sans-serif;
   --size-chip: 17px;
   --size-tag: 15px;

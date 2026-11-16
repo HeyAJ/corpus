@@ -295,3 +295,32 @@ a.item {
 .hormMarkOn {
   color: var(--ink);
 }
+
+/*
+ * PHONE, A CARD IS OPEN: THE CORNER SWITCHES AND THE HORMONE LEGEND STEP OUT OF THE WAY.
+ * A bottom sheet or the resuscitation card covers the bottom-left corner of the stage, so
+ * the three switches (and the legend above them) were still in the DOM, still looked
+ * tappable, and were painted over (the checker reported "Show blood vessels" covered under
+ * Charge, 120 J and Compress). Nothing a visitor can tap may sit under something else, and
+ * a control they cannot reach is better absent than present-but-dead. data-card is set on
+ * the shell from the same flags that fold the HUD (App.tsx sheetOpen). Desktop is not
+ * touched: its sheet is a right-hand column and the corner stays free.
+ */
+@media (max-width: 720px) {
+  :global([data-card='open']) .vessels,
+  :global([data-card='open']) .hormLegend {
+    display: none;
+  }
+}
+
+/*
+ * THE PANELS MENU HIDES THE CORNER SWITCHES AND THE LEGEND, AT EVERY WIDTH. The launcher
+ * opens upward from the dock over the bottom-left corner, so the Vessels, Nerves and
+ * Hormones switches were painted through the "Receptors" and "Laboratory" rows (the checker
+ * printed "Vessels" x "Receptors"). The menu is modal (its scrim takes every tap), so the
+ * switches were unreachable anyway; they return the moment it closes.
+ */
+:global([data-menu='open']) .vessels,
+:global([data-menu='open']) .hormLegend {
+  display: none;
+}

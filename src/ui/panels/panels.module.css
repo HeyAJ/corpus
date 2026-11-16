@@ -47,13 +47,6 @@
   }
 }
 
-/* On a phone the speed chip takes the top-right corner; the tags start below it. */
-@media (max-width: 720px) {
-  .conditions {
-    top: calc(env(safe-area-inset-top, 0px) + 70px);
-  }
-}
-
 .noteText {
   font-weight: 500;
   line-height: 1.4;
@@ -89,6 +82,18 @@
   gap: 8px;
   pointer-events: none;
   max-width: 46vw;
+}
+
+/* On a phone the speed chip takes the top-right corner; the tags start below it.
+   THIS RULE MUST COME AFTER the base .conditions rule above. It used to sit near the top of
+   the file, where the later base rule (same specificity) overrode it, so on a phone the
+   first alarm pill was painted straight over the clock chip (the checker printed
+   "Hypovolemia" x "01"). The 70 px is the chip's 22 px offset plus its 36 px minimum
+   height plus a gap: a layout choice, not a measured value. */
+@media (max-width: 720px) {
+  .conditions {
+    top: calc(env(safe-area-inset-top, 0px) + 70px);
+  }
 }
 
 /* With a panel open on a wide screen the sheet takes the top-right corner, so the tags
@@ -166,4 +171,17 @@
 .transitVolume {
   grid-area: volume;
   text-align: right;
+}
+
+/*
+ * PHONE, DRUG DRAWER OPEN: the alarm pills step aside. The drawer is a modal bottom sheet
+ * taller than the other sheets (56vh), and a long column of pills (cardiac arrest shows
+ * nine) reached down into its category chips, so "Cardiac Arrest" was painted over
+ * "Antiarrhythmics". The pills are display-only and come straight back when the drawer
+ * closes; the HUD and the rhythm readout above still say the body is in trouble.
+ */
+@media (max-width: 720px) {
+  :global([data-drawer-open='open']) .conditions {
+    display: none;
+  }
 }

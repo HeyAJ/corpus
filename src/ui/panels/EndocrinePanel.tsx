@@ -128,7 +128,7 @@ export function EndocrinePanel() {
           return (
             <li key={h.id} className={styles.row}>
               <div className={styles.rowHead}>
-                <span className={styles.name}>{h.label}</span>
+                <span className={styles.name} title={h.label}>{h.label}</span>
                 <span className={styles.gland}>{h.gland}</span>
                 <span className={styles.value}>
                   {fmt(h.level)} <span className={styles.unit}>{h.unit}</span>
@@ -149,6 +149,8 @@ export function EndocrinePanel() {
                 />
                 <span className={`${styles.needle} ${cls}`} style={{ left: `${g.needle}%` }} />
               </div>
+
+              {h.note && <p className={styles.note}>{h.note}</p>}
 
               <div className={styles.rowFoot}>
                 <span>

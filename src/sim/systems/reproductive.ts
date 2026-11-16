@@ -846,8 +846,13 @@ function hormone(
   refHigh: number,
   gland: string,
   displayMax: number,
+  note?: string,
 ): HormoneSnapshot {
-  return { id, label, level, unit, activity: clamp01(level / displayMax), refLow, refHigh, gland };
+  // The label stays a short NAME. A caveat about the range used to be glued onto the label
+  // and the panel printed it over the value; it now travels separately as `note`.
+  const h: HormoneSnapshot = { id, label, level, unit, activity: clamp01(level / displayMax), refLow, refHigh, gland };
+  if (note !== undefined) h.note = note;
+  return h;
 }
 
 /** The reproductive hormones, in the same shape the endocrine panel already lists. */
@@ -861,7 +866,7 @@ export function reproductiveHormones(s: SimState): HormoneSnapshot[] {
   } else if (r.pregnant) {
     const w = r.gestationWeeks;
     const hMax = R('pregnancy.hcgDisplayMax_IU_L');
-    out.push(hormone('hcg', 'hCG (total; reference is the peak weekly median, no percentile range)', hcgAt(w), 'IU/L', 0, hMax, 'placenta', hMax));
+    out.push(hormone('hcg', 'hCG (total)', hcgAt(w), 'IU/L', 0, hMax, 'placenta', hMax, 'The reference shown is the peak weekly median, not a percentile range.'));
     out.push(hormone('progesterone', 'Progesterone', pregnancyLevel('progesterone', w, 'p50'), 'nmol/L', pregnancyLevel('progesterone', w, 'p10'), pregnancyLevel('progesterone', w, 'p90'), 'placenta', pregnancyDisplayMax('progesterone')));
     out.push(hormone('estradiol', 'Estradiol', pregnancyLevel('estradiol', w, 'p50'), 'pmol/L', pregnancyLevel('estradiol', w, 'p10'), pregnancyLevel('estradiol', w, 'p90'), 'placenta', pregnancyDisplayMax('estradiol')));
     out.push(hormone('prolactin', 'Prolactin', pregnancyLevel('prolactin', w, 'p50'), 'ng/mL', pregnancyLevel('prolactin', w, 'p10'), pregnancyLevel('prolactin', w, 'p90'), 'anterior pituitary', pregnancyDisplayMax('prolactin')));
@@ -876,7 +881,7 @@ export function reproductiveHormones(s: SimState): HormoneSnapshot[] {
   }
   // Measured basal and peak (MURPHY1987, men), not a laboratory range; used for both sexes.
   out.push(
-    hormone('oxytocin', 'Oxytocin (range shown is the measured basal and peak, not a laboratory range)', oxytocinLevel(r), 'pmol/L', R('sexual.oxytocinBasal_pmol_L'), R('sexual.oxytocinPeak_pmol_L'), 'posterior pituitary', R('sexual.oxytocinPeak_pmol_L')),
+    hormone('oxytocin', 'Oxytocin', oxytocinLevel(r), 'pmol/L', R('sexual.oxytocinBasal_pmol_L'), R('sexual.oxytocinPeak_pmol_L'), 'posterior pituitary', R('sexual.oxytocinPeak_pmol_L'), 'The range shown is the measured basal and peak, not a laboratory range.'),
   );
   return out;
 }

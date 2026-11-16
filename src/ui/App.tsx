@@ -68,6 +68,8 @@ export function App() {
   const nervesVisible = useStore((s) => s.nervesVisible);
   const hormonesVisible = useStore((s) => s.hormonesVisible);
   const pushLog = useStore((s) => s.pushLog);
+  // Why the 3D view is not showing, if it is not: it could not start, or it lost its context.
+  const [glProblem, setGlProblem] = useState<null | 'unavailable' | 'lost'>(null);
 
   // The shell no longer subscribes to the snapshot or the organ labels: the HUD, the
   // labels and the condition tags are their own components below, so a tick of the
@@ -111,6 +113,8 @@ export function App() {
       s.reproductionPanelOpen ||
       s.anatomyPanelOpen,
   );
+  const menuOpen = useStore((s) => s.menuOpen);
+  const drawerOpen = useStore((s) => s.drawerOpen);
   const reducedMotion = useStore((s) => s.reducedMotion);
   const firstRunAccepted = useStore((s) => s.firstRunAccepted);
   const sharedArrayBuffer = useStore((s) => s.sharedArrayBuffer);
@@ -143,9 +147,31 @@ export function App() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const viewer = new Viewer(canvas);
+    // THE 3D VIEW MAY NOT BE ABLE TO START. `new Viewer` throws when WebGL2 is unavailable
+    // (a blocklisted GPU, hardware acceleration switched off, a locked-down browser) and
+    // the stage used to be left blank with nothing to say why. The simulation does not need
+    // the picture, so a failed start is caught, explained in a card, and everything else
+    // (the banner, the readouts, the panels, the sim worker) carries on without a viewer.
+    let viewer: Viewer | null = null;
+    try {
+      viewer = new Viewer(canvas);
+    } catch (err) {
+      console.error('CORPUS: the 3D view could not start', err);
+      setGlProblem('unavailable');
+    }
     viewerRef.current = viewer;
-    viewer.setCallbacks({
+
+    // A lost GL context (the GPU driver reset, the tab was backgrounded under memory
+    // pressure) used to freeze the picture silently while the numbers kept moving.
+    const onContextLost = (e: Event) => {
+      e.preventDefault();
+      setGlProblem('lost');
+    };
+    const onContextRestored = () => setGlProblem((p) => (p === 'lost' ? null : p));
+    canvas.addEventListener('webglcontextlost', onContextLost);
+    canvas.addEventListener('webglcontextrestored', onContextRestored);
+
+    viewer?.setCallbacks({
       onSelect: (id) => setSelected(id),
       onLabels: (l) => setLabels(l),
       // A tap on a structure INSIDE the selected organ, and where each structure sits on
@@ -154,13 +180,13 @@ export function App() {
       onPart: (p) => setSelectedPart(p ? p.part : null),
       onPartLabels: (l) => setPartLabels(l),
     });
-    viewer.start();
+    viewer?.start();
 
     // DEVELOPMENT ONLY. The browser probes that check the renderer (.cache/probes) need to
     // select an organ by name rather than by guessing where it is on screen, and to read
     // the store. Vite removes this branch from a production build, so the live site never
     // exposes the handle.
-    if (import.meta.env.DEV) {
+    if (import.meta.env.DEV && viewer) {
       (window as unknown as { __corpus?: unknown }).__corpus = { viewer, store: useStore };
     }
 
@@ -179,7 +205,7 @@ export function App() {
           // each refresh is a React render of every open readout, and halving them is
           // frame time handed back to the 3D body. The LAST snapshot of any burst is
           // always delivered, so a readout is never left showing a stale value.
-          viewer.pushSnapshot(s);
+          viewer?.pushSnapshot(s);
           pendingSnapshot = s;
           const now = performance.now();
           if (now - lastUiSnapshot >= UI_SNAPSHOT_MS) {
@@ -200,7 +226,7 @@ export function App() {
           // Background mode follows the body's state (spec 8.1). Done here rather than in
           // a React effect so the shell does not have to subscribe to the snapshot.
           const arrested = s.conditions.some((c) => c.id === 'arrest' || c.id === 'vfib' || c.id === 'asystole');
-          viewer.setBackgroundMode(arrested ? 'arrest' : s.drugs.length > 0 || s.gi.digesta.length > 0 ? 'active' : 'idle');
+          viewer?.setBackgroundMode(arrested ? 'arrest' : s.drugs.length > 0 || s.gi.digesta.length > 0 ? 'active' : 'idle');
         },
         (r) => {
           setShock({ ...r, at: Date.now() });
@@ -220,20 +246,22 @@ export function App() {
         setReady(true);
       });
 
-    const onResize = () => viewer.resize();
+    const onResize = () => viewer?.resize();
     window.addEventListener('resize', onResize);
 
     // The canvas fills the stage, which fills the screen; observing the box directly
     // (rather than trusting window `resize`) also catches mobile address-bar collapses
     // and orientation changes that resize the layout without a window resize event.
-    const observer = new ResizeObserver(() => viewer.resize());
+    const observer = new ResizeObserver(() => viewer?.resize());
     observer.observe(canvas);
 
     return () => {
       if (flushTimer !== null) clearTimeout(flushTimer);
       window.removeEventListener('resize', onResize);
       observer.disconnect();
-      viewer.dispose();
+      canvas.removeEventListener('webglcontextlost', onContextLost);
+      canvas.removeEventListener('webglcontextrestored', onContextRestored);
+      viewer?.dispose();
       client.dispose();
       viewerRef.current = null;
       clientRef.current = null;
@@ -311,7 +339,8 @@ export function App() {
   const client = clientRef.current;
 
   return (
-    <div className={styles.root} data-sheet={anyPanelOpen ? 'open' : 'closed'}>
+    <div className={styles.root} data-sheet={anyPanelOpen ? 'open' : 'closed'} data-card={sheetOpen ? 'open' : 'closed'}
+      data-menu={menuOpen ? 'open' : 'closed'} data-drawer-open={drawerOpen ? 'open' : 'closed'}>
       {/*
         THE STAGE. The body and everything that must sit OVER the body: its own HUD,
         the screen-space labels, the condition tags, the speed control, the engine's
@@ -331,6 +360,8 @@ export function App() {
           aria-label="Three-dimensional body. Tap an organ to read its telemetry."
           role="img"
         />
+
+        {glProblem && <GlProblemCard kind={glProblem} />}
 
         <OrganLabels />
         <PartLabel />
@@ -410,6 +441,44 @@ export function App() {
       </div>
 
       {!firstRunAccepted && <FirstRunModal />}
+    </div>
+  );
+}
+
+/**
+ * The plain-language card shown in place of the body when the 3D view cannot draw. It says
+ * what happened and what to try, and promises nothing it cannot keep: the numbers and the
+ * panels still run, so the card says so. The wording is documented in the report for the
+ * documentation writer; change both together.
+ */
+function GlProblemCard({ kind }: { kind: 'unavailable' | 'lost' }) {
+  return (
+    <div className={styles.glCard} role="alert" data-gl-problem={kind}>
+      {kind === 'unavailable' ? (
+        <>
+          <strong>The 3D body cannot be shown on this device.</strong>
+          <p>
+            Your browser did not give CORPUS the graphics support (WebGL 2) it needs to draw the
+            body. The simulation itself is still running, so the readouts and panels work.
+          </p>
+          <p>
+            To see the body, try another browser, turn on hardware acceleration in your browser
+            settings, or open CORPUS on another device.
+          </p>
+        </>
+      ) : (
+        <>
+          <strong>The 3D view stopped.</strong>
+          <p>
+            The browser took the graphics context away from this page, so the picture of the
+            body froze. The readouts still update. Reloading the page brings the body back, but
+            starts the simulation again from rest.
+          </p>
+          <button type="button" className={styles.glReload} onClick={() => window.location.reload()}>
+            Reload
+          </button>
+        </>
+      )}
     </div>
   );
 }

@@ -113,7 +113,22 @@
   font-size: 13px;
   font-weight: var(--weight-bold);
   color: var(--ink);
+  /* A long name is cut with an ellipsis (the full text is in the title attribute) rather
+     than being allowed to run under the value beside it. */
+  min-width: 0;
+  max-width: 11em;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* A caveat about how to read the range, wrapped under its row so it cannot collide. */
+.note {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--ink-faint);
+  overflow-wrap: anywhere;
 }
 
 .gland {

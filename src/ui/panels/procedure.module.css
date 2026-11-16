@@ -60,7 +60,11 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 16px;
+  /* The MEASURED bottom-bar height, as the sheet and drawer use. A fixed 16px let this card
+     reach down over the tool dock on a phone, so the Cancel button was unreachable. */
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  max-height: calc(100% - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
+  overflow-y: auto;
   width: min(340px, calc(100% - 24px));
   background: var(--sheet-bg);
   backdrop-filter: blur(16px);

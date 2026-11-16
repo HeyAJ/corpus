@@ -338,3 +338,44 @@
     display: none;
   }
 }
+
+/*
+ * THE 3D-VIEW FALLBACK CARD. Centred on the stage, over the (blank or frozen) canvas and
+ * under the HUD, the dock and every sheet, so those keep working. Colours and sizes are
+ * display choices. It sits in the upper-middle so it does not hide the bottom dock.
+ */
+.glCard {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100% - 2 * var(--inset-hud)));
+  box-sizing: border-box;
+  padding: 18px 20px;
+  border-radius: var(--radius-card);
+  background: var(--sheet-bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.14);
+  z-index: 13;
+  pointer-events: auto;
+}
+
+.glCard p {
+  margin: 8px 0 0;
+  color: var(--ink-mid);
+}
+
+.glReload {
+  margin-top: 12px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--ink-inverse);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -180,6 +180,33 @@ export const LOG_LIFETIME_MS = 2000;
 let eventId = 1;
 
 /** The longest history worth keeping; older entries fall off the front. */
+/**
+ * THE WELCOME DIALOG IS ASKED ONCE PER BROWSER, NOT ONCE PER LOAD. `firstRunAccepted` used to
+ * start false on every page load, so a returning visitor met the same dialog every time.
+ * The acceptance is remembered under a VERSIONED key, so that a future change to what the
+ * dialog says can ask again by bumping the suffix. Storage is wrapped in try/catch because a
+ * private window, blocked site data or a sandboxed frame makes even reading it throw; in
+ * that case the visitor is simply asked again, which is the safe direction to fail. The
+ * permanent NOT FOR CLINICAL USE banner is a separate element and does not depend on this.
+ */
+const FIRST_RUN_KEY = 'corpus.firstRunAccepted.v1';
+
+function readFirstRunAccepted(): boolean {
+  try {
+    return window.localStorage.getItem(FIRST_RUN_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function writeFirstRunAccepted(): void {
+  try {
+    window.localStorage.setItem(FIRST_RUN_KEY, 'true');
+  } catch {
+    /* Not persisted; the dialog will be shown again next visit. */
+  }
+}
+
 const MAX_EVENTS = 300;
 
 const CLOSED = {
@@ -321,8 +348,11 @@ export const useStore = create<UiState>((set, get) => ({
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false,
   setReducedMotion: (v) => set({ reducedMotion: v }),
-  firstRunAccepted: false,
-  acceptFirstRun: () => set({ firstRunAccepted: true }),
+  firstRunAccepted: readFirstRunAccepted(),
+  acceptFirstRun: () => {
+    writeFirstRunAccepted();
+    set({ firstRunAccepted: true });
+  },
   showProvenance: null,
   setProvenance: (key) => set({ showProvenance: key }),
 

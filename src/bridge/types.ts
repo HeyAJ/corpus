@@ -227,6 +227,8 @@ export interface HormoneSnapshot {
   refLow: number;
   refHigh: number;
   gland: string;
+  /** A caveat about how to read the range, shown as small text under the row. */
+  note?: string;
 }
 
 export interface EndocrineSnapshot {
