@@ -4,6 +4,14 @@ on:
   push:
   pull_request:
 
+# The suite used to run as ONE job and took about 36 minutes, almost all of it in the
+# test step: the long simulations (a 24-hour homeostasis run, the nutrition scenarios,
+# the pharmacology golden tests) ran one after another on a single runner. It is now
+# two jobs. `verify` answers "does it lint, type-check and build" in about a minute;
+# `test` runs the same suite split across six runners with Vitest's own sharding.
+# Sharding assigns every test file to exactly one shard by a hash of its path, so a
+# newly added test file is picked up automatically and can never be left out, which a
+# hand-written list of files per job could not promise.
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -23,12 +31,6 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      # The whole suite, including the 24-hour homeostasis run, the determinism
-      # check, the pharmacology golden tests against each drug's own citation, the
-      # render order-independence proof, and the tick-budget test.
-      - name: Test
-        run: npm test
-
       - name: Build
         run: npm run build
 
@@ -46,3 +48,26 @@ jobs:
 
       - name: Placeholder triangle budget
         run: npm run organs
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      # One failing shard must not cancel the others: the point of a red run is to see
+      # everything that is broken, not only the first thing.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6]
+    name: test (${{ matrix.shard }}/6)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+
+      # The whole suite, including the 24-hour homeostasis run, the determinism
+      # check, the pharmacology golden tests against each drug's own citation, the
+      # render order-independence proof, and the tick-budget test.
+      - name: Test (shard ${{ matrix.shard }} of 6)
+        run: npm test -- --shard=${{ matrix.shard }}/6
