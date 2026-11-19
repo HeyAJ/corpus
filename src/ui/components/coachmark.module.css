@@ -1,13 +1,17 @@
 /*
- * THE FIRST-VISIT HINT PILL (CoachMark.tsx). Centred over the lower body, above the four
- * corner switches and clear of the bottom bar, the HUD at the top-left and the speed and
- * condition tags at the top-right, so it covers no control. Every offset is a display
- * choice. It sits under the sheets and the panels menu (z-index 13 against their 24 and up).
+ * THE FIRST-VISIT HINT PILL (CoachMark.tsx). It sits on the row just above the bottom bar,
+ * centred on a wide screen and, on a phone, to the right of the corner switches, so it
+ * covers no control: not the four switches (bottom-left, up to about 140 px wide), not the
+ * dock under it, not the HUD at the top-left or the speed and condition tags at the top
+ * right. An earlier placement over the lower body landed under the legends column when a
+ * switch was on. Every offset is a display choice. It sits under the sheets and the panels
+ * menu (z-index 13 against their 24 and up) and only fades in (no transform to fight the
+ * centring).
  */
 .hint {
   position: absolute;
   left: 50%;
-  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + 204px);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
   transform: translateX(-50%);
   z-index: 13;
   max-width: calc(100% - 2 * var(--inset-hud));
@@ -23,7 +27,16 @@
   animation: hintIn 400ms var(--ease-out) both;
 }
 
+@media (max-width: 720px) {
+  .hint {
+    left: calc(var(--inset-hud) + 138px);
+    right: var(--inset-hud);
+    max-width: none;
+    transform: none;
+  }
+}
+
 @keyframes hintIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
-  to { opacity: 1; transform: translateX(-50%); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
