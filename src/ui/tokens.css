@@ -37,6 +37,15 @@
   --ink-ok: #1f6b3a;
   --ink-info: #1d5fa8;
 
+  /* ONE COLOUR FOR "SELECTED". Selected chips, segments and tabs were red in most panels
+     and a pale blue in Environment and Reproduction, so a visitor could not learn what a
+     filled chip means. Every selected state now points at these two. White text on
+     --accent-selected measures 4.86:1. Blue is kept ONLY where it carries meaning (venous
+     blood, deoxygenated, informational text), never for "selected". The soft tint is the
+     hover state of a control that could be selected. */
+  --accent-selected: #c8433a;
+  --accent-selected-soft: rgba(200, 67, 58, 0.14);
+
   /* --- organ accents (measured, VISUAL_AUDIT 2.1) --------------------- */
   --organ-active: #c8433a;
   --organ-heart: #b0232a;
@@ -76,6 +85,12 @@
   /* Reserved height of the bottom bar (timeline + dock + warning). The drug drawer
      clears this so it can never sit on top of the tool dock. */
   --corpus-bar-h: 92px;
+  /* Where a FULL-HEIGHT phone sheet must stop at the top: just below the speed chip, which
+     sits at 22 px from the top and is 44 px tall (timescale.module.css), plus 8 px of air.
+     The full administration sheet used to run to 24 px from the top and its handle strip
+     was painted over the "Simulation speed" chip (measured). A layout choice, not a
+     measured value. */
+  --sheet-top-clear: calc(env(safe-area-inset-top, 0px) + 74px);
 
   /* --- type ----------------------------------------------------------- */
   --font-ui: 'Nunito Variable', 'Nunito', 'Varela Round', 'M PLUS Rounded 1c', ui-rounded,

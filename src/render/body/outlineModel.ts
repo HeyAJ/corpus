@@ -106,6 +106,8 @@ export interface OutlineModel {
   /** Height at which the arms (elbow) and legs (last thigh point) end; the mesh fades towards them. */
   armEndY: number;
   legEndY: number;
+  /** Height from which the legs fade: mid-femur, half way down the femoral centreline. */
+  legFadeStartY: number;
   /** Lowest point of the figure (the bottom of the leg's end cap), for the floor shadow. */
   floorY: number;
 }
@@ -471,26 +473,29 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
   const arms = limited(smoothUnion(BLEND_K_M, armFor('l'), armFor('r')), armReach(), LIMB_MIN_RADIUS_M + SKIN_MARGIN_M);
   const armEndY = Math.min(...axisPoints(['brachial_l']).map((p) => p[1]), ...axisPoints(['brachial_r']).map((p) => p[1]));
 
-  // Each thigh is its own tapered capsule chain. Its axis is the femoral centreline
-  // moved outward by THIGH_OFFSET_M (the artery runs on the inner side), and its radius
-  // is whatever leaves the inner surface THIGH_INNER_GAP_M from the midline, so the two
-  // thighs are separated by a notch. The two are joined by a plain union, not a smooth
-  // one, because the fillet of a smooth union would close a gap this narrow.
+  // Each thigh is its own capsule chain. Its axis is the femoral centreline moved
+  // outward by THIGH_OFFSET_M (the artery runs on the inner side); its radius is set so
+  // its outer edge is the hip's. The two thighs are joined by a plain union.
+  const edgeSlice = Math.max(0, Math.min(count - 1, Math.round((yFloor + 0.02 - y0) / dy)));
+  const hipEdge = Math.abs(scx[edgeSlice]) + ax[edgeSlice];
   let legEndRadius = LIMB_MIN_RADIUS_M;
   const legFor = (side: 'l' | 'r'): Sdf => {
     const pts3 = axisPoints([`femoral_${side}`, `popliteal_${side}`]);
     const dir = pts3[0][0] < 0 ? -1 : 1;
     const axis = pts3.map((p): V3 => [p[0] + dir * THIGH_OFFSET_M, p[1], p[2]]);
-    // A thigh is never thinner than its vessel plus the skin margin. Where the external
-    // genitalia are wider than the notch allows (a male body: the testes are as wide as
-    // the thighs' own axes), the thighs reach the midline and the notch is the blob's.
-    const r0 = Math.max(Math.abs(axis[0][0]) - Math.max(THIGH_INNER_GAP_M, genitalHalfX), vesselRadius(`femoral_${side}`) + SKIN_MARGIN_M);
-    const radii = axis.map((_, i) => r0 * (1 - (1 - LEG_TAPER) * (i / (axis.length - 1))));
+    // The thigh's OUTER edge meets the hip's outer edge (the loft's edge just above the
+    // pelvic floor) and stays there to the end of the leg, so the contour runs straight
+    // down from the hip with no inward step; the radius therefore shrinks only as the axis
+    // drifts outward. A thigh is never thinner than its vessel plus the skin margin.
+    const radii = axis.map((p) => Math.max(hipEdge - Math.abs(p[0]), vesselRadius(`femoral_${side}`) + SKIN_MARGIN_M));
     legEndRadius = radii[radii.length - 1];
     return chain(axis, radii);
   };
   const legBox: V3[] = [...axisPoints(['femoral_l', 'popliteal_l']), ...axisPoints(['femoral_r', 'popliteal_r'])].map((p): V3 => [p[0] + (p[0] < 0 ? -1 : 1) * THIGH_OFFSET_M, p[1], p[2]]);
   const legs = limited(union(legFor('l'), legFor('r')), legBox, 0.08);
+  const femPts = axisPoints(['femoral_l']);
+  const femTop = femPts[0][1];
+  const femEnd = femPts[femPts.length - 1][1];
   const legEndY = Math.min(...axisPoints(['popliteal_l']).map((p) => p[1]), ...axisPoints(['popliteal_r']).map((p) => p[1]));
 
   // The external genitalia get their own small blob: the ellipse-per-slice fit that
@@ -566,6 +571,7 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
     max: [maxX + slack, yTop + 0.08, maxZ + slack],
     armEndY,
     legEndY,
+    legFadeStartY: (femTop + femEnd) / 2,
     floorY: lowestY,
   };
 }

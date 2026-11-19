@@ -2,6 +2,7 @@ import pathogensFile from '../../data/pathogens.json';
 import type { PathogenSnapshot } from '../../bridge/types';
 import { useStore } from '../store';
 import styles from './infection.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * INFECTION PANEL — inoculate the body, watch the course, treat or clear it.
@@ -83,13 +84,7 @@ export function InfectionPanel() {
 
   return (
     <aside className={styles.panel} role="dialog" aria-label="Infection panel" data-panel="infection">
-      <header className={styles.header}>
-        <h2 className={styles.title}>Infection</h2>
-        {inf.sepsis && <span className={styles.sepsis}>SEPSIS</span>}
-        <button className={styles.close} onClick={() => toggle()} aria-label="Close infection panel">
-          {'×'}
-        </button>
-      </header>
+      <PanelHeader title="Infection" meta={inf.sepsis ? 'SEPSIS' : undefined} metaTone="critical" onClose={() => toggle()} />
 
       <div className={styles.markers}>
         <span><b>{inf.wbc_10e9_per_L.toFixed(1)}</b> WBC ×10⁹/L</span>

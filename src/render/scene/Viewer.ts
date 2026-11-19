@@ -6,7 +6,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 
 import { OrganSet, type OrganState } from '../organs/OrganSet';
 import { OrbitRig } from '../camera/OrbitRig';
-import { slicePlane, sliceKeeps, type SliceAxis, type SlicePlane } from '../materials/sliceCut';
+import { slicePlane, sliceKeeps, sliceEdgeWidth, type SliceAxis, type SlicePlane } from '../materials/sliceCut';
 import { BodyOutline } from '../body/BodyOutline';
 import { createDitherPass } from '../postfx/DitherPass';
 import { GiBolus } from '../organs/GiBolus';
@@ -639,7 +639,13 @@ export class Viewer {
     // The organ's centre as the scene sees it (after the renderer's mirror).
     this.toScene(h.centroid, this.sliceCentre);
     slicePlane(axis, this.sliceDepthValue, this.sliceCentre, h.boundingRadius, this.slicePlaneScratch);
-    this.detail.setCut(this.slicePlaneScratch);
+    const edge = sliceEdgeWidth(
+      h.boundingRadius,
+      this.rig.framingDistance(h.boundingRadius),
+      this.rig.camera.fov,
+      this.renderer.domElement.clientHeight || 1,
+    );
+    this.detail.setCut(this.slicePlaneScratch, edge);
   }
 
   /** The UI picked a part from its list: mark it (or clear with null) in the interior. */

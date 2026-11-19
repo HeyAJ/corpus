@@ -78,22 +78,24 @@
   z-index: 26;
 }
 
-.headerRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.title {
-  margin: 0;
-  font-size: var(--text-xl);
-  font-weight: 700;
-}
-
-.downtime {
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--severity-warn-ink);
+/*
+ * WIDE SCREENS: DOCKED TO THE RIGHT LIKE THE PANEL CARD. Centre-bottom put this card over the
+ * very chest it is acting on and was the one panel not on the right. It now takes the shell
+ * card's width and top inset (app.module.css .sheet) and is content-height, with its height
+ * capped so it stops above the MEASURED bottom bar. The defib pads stay on the thorax (they
+ * are placed from the stage centre, not from this card). The phone keeps its bottom card.
+ * It carries data-stage-cover (ProcedurePanel.tsx).
+ */
+@media (min-width: 721px) {
+  .panel {
+    left: auto;
+    right: 16px;
+    transform: none;
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    bottom: auto;
+    width: min(380px, 38vw);
+    max-height: calc(100% - env(safe-area-inset-top, 0px) - 16px - var(--corpus-bar-actual, var(--corpus-bar-h)) - 8px);
+  }
 }
 
 .metrics {
@@ -154,8 +156,8 @@
 }
 
 .energyActive {
-  background: rgba(0, 0, 0, 0.14);
-  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.16);
+  background: var(--accent-selected);
+  color: var(--ink-inverse);
 }
 
 .actionRow {

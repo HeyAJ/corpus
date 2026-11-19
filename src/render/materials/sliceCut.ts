@@ -40,6 +40,33 @@ export type SliceAxis = 'front' | 'side' | 'top';
 export const SLICE_MARGIN = 1.02;
 
 /**
+ * DISPLAY CONSTANTS for the CUT-EDGE CONTOUR. Slicing alone only makes things disappear:
+ * most parts of an organ are glass walls, and a glass wall with its front half discarded
+ * leaves nothing to look at, so the organ merely looked fainter and nobody could tell a
+ * section from a dim organ. A section drawing shows the line where the plane crosses every
+ * surface, so every fragment on the KEPT side within an edge width of the plane is redrawn
+ * in a dark tone (SLICE_EDGE_DARKEN x its own colour) at full opacity. Each surface the
+ * plane crosses (capsule, cortex boundary, pyramids, chamber walls, septum, ventricles)
+ * then shows as a line in its own hue.
+ *
+ * The width is a fraction of the organ's bounding radius (SLICE_EDGE_WIDTH, 0.8 %) but is
+ * never less than SLICE_EDGE_MIN_PX screen pixels at the selection's framing, or a small
+ * organ framed large would get a hairline that aliases away. All three are display choices.
+ */
+export const SLICE_EDGE_WIDTH = 0.008;
+export const SLICE_EDGE_MIN_PX = 1.5;
+export const SLICE_EDGE_DARKEN = 0.45;
+
+/**
+ * The world-space width of the contour: SLICE_EDGE_WIDTH of the radius, or SLICE_EDGE_MIN_PX
+ * pixels at the given viewing distance, whichever is larger. Pure, so it can be tested.
+ */
+export function sliceEdgeWidth(radius: number, distance: number, fovDegrees: number, heightPx: number): number {
+  const perPixel = (2 * Math.tan((fovDegrees * Math.PI) / 360) * distance) / Math.max(1, heightPx);
+  return Math.max(radius * SLICE_EDGE_WIDTH, SLICE_EDGE_MIN_PX * perPixel);
+}
+
+/**
  * The direction in which the plane advances, in scene space, per axis. A fragment is REMOVED
  * when dot(normal, position) exceeds the plane offset, so each normal points at the side of
  * the organ that goes first.
@@ -101,6 +128,8 @@ export function sliceKeeps(plane: SlicePlane, x: number, y: number, z: number): 
 export interface CutUniforms {
   uCutPlane: { value: THREE.Vector4 };
   uCutOn: { value: number };
+  /** Contour width in metres; 0 draws none (streams, which keep their look). */
+  uCutEdge: { value: number };
 }
 
 const VERT_DECL = /* glsl */ `
@@ -112,10 +141,21 @@ const VERT_MAIN = /* glsl */ `
 const FRAG_DECL = /* glsl */ `
 uniform vec4 uCutPlane;
 uniform float uCutOn;
+uniform float uCutEdge;
 varying vec3 vCutPos;
 `;
 const FRAG_MAIN = /* glsl */ `
   if (uCutOn > 0.5 && dot(uCutPlane.xyz, vCutPos) > uCutPlane.w) discard;
+`;
+// The material's own main becomes cutMain; the new main runs it and then redraws the
+// fragments that lie within the edge width of the plane (the contour, see SLICE_EDGE_*).
+const FRAG_WRAP = /* glsl */ `
+void main() {
+  cutMain();
+  if (uCutOn > 0.5 && uCutEdge > 0.0 && uCutPlane.w - dot(uCutPlane.xyz, vCutPos) < uCutEdge) {
+    gl_FragColor = vec4(gl_FragColor.rgb * ${SLICE_EDGE_DARKEN.toFixed(2)}, 1.0);
+  }
+}
 `;
 
 const MAIN = /void\s+main\s*\(\s*\)\s*\{/;
@@ -127,22 +167,29 @@ const MAIN = /void\s+main\s*\(\s*\)\s*\{/;
  * The material is flagged for recompilation, which is a one-off per distinct shader source
  * (the programs are cached by their text, so the nineteen shells of one kind share one).
  */
-export function patchForCut(material: THREE.ShaderMaterial): CutUniforms {
+export function patchForCut(material: THREE.ShaderMaterial, contour = true): CutUniforms {
   const existing = material.userData.cut as CutUniforms | undefined;
   if (existing) return existing;
-  const cut: CutUniforms = { uCutPlane: { value: new THREE.Vector4(0, 0, 0, 0) }, uCutOn: { value: 0 } };
+  const cut: CutUniforms = { uCutPlane: { value: new THREE.Vector4(0, 0, 0, 0) }, uCutOn: { value: 0 }, uCutEdge: { value: 0 } };
   material.uniforms.uCutPlane = cut.uCutPlane;
   material.uniforms.uCutOn = cut.uCutOn;
+  material.uniforms.uCutEdge = cut.uCutEdge;
   material.vertexShader = VERT_DECL + material.vertexShader.replace(MAIN, (m) => m + VERT_MAIN);
-  material.fragmentShader = FRAG_DECL + material.fragmentShader.replace(MAIN, (m) => m + FRAG_MAIN);
+  if (contour) {
+    material.fragmentShader =
+      FRAG_DECL + material.fragmentShader.replace(MAIN, (m) => 'void cutMain() {' + m.slice(m.indexOf('{') + 1) + FRAG_MAIN) + FRAG_WRAP;
+  } else {
+    material.fragmentShader = FRAG_DECL + material.fragmentShader.replace(MAIN, (m) => m + FRAG_MAIN);
+  }
   material.userData.cut = cut;
   material.needsUpdate = true;
   return cut;
 }
 
 /** Point a patched material's cut at a plane, or switch it off with null. No allocation. */
-export function setCut(cut: CutUniforms, plane: SlicePlane | null): void {
+export function setCut(cut: CutUniforms, plane: SlicePlane | null, edge = 0): void {
   if (plane) {
+    cut.uCutEdge.value = edge;
     cut.uCutPlane.value.set(plane.nx, plane.ny, plane.nz, plane.w);
     cut.uCutOn.value = 1;
   } else {

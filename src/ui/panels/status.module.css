@@ -36,43 +36,10 @@
 .edge_watch { border-left-color: #b8a52c; }
 .edge_none { border-left-color: rgba(0, 0, 0, 0.12); }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
+/* Placement only: the header row's padding (the whole card used to be one button). */
+.head {
   padding: 11px 14px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font: inherit;
-  text-align: left;
-  color: var(--ink);
 }
-
-.title {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-mid);
-}
-
-.count {
-  min-width: 22px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--chip-bg-strong);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-align: center;
-  color: var(--ink-mid);
-}
-
-.dot_critical { background: #c8231d; color: var(--ink-inverse); }
-.dot_warn { background: #a35f08; color: var(--ink-inverse); }
-.dot_watch { background: #857000; color: var(--ink-inverse); }
 
 .body {
   display: flex;

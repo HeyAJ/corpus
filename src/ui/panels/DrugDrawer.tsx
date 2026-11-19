@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import drugsFile from '../../data/drugs.json';
 import foodsFile from '../../data/foods.json';
-import type { Drug, DrugsFile } from '../../data/pharma-types';
+import type { Drug } from '../../data/pharma-types';
+import { useDrugData } from '../drugData';
 import type { Route, SimIntent } from '../../bridge/types';
 import { useStore, type DrawerTab } from '../store';
 import {
@@ -57,7 +57,12 @@ import styles from './drawer.module.css';
  *    believed rather than checked.
  */
 
-const DRUGS = (drugsFile as unknown as DrugsFile).drugs;
+/*
+ * The drug list is NOT imported here any more: it is about 1.2 MB and used to ride inside
+ * the entry script for every visitor. It arrives through useDrugData (drugData.ts), is
+ * usually prefetched a few seconds after the body appears, and the sheet shows a loading
+ * line until it is there. Nothing about what the sheet offers has changed.
+ */
 
 interface FoodDef {
   id: string;
@@ -144,9 +149,9 @@ function groupRank(name: string): number {
 }
 
 /** Every group that has a drug in it, in drawer order - the filter chips. */
-const ALL_GROUPS = [...new Set(DRUGS.map(groupOf))].sort(
-  (a, b) => groupRank(a) - groupRank(b) || a.localeCompare(b),
-);
+function groupsOf(drugs: Drug[]): string[] {
+  return [...new Set(drugs.map(groupOf))].sort((a, b) => groupRank(a) - groupRank(b) || a.localeCompare(b));
+}
 
 /** Whether the engine can run this drug at all (it has kinetics or a payload). */
 function simulatable(d: Drug): boolean {
@@ -172,6 +177,8 @@ export function DrugDrawer() {
   const pushLog = useStore((s) => s.pushLog);
   const pushEvent = useStore((s) => s.pushEvent);
   const [drugId, setDrugId] = useState<string | null>(null);
+  // Only asks for the data while the sheet is open, so a closed sheet costs nothing.
+  const drugData = useDrugData(open);
   const [query, setQuery] = useState('');
   const [group, setGroup] = useState<string | null>(null);
   const [dragY, setDragY] = useState(0);
@@ -185,7 +192,7 @@ export function DrugDrawer() {
 
   if (!open) return null;
 
-  const drug = drugId ? DRUGS.find((d) => d.id === drugId) ?? null : null;
+  const drug = drugId ? drugData.data?.byId.get(drugId) ?? null : null;
 
   const give = (d: Drug, route: Route, preset: Preset, multiplier = 1, durationMin?: number) => {
     const intent: SimIntent = {
@@ -258,6 +265,7 @@ export function DrugDrawer() {
       role="dialog"
       aria-label="Administration drawer"
       data-drawer
+      data-stage-cover
     >
       <div
         className={styles.handleZone}
@@ -307,7 +315,20 @@ export function DrugDrawer() {
           </header>
 
           {tab === 'drugs' && (
-            <DrugList query={query} setQuery={setQuery} group={group} setGroup={setGroup} onOpen={openDrug} />
+            drugData.data ? (
+              <DrugList drugs={drugData.data.drugs} query={query} setQuery={setQuery} group={group} setGroup={setGroup} onOpen={openDrug} />
+            ) : (
+              <div className={styles.scroll}>
+                {drugData.error ? (
+                  <p className={styles.emptyNote} role="alert">
+                    The drug list could not be loaded.{' '}
+                    <button className={styles.ivButton} onClick={drugData.retry}>Retry</button>
+                  </p>
+                ) : (
+                  <p className={styles.emptyNote} role="status">Loading the drug list…</p>
+                )}
+              </div>
+            )
           )}
           {tab === 'food' && <FoodList />}
           {tab === 'biologics' && (
@@ -350,12 +371,14 @@ function SearchField({ value, onChange, placeholder }: { value: string; onChange
 }
 
 function DrugList({
+  drugs: DRUGS,
   query,
   setQuery,
   group,
   setGroup,
   onOpen,
 }: {
+  drugs: Drug[];
   query: string;
   setQuery: (q: string) => void;
   group: string | null;
@@ -392,7 +415,7 @@ function DrugList({
       map.set(g, list);
     }
     return [...map.entries()].sort((a, b) => groupRank(a[0]) - groupRank(b[0]) || a[0].localeCompare(b[0]));
-  }, [query, group]);
+  }, [DRUGS, query, group]);
 
   const shown = grouped.reduce((n, [, list]) => n + list.length, 0);
 
@@ -417,7 +440,7 @@ function DrugList({
           <button className={`${styles.chip} ${group === null ? styles.chipOn : ''}`} onClick={() => setGroup(null)} aria-pressed={group === null}>
             All
           </button>
-          {ALL_GROUPS.map((g) => (
+          {groupsOf(DRUGS).map((g) => (
             <button
               key={g}
               className={`${styles.chip} ${group === g ? styles.chipOn : ''}`}

@@ -8,10 +8,9 @@
   pointer-events: auto;
 }
 
-.title {
-  margin: 0 0 12px;
-  font-size: var(--text-xl);
-  font-weight: 700;
+/* Placement only: the header itself is PanelHeader's. */
+.head {
+  margin-bottom: 12px;
 }
 
 .subtitle {
@@ -66,7 +65,7 @@
 }
 
 .active {
-  background: var(--organ-active) !important;
+  background: var(--accent-selected) !important;
   color: var(--ink-inverse);
 }
 

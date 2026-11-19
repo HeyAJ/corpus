@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useStore } from '../store';
 import { EXPLANATIONS, causeOf } from '../explanations';
 import styles from './status.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * WHAT IS HAPPENING TO THIS BODY, IN ENGLISH.
@@ -38,6 +39,7 @@ const SEVERITY_WORD: Record<string, string> = {
 export function StatusPanel() {
   const snapshot = useStore((s) => s.snapshot);
   const panelOpen = useStore((s) => s.statusPanelOpen);
+  const closePanel = useStore((s) => s.toggleStatusPanel);
   const [open, setOpen] = useState(true);
 
   // Behind the dock's menu now, like every other panel: the conditions it explains are
@@ -56,12 +58,14 @@ export function StatusPanel() {
       data-panel="status"
       aria-label="What is happening"
     >
-      <button className={styles.header} onClick={() => setOpen(!open)} aria-expanded={open}>
-        <span className={styles.title}>What is happening</span>
-        <span className={`${styles.count} ${styles[`dot_${worst}`] ?? ''}`}>
-          {conditions.length === 0 ? 'stable' : conditions.length}
-        </span>
-      </button>
+      <PanelHeader
+        className={styles.head}
+        title="What is happening"
+        meta={conditions.length === 0 ? 'stable' : conditions.length}
+        metaTone={worst === 'critical' || worst === 'warn' || worst === 'watch' ? worst : undefined}
+        collapse={{ open, onToggle: () => setOpen(!open) }}
+        onClose={() => closePanel()}
+      />
 
       {open && (
         <div className={styles.body}>

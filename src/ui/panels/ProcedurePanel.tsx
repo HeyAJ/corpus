@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useStore } from '../store';
 import styles from './procedure.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * PROCEDURE MODE: CPR and defibrillation (spec 9, 8.6).
@@ -97,13 +98,13 @@ export function ProcedurePanel() {
       )}
 
       <div className={styles.panel} role="region" aria-label="Resuscitation"
-      data-panel="procedure">
-        <div className={styles.headerRow}>
-          <h2 className={styles.title}>Resuscitation</h2>
-          <span className={styles.downtime}>
-            {p.downtime_s > 0 ? `${Math.floor(p.downtime_s / 60)}:${String(Math.floor(p.downtime_s % 60)).padStart(2, '0')} down` : 'Perfusing'}
-          </span>
-        </div>
+      data-panel="procedure" data-stage-cover>
+        <PanelHeader
+          title="Resuscitation"
+          meta={p.downtime_s > 0 ? `${Math.floor(p.downtime_s / 60)}:${String(Math.floor(p.downtime_s % 60)).padStart(2, '0')} down` : 'Perfusing'}
+          metaTone={p.downtime_s > 0 ? 'warn' : undefined}
+          onClose={cancel}
+        />
 
         <div className={styles.metrics}>
           <span>CPP {snapshot.cardio.coronaryPerfusionPressure_mmHg.toFixed(0)} mmHg</span>

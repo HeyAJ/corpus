@@ -27,15 +27,6 @@
   gap: 5px;
 }
 
-.title {
-  margin: 0;
-  font-size: var(--text-md);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-mid);
-}
-
 .sub {
   margin: 0;
   font-size: var(--text-sm);
@@ -147,7 +138,7 @@
 }
 
 .toggleOn {
-  background: var(--organ-active);
+  background: var(--accent-selected);
   color: var(--ink-inverse);
 }
 

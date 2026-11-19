@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { HormoneSnapshot, SexualPhase } from '../../bridge/types';
 import { useStore } from '../store';
 import styles from './reproduction.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * REPRODUCTION PANEL — the body's sex, its menstrual cycle, pregnancy and sexual response.
@@ -415,12 +416,7 @@ export function ReproductionPanel() {
 
   return (
     <section className={styles.panel} role="region" aria-label="Reproduction" data-panel="reproduction">
-      <header className={styles.header}>
-        <h2 className={styles.title}>Reproduction</h2>
-        <button className={styles.close} onClick={() => toggle()} aria-label="Close reproduction panel">
-          {'×'}
-        </button>
-      </header>
+      <PanelHeader title="Reproduction" onClose={() => toggle()} />
 
       {/* ------------------------------------------------------------- body */}
       <div className={styles.group}>

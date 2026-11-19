@@ -118,6 +118,9 @@ interface UiState {
   toggleNerves: () => void;
   hormonesVisible: boolean;
   toggleHormones: () => void;
+  /** Recolour every unselected organ by how far it is above its own rest (the Activity switch). */
+  activityVisible: boolean;
+  toggleActivity: () => void;
   /** Keep the brain scan inset on screen when the brain is not the selected organ. */
   scanPinned: boolean;
   toggleScanPinned: () => void;
@@ -325,6 +328,8 @@ export const useStore = create<UiState>((set, get) => ({
   toggleNerves: () => set((s) => ({ nervesVisible: !s.nervesVisible })),
   hormonesVisible: false,
   toggleHormones: () => set((s) => ({ hormonesVisible: !s.hormonesVisible })),
+  activityVisible: false,
+  toggleActivity: () => set((s) => ({ activityVisible: !s.activityVisible })),
   scanPinned: false,
   toggleScanPinned: () => set((s) => ({ scanPinned: !s.scanPinned })),
   menuOpen: false,

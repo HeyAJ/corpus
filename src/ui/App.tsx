@@ -6,7 +6,8 @@ import type { OrganId } from '../data/types';
 import { ANATOMY, atlasOf } from '../data/anatomy';
 import type { WaveformChannel } from '../bridge/types';
 import { useStore } from './store';
-import { ToolDock, VesselToggle, NervesToggle, HormonesToggle, HormoneLegend } from './components/ToolDock';
+import { ToolDock, VesselToggle, NervesToggle, HormonesToggle, ActivityToggle, LegendStack } from './components/ToolDock';
+import { CoachMark } from './components/CoachMark';
 import { DrugDrawer } from './panels/DrugDrawer';
 import { ReceptorPanel } from './panels/ReceptorPanel';
 import { ProcedurePanel } from './panels/ProcedurePanel';
@@ -67,6 +68,7 @@ export function App() {
   const vascularVisible = useStore((s) => s.vascularVisible);
   const nervesVisible = useStore((s) => s.nervesVisible);
   const hormonesVisible = useStore((s) => s.hormonesVisible);
+  const activityVisible = useStore((s) => s.activityVisible);
   const pushLog = useStore((s) => s.pushLog);
   // Why the 3D view is not showing, if it is not: it could not start, or it lost its context.
   const [glProblem, setGlProblem] = useState<null | 'unavailable' | 'lost'>(null);
@@ -87,7 +89,12 @@ export function App() {
       s.bloodPanelOpen ||
       s.reproductionPanelOpen ||
       s.anatomyPanelOpen ||
-      s.tool === 'body',
+      s.tool === 'body' ||
+      // The administration sheet and the resuscitation card are docked cards now (wide) or bottom
+      // sheets (phone) that cover the stage like a panel; the viewer frames an organ in the free
+      // part only while data-sheet is open, so they must count here too.
+      s.drawerOpen ||
+      s.tool === 'procedure',
   );
   // The HUD folds to its first line while ANY floating sheet is showing (phones only, in
   // CSS). anyPanelOpen above covers the menu panels, Structures and the body tool; the
@@ -294,6 +301,9 @@ export function App() {
   useEffect(() => {
     viewerRef.current?.setHormonesVisible(hormonesVisible);
   }, [hormonesVisible]);
+  useEffect(() => {
+    viewerRef.current?.setActivityVisible(activityVisible);
+  }, [activityVisible]);
 
   /* ---------------------------------------------------------------- input */
 
@@ -371,7 +381,9 @@ export function App() {
         <VesselToggle />
         <NervesToggle />
         <HormonesToggle />
-        <HormoneLegend viewerRef={viewerRef} ready={ready} />
+        <ActivityToggle />
+        <LegendStack viewerRef={viewerRef} ready={ready} />
+        <CoachMark />
         <NoticeToasts />
         <BrainScanInset viewerRef={viewerRef} ready={ready} />
 

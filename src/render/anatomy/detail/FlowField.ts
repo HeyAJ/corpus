@@ -263,7 +263,7 @@ export class FlowField {
 
     // The streams of the selected organ are cut by the same plane as its parts, or a stream
     // would hang in the air where the tissue around it had been sliced away.
-    this.cut = patchForCut(this.material);
+    this.cut = patchForCut(this.material, false);
 
     this.object = new THREE.Points(geometry, this.material);
     this.object.frustumCulled = false;

@@ -188,7 +188,7 @@ a.item {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  /* 44 px touch target; the Nerves and Hormones switches stack above on a 48 px pitch. */
+  /* 44 px touch target; the Nerves, Hormones and Activity switches stack above on a 48 px pitch. */
   min-height: 44px;
   padding: 4px 12px 4px 9px;
   border: none;
@@ -209,6 +209,10 @@ a.item {
 
 .slot2 {
   --switch-slot: 96px;
+}
+
+.slot3 {
+  --switch-slot: 144px;
 }
 
 .vessels:hover {
@@ -236,18 +240,39 @@ a.item {
 /* ------------------------------------------------------------ hormone legend */
 
 /*
- * Above the three switches (3 x 44 px plus two 4 px gaps, plus 8 px of air), left-aligned
- * with them. Two columns, at most 170 px, small type. If the list outgrows 40 % of the
- * viewport it scrolls inside itself rather than climbing into the readouts.
+ * THE LEGENDS COLUMN. Above the four switches (4 x 44 px plus three 4 px gaps, plus 8 px of
+ * air), left-aligned with them. It holds the Hormones legend and the Activity legend one
+ * above the other, so with both switches on they cannot collide (each used to position
+ * itself, and a second legend would have landed on the first). The Activity legend sits
+ * nearest the switches; the hormone list is the part that shrinks and scrolls inside
+ * itself when the column outgrows the room between the dock and the readouts above it, so
+ * it never climbs into them. The column takes no pointer events of its own.
  */
-.hormLegend {
+.legends {
   position: absolute;
   left: var(--inset-hud);
-  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + 144px);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + 192px);
   z-index: 14;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* 200 px is the room kept for the HUD's first rows (a display choice). */
+  max-height: calc(100% - var(--corpus-bar-actual, var(--corpus-bar-h)) - 200px - 192px);
+  pointer-events: none;
+}
+
+.legends > * {
+  pointer-events: auto;
+}
+
+/*
+ * The hormone list: two columns, 190 px, small type.
+ */
+.hormLegend {
+  flex: 0 1 auto;
+  min-height: 0;
   box-sizing: border-box;
   width: 190px;
-  max-height: 40vh;
   overflow-y: auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -301,7 +326,7 @@ a.item {
 /*
  * PHONE, A CARD IS OPEN: THE CORNER SWITCHES AND THE HORMONE LEGEND STEP OUT OF THE WAY.
  * A bottom sheet or the resuscitation card covers the bottom-left corner of the stage, so
- * the three switches (and the legend above them) were still in the DOM, still looked
+ * the four switches (and the legends above them) were still in the DOM, still looked
  * tappable, and were painted over (the checker reported "Show blood vessels" covered under
  * Charge, 120 J and Compress). Nothing a visitor can tap may sit under something else, and
  * a control they cannot reach is better absent than present-but-dead. data-card is set on
@@ -310,19 +335,19 @@ a.item {
  */
 @media (max-width: 720px) {
   :global([data-card='open']) .vessels,
-  :global([data-card='open']) .hormLegend {
+  :global([data-card='open']) .legends {
     display: none;
   }
 }
 
 /*
  * THE PANELS MENU HIDES THE CORNER SWITCHES AND THE LEGEND, AT EVERY WIDTH. The launcher
- * opens upward from the dock over the bottom-left corner, so the Vessels, Nerves and
- * Hormones switches were painted through the "Receptors" and "Laboratory" rows (the checker
+ * opens upward from the dock over the bottom-left corner, so the Vessels, Nerves, Hormones
+ * and Activity switches were painted through the "Receptors" and "Laboratory" rows (the checker
  * printed "Vessels" x "Receptors"). The menu is modal (its scrim takes every tap), so the
  * switches were unreachable anyway; they return the moment it closes.
  */
 :global([data-menu='open']) .vessels,
-:global([data-menu='open']) .hormLegend {
+:global([data-menu='open']) .legends {
   display: none;
 }

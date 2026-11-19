@@ -1,5 +1,4 @@
-import drugsFile from '../data/drugs.json';
-import type { DrugsFile } from '../data/pharma-types';
+import { drugDataIfLoaded, loadDrugData } from './drugData';
 import type { Route, SimIntent } from '../bridge/types';
 
 /**
@@ -18,14 +17,17 @@ import type { Route, SimIntent } from '../bridge/types';
  * or route has been removed from the data simply omits that step rather than sending
  * something the engine would silently refuse.
  *
+ * THE DATA IS LOADED LAZILY (drugData.ts), so `intents()` reads whatever is loaded and a
+ * drug step is omitted if it is not. Anything that actually RUNS a scenario must go
+ * through `resolveIntents`, which awaits the loader first; otherwise a scenario run
+ * before the drug list had arrived would silently lose its drug.
+ *
  * Nothing here is clinical guidance. The scenarios are the insults you learn to treat,
  * framed as "what happens if", in the same register as the rest of the interface.
  */
 
-const DRUGS = (drugsFile as unknown as DrugsFile).drugs;
-
 function dose(drugId: string, route: Route, multiplier = 1): SimIntent[] {
-  const drug = DRUGS.find((d) => d.id === drugId);
+  const drug = drugDataIfLoaded()?.byId.get(drugId);
   const preset = drug?.presetDoses.find((p) => p.route === route);
   if (!drug || !preset) return [];
   return [
@@ -50,6 +52,12 @@ export interface Scenario {
   intents: () => SimIntent[];
   /** Time scale to switch to, for slow processes. Omitted means real time. */
   timeScale?: number;
+}
+
+/** Await the drug data, then build the scenario's intents with amounts taken verbatim from it. */
+export async function resolveIntents(sc: Scenario): Promise<SimIntent[]> {
+  await loadDrugData();
+  return sc.intents();
 }
 
 export const SCENARIOS: Scenario[] = [

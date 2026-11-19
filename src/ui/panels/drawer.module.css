@@ -42,9 +42,12 @@
   animation: sheetIn 300ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+/* FULL stops below the speed chip (--sheet-top-clear in tokens.css) instead of 24 px from the
+   top, where its handle strip covered that control. The sheet is bottom-anchored at the bar
+   height plus 4 px, so the height is the stage less that, less the clear space above. */
 .sheetFull {
-  height: calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
-  height: calc(100dvh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
+  height: calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 4px - var(--sheet-top-clear));
+  height: calc(100dvh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 4px - var(--sheet-top-clear));
 }
 
 @keyframes sheetIn {
@@ -130,9 +133,16 @@
   transition: background 160ms ease, box-shadow 160ms ease;
 }
 
-.segmentOn {
-  background: #fff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+.segment:hover {
+  background: var(--accent-selected-soft);
+}
+
+/* Was a raised white tab: selected is the one red everywhere (tokens.css). */
+.segmentOn,
+.segmentOn:hover {
+  background: var(--accent-selected);
+  color: var(--ink-inverse);
+  box-shadow: none;
 }
 
 .close {
@@ -280,8 +290,14 @@
   cursor: pointer;
 }
 
-.chipOn {
-  background: var(--ink);
+.chip:hover {
+  background: var(--accent-selected-soft);
+}
+
+/* Was solid black: selected is the one red everywhere (tokens.css). */
+.chipOn,
+.chipOn:hover {
+  background: var(--accent-selected);
   color: var(--ink-inverse);
   box-shadow: none;
 }
@@ -573,7 +589,7 @@
 }
 
 .routeCardOn {
-  box-shadow: 0 0 0 2px #c8433a;
+  box-shadow: 0 0 0 2px var(--accent-selected);
 }
 
 .routeShortName {
@@ -752,6 +768,29 @@
      override the full size, so opening a drug on a phone never grew the sheet. */
   .sheet:not(.sheetFull) {
     height: min(66vh, calc(100vh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px));
+  }
+}
+
+/*
+ * WIDE SCREENS: DOCKED TO THE RIGHT LIKE THE PANEL CARD. The sheet used to open centre-bottom
+ * over the body (640 px wide), while every panel was a right-hand card, so the visitor had two
+ * places to look. It now takes the card's own box (the shell's .sheet in app.module.css): the
+ * same width, the same 16 px top inset, and the same bottom inset above the MEASURED bottom
+ * bar. Half and full heights are a phone idea (a bottom sheet that grows), so both are the
+ * full height of the card here. It carries data-stage-cover (DrugDrawer.tsx) so the camera
+ * frames a selected organ in the free part of the stage.
+ */
+@media (min-width: 721px) {
+  .sheet,
+  .sheetFull {
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    right: 16px;
+    left: auto;
+    bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+    width: min(380px, 38vw);
+    max-width: none;
+    margin: 0;
+    height: auto;
   }
 }
 

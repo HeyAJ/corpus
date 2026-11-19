@@ -5,6 +5,7 @@ import type { AnatomyFile, AnatomyPartDef } from '../../data/anatomy-types';
 import type { BodySystem, OrganDef, OrganId } from '../../data/types';
 import { useStore } from '../store';
 import styles from './anatomy.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * STRUCTURES PANEL — what is inside each organ, and how hard each part is working now.
@@ -252,35 +253,24 @@ export function AnatomyPanel() {
       {/* One sticky header for both states: the panel itself is the scroll container, so the
           organ name, its part count, the way back and the close button stay put while the list
           scrolls (sticky + an opaque background; see .header in the stylesheet). */}
-      <header className={styles.header}>
-        {organ && (
-          <button className={styles.back} onClick={() => setSelected(null)} aria-label="Back to the list of organs">
-            {'‹'}
-          </button>
-        )}
-        {organ ? (
-          <div className={styles.headText}>
-            <h2 className={styles.organTitle}>{organ.displayName}</h2>
-            <span className={styles.partCount}>
-              Structures{partCount > 0 ? ` \u00B7 ${partCount} parts` : ''}
-            </span>
-          </div>
-        ) : (
-          <h2 className={styles.title}>Structures</h2>
-        )}
-        <button
-          className={styles.close}
-          onClick={() => {
-            // Closing by hand while an organ is selected means "stop opening this for me":
-            // the store reopens the panel on every organ tap unless told otherwise.
-            if (organ) setAnatomyAuto(false);
-            toggle();
-          }}
-          aria-label="Close structures panel"
-        >
-          {'×'}
-        </button>
-      </header>
+      <PanelHeader
+        className={styles.header}
+        title="Structures"
+        before={
+          organ ? (
+            <button className={styles.back} onClick={() => setSelected(null)} aria-label="Back to the list of organs">
+              {'‹'}
+            </button>
+          ) : undefined
+        }
+        meta={organ ? `${organ.displayName}${partCount > 0 ? ` \u00B7 ${partCount} parts` : ''}` : undefined}
+        onClose={() => {
+          // Closing by hand while an organ is selected means "stop opening this for me":
+          // the store reopens the panel on every organ tap unless told otherwise.
+          if (organ) setAnatomyAuto(false);
+          toggle();
+        }}
+      />
       {organ ? <OrganAtlas organ={organ} /> : <OrganList />}
     </section>
   );

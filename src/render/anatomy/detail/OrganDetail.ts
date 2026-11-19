@@ -234,6 +234,7 @@ export class OrganDetail {
    * streams read it every frame; the shell is updated when it changes (see setCut).
    */
   private cutPlane: SlicePlane | null = null;
+  private cutEdge = 0;
   private viewport = { height: 900, fov: 40 };
   private readonly warned = new Set<string>();
 
@@ -567,7 +568,7 @@ export class OrganDetail {
     // the cut it had so it does not pop whole again while it leaves.
     if (animate) {
       const plane = this.cutPlane;
-      for (const p of interior.partList) setCut(p.material.userData.cut as CutUniforms, plane);
+      for (const p of interior.partList) setCut(p.material.userData.cut as CutUniforms, plane, this.cutEdge);
       if (interior.flow) setCut(interior.flow.cut, plane);
     }
 
@@ -596,7 +597,8 @@ export class OrganDetail {
    * switched off, not unspliced, when the slice ends. Nothing else in the body is touched.
    * The plane object is copied, so the caller may reuse its own.
    */
-  setCut(plane: SlicePlane | null): void {
+  setCut(plane: SlicePlane | null, edge = 0): void {
+    this.cutEdge = edge;
     if (plane) {
       const own = this.cutPlane ?? { nx: 0, ny: 0, nz: 0, w: 0 };
       own.nx = plane.nx;
@@ -614,7 +616,7 @@ export class OrganDetail {
       if (!m) continue;
       const material = m as THREE.ShaderMaterial;
       if (!this.cutPlane && !material.userData.cut) continue;
-      setCut(patchForCut(material), this.cutPlane);
+      setCut(patchForCut(material), this.cutPlane, edge);
     }
   }
 

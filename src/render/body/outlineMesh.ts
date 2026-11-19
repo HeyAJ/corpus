@@ -23,8 +23,6 @@ import { FADE_LENGTH_M, outlineModel, type OutlineBody } from './outlineModel';
  */
 
 export const OUTLINE_MAX_TRIANGLES = 15000;
-/** The thighs fade over a shorter length than the arms, metres, so the notch between them stays visible nearer the end. A DISPLAY choice. */
-const LEG_FADE_LENGTH_M = 0.035;
 const START_CELL_M = 0.0135;
 
 export interface OutlineBuild {
@@ -76,7 +74,7 @@ export function buildOutline(samples: Float32Array, body: OutlineBody, maxTriang
     // whichever component forms the surface there (the thigh, or the pelvic floor's cap
     // under a male body's genitals), and a cut edge anywhere would read as a mannequin.
     const armFade = smoothstep(model.armEndY, model.armEndY + FADE_LENGTH_M, y);
-    const legFade = smoothstep(model.legEndY, model.legEndY + LEG_FADE_LENGTH_M, y);
+    const legFade = smoothstep(model.legEndY, model.legFadeStartY, y);
     fade[i] = (1 - arm * (1 - armFade)) * legFade;
   }
   geometry.setAttribute('fade', new THREE.BufferAttribute(fade, 1));

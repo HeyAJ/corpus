@@ -3,6 +3,7 @@ import { useShallow } from 'zustand/react/shallow';
 import type { Viewer } from '../../render/scene/Viewer';
 import { LEGEND_HIGH, LEGEND_LOW, type HormoneLegendEntry } from '../../render/endocrine/HormoneTraffic';
 import { useStore, type ToolMode } from '../store';
+import { ActivityLegend } from './ActivityLegend';
 import styles from './dock.module.css';
 import { useVitalsAudio } from '../audio/useVitalsAudio';
 
@@ -151,6 +152,53 @@ export function HormoneLegend({ viewerRef, ready }: { viewerRef: React.MutableRe
   );
 }
 
+/**
+ * THE ACTIVITY SWITCH, fourth in the stack (slot 3). It recolours every unselected organ
+ * by how far it is above its own rest (Viewer.setActivityVisible), from the one amber ramp
+ * the legend below also draws. Off at start; the legend appears with it.
+ */
+export function ActivityToggle() {
+  const on = useStore((s) => s.activityVisible);
+  const toggle = useStore((s) => s.toggleActivity);
+  return (
+    <button
+      className={`${styles.vessels} ${styles.slot3} ${on ? styles.vesselsOn : ''}`}
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label="Show organ activity"
+      title={on ? 'Hide organ activity' : 'Show organ activity'}
+    >
+      <ActivityGlyph on={on} />
+      <span>Activity</span>
+      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
+    </button>
+  );
+}
+
+/**
+ * The legends column: the Hormones legend and the Activity legend, stacked so that both
+ * switches on at once cannot make them collide (see .legends in dock.module.css).
+ */
+export function LegendStack({ viewerRef, ready }: { viewerRef: React.MutableRefObject<Viewer | null>; ready: boolean }) {
+  return (
+    <div className={styles.legends}>
+      <HormoneLegend viewerRef={viewerRef} ready={ready} />
+      <ActivityLegend />
+    </div>
+  );
+}
+
+function ActivityGlyph({ on }: { on: boolean }) {
+  // Amber, the hue of the ramp itself (activityRamp.ts), so the switch and what it paints agree.
+  const c = '#c0731a';
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 12h4l2-5 4 10 2-5h6" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="12" r="9" fill={on ? c : 'none'} fillOpacity={on ? 0.18 : 0} stroke={c} strokeWidth="1.4" />
+    </svg>
+  );
+}
+
 function NerveGlyph({ on }: { on: boolean }) {
   const c = '#d08a1c';
   return (
@@ -271,7 +319,7 @@ function Syringe({ filled }: { filled: boolean }) {
   );
 }
 
-/** A flask: the endocrine panel. */
+/** A flask: the Hormone levels panel (the measured levels, not the Hormones overlay switch). */
 function Flask({ filled }: { filled: boolean }) {
   return (
     <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
@@ -465,7 +513,7 @@ export function ToolDock() {
     { key: 'environment', label: 'Environment', hint: 'temperature, altitude, oxygen, posture', icon: <Mountain filled={st.environmentPanelOpen} />, active: st.environmentPanelOpen, onClick: st.toggleEnvironmentPanel },
     { key: 'reproduction', label: 'Reproduction', hint: 'cycle, pregnancy, sexual response', icon: <Cycle filled={st.reproductionPanelOpen} />, active: st.reproductionPanelOpen, onClick: st.toggleReproductionPanel },
     { key: 'infection', label: 'Infection', hint: 'inoculate, watch and clear', icon: <Microbe filled={st.infectionPanelOpen} />, active: st.infectionPanelOpen, onClick: st.toggleInfectionPanel },
-    { key: 'endocrine', label: 'Hormones', hint: 'cortisol, ADH, glucagon and more', icon: <Flask filled={st.endocrinePanelOpen} />, active: st.endocrinePanelOpen, onClick: st.toggleEndocrinePanel },
+    { key: 'endocrine', label: 'Hormone levels', hint: 'cortisol, ADH, glucagon and more', icon: <Flask filled={st.endocrinePanelOpen} />, active: st.endocrinePanelOpen, onClick: st.toggleEndocrinePanel },
     { key: 'blood', label: 'In the blood', hint: 'what the vessels are carrying', icon: <BloodDrop filled={st.bloodPanelOpen} />, active: st.bloodPanelOpen, onClick: st.toggleBloodPanel },
     { key: 'lab', label: 'Laboratory', hint: 'blood gas and chemistry', icon: <Tube filled={st.labPanelOpen} />, active: st.labPanelOpen, onClick: st.toggleLabPanel },
     { key: 'receptors', label: 'Receptors', hint: 'what each drug is binding', icon: <Receptors />, active: st.receptorPanelOpen, onClick: st.toggleReceptorPanel },

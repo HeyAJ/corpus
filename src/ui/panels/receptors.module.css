@@ -24,41 +24,9 @@
   pointer-events: auto;
 }
 
+/* Placement only: the header itself (type, close button) is PanelHeader's. */
 .titleRow {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  position: relative;
   margin-bottom: 10px;
-}
-
-.title {
-  margin: 0;
-  font-size: var(--text-lg);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-
-/* The glyph stays small; the 44 px hit area is an invisible ::after so the title row
-   does not grow (readability rule 4). */
-.close {
-  position: relative;
-  margin-left: auto;
-  border: none;
-  background: none;
-  font-size: var(--text-xl);
-  line-height: 1;
-  color: var(--ink-dim);
-  cursor: pointer;
-  padding: 0 2px;
-}
-
-.close::after {
-  content: '';
-  position: absolute;
-  inset: -14px -10px;
 }
 
 .well {

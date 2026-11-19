@@ -22,48 +22,6 @@
   overflow: hidden;
 }
 
-.header {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.title {
-  margin: 0;
-  font-size: var(--text-lg);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-
-.count {
-  font-size: var(--text-xs);
-  color: var(--ink-dim);
-  padding: 1px 7px;
-  background: var(--chip-bg-strong);
-  border-radius: var(--radius-pill);
-}
-
-.close {
-  margin-left: auto;
-  border: none;
-  background: none;
-  font-size: var(--text-xl);
-  line-height: 1;
-  color: var(--ink-dim);
-  cursor: pointer;
-  padding: 0 2px;
-  position: relative;
-}
-
-/* Invisible 44 px hit area; the glyph and the header row keep their size. */
-.close::after {
-  content: '';
-  position: absolute;
-  inset: -14px -10px;
-}
-
 .lede {
   margin: 0;
   font-size: var(--text-sm);

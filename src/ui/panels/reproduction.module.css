@@ -23,35 +23,6 @@
   min-width: 0;
 }
 
-.header {
-  display: flex;
-  align-items: baseline;
-}
-
-.title {
-  margin: 0;
-  font-size: var(--size-tag);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-
-.close {
-  margin-left: auto;
-  align-self: center;
-  min-width: 44px;
-  min-height: 44px;
-  margin-top: -12px;
-  margin-right: -10px;
-  border: none;
-  background: none;
-  font-size: var(--text-xl);
-  line-height: 1;
-  color: var(--ink-dim);
-  cursor: pointer;
-}
-
 .group {
   display: flex;
   flex-direction: column;
@@ -203,12 +174,13 @@
 }
 
 .toggle:hover {
-  background: var(--chip-bg-strong);
+  background: var(--accent-selected-soft);
 }
 
+/* Was pale blue (--accent-cool), the one panel family where "selected" was not red. */
 .toggleOn {
-  background: var(--accent-cool);
-  color: var(--ink);
+  background: var(--accent-selected);
+  color: var(--ink-inverse);
 }
 
 .switchOn,

@@ -5,6 +5,7 @@ import type { ReceptorSnapshot } from '../../bridge/types';
 import { useStore } from '../store';
 import { DotMatrix } from '../components/primitives';
 import styles from './receptors.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * RECEPTOR PANEL (spec 8.5).
@@ -119,12 +120,7 @@ export function ReceptorPanel() {
   return (
     <div className={styles.card} role="region" aria-label="Receptor occupancy"
       data-panel="receptors">
-      <div className={styles.titleRow}>
-        <h2 className={styles.title}>Receptors</h2>
-        <button className={styles.close} onClick={toggle} aria-label="Close receptor panel">
-          {'×'}
-        </button>
-      </div>
+      <PanelHeader className={styles.titleRow} title="Receptors" onClose={() => toggle()} />
 
       <div className={styles.well}>
         <canvas ref={canvasRef} className={styles.chart} aria-hidden="true" />

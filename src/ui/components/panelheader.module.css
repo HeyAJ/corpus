@@ -1,0 +1,101 @@
+/*
+ * THE ONE PANEL HEADER (PanelHeader.tsx). Every panel's title, its small meta chip and its
+ * close button come from here, so there is exactly one size, case, weight and colour for a
+ * panel title: sentence case, --text-xl, 700, --ink. The old per-panel title rules (15 px
+ * capitals in most, 13 px grey in two, 18 px in the body panel) were deleted with this.
+ */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  min-width: 0;
+}
+
+.title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+/* The collapsing variant: the whole title is the button, laid out exactly like the plain
+   title. The invisible ::after brings its touch area to 44 px without growing the row. */
+.titleButton {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.titleButton::after {
+  content: '';
+  position: absolute;
+  inset: -8px -6px;
+}
+
+.meta {
+  flex: none;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--chip-bg-strong);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mid);
+}
+
+/* Severity tones keep the colours the panels already used for them (white on each of these
+   fills measures above 4.5:1). */
+.tone_critical {
+  background: #c8231d;
+  color: var(--ink-inverse);
+}
+
+.tone_warn {
+  background: #a35f08;
+  color: var(--ink-inverse);
+}
+
+.tone_watch {
+  background: #857000;
+  color: var(--ink-inverse);
+}
+
+.close {
+  position: relative;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  margin-right: -6px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  font-size: var(--text-2xl);
+  line-height: 1;
+  color: var(--ink-mid);
+  cursor: pointer;
+}
+
+/* Invisible 44 x 44 touch area around the 32 px glyph. */
+.close::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.close:hover {
+  background: var(--chip-bg-strong);
+}

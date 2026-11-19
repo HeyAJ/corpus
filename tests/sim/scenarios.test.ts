@@ -1,7 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { Engine } from '../../src/sim/core/engine';
 import { P } from '../../src/sim/core/constants';
 import { SCENARIOS } from '../../src/ui/scenarios';
+import { loadDrugData } from '../../src/ui/drugData';
 
 /**
  * THE SCENARIO LIBRARY AND THE SUBJECT.
@@ -22,6 +23,11 @@ function run(e: Engine, seconds: number): void {
 }
 
 describe('scenarios', () => {
+  // The interface loads the drug list lazily; a scenario omits a drug step until it has.
+  beforeAll(async () => {
+    await loadDrugData();
+  });
+
   it('every scenario produces at least one intent', () => {
     for (const sc of SCENARIOS) {
       expect(sc.intents().length, sc.id).toBeGreaterThan(0);
