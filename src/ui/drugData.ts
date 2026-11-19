@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react';
 import type { Drug, DrugsFile } from '../data/pharma-types';
+import drugsUrl from '../data/drugs.json?url';
 import { useStore } from './store';
 
 /**
@@ -11,7 +12,14 @@ import { useStore } from './store';
  * simulation worker still imports it itself (it is a separate chunk and needs it to
  * refuse undeclared doses); only the interface side is lazy.
  *
- * CONTRACT. `loadDrugData()` dynamic-imports the file once, in its own chunk, and every
+ * WHY FETCH AND NOT import(). Vite emits the JSON as its own hashed asset and hands us its
+ * URL. A dynamic import() of a module that failed to download is CACHED as a failure by
+ * Chromium, so a second import() rejected at once without sending a request and the
+ * Retry button did nothing until the visitor reloaded. A failed fetch is not cached, so
+ * Retry really asks again; and JSON.parse of the file is cheaper than parsing the same
+ * data as a JavaScript module.
+ *
+ * CONTRACT. `loadDrugData()` fetches the file once, and every
  * caller shares the one promise. A failed import is NOT cached: the next call tries
  * again, which is what the sheet's Retry button relies on. `drugDataIfLoaded()` is the
  * synchronous read for code that cannot wait (it returns null until the import has
@@ -46,23 +54,27 @@ function notify(): void {
 export function loadDrugData(): Promise<DrugData> {
   if (loaded) return Promise.resolve(loaded);
   if (pending) return pending;
-  pending = import('../data/drugs.json').then(
-    (mod) => {
-      const file = ((mod as { default?: unknown }).default ?? mod) as unknown as DrugsFile;
-      loaded = { drugs: file.drugs, byId: new Map(file.drugs.map((d) => [d.id, d])) };
-      lastError = null;
-      pending = null;
-      notify();
-      return loaded;
-    },
-    (err: unknown) => {
-      // Not cached: a dropped connection must not poison the session.
-      pending = null;
-      lastError = err instanceof Error ? err : new Error(String(err));
-      notify();
-      throw lastError;
-    },
-  );
+  pending = fetch(drugsUrl)
+    .then((res) => {
+      if (!res.ok) throw new Error(`drug list: HTTP ${res.status}`);
+      return res.json() as Promise<DrugsFile>;
+    })
+    .then(
+      (file) => {
+        loaded = { drugs: file.drugs, byId: new Map(file.drugs.map((d) => [d.id, d])) };
+        lastError = null;
+        pending = null;
+        notify();
+        return loaded;
+      },
+      (err: unknown) => {
+        // Not cached: a dropped connection must not poison the session.
+        pending = null;
+        lastError = err instanceof Error ? err : new Error(String(err));
+        notify();
+        throw lastError;
+      },
+    );
   return pending;
 }
 

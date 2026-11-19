@@ -1,4 +1,5 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { readFile } from 'node:fs/promises';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { Engine } from '../../src/sim/core/engine';
 import { P } from '../../src/sim/core/constants';
 import { SCENARIOS } from '../../src/ui/scenarios';
@@ -25,6 +26,8 @@ function run(e: Engine, seconds: number): void {
 describe('scenarios', () => {
   // The interface loads the drug list lazily; a scenario omits a drug step until it has.
   beforeAll(async () => {
+    // The loader fetches the asset URL, which does not exist under node; serve the file itself.
+    vi.stubGlobal('fetch', async () => new Response(await readFile('src/data/drugs.json', 'utf8')));
     await loadDrugData();
   });
 
