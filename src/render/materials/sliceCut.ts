@@ -49,13 +49,13 @@ export const SLICE_MARGIN = 1.02;
  * plane crosses (capsule, cortex boundary, pyramids, chamber walls, septum, ventricles)
  * then shows as a line in its own hue.
  *
- * The width is a fraction of the organ's bounding radius (SLICE_EDGE_WIDTH, 0.8 %) but is
+ * The width is a fraction of the organ's bounding radius (SLICE_EDGE_WIDTH, 1.2 %) but is
  * never less than SLICE_EDGE_MIN_PX screen pixels at the selection's framing, or a small
  * organ framed large would get a hairline that aliases away. All three are display choices.
  */
-export const SLICE_EDGE_WIDTH = 0.008;
-export const SLICE_EDGE_MIN_PX = 1.5;
-export const SLICE_EDGE_DARKEN = 0.45;
+export const SLICE_EDGE_WIDTH = 0.012;
+export const SLICE_EDGE_MIN_PX = 3;
+export const SLICE_EDGE_DARKEN = 0.35;
 
 /**
  * The world-space width of the contour: SLICE_EDGE_WIDTH of the radius, or SLICE_EDGE_MIN_PX

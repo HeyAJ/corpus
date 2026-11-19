@@ -74,7 +74,8 @@ export function buildOutline(samples: Float32Array, body: OutlineBody, maxTriang
     // whichever component forms the surface there (the thigh, or the pelvic floor's cap
     // under a male body's genitals), and a cut edge anywhere would read as a mannequin.
     const armFade = smoothstep(model.armEndY, model.armEndY + FADE_LENGTH_M, y);
-    const legFade = smoothstep(model.legEndY, model.legFadeStartY, y);
+    // A linear ramp, not a smoothstep: a smoothstep is nearly flat at its top and left the thigh contour faint almost at once below the pelvis.
+    const legFade = Math.max(0, Math.min(1, (y - model.legEndY) / (model.legFadeStartY - model.legEndY)));
     fade[i] = (1 - arm * (1 - armFade)) * legFade;
   }
   geometry.setAttribute('fade', new THREE.BufferAttribute(fade, 1));
