@@ -21,7 +21,7 @@ scope.onmessage = (e) => {
   const reply = answer(e.data.id, e.data.request);
   const transfer: Transferable[] = [];
   if (reply.ok) {
-    if (reply.kind === 'model') transfer.push(...(transferables(reply.geometry) as Transferable[]));
+    if (reply.kind === 'model' || reply.kind === 'outline') transfer.push(...(transferables(reply.geometry) as Transferable[]));
     else for (const p of reply.parts) transfer.push(...(transferables(p.geometry) as Transferable[]));
   }
   scope.postMessage(reply, transfer);

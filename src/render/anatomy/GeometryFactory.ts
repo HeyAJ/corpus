@@ -1,7 +1,8 @@
 import type * as THREE from 'three';
 import type { ModelParams } from './models';
 import type { PartGeometry, PartParams } from './parts';
-import { answer, deserialiseGeometry, type GeometryReply, type GeometryRequest } from './geometryProtocol';
+import { answer, deserialiseGeometry, type GeometryReply, type GeometryRequest, type OutlineInfo } from './geometryProtocol';
+import type { OutlineBody } from '../body/outlineModel';
 
 /**
  * WHERE ORGAN GEOMETRY IS MADE: off the main thread.
@@ -87,6 +88,19 @@ export class GeometryFactory {
     if (!reply.ok) throw new Error(reply.error);
     if (reply.kind !== 'model') throw new Error('geometry factory: mismatched reply');
     return deserialiseGeometry(reply.geometry);
+  }
+
+  /**
+   * The glass figure round the organs, fitted to the given points (x, y, z, radius per
+   * point). Built here, in the same worker as the organs, because it is a few hundred
+   * milliseconds of field evaluation and a pregnancy time-lapse asks for a new one every
+   * half second. The samples are copied into the worker (a few hundred kilobytes), so the caller may reuse them.
+   */
+  async outline(samples: Float32Array, body: OutlineBody): Promise<{ geometry: THREE.BufferGeometry; info: OutlineInfo }> {
+    const reply = await this.send({ kind: 'outline', samples, body });
+    if (!reply.ok) throw new Error(reply.error);
+    if (reply.kind !== 'outline') throw new Error('geometry factory: mismatched reply');
+    return { geometry: deserialiseGeometry(reply.geometry), info: reply.info };
   }
 
   /** The interior parts of one atlas, built for one organ instance. */

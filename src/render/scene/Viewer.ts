@@ -6,6 +6,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 
 import { OrganSet, type OrganState } from '../organs/OrganSet';
 import { OrbitRig } from '../camera/OrbitRig';
+import { BodyOutline } from '../body/BodyOutline';
 import { createDitherPass } from '../postfx/DitherPass';
 import { GiBolus } from '../organs/GiBolus';
 import { AirwayCue } from '../organs/AirwayCue';
@@ -86,6 +87,11 @@ export class Viewer {
   private vascular: VascularSystem;
   private nerves: NervousSystem;
   private hormones: HormoneTraffic;
+  /**
+   * The faint glass figure drawn around the organs (src/render/body). Drawn before every
+   * organ bucket, never pickable, faded to a third while an organ is open.
+   */
+  private outline: BodyOutline;
   /**
    * The inside of the selected organ: part meshes and particle streams, drawn through the
    * organ's glass shell. Owned and animated by OrganDetail; this class only selects, ticks,
@@ -196,6 +202,11 @@ export class Viewer {
     this.body.scale.x = BODY_MIRROR_X;
     this.scene.add(this.body);
     this.body.add(this.organs.root);
+
+    // The glass figure shares the organ set's geometry worker (it is built there) and is
+    // fitted to whichever organ shells that set holds. It draws first (renderOrder 5).
+    this.outline = new BodyOutline(this.organs.geometryFactory, this.organs);
+    this.body.add(this.outline.root);
 
     this.bolus = new GiBolus();
     this.body.add(this.bolus.root);
@@ -415,6 +426,7 @@ export class Viewer {
   select(id: OrganId | null): void {
     if (this.selected === id) return;
     this.selected = id;
+    this.outline.setFocus(id !== null);
     this.applyVascularVisibility();
     this.organs.clearStates(id ?? undefined);
     if (id) {
@@ -472,6 +484,20 @@ export class Viewer {
     this.vascular.setVisible(this.vascularSwitch || this.selected === 'heart');
   }
 
+  /** Show or hide the glass body outline and its floor shadow. On by default. */
+  setBodyOutlineVisible(on: boolean): void {
+    this.outline.setVisible(on);
+  }
+
+  get bodyOutlineVisible(): boolean {
+    return this.outline.visible;
+  }
+
+  /** Triangles in, and milliseconds taken by, the last glass-figure build, for the performance report. */
+  get bodyOutlineStats(): { triangles: number; buildMs: number } {
+    return { triangles: this.outline.triangles, buildMs: this.outline.buildMs };
+  }
+
   /** Show or hide the nervous-system overlay ("Nerves" switch). */
   setNervesVisible(on: boolean): void {
     this.nerves.setVisible(on);
@@ -504,6 +530,8 @@ export class Viewer {
       pregnant: s.reproductive.pregnancy.pregnant,
       gestationWeeks: s.reproductive.pregnancy.gestationWeeks,
     });
+    // The figure's abdomen follows the same week the uterus is built for.
+    this.outline.setBody(s.body.sex, this.currentWeeks(s));
     if (this.snapshots.current) {
       this.snapshots.intervalMs = Math.max(8, Math.min(200, now - this.snapshots.receivedAt));
     }
@@ -597,6 +625,7 @@ export class Viewer {
     this.vascular.update(dtMs / 1000);
     this.nerves.update(dtMs / 1000);
     this.hormones.update(dtMs / 1000);
+    this.outline.update(dtMs / 1000, now, this.reducedMotion);
     this.airway.update(dtMs / 1000, this.snapshots.current);
     this.measureViewport(now);
     this.rig.update(dtMs);
@@ -822,6 +851,7 @@ export class Viewer {
     this.stop();
     this.detachTouch();
     this.organs.dispose();
+    this.outline.dispose();
     this.bolus.dispose();
     this.airway.dispose();
     this.detail.dispose();
