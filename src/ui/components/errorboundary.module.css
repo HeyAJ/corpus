@@ -27,12 +27,12 @@
 
 .title {
   margin: 0 0 8px;
-  font-size: 20px;
+  font-size: var(--text-xl);
 }
 
 .message {
   margin: 0 0 14px;
-  font-size: 14px;
+  font-size: var(--text-md);
   line-height: 1.5;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
@@ -44,14 +44,14 @@
   border: none;
   border-radius: 999px;
   background: #1a1a1a;
-  color: #fff;
+  color: var(--ink-inverse);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 
 .banner {
-  font-size: 12px;
+  font-size: var(--text-sm);
   letter-spacing: 0.04em;
   text-align: center;
 }

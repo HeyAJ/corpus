@@ -23,7 +23,7 @@
 .toast {
   padding: 8px 16px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   text-align: center;
   background: var(--chip-bg-strong);
@@ -44,5 +44,5 @@
 
 .tone_critical {
   background: var(--severity-critical-bg);
-  color: #fff;
+  color: var(--ink-inverse);
 }

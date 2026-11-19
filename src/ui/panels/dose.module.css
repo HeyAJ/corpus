@@ -29,7 +29,7 @@
 }
 
 .amount {
-  font-size: 34px;
+  font-size: var(--text-display);
   font-weight: 800;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -38,7 +38,7 @@
 }
 
 .multiplier {
-  font-size: 14px;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--ink-dim);
   font-variant-numeric: tabular-nums;
@@ -48,7 +48,7 @@
   align-self: flex-start;
   padding: 3px 10px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
 }
 
@@ -59,7 +59,8 @@
 
 .bandRef {
   background: rgba(127, 214, 238, 0.35);
-  color: #29616f;
+  /* Was #29616f on a 35% cyan wash, about 4.2:1; the info ink holds 4.8:1. */
+  color: var(--ink-info);
 }
 
 .bandHigh {
@@ -78,7 +79,7 @@
   position: relative;
   display: flex;
   align-items: center;
-  height: 40px;
+  height: 44px;
   margin-top: 4px;
 }
 
@@ -92,7 +93,7 @@
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 40px;
+  height: 44px;
   margin: 0;
   background: transparent;
   cursor: pointer;
@@ -177,9 +178,10 @@
   display: flex;
   justify-content: space-between;
   margin-top: -6px;
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--ink-faint);
+  /* Text, so --ink-dim: --ink-faint is a 2.3:1 hairline grey. */
+  color: var(--ink-dim);
   font-variant-numeric: tabular-nums;
 }
 
@@ -203,12 +205,13 @@
 }
 
 .step {
-  min-height: 34px;
+  /* Was 34 px: a quick step is the way most people set a dose on a phone. */
+  min-height: 44px;
   border: none;
   border-radius: 9px;
   background: transparent;
   font: inherit;
-  font-size: 14px;
+  font-size: var(--text-md);
   font-weight: 700;
   color: var(--ink-mid);
   cursor: pointer;
@@ -235,7 +238,7 @@
 }
 
 .durationLabel {
-  font-size: 14px;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--ink-mid);
 }
@@ -248,32 +251,32 @@
 }
 
 .stepper button {
-  width: 40px;
-  min-height: 34px;
+  width: 44px;
+  min-height: 44px;
   border: none;
   background: transparent;
-  font-size: 20px;
+  font-size: var(--text-xl);
   font-weight: 600;
   color: var(--ink);
   cursor: pointer;
 }
 
 .stepper button:disabled {
-  color: var(--ink-faint);
+  color: var(--ink-dim);
   cursor: not-allowed;
 }
 
 .durationValue {
   min-width: 64px;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--text-md);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
 .rate {
   margin-left: auto;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--ink-dim);
   font-variant-numeric: tabular-nums;
@@ -294,7 +297,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--ink-dim);
 }
@@ -304,7 +307,7 @@
   align-items: center;
   gap: 5px;
   font-weight: 600;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
 .keyGhost {
@@ -315,14 +318,14 @@
 
 .curveNote {
   margin: 6px 0 0;
-  font-size: 11px;
+  font-size: var(--text-xs);
   line-height: 1.45;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
 .curveReason {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.45;
   color: var(--ink-dim);
 }
@@ -330,15 +333,15 @@
 /* ------------------------------------------------------------- provenance */
 
 .provenance {
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--ink-dim);
 }
 
 .provenance summary {
   cursor: pointer;
   font-weight: 600;
-  color: #2f6fd6;
-  min-height: 32px;
+  color: var(--ink-info);
+  min-height: 44px;
   display: flex;
   align-items: center;
 }

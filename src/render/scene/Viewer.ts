@@ -6,6 +6,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 
 import { OrganSet, type OrganState } from '../organs/OrganSet';
 import { OrbitRig } from '../camera/OrbitRig';
+import { slicePlane, sliceKeeps, type SliceAxis, type SlicePlane } from '../materials/sliceCut';
 import { BodyOutline } from '../body/BodyOutline';
 import { createDitherPass } from '../postfx/DitherPass';
 import { GiBolus } from '../organs/GiBolus';
@@ -40,6 +41,18 @@ const BACKGROUNDS: Record<BackgroundMode, number> = {
   active: 0xf6f4e4,
   arrest: 0xfbf3d0,
 };
+
+/**
+ * DISPLAY CONSTANTS for double-tap detection (feel choices, not measurements). Two taps
+ * count as one double-tap when the second lands within DOUBLE_TAP_MS of the first and
+ * within DOUBLE_TAP_SLOP of it in normalised canvas units (the canvas is 2 wide, so 0.06 is
+ * about 3 % of its width, roughly a fingertip on a phone and 40 px on a desktop window).
+ * 350 ms is the span the platforms' own double-click settings default to or sit near.
+ */
+const DOUBLE_TAP_MS = 350;
+const DOUBLE_TAP_SLOP = 0.06;
+/** Milliseconds of every camera flight; under reduced motion each flight is an instant cut. */
+const FLIGHT_MS = 600;
 
 export interface ViewerCallbacks {
   onHover?: (id: OrganId | null) => void;
@@ -116,6 +129,30 @@ export class Viewer {
   private lastTouchX = 0;
   private lastTouchY = 0;
   private lastTouchDist = 0;
+  /** Centre of the two fingers last frame, normalised, for the two-finger pan. */
+  private lastTouchCX = 0;
+  private lastTouchCY = 0;
+  /**
+   * Mouse pan (right button, or Shift + left button) and the guards around it. The
+   * interface's own pointer handlers (App.tsx) know nothing of buttons or modifiers, so
+   * the Viewer listens on its canvas itself, as it already does for touch: its listeners
+   * run first (target phase, before React's root listener), mark the gesture, and
+   * handlePointerMove / handleTap read the marks.
+   */
+  private panActive = false;
+  private panX = 0;
+  private panY = 0;
+  /** True from the start of a pan or multi-finger gesture until the next press: the release is not a tap. */
+  private tapSuppressed = false;
+  /** Whether the last pointer seen was a mouse; hover is for mice only. */
+  private mouseActive = false;
+  private lastTapAt = -1e9;
+  private lastTapX = 0;
+  private lastTapY = 0;
+  private boundPointerDown?: (e: PointerEvent) => void;
+  private boundPointerMove?: (e: PointerEvent) => void;
+  private boundPointerUp?: (e: PointerEvent) => void;
+  private boundContextMenu?: (e: Event) => void;
   private boundTouchStart?: (e: TouchEvent) => void;
   private boundTouchMove?: (e: TouchEvent) => void;
   private boundTouchEnd?: (e: TouchEvent) => void;
@@ -133,6 +170,25 @@ export class Viewer {
   private backgroundMode: BackgroundMode = 'idle';
   private backgroundColor = new THREE.Color(BACKGROUNDS.idle);
   private targetBackground = new THREE.Color(BACKGROUNDS.idle);
+
+  /** Slice state (see setSlice). The axis is null whenever no organ is open. */
+  private sliceAxisValue: SliceAxis | null = null;
+  private sliceDepthValue = 0;
+  private readonly slicePlaneScratch: SlicePlane = { nx: 0, ny: 0, nz: 0, w: 0 };
+  private readonly sliceCentre = new THREE.Vector3();
+  private readonly partCentre = new THREE.Vector3();
+  private readonly hitPoint = new THREE.Vector3();
+
+  /**
+   * Called only when `viewAtHome` flips, so a Reset button can appear once the visitor has
+   * orbited, panned or zoomed away and go again after resetView().
+   */
+  onViewChanged: ((atHome: boolean) => void) | null = null;
+  /**
+   * Called when the organ under a MOUSE pointer changes (never for touch). Only while no
+   * organ is open: with one open the mouse is working on its interior, not choosing organs.
+   */
+  onHoverChanged: ((organId: string | null) => void) | null = null;
 
   private labelBuffer: { id: OrganId; x: number; y: number; visible: boolean }[] = [];
   private projected = new THREE.Vector3();
@@ -264,8 +320,67 @@ export class Viewer {
     this.dither = createDitherPass({ dotSize: 3.0, strength: 0.12, vignette: 0.1 });
     this.composer.addPass(this.dither);
 
+    this.rig.onHomeChanged = (atHome) => this.onViewChanged?.(atHome);
+
     this.resize();
     this.attachTouch();
+    this.attachPointerExtras();
+  }
+
+  /* ------------------------------------------------------- mouse extras */
+
+  /** Right-button and Shift-drag pan, pointer-type tracking, and no browser context menu. */
+  private attachPointerExtras(): void {
+    const canvas = this.renderer.domElement;
+    const norm = (e: PointerEvent): { x: number; y: number } => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: ((e.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1,
+        y: -(((e.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1),
+      };
+    };
+    this.boundPointerDown = (e) => {
+      this.mouseActive = e.pointerType === 'mouse';
+      // A new press: the last gesture's suppression ends, unless a second finger is
+      // already down (touchstart sets it again once it has seen both).
+      this.tapSuppressed = false;
+      if (e.pointerType === 'mouse' && (e.button === 2 || (e.button === 0 && e.shiftKey))) {
+        const n = norm(e);
+        this.panActive = true;
+        this.tapSuppressed = true;
+        this.panX = n.x;
+        this.panY = n.y;
+      }
+    };
+    this.boundPointerMove = (e) => {
+      this.mouseActive = e.pointerType === 'mouse';
+      if (!this.panActive) return;
+      const n = norm(e);
+      this.rig.pan(n.x - this.panX, n.y - this.panY);
+      this.panX = n.x;
+      this.panY = n.y;
+    };
+    this.boundPointerUp = () => {
+      this.panActive = false;
+    };
+    // The right button is a pan, so the browser's menu would pop up at the end of every one.
+    this.boundContextMenu = (e) => e.preventDefault();
+    canvas.addEventListener('pointerdown', this.boundPointerDown);
+    canvas.addEventListener('pointermove', this.boundPointerMove);
+    canvas.addEventListener('pointerup', this.boundPointerUp);
+    canvas.addEventListener('pointercancel', this.boundPointerUp);
+    canvas.addEventListener('contextmenu', this.boundContextMenu);
+  }
+
+  private detachPointerExtras(): void {
+    const canvas = this.renderer.domElement;
+    if (this.boundPointerDown) canvas.removeEventListener('pointerdown', this.boundPointerDown);
+    if (this.boundPointerMove) canvas.removeEventListener('pointermove', this.boundPointerMove);
+    if (this.boundPointerUp) {
+      canvas.removeEventListener('pointerup', this.boundPointerUp);
+      canvas.removeEventListener('pointercancel', this.boundPointerUp);
+    }
+    if (this.boundContextMenu) canvas.removeEventListener('contextmenu', this.boundContextMenu);
   }
 
   /* --------------------------------------------------------------- touch */
@@ -288,12 +403,25 @@ export class Viewer {
       };
     };
     const dist = (a: Touch, b: Touch): number => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    // Midpoint of two fingers in the same normalised units as `norm` (y up).
+    const centre = (a: Touch, b: Touch): { x: number; y: number } => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: (((a.clientX + b.clientX) / 2 - rect.left) / Math.max(1, rect.width)) * 2 - 1,
+        y: -((((a.clientY + b.clientY) / 2 - rect.top) / Math.max(1, rect.height)) * 2 - 1),
+      };
+    };
 
     this.boundTouchStart = (e: TouchEvent) => {
       this.touchActive = true;
       if (e.touches.length >= 2) {
         this.touchMode = 'pinch';
         this.lastTouchDist = dist(e.touches[0], e.touches[1]);
+        const c = centre(e.touches[0], e.touches[1]);
+        this.lastTouchCX = c.x;
+        this.lastTouchCY = c.y;
+        // The fingers that lift after a pinch or a pan must not tap what is under them.
+        this.tapSuppressed = true;
       } else {
         this.touchMode = 'orbit';
         const n = norm(e.touches[0]);
@@ -308,6 +436,11 @@ export class Viewer {
         const d = dist(e.touches[0], e.touches[1]);
         if (this.lastTouchDist > 0) this.handlePinch(d / this.lastTouchDist);
         this.lastTouchDist = d;
+        // The same two fingers also pan, as on a map: the content follows the midpoint.
+        const c = centre(e.touches[0], e.touches[1]);
+        this.rig.pan(c.x - this.lastTouchCX, c.y - this.lastTouchCY);
+        this.lastTouchCX = c.x;
+        this.lastTouchCY = c.y;
       } else if (e.touches.length >= 1) {
         // Fall back to orbit if a finger was lifted from a pinch mid-gesture.
         if (this.touchMode !== 'orbit') {
@@ -368,7 +501,7 @@ export class Viewer {
     // While a touch gesture is running, the Viewer's own touch handler is already
     // orbiting; letting the PointerEvent that the same finger also generates orbit here
     // would double the drag. The mouse never sets touchActive, so it is unaffected.
-    if (dragging && !this.touchActive) this.rig.orbit(-dx, -dy);
+    if (dragging && !this.touchActive && !this.panActive) this.rig.orbit(-dx, -dy);
   }
 
   handlePointerLeave(): void {
@@ -385,6 +518,23 @@ export class Viewer {
   }
 
   handleTap(x: number, y: number): void {
+    // The release of a pan or of a multi-finger gesture is not a tap.
+    if (this.tapSuppressed) return;
+    // A DOUBLE-TAP IS NOT TWO TAPS. The first tap has already done its single-tap job
+    // (selected an organ, or deselected), and the second must not undo it: tapping an organ
+    // twice used to select it and then, on the second tap, find the organ already open and
+    // fall through to a re-pick. It zooms to the point instead, or resets on empty space.
+    const now = performance.now();
+    const double =
+      now - this.lastTapAt < DOUBLE_TAP_MS && Math.hypot(x - this.lastTapX, y - this.lastTapY) < DOUBLE_TAP_SLOP;
+    this.lastTapAt = double ? -1e9 : now;
+    this.lastTapX = x;
+    this.lastTapY = y;
+    if (double) {
+      this.pointer.set(x, y);
+      this.handleDoubleTap();
+      return;
+    }
     this.pointer.set(x, y);
     // With an organ open, its interior parts get the first claim on the tap. A hit marks
     // the part and leaves the organ selected; a miss falls through to the ordinary organ
@@ -400,6 +550,96 @@ export class Viewer {
     }
     const hit = this.pick();
     this.select(hit);
+  }
+
+  /**
+   * On the body: the point under the finger becomes the orbit target and the camera closes
+   * to 55 % of its distance (never under the rig's floor). On empty space: back to the home
+   * view. The ray is already set from `this.pointer`.
+   */
+  private handleDoubleTap(): void {
+    this.raycaster.setFromCamera(this.pointer, this.rig.camera);
+    let hit = false;
+    if (this.selected && this.detail.pick(this.raycaster, this.hitPoint)) hit = true;
+    else hit = this.pickHit(this.hitPoint) !== null;
+    if (hit) this.rig.flyTo(this.hitPoint, this.rig.doubleTapTarget, 0, this.flightMs());
+    else this.resetView();
+  }
+
+  private flightMs(): number {
+    return this.reducedMotion ? 0 : FLIGHT_MS;
+  }
+
+  /* ------------------------------------------------------------ the view */
+
+  /** False once the visitor has orbited, panned or zoomed away from the home view of this state. */
+  get viewAtHome(): boolean {
+    return this.rig.viewAtHome;
+  }
+
+  /**
+   * Back to the home view of the current state: the whole body when nothing is selected,
+   * the organ's framing when one is. The camera turns back to the front, the pan is
+   * cleared and the distance refitted.
+   */
+  resetView(): void {
+    const h = this.selected ? this.organs.organs.get(this.selected) : undefined;
+    if (h) this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius, this.flightMs(), true);
+    else this.rig.reset(this.flightMs(), true);
+  }
+
+  /**
+   * Fly to frame one part of the open organ, or with null back to framing the whole organ.
+   * Does nothing when no organ is open or the part is unknown (an interior still being
+   * built has no parts yet). The framing respects the area a panel leaves free.
+   */
+  focusPart(partId: string | null): void {
+    if (!this.selected) return;
+    const h = this.organs.organs.get(this.selected);
+    if (!h) return;
+    if (partId === null) {
+      this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius, this.flightMs());
+      return;
+    }
+    const r = this.detail.partSphere(partId, this.partCentre);
+    if (!(r > 0)) return;
+    this.toScene(this.partCentre, this.focusPoint);
+    this.rig.flyTo(this.focusPoint, this.rig.framingDistance(r), r, this.flightMs());
+  }
+
+  /* --------------------------------------------------------------- slice */
+
+  get sliceAxis(): SliceAxis | null {
+    return this.sliceAxisValue;
+  }
+
+  get sliceDepth(): number {
+    return this.sliceDepthValue;
+  }
+
+  /**
+   * Cut the selected organ with one flat plane through its bounding sphere, or restore it
+   * whole with a null axis. See materials/sliceCut.ts for which side each axis removes and
+   * for why the cut lives in the organ's own materials. `depth` 0..1: 0 removes nothing,
+   * 0.5 passes through the centre, 1 removes everything. It applies to the selected organ's
+   * parts, streams and shell only, NEVER to the rest of the body or to the glass figure,
+   * and it returns to null whenever the selection changes. With no organ open there is
+   * nothing to cut and the call leaves the state at null.
+   */
+  setSlice(axis: SliceAxis | null, depth: number): void {
+    const h = this.selected ? this.organs.organs.get(this.selected) : undefined;
+    if (!axis || !h) {
+      this.sliceAxisValue = null;
+      this.sliceDepthValue = 0;
+      this.detail.setCut(null);
+      return;
+    }
+    this.sliceAxisValue = axis;
+    this.sliceDepthValue = Number.isFinite(depth) ? Math.max(0, Math.min(1, depth)) : 0;
+    // The organ's centre as the scene sees it (after the renderer's mirror).
+    this.toScene(h.centroid, this.sliceCentre);
+    slicePlane(axis, this.sliceDepthValue, this.sliceCentre, h.boundingRadius, this.slicePlaneScratch);
+    this.detail.setCut(this.slicePlaneScratch);
   }
 
   /** The UI picked a part from its list: mark it (or clear with null) in the interior. */
@@ -425,6 +665,9 @@ export class Viewer {
 
   select(id: OrganId | null): void {
     if (this.selected === id) return;
+    // A slice belongs to the organ it was made in: clear it while the OLD organ's shell is
+    // still the one the detail layer holds, so that shell is restored whole.
+    this.setSlice(null, 0);
     this.selected = id;
     this.outline.setFocus(id !== null);
     this.applyVascularVisibility();
@@ -432,15 +675,17 @@ export class Viewer {
     if (id) {
       const h = this.organs.organs.get(id);
       this.organs.setState(id, 'selected');
-      if (h) this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius);
+      if (h) this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius, this.flightMs());
       if (h) {
         this.interiorWeeks = this.currentWeeks();
         this.detail.show(h, this.interiorWeeks);
       }
     } else {
-      this.rig.reset();
+      this.rig.reset(this.flightMs());
       this.detail.hide();
     }
+    // With an organ open the mouse works on its interior, so organ hover ends.
+    if (id) this.setHover(null);
     // A picked part belongs to the organ it was picked in.
     this.callbacks.onPart?.(null);
     this.callbacks.onSelect?.(id);
@@ -452,16 +697,29 @@ export class Viewer {
     this.hovered = id;
     if (id && id !== this.selected) this.organs.setState(id, 'hovered');
     this.callbacks.onHover?.(id);
+    this.onHoverChanged?.(id);
   }
 
   private pick(): OrganId | null {
+    return this.pickHit(null);
+  }
+
+  /** Nearest organ under the pointer, and where the ray met it (scene space) if asked. */
+  private pickHit(outPoint: THREE.Vector3 | null): OrganId | null {
     this.raycaster.setFromCamera(this.pointer, this.rig.camera);
     const hits = this.raycaster.intersectObjects(this.organs.pickTargets, false);
-    if (hits.length === 0) return null;
     // Nearest hit wins. Because the absorption meshes are DoubleSide, a ray through
     // a hollow shell hits both walls; taking the first is the front wall, which is
-    // what the user is pointing at.
-    return (hits[0].object.userData.organId as OrganId) ?? null;
+    // what the user is pointing at. With a slice on, the part of the shell the plane
+    // removed is not there to be hit, so those hits are skipped and the tap goes
+    // through to what is visible behind them.
+    const plane = this.detail.cut;
+    for (const hit of hits) {
+      if (plane && !sliceKeeps(plane, hit.point.x, hit.point.y, hit.point.z)) continue;
+      outPoint?.copy(hit.point);
+      return (hit.object.userData.organId as OrganId) ?? null;
+    }
+    return null;
   }
 
   /* ------------------------------------------------------------ snapshots */
@@ -616,7 +874,7 @@ export class Viewer {
 
     this.backgroundColor.lerp(this.targetBackground, Math.min(1, dtMs / 400));
 
-    if (this.pointerInside && !this.selected) {
+    if (this.pointerInside && !this.selected && this.mouseActive) {
       this.setHover(this.pick());
     }
 
@@ -850,6 +1108,7 @@ export class Viewer {
   dispose(): void {
     this.stop();
     this.detachTouch();
+    this.detachPointerExtras();
     this.organs.dispose();
     this.outline.dispose();
     this.bolus.dispose();

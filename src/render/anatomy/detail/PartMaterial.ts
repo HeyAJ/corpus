@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { SOLID_VERT } from '../../materials/OrganSolid';
+import { patchForCut } from '../../materials/sliceCut';
 
 /**
  * THE MATERIAL OF AN ORGAN'S INTERIOR PARTS.
@@ -77,6 +78,18 @@ void main() {
   float alpha = uOpacity * mix(1.0, mix(1.0, 1.9, pow(1.0 - ndv, 1.4)), uGlass);
 
   gl_FragColor = vec4(lit, clamp(alpha, 0.0, 1.0));
+
+  // A SECTION (see materials/sliceCut.ts): with a slice on, the front wall of a solid part
+  // that the plane removed is gone and the eye looks in through the hole at the part's own
+  // BACK wall. Shaded like a front face that reads as a hollow paper shell, an empty
+  // eggshell with the lighting of the outside. So a back face of a cut solid part is drawn
+  // flat and darker in the part's own colour, which reads as the cut face of a solid. The
+  // 0.55 is a display choice, dark enough to separate it from the intact outside and light
+  // enough that the colour still says which part it is. Glass parts keep the shading above:
+  // they were never meant to read as solid. Without a slice this branch never runs.
+  if (uCutOn > 0.5 && uGlass < 0.5 && !gl_FrontFacing) {
+    gl_FragColor = vec4(uColor * 0.55, clamp(uOpacity, 0.0, 1.0));
+  }
 }
 `;
 
@@ -85,7 +98,7 @@ export interface PartMaterialOptions {
 }
 
 export function createPartMaterial(options: PartMaterialOptions = {}): THREE.ShaderMaterial {
-  return new THREE.ShaderMaterial({
+  const material = new THREE.ShaderMaterial({
     name: 'OrganPart',
     uniforms: {
       uColor: { value: new THREE.Color(options.color ?? 0xc8b8aa) },
@@ -101,4 +114,8 @@ export function createPartMaterial(options: PartMaterialOptions = {}): THREE.Sha
     depthWrite: true,
     depthTest: true,
   });
+  // Every part can be cut; the cut is off until OrganDetail turns it on. It is spliced in
+  // here, before the first compile, so no part is ever recompiled when a slice is first used.
+  patchForCut(material);
+  return material;
 }

@@ -174,6 +174,36 @@ describe('glass body outline', () => {
     }
   });
 
+  it('arm and thigh capsules enclose their centrelines, and the thighs are separated by a notch', { timeout: 60000 }, () => {
+    for (const { name, body } of BODIES) {
+      const model = outlineModel(samplesOf(body), body);
+      const ids = ['brachial_l', 'brachial_r', 'femoral_l', 'femoral_r', 'popliteal_l', 'popliteal_r'];
+      const axis: Record<string, [number, number, number][]> = {};
+      for (const c of buildCentrelines()) {
+        if (!ids.includes(c.id)) continue;
+        axis[c.id] = c.positions.map((p) => warpPoint([p.x, p.y, p.z]));
+        const field = c.id.startsWith('brachial') ? model.arms : model.legs;
+        for (const w of axis[c.id]) expect(field(w[0], w[1], w[2]), `${name} ${c.id}`).toBeLessThan(0);
+      }
+      // Midway between the two thigh axes, below the pelvic floor: page colour. The
+      // external genitalia lie ON the midline, in front, and the figure encloses them
+      // with their own blob, so a through-view notch is only possible behind them; the
+      // point is taken 6 cm behind the thighs' axes, at the lower thigh.
+      const l = axis.femoral_l.concat(axis.popliteal_l);
+      const r = axis.femoral_r.concat(axis.popliteal_r);
+      const yNotch = l[l.length - 1][1] + 0.03;
+      const at = (pts: [number, number, number][]): [number, number, number] =>
+        pts.reduce((best, p) => (Math.abs(p[1] - yNotch) < Math.abs(best[1] - yNotch) ? p : best));
+      const a = at(l);
+      const b = at(r);
+      const mx = (a[0] + b[0]) / 2;
+      const mz = (a[2] + b[2]) / 2 - 0.06;
+      expect(model.field(mx, yNotch, mz), `${name} notch`).toBeGreaterThan(0);
+      // And the two thighs' own capsules are separate: the legs field is outside at the midline.
+      expect(model.legs(mx, yNotch, (a[2] + b[2]) / 2), `${name} legs`).toBeGreaterThan(0);
+    }
+  });
+
   it('samples are laid out x, y, z, radius', () => {
     expect(SAMPLE_STRIDE).toBe(4);
   });

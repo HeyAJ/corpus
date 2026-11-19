@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { patchForCut, type CutUniforms } from '../../materials/sliceCut';
 import type { FlowHandle, FlowSpec } from './types';
 
 /**
@@ -130,6 +131,8 @@ export class FlowField {
   private readonly sizeAttr: THREE.BufferAttribute;
   private readonly sizes: Float32Array;
   private readonly material: THREE.ShaderMaterial;
+  /** The slice-plane uniforms of the stream material (see materials/sliceCut.ts). */
+  readonly cut: CutUniforms;
   private readonly scratchColor = new THREE.Color();
 
   constructor(specs: readonly FlowSpec[]) {
@@ -257,6 +260,10 @@ export class FlowField {
       depthTest: true,
       transparent: true,
     });
+
+    // The streams of the selected organ are cut by the same plane as its parts, or a stream
+    // would hang in the air where the tissue around it had been sliced away.
+    this.cut = patchForCut(this.material);
 
     this.object = new THREE.Points(geometry, this.material);
     this.object.frustumCulled = false;

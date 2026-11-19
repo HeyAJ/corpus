@@ -14,9 +14,12 @@
 }
 
 .rhythm {
-  font-size: 12px;
+  /* Inside the HUD, which is drawn at scale 0.86 (app.module.css): 12 px drew at 10.3 px
+     (9.4 px on a phone, before the scales were unified) and the colour was --ink-faint,
+     about 2:1. --text-md draws at 11.2 px. */
+  font-size: var(--text-md);
   font-weight: 700;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
   letter-spacing: 0.02em;
 }
 
@@ -28,8 +31,10 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px 10px;
-  max-width: 240px;
-  font-size: 12px;
+  /* 240 px before the text grew from 12 to 13 px; widened in proportion so the lines wrap
+     no more than they did. */
+  max-width: 260px;
+  font-size: var(--text-md);
   font-weight: 700;
   /* Same backing as the metric chips, so the line does not depend on the organ behind it. */
   color: var(--ink-mid);
@@ -59,7 +64,8 @@
   border-radius: var(--radius-pill);
   background: var(--chip-bg);
   color: var(--ink-dim);
-  font-size: 11px;
+  /* The kidney readout shows this badge inside the HUD (scale 0.86), where 11 px drew at 9.5 px. */
+  font-size: var(--text-md);
 }
 
 .badgeWarn {
@@ -67,7 +73,8 @@
   border-radius: var(--radius-pill);
   background: var(--severity-warn-bg);
   color: var(--severity-warn-ink);
-  font-size: 11px;
+  /* The kidney readout shows this badge inside the HUD (scale 0.86), where 11 px drew at 9.5 px. */
+  font-size: var(--text-md);
 }
 
 /* --- condition tags, top-right, most severe first ----------------------- */
@@ -88,11 +95,11 @@
    THIS RULE MUST COME AFTER the base .conditions rule above. It used to sit near the top of
    the file, where the later base rule (same specificity) overrode it, so on a phone the
    first alarm pill was painted straight over the clock chip (the checker printed
-   "Hypovolemia" x "01"). The 70 px is the chip's 22 px offset plus its 36 px minimum
-   height plus a gap: a layout choice, not a measured value. */
+   "Hypovolemia" x "01"). The 78 px is the chip's 22 px offset plus its 44 px minimum
+   height (it was 36 px, hence 70 px, before the touch-target fix) plus a gap: a layout choice, not a measured value. */
 @media (max-width: 720px) {
   .conditions {
-    top: calc(env(safe-area-inset-top, 0px) + 70px);
+    top: calc(env(safe-area-inset-top, 0px) + 78px);
   }
 }
 
@@ -124,7 +131,7 @@
     'label segment'
     'bar   volume';
   gap: 2px 8px;
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: 700;
   color: var(--ink-dim);
   background: var(--chip-bg);
@@ -134,7 +141,7 @@
 
 .transitEmpty {
   display: block !important;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
   font-weight: 500;
 }
 
@@ -146,7 +153,7 @@
 .transitSegment {
   grid-area: segment;
   text-align: right;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
   text-transform: capitalize;
 }
 
@@ -182,6 +189,20 @@
  */
 @media (max-width: 720px) {
   :global([data-drawer-open='open']) .conditions {
+    display: none;
+  }
+}
+
+/*
+ * PHONE, BRAIN SCAN PINNED WITH NO SHEET OPEN: the card sits in the right-hand column, where
+ * the pills also stack, so the pills would be painted through it. The pill text and the
+ * scan legend are both text and neither may hide the other; the scan is the thing the
+ * visitor asked to keep, so the pills step aside, exactly as they do for the drawer. The
+ * HUD and the rhythm readout still say the body is in trouble. (With a sheet open the card
+ * moves left instead, brainscan.module.css, and the pills stay.)
+ */
+@media (max-width: 720px) {
+  :global([data-card='closed']):has([data-scan]) .conditions {
     display: none;
   }
 }

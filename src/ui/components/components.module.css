@@ -26,11 +26,14 @@
   /* --ink-mid (#4a4a4a) is about 6.5:1 on the chip; the old --ink-faint was about 1.9:1. */
   color: var(--ink-mid);
   font-weight: var(--weight-bold);
-  font-size: 0.85em;
+  /* Was 0.85em of the chip text, which drew units at 10.8 px inside the scaled HUD. A fixed
+     step keeps them at 11.2 px there (13 px x 0.86) whatever the chip size. */
+  font-size: var(--text-md);
 }
 
 .chipSeparator {
-  color: #9a9a9a;
+  /* Was #9a9a9a, a hard-coded grey of about 2.4:1 used as text. */
+  color: var(--ink-dim);
   padding: 0 2px;
 }
 
@@ -87,9 +90,9 @@
 }
 
 .darkStripBadge {
-  color: #fff;
+  color: var(--ink-inverse);
   font-weight: var(--weight-bold);
-  font-size: 14px;
+  font-size: var(--text-md);
   min-width: 14px;
   text-align: center;
 }
@@ -196,14 +199,14 @@
 
 .provenanceButton {
   padding: 0 4px;
-  color: var(--ink-faint);
-  font-size: 11px;
+  color: var(--ink-dim);
+  font-size: var(--text-xs);
   line-height: 1;
   border-radius: 4px;
 }
 
 .provenanceButton:hover {
-  color: var(--ink-dim);
+  color: var(--ink);
   background: rgba(0, 0, 0, 0.04);
 }
 

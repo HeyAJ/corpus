@@ -1,7 +1,7 @@
 import { SEGMENTS } from '../vascular/centrelines';
 import { organDef, organPosition, warpPoint } from '../anatomy/layout';
 import { gravidBody } from '../anatomy/models';
-import { chain, smoothUnion, type Sdf, type V3 } from '../anatomy/sdf';
+import { chain, ellipsoid, smoothUnion, union, type Sdf, type V3 } from '../anatomy/sdf';
 
 /**
  * THE GLASS FIGURE: one closed smooth surface drawn around the organs.
@@ -64,8 +64,22 @@ export const ARM_TAPER = 0.8;
 export const LEG_TAPER = 0.75;
 /** A thigh's radius as a fraction of the distance of its axis from the midline, so the two thighs do not fuse. A DISPLAY choice. */
 export const THIGH_GAP_FRACTION = 0.92;
+/** How far each thigh's capsule axis is moved outward from its femoral centreline, metres. A DISPLAY choice: the femoral artery runs on the INNER side of the thigh, so the thigh's body lies outside it, which is also what opens a notch between the two thighs. */
+export const THIGH_OFFSET_M = 0.025;
+/** Distance of each thigh's inner surface from the midline, metres. A DISPLAY choice: the visible notch of page colour between the thighs. */
+export const THIGH_INNER_GAP_M = 0.012;
+/** How far inside an arm's inner surface its brachial centreline lies, metres. A DISPLAY choice: the brachial artery runs along the INNER side of the upper arm, so the arm's capsule axis is moved outward from it until the artery sits this far inside the inner surface; that is what lets the arm stand clear of the trunk with a notch at the armpit. */
+export const ARM_INNER_INSET_M = 0.01;
+/** Fillet radius where the genitalia's blob joins the rest, metres. A DISPLAY choice. */
+export const GENITAL_BLEND_K_M = 0.012;
+/** Margin round the external genitalia's own blob, metres. A DISPLAY choice, thinner than the trunk's. */
+export const GENITAL_MARGIN_M = 0.012;
+/** A sample whose radius is this (negative) marks an external organ: the trunk loft stops at the pelvic floor and these points are enclosed by their own small blob instead. */
+export const EXTERNAL_FLAG = -1e-9;
 /** Slices added beyond the highest and lowest data point, each smaller than the last, to round the crown and the foot. A DISPLAY choice. */
 export const CAP_SLICES = 3;
+/** Squareness of each slice's cross-section: 2 is an ellipse, higher is boxier. A DISPLAY choice. An ellipse has to be scaled up by up to sqrt(2) to contain the corner of a box of organs (two lungs, a liver beside them), which made the chest 4 cm wider than the organs need and left no room for an arm to stand clear of it. */
+export const SLICE_POWER = 3;
 /** Fillet radius where limbs meet the trunk, metres. A DISPLAY choice. */
 export const BLEND_K_M = 0.04;
 /** Slice spacing of the loft, metres. A DISPLAY choice (finer follows the organs more closely and costs more triangles). */
@@ -120,15 +134,20 @@ function gravidPoints(weeks: number, out: number[]): void {
 }
 
 /** Every named vessel's control points (and the midpoints between them), moved by the exploded-stack warp. */
-export function vesselPoints(out: number[]): void {
+export function vesselPoints(out: number[], limb?: number[]): void {
   for (const seg of SEGMENTS) {
+    // The arm and leg vessels are enclosed by their own capsules; they are kept out of
+    // the trunk loft, where a brachial artery at the edge of the chest would widen it.
+    const isLimb = /^(brachial|femoral|popliteal)/.test(seg.id) ? 1 : 0;
     const r = Math.max(seg.radius_m[0], seg.radius_m[1]);
     for (let i = 0; i < seg.points.length; i++) {
       const p = warpPoint(seg.points[i]);
       out.push(p[0], p[1], p[2], r);
+      limb?.push(isLimb);
       if (i + 1 < seg.points.length) {
         const q = warpPoint(seg.points[i + 1]);
         out.push((p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2, r);
+        limb?.push(isLimb);
       }
     }
   }
@@ -196,23 +215,45 @@ function vesselRadius(id: string): number {
  */
 export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineModel {
   const pts: number[] = Array.from(samples);
-  vesselPoints(pts);
+  const limbFlags: number[] = new Array<number>(samples.length / SAMPLE_STRIDE).fill(0);
+  vesselPoints(pts, limbFlags);
   if (body.weeks >= 6) gravidPoints(body.weeks, pts);
   const n = pts.length / SAMPLE_STRIDE;
+  while (limbFlags.length < n) limbFlags.push(0);
+
+  // External organs (flagged by a negative radius) leave the loft; so do the vessels
+  // below the pelvic floor, which belong to the thighs. The PELVIC FLOOR is the lowest
+  // point of any organ that is not external: below it nothing but legs and genitalia.
+  const external = new Uint8Array(n);
+  let yFloor = Infinity;
+  for (let i = 0; i < samples.length / SAMPLE_STRIDE; i++) {
+    if (pts[i * 4 + 3] < 0) {
+      external[i] = 1;
+      pts[i * 4 + 3] = 0;
+    } else if (pts[i * 4 + 1] < yFloor) yFloor = pts[i * 4 + 1];
+  }
+  // Limb vessels are kept out of the loft (flag 2); external organs (flag 1) get the blob.
+  for (let i = 0; i < n; i++) if (limbFlags[i]) external[i] = 2;
+
+  // How far the external genitalia reach from the midline: the thighs' inner surfaces
+  // must stand clear of them or the blob would fill the notch between the thighs.
+  let genitalHalfX = 0;
+  for (let i = 0; i < n; i++) if (external[i] === 1) genitalHalfX = Math.max(genitalHalfX, Math.abs(pts[i * 4]));
+  if (genitalHalfX > 0) genitalHalfX += GENITAL_MARGIN_M;
 
   // ---- the vertical extent -------------------------------------------------
-  let yLo = Infinity;
+  let yLo = yFloor;
   let yHi = -Infinity;
   for (let i = 0; i < n; i++) {
+    if (external[i]) continue;
     const y = pts[i * 4 + 1];
     const r = pts[i * 4 + 3];
-    if (y - r < yLo) yLo = y - r;
     if (y + r > yHi) yHi = y + r;
   }
   const dy = SLICE_DY_M;
   // CAP slices are added above and below the data so the crown of the head and the foot
   // of the figure are domes and not flat discs (see CAP_SLICES).
-  yLo -= CAP_SLICES * dy;
+  yLo -= 1 * dy; // the pelvic floor's own cap is one slice: the crotch must stay high enough to leave a notch
   yHi += CAP_SLICES * dy;
   const count = Math.ceil((yHi - yLo) / dy) + 1;
   const y0 = yLo;
@@ -229,6 +270,7 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
     Math.min(count - 1, Math.floor((y + dy - y0) / dy)),
   ];
   for (let i = 0; i < n; i++) {
+    if (external[i]) continue;
     const x = pts[i * 4];
     const y = pts[i * 4 + 1];
     const z = pts[i * 4 + 2];
@@ -262,6 +304,7 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
   // rounded organs needs less than that, so find the smallest scale that works.
   const k = new Float64Array(count).fill(1);
   for (let i = 0; i < n; i++) {
+    if (external[i]) continue;
     const x = pts[i * 4];
     const y = pts[i * 4 + 1];
     const z = pts[i * 4 + 2];
@@ -270,7 +313,7 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
       if (hx[s] < 0) continue;
       const u = (x - cx[s]) / hx[s];
       const v = (z - cz[s]) / hz[s];
-      const kk = Math.hypot(u, v);
+      const kk = (Math.abs(u) ** SLICE_POWER + Math.abs(v) ** SLICE_POWER) ** (1 / SLICE_POWER);
       if (kk > k[s]) k[s] = kk;
     }
   }
@@ -313,7 +356,7 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
     const out = new Float64Array(count);
     for (let s = 0; s < count; s++) {
       let m = -Infinity;
-      for (let t = Math.max(0, s - 2); t <= Math.min(count - 1, s + 2); t++) if (src[t] > m) m = src[t];
+      for (let t = Math.max(0, s - 3); t <= Math.min(count - 1, s + 3); t++) if (src[t] > m) m = src[t];
       out[s] = m;
     }
     return out;
@@ -333,10 +376,20 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
     }
     return out;
   };
-  const sx = blur(dilate(hx));
-  const sz = blur(dilate(hz));
-  const scx = blur(cx);
-  const scz = blur(cz);
+  // A second, short blur (radius one) on top of the first: together they reach three
+  // slices, which is exactly the radius of the maximum filter, so containment still
+  // holds and the side outline stops wobbling from slice to slice.
+  const blur1 = (src: Float64Array): Float64Array => {
+    const out = new Float64Array(count);
+    for (let s = 0; s < count; s++) {
+      out[s] = (src[Math.max(0, s - 1)] + 2 * src[s] + src[Math.min(count - 1, s + 1)]) / 4;
+    }
+    return out;
+  };
+  const sx = blur1(blur(dilate(hx)));
+  const sz = blur1(blur(dilate(hz)));
+  const scx = blur1(blur(cx));
+  const scz = blur1(blur(cz));
 
   // The skin margin eases from the trunk's to the head's across the neck. The head
   // starts where the brain does, so the margin follows the data, not a typed height.
@@ -352,7 +405,8 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
     const m = marginAt(y0 + s * dy);
     // Cap slices shrink as a quarter-ellipse: the dome that closes the surface.
     const j = capDistance[s];
-    const dome = j > 0 ? Math.sqrt(Math.max(0, 1 - (j / (CAP_SLICES + 1)) ** 2)) : 1;
+    const lowerEnd = s < count / 2;
+    const dome = j > 0 ? Math.sqrt(Math.max(0, 1 - (j / ((lowerEnd ? 1 : CAP_SLICES) + 1)) ** 2)) : 1;
     ax[s] = Math.max((sx[s] + m) * dome, 1e-3);
     bz[s] = Math.max((sz[s] + m) * dome, 1e-3);
   }
@@ -364,11 +418,18 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
     const t = f - i;
     const a = ax[i] + (ax[i + 1] - ax[i]) * t;
     const b = bz[i] + (bz[i + 1] - bz[i]) * t;
-    const px = (x - (scx[i] + (scx[i + 1] - scx[i]) * t)) / a;
-    const pz = (z - (scz[i] + (scz[i + 1] - scz[i]) * t)) / b;
-    const k0 = Math.hypot(px, pz);
-    const k1 = Math.hypot(px / a, pz / b);
-    const d2 = k1 < 1e-9 ? -Math.min(a, b) : (k0 * (k0 - 1)) / k1;
+    const px = Math.abs(x - (scx[i] + (scx[i + 1] - scx[i]) * t)) / a;
+    const pz = Math.abs(z - (scz[i] + (scz[i + 1] - scz[i]) * t)) / b;
+    const P = SLICE_POWER;
+    const nrm = (px ** P + pz ** P) ** (1 / P);
+    // First-order distance to the superellipse: (n - 1) over the gradient's length.
+    let d2: number;
+    if (nrm < 1e-9) d2 = -Math.min(a, b);
+    else {
+      const gx = px ** (P - 1) / (nrm ** (P - 1) * a);
+      const gz = pz ** (P - 1) / (nrm ** (P - 1) * b);
+      d2 = (nrm - 1) / Math.max(Math.hypot(gx, gz), 1e-9);
+    }
     const out = y < y0 ? y0 - y : y > yTop ? y - yTop : 0;
     if (out === 0) return d2;
     // Beyond the first or last slice: the extrusion's rounded end, so the crown of the
@@ -379,29 +440,88 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
   // ---- limbs ----------------------------------------------------------------
   const armRadius = (id: string): number => Math.max(LIMB_MIN_RADIUS_M, vesselRadius(id) + SKIN_MARGIN_M);
   const armFor = (side: 'l' | 'r'): Sdf => {
-    const pts3 = axisPoints([`subclavian_${side}`, `brachial_${side}`]);
+    const sub = axisPoints([`subclavian_${side}`]);
+    const bra = axisPoints([`brachial_${side}`]);
     const r0 = Math.max(armRadius(`subclavian_${side}`), armRadius(`brachial_${side}`));
-    const radii = pts3.map((_, i) => r0 * (1 - (1 - ARM_TAPER) * (i / (pts3.length - 1))));
-    return chain(pts3, radii);
+    // The brachial artery runs on the INNER side of the upper arm, so the arm's own axis
+    // is moved outward from it until the artery lies ARM_INNER_INSET_M inside the inner
+    // surface. The offset is a display choice. It ramps in along the subclavian, so the
+    // shoulder girdle runs from the neck to the arm instead of jumping sideways.
+    const full = r0 - ARM_INNER_INSET_M;
+    const out: V3[] = [];
+    const radii: number[] = [];
+    const all = [...sub, ...bra.slice(1)];
+    all.forEach((p, i) => {
+      const ramp = i < sub.length ? i / (sub.length - 1) : 1;
+      const dir = p[0] < 0 ? -1 : 1;
+      out.push([p[0] + dir * full * ramp, p[1], p[2]]);
+      radii.push(r0 * (1 - (1 - ARM_TAPER) * (i / (all.length - 1))));
+    });
+    return chain(out, radii);
   };
-  const arms = limited(smoothUnion(BLEND_K_M, armFor('l'), armFor('r')), [...axisPoints(['subclavian_l', 'brachial_l']), ...axisPoints(['subclavian_r', 'brachial_r'])], LIMB_MIN_RADIUS_M + SKIN_MARGIN_M);
+  const armReach = (): V3[] => {
+    const pts3: V3[] = [];
+    for (const side of ['l', 'r'] as const) {
+      for (const p of [...axisPoints([`subclavian_${side}`]), ...axisPoints([`brachial_${side}`])]) {
+        pts3.push([p[0] + (p[0] < 0 ? -1 : 1) * LIMB_MIN_RADIUS_M, p[1], p[2]]);
+      }
+    }
+    return pts3;
+  };
+  const arms = limited(smoothUnion(BLEND_K_M, armFor('l'), armFor('r')), armReach(), LIMB_MIN_RADIUS_M + SKIN_MARGIN_M);
   const armEndY = Math.min(...axisPoints(['brachial_l']).map((p) => p[1]), ...axisPoints(['brachial_r']).map((p) => p[1]));
 
-  // The hip radius comes from the thigh's own axis: as wide as it can be without the
-  // two thighs fusing at the midline (THIGH_GAP_FRACTION of the axis's distance from it).
+  // Each thigh is its own tapered capsule chain. Its axis is the femoral centreline
+  // moved outward by THIGH_OFFSET_M (the artery runs on the inner side), and its radius
+  // is whatever leaves the inner surface THIGH_INNER_GAP_M from the midline, so the two
+  // thighs are separated by a notch. The two are joined by a plain union, not a smooth
+  // one, because the fillet of a smooth union would close a gap this narrow.
   let legEndRadius = LIMB_MIN_RADIUS_M;
   const legFor = (side: 'l' | 'r'): Sdf => {
     const pts3 = axisPoints([`femoral_${side}`, `popliteal_${side}`]);
-    const top = pts3[0];
-    const r0 = Math.max(vesselRadius(`femoral_${side}`) + SKIN_MARGIN_M, Math.abs(top[0]) * THIGH_GAP_FRACTION);
-    const radii = pts3.map((_, i) => r0 * (1 - (1 - LEG_TAPER) * (i / (pts3.length - 1))));
+    const dir = pts3[0][0] < 0 ? -1 : 1;
+    const axis = pts3.map((p): V3 => [p[0] + dir * THIGH_OFFSET_M, p[1], p[2]]);
+    // A thigh is never thinner than its vessel plus the skin margin. Where the external
+    // genitalia are wider than the notch allows (a male body: the testes are as wide as
+    // the thighs' own axes), the thighs reach the midline and the notch is the blob's.
+    const r0 = Math.max(Math.abs(axis[0][0]) - Math.max(THIGH_INNER_GAP_M, genitalHalfX), vesselRadius(`femoral_${side}`) + SKIN_MARGIN_M);
+    const radii = axis.map((_, i) => r0 * (1 - (1 - LEG_TAPER) * (i / (axis.length - 1))));
     legEndRadius = radii[radii.length - 1];
-    return chain(pts3, radii);
+    return chain(axis, radii);
   };
-  const legs = limited(smoothUnion(BLEND_K_M, legFor('l'), legFor('r')), [...axisPoints(['femoral_l', 'popliteal_l']), ...axisPoints(['femoral_r', 'popliteal_r'])], LIMB_MIN_RADIUS_M);
+  const legBox: V3[] = [...axisPoints(['femoral_l', 'popliteal_l']), ...axisPoints(['femoral_r', 'popliteal_r'])].map((p): V3 => [p[0] + (p[0] < 0 ? -1 : 1) * THIGH_OFFSET_M, p[1], p[2]]);
+  const legs = limited(union(legFor('l'), legFor('r')), legBox, 0.08);
   const legEndY = Math.min(...axisPoints(['popliteal_l']).map((p) => p[1]), ...axisPoints(['popliteal_r']).map((p) => p[1]));
 
+  // The external genitalia get their own small blob: the ellipse-per-slice fit that
+  // serves the trunk, applied once to all the external points together.
+  const blobParts: Sdf[] = [];
+  {
+    let x0 = Infinity, y0b = Infinity, z0 = Infinity, x1 = -Infinity, y1 = -Infinity, z1 = -Infinity;
+    let any = false;
+    for (let i = 0; i < n; i++) {
+      if (external[i] !== 1) continue;
+      any = true;
+      x0 = Math.min(x0, pts[i * 4]); x1 = Math.max(x1, pts[i * 4]);
+      y0b = Math.min(y0b, pts[i * 4 + 1]); y1 = Math.max(y1, pts[i * 4 + 1]);
+      z0 = Math.min(z0, pts[i * 4 + 2]); z1 = Math.max(z1, pts[i * 4 + 2]);
+    }
+    if (any) {
+      const c: V3 = [(x0 + x1) / 2, (y0b + y1) / 2, (z0 + z1) / 2];
+      const h: V3 = [Math.max((x1 - x0) / 2, 1e-3), Math.max((y1 - y0b) / 2, 1e-3), Math.max((z1 - z0) / 2, 1e-3)];
+      let k = 1;
+      for (let i = 0; i < n; i++) {
+        if (external[i] !== 1) continue;
+        k = Math.max(k, Math.hypot((pts[i * 4] - c[0]) / h[0], (pts[i * 4 + 1] - c[1]) / h[1], (pts[i * 4 + 2] - c[2]) / h[2]));
+      }
+      blobParts.push(ellipsoid(c, [h[0] * k + GENITAL_MARGIN_M, h[1] * k + GENITAL_MARGIN_M, h[2] * k + GENITAL_MARGIN_M]));
+    }
+  }
+
+  // The blob is joined with a tighter fillet than the limbs: a wide one would reach back
+  // from the genitalia and close the notch between the thighs behind them.
   let field: Sdf = smoothUnion(BLEND_K_M, trunk, arms, legs);
+  if (blobParts.length > 0) field = smoothUnion(GENITAL_BLEND_K_M, field, ...blobParts);
 
   // ---- enclosure guard -------------------------------------------------------
   for (let pass = 0; pass < 3; pass++) {
@@ -430,8 +550,8 @@ export function outlineModel(samples: Float32Array, body: OutlineBody): OutlineM
   }
   for (const id of ['subclavian_l', 'brachial_l', 'subclavian_r', 'brachial_r', 'femoral_l', 'popliteal_l', 'femoral_r', 'popliteal_r']) {
     for (const p of axisPoints([id])) {
-      minX = Math.min(minX, p[0] - 0.12);
-      maxX = Math.max(maxX, p[0] + 0.12);
+      minX = Math.min(minX, p[0] - 0.16);
+      maxX = Math.max(maxX, p[0] + 0.16);
     }
   }
   const lowestY = Math.min(y0, legEndY - legEndRadius);

@@ -14,8 +14,8 @@
   border-radius: 14px;
   border: 2px solid #b4342c;
   background: transparent;
-  color: #b4342c;
-  font-size: 17px;
+  color: var(--ink-alarm);
+  font-size: var(--text-xl);
   font-weight: 700;
   pointer-events: auto;
   transition: background 200ms ease, opacity 200ms ease;
@@ -86,12 +86,12 @@
 
 .title {
   margin: 0;
-  font-size: 17px;
+  font-size: var(--text-xl);
   font-weight: 700;
 }
 
 .downtime {
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--severity-warn-ink);
 }
@@ -99,7 +99,7 @@
 .metrics {
   display: flex;
   gap: 12px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--ink-dim);
 }
@@ -116,7 +116,7 @@
   border-radius: var(--radius-chip);
   background: rgba(0, 0, 0, 0.07);
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--text-lg);
   touch-action: none;
   user-select: none;
 }
@@ -124,18 +124,18 @@
 .cprButton:active,
 .cprActive {
   background: var(--organ-active);
-  color: #fff;
+  color: var(--ink-inverse);
 }
 
 .quality {
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   min-width: 96px;
   text-align: right;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
-.quality_good { color: #2f7d4f; }
+.quality_good { color: var(--ink-ok); }
 .quality_slow { color: var(--severity-warn-ink); }
 .quality_fast { color: var(--severity-warn-ink); }
 
@@ -150,7 +150,7 @@
   border-radius: var(--radius-chip);
   background: rgba(0, 0, 0, 0.05);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--text-md);
 }
 
 .energyActive {
@@ -169,7 +169,7 @@
   padding: 12px;
   border-radius: var(--radius-chip);
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--text-lg);
 }
 
 .charge {
@@ -178,7 +178,7 @@
 
 .shock {
   background: var(--organ-active);
-  color: #fff;
+  color: var(--ink-inverse);
 }
 
 .charge:disabled,
@@ -190,14 +190,14 @@
 .outcome {
   border-radius: var(--radius-chip);
   padding: 10px 12px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.5;
 }
 
 .outcome strong {
   display: block;
   margin-bottom: 4px;
-  font-size: 13px;
+  font-size: var(--text-md);
 }
 
 .outcome p {
@@ -207,7 +207,7 @@
 
 .outcomeGood {
   background: rgba(47, 125, 79, 0.12);
-  color: #1f5c39;
+  color: var(--ink-ok);
 }
 
 .outcomeBad {

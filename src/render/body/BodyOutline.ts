@@ -1,12 +1,12 @@
 import * as THREE from 'three';
 import type { GeometryFactory } from '../anatomy/GeometryFactory';
 import type { OrganSet } from '../organs/OrganSet';
-import { createBodyGlassMaterial, createContactShadowMaterial } from '../materials/BodyGlass';
+import { createBodyGlassMaterial } from '../materials/BodyGlass';
 import { organSamples } from './organSamples';
 import type { OutlineBody } from './outlineModel';
 
 /**
- * THE GLASS FIGURE IN THE SCENE: owns the mesh, the floor shadow, and the decision of
+ * THE GLASS FIGURE IN THE SCENE: owns the mesh and the decision of
  * when to rebuild either. See outlineModel.ts for what the shape is and is not, and
  * materials/BodyGlass.ts for how it is drawn.
  *
@@ -35,18 +35,11 @@ const SIGNATURE_INTERVAL_MS = 250;
 export const FOCUS_OPACITY = 0.33;
 /** Rate at which the figure fades between its two opacities, per second. A DISPLAY choice. */
 const FADE_RATE_PER_S = 6;
-/** The shadow quad's extent as a multiple of the figure's, in x and in z. A DISPLAY choice. */
-const SHADOW_SPREAD_X = 1.25;
-const SHADOW_SPREAD_Z = 2.2;
-/** How far under the figure's lowest point the floor is implied, metres. A DISPLAY choice. */
-const FLOOR_GAP_M = 0.012;
 
 export class BodyOutline {
   readonly root = new THREE.Group();
   private readonly glass = createBodyGlassMaterial();
-  private readonly shadowMaterial = createContactShadowMaterial(0.08);
   private readonly mesh: THREE.Mesh;
-  private readonly shadow: THREE.Mesh;
 
   private switchedOn = true;
   private focused = false;
@@ -79,15 +72,10 @@ export class BodyOutline {
     // Not pickable, by belt and braces: it is not in OrganSet.pickTargets either.
     this.mesh.raycast = () => undefined;
 
-    const quad = new THREE.PlaneGeometry(1, 1);
-    quad.rotateX(-Math.PI / 2);
-    this.shadow = new THREE.Mesh(quad, this.shadowMaterial);
-    this.shadow.renderOrder = 0;
-    this.shadow.frustumCulled = false;
-    this.shadow.raycast = () => undefined;
-    this.shadow.visible = false;
-
-    this.root.add(this.shadow, this.mesh);
+    // THERE IS NO FLOOR SHADOW. A contact shadow was tried and removed: a torso that
+    // dissolves at mid-thigh touches no floor, and the blob read as a smudge floating
+    // about 4 cm below the fade rather than as a ground reference.
+    this.root.add(this.mesh);
   }
 
   get visible(): boolean {
@@ -175,14 +163,6 @@ export class BodyOutline {
         this.hasMesh = true;
         this.triangles = info.triangles;
         this.buildMs = performance.now() - started;
-
-        // The floor shadow sits just under the lowest point of the figure and is sized
-        // from the figure's own footprint.
-        const box = geometry.boundingBox;
-        const cz = box ? (box.min.z + box.max.z) / 2 : 0;
-        this.shadow.position.set(0, info.floorY - FLOOR_GAP_M, cz);
-        this.shadow.scale.set(info.halfX * 2 * SHADOW_SPREAD_X, 1, info.halfZ * 2 * SHADOW_SPREAD_Z);
-        this.shadow.visible = true;
       })
       .catch(() => {
         // A failed build leaves the previous figure (or none); try again on the next change.
@@ -209,15 +189,12 @@ export class BodyOutline {
     else this.level += (target - this.level) * (1 - Math.exp(-dtSeconds * FADE_RATE_PER_S));
     if (Math.abs(this.level - target) < 0.002) this.level = target;
     this.glass.uniforms.uOpacity.value = this.level;
-    this.shadowMaterial.uniforms.uStrength.value = 0.08 * this.level;
     this.root.visible = this.level > 0;
   }
 
   dispose(): void {
     this.sequence++;
     this.mesh.geometry.dispose();
-    this.shadow.geometry.dispose();
     this.glass.dispose();
-    this.shadowMaterial.dispose();
   }
 }

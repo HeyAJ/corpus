@@ -45,14 +45,14 @@
 
 .title {
   margin: 0 0 8px;
-  font-size: 30px;
+  font-size: var(--text-display);
   font-weight: 700;
   letter-spacing: 0.06em;
 }
 
 .lede {
   margin: 0 0 16px;
-  font-size: 15px;
+  font-size: var(--text-lg);
   line-height: 1.55;
   color: var(--ink-mid);
   font-weight: 500;
@@ -68,21 +68,21 @@
 
 .warning strong {
   display: block;
-  font-size: 13px;
+  font-size: var(--text-md);
   letter-spacing: 0.04em;
   margin-bottom: 6px;
 }
 
 .warning p {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-md);
   line-height: 1.5;
   font-weight: 500;
 }
 
 .subtitle {
   margin: 0 0 10px;
-  font-size: 15px;
+  font-size: var(--text-lg);
   font-weight: 700;
 }
 
@@ -92,7 +92,7 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
-  font-size: 13.5px;
+  font-size: var(--text-md);
   line-height: 1.55;
   color: var(--ink-mid);
   font-weight: 500;
@@ -104,14 +104,14 @@
 
 .footnote {
   margin: 0 0 18px;
-  font-size: 12px;
-  color: var(--ink-faint);
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
   font-weight: 500;
 }
 
 .footnote code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 11px;
+  font-size: var(--text-xs);
   background: var(--chip-bg);
   padding: 1px 5px;
   border-radius: 4px;
@@ -122,7 +122,7 @@
   padding: 13px;
   border-radius: var(--radius-chip);
   background: var(--organ-active);
-  color: #fff;
-  font-size: 15px;
+  color: var(--ink-inverse);
+  font-size: var(--text-lg);
   font-weight: 700;
 }

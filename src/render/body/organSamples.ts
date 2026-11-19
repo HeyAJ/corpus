@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { organPosition } from '../anatomy/layout';
 import type { OrganDef } from '../../data/types';
-import { SAMPLE_STRIDE } from './outlineModel';
+import { EXTERNAL_FLAG, SAMPLE_STRIDE } from './outlineModel';
 
 /**
  * THE POINTS A GLASS FIGURE IS FITTED TO: a thinned copy of an organ's vertices, moved
@@ -23,6 +23,9 @@ import { SAMPLE_STRIDE } from './outlineModel';
 
 /** Strided vertices kept per organ, before the six extremes. A DISPLAY/cost choice. */
 export const SAMPLES_PER_ORGAN = 500;
+
+/** Organs outside the pelvic floor: the outline gives them their own blob and ends the trunk above them. */
+const EXTERNAL_ORGANS = new Set<string>(['testes', 'penis', 'vagina']);
 
 export function organSamples(def: OrganDef, geometry: THREE.BufferGeometry): Float32Array {
   const pos = geometry.getAttribute('position');
@@ -61,7 +64,7 @@ export function organSamples(def: OrganDef, geometry: THREE.BufferGeometry): Flo
     out[n * SAMPLE_STRIDE] = v.x + origin.x;
     out[n * SAMPLE_STRIDE + 1] = v.y + origin.y;
     out[n * SAMPLE_STRIDE + 2] = v.z + origin.z;
-    out[n * SAMPLE_STRIDE + 3] = 0;
+    out[n * SAMPLE_STRIDE + 3] = EXTERNAL_ORGANS.has(def.id) ? EXTERNAL_FLAG : 0;
   }
   return out;
 }

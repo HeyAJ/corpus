@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 
 /**
- * THE GLASS FIGURE'S TWO MATERIALS: the faint body outline and its contact shadow.
+ * THE GLASS FIGURE'S MATERIAL: the faint body outline. (A floor contact shadow was
+ * removed: the figure dissolves at mid-thigh and touches no floor.)
  *
  * THE LOOK. A figure that only says "there is a person here" and then gets out of the
  * way. It is NOT drawn with the organs' additive rim: the page is pale (#f0f0f0), and
@@ -87,48 +88,5 @@ export function createBodyGlassMaterial(options: GlassOptions = {}): THREE.Shade
     depthWrite: false,
     depthTest: false,
     blending: THREE.NormalBlending,
-  });
-}
-
-export const SHADOW_VERT = /* glsl */ `
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}
-`;
-
-export const SHADOW_FRAG = /* glsl */ `
-uniform float uStrength;
-varying vec2 vUv;
-void main() {
-  // Radial falloff from the centre of the quad to its edge: smooth, zero at the rim, so
-  // the quad's own border is never seen.
-  float r = clamp(length(vUv - 0.5) * 2.0, 0.0, 1.0);
-  float f = 1.0 - smoothstep(0.0, 1.0, r);
-  f *= f;
-  gl_FragColor = vec4(vec3(1.0 - uStrength * f), 1.0);
-}
-`;
-
-/**
- * The contact shadow: multiply-blended, so it can only darken the page, and by at most
- * `strength` (8 % by default, a DISPLAY choice) at its centre.
- */
-export function createContactShadowMaterial(strength = 0.08): THREE.ShaderMaterial {
-  return new THREE.ShaderMaterial({
-    name: 'BodyContactShadow',
-    uniforms: { uStrength: { value: strength } },
-    vertexShader: SHADOW_VERT,
-    fragmentShader: SHADOW_FRAG,
-    side: THREE.DoubleSide,
-    transparent: true,
-    depthWrite: false,
-    depthTest: false,
-    // result = srcColor * dstColor, the same blend as the absorption bucket.
-    blending: THREE.CustomBlending,
-    blendEquation: THREE.AddEquation,
-    blendSrc: THREE.DstColorFactor,
-    blendDst: THREE.ZeroFactor,
   });
 }

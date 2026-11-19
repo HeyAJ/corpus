@@ -89,7 +89,8 @@ export function DoseCurve({ prediction, reference, width: fixedWidth, height, co
     const padL = 2;
     const padR = 2;
     const padT = 4;
-    const padB = 12;
+    // Was 12 for a 10 px label; the axis text is now 11 px, which needs the room.
+    const padB = 15;
     const plotW = width - padL - padR;
     const plotH = height - padT - padB;
 
@@ -156,8 +157,12 @@ export function DoseCurve({ prediction, reference, width: fixedWidth, height, co
     }
 
     // Time axis: just the two ends and the peak. More would be clutter at this size.
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
-    ctx.font = '10px system-ui, sans-serif';
+    // Was 45 % black at 10 px (about 2.6:1 on white and under the 11 px floor). The ink is
+    // read from the shared token so the chart follows the app's text grey; #595959 is only
+    // the fallback if the variable is missing.
+    const ink = getComputedStyle(canvas).getPropertyValue('--ink-dim').trim() || '#595959';
+    ctx.fillStyle = ink;
+    ctx.font = '500 11px system-ui, sans-serif';
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
     ctx.fillText('0', padL, padT + plotH + 2);
@@ -165,7 +170,8 @@ export function DoseCurve({ prediction, reference, width: fixedWidth, height, co
     ctx.fillText(niceTime(scale.xMax), padL + plotW, padT + plotH + 2);
     if (prediction.peak > 0) {
       const px = x(prediction.tmax_min);
-      if (px > padL + 26 && px < padL + plotW - 30) {
+      // 11 px text is wider, so the peak label keeps clear of the end labels by more.
+      if (px > padL + 44 && px < padL + plotW - 64) {
         ctx.textAlign = 'center';
         ctx.fillText(`peak ${niceTime(prediction.tmax_min)}`, px, padT + plotH + 2);
       }

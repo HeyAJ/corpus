@@ -9,6 +9,7 @@ import { DETAIL_SPECS } from '../atlas/details';
 import type { V3 } from '../sdf';
 import { FlowField } from './FlowField';
 import { createPartMaterial } from './PartMaterial';
+import { patchForCut, setCut, sliceKeeps, type CutUniforms, type SlicePlane } from '../../materials/sliceCut';
 import type { DetailContext, FlowSpec, OrganDetailSpec, PartHandle } from './types';
 
 /**
@@ -226,6 +227,13 @@ export class OrganDetail {
   private readonly leaving = new Set<Interior>();
   private target: { id: OrganId; key: string } | null = null;
   private highlighted: string | null = null;
+  /** The handle of the organ whose interior is wanted: its shell is cut with its parts. */
+  private targetHandle: OrganHandle | null = null;
+  /**
+   * The slice plane in force (scene space), or null for the whole organ. The parts and the
+   * streams read it every frame; the shell is updated when it changes (see setCut).
+   */
+  private cutPlane: SlicePlane | null = null;
   private viewport = { height: 900, fov: 40 };
   private readonly warned = new Set<string>();
 
@@ -297,6 +305,7 @@ export class OrganDetail {
     if (this.target && this.target.key === key) return;
     if (this.target?.id !== handle.id) this.highlighted = null;
     this.target = { id: handle.id, key };
+    this.targetHandle = handle;
 
     // An interior of ANOTHER organ leaves at once; the same organ's previous week stays
     // until its replacement arrives, so the uterus does not blink at every week.
@@ -326,6 +335,7 @@ export class OrganDetail {
   /** Fade the interior out and detach it. */
   hide(): void {
     this.target = null;
+    this.targetHandle = null;
     this.highlighted = null;
     if (this.current) this.leave(this.current);
   }
@@ -553,6 +563,14 @@ export class OrganDetail {
       p.applyTransform();
     }
 
+    // THE CUT. Only the interior being shown is steered by the slice; one fading out keeps
+    // the cut it had so it does not pop whole again while it leaves.
+    if (animate) {
+      const plane = this.cutPlane;
+      for (const p of interior.partList) setCut(p.material.userData.cut as CutUniforms, plane);
+      if (interior.flow) setCut(interior.flow.cut, plane);
+    }
+
     if (interior.flow) {
       interior.flow.setFade(fade);
       interior.flow.object.visible = fade > 0.003;
@@ -566,25 +584,95 @@ export class OrganDetail {
     for (const i of this.cache.values()) i.flow?.setViewport(heightPx, fovDegrees);
   }
 
+  /* ----------------------------------------------------------------- slice */
+
+  /**
+   * Cut the selected organ with a plane, or restore it whole with null. The parts and the
+   * streams follow the plane on their next frame; the organ's own shell (all four of its
+   * materials: the absorption wall, the rim, the bucket-3 solid and the fluid of a stomach
+   * or bladder) is cut here and now, because it belongs to OrganSet and is not stepped by
+   * this class. The shell materials are spliced for the cut the first time a slice is
+   * asked for (a one-off recompile; every shell of one kind shares a program) and are
+   * switched off, not unspliced, when the slice ends. Nothing else in the body is touched.
+   * The plane object is copied, so the caller may reuse its own.
+   */
+  setCut(plane: SlicePlane | null): void {
+    if (plane) {
+      const own = this.cutPlane ?? { nx: 0, ny: 0, nz: 0, w: 0 };
+      own.nx = plane.nx;
+      own.ny = plane.ny;
+      own.nz = plane.nz;
+      own.w = plane.w;
+      this.cutPlane = own;
+    } else {
+      this.cutPlane = null;
+    }
+    const h = this.targetHandle;
+    if (!h) return;
+    const mats = [h.absorption.material, h.rim.material, h.solid.material, h.fluid?.material];
+    for (const m of mats) {
+      if (!m) continue;
+      const material = m as THREE.ShaderMaterial;
+      if (!this.cutPlane && !material.userData.cut) continue;
+      setCut(patchForCut(material), this.cutPlane);
+    }
+  }
+
+  /** The slice plane in force, or null. Picking uses it to ignore what was cut away. */
+  get cut(): SlicePlane | null {
+    return this.cutPlane;
+  }
+
+  /**
+   * The bounding sphere of one part of the open organ, in the BODY frame (+x = the
+   * patient's right): centre into `out`, radius returned, or -1 when there is no such part.
+   * It goes through the part's own pose and the shell's live transform, as the labels do.
+   */
+  partSphere(partId: string, out: THREE.Vector3): number {
+    const interior = this.current;
+    const p = interior?.parts.get(partId);
+    if (!interior || !p) return -1;
+    const geometry = p.mesh.geometry;
+    if (!geometry.boundingSphere) geometry.computeBoundingSphere();
+    const sphere = geometry.boundingSphere;
+    if (!sphere) return -1;
+    interior.group.updateMatrix();
+    p.mesh.updateMatrix();
+    out.copy(sphere.center).applyMatrix4(p.mesh.matrix).applyMatrix4(interior.group.matrix);
+    return sphere.radius * Math.max(p.mesh.scale.x, p.mesh.scale.y, p.mesh.scale.z) * interior.group.scale.x;
+  }
+
   /* ----------------------------------------------------------- interaction */
 
   /** Nearest part under a ray already set on the raycaster, or null. */
-  pick(raycaster: THREE.Raycaster): string | null {
+  pick(raycaster: THREE.Raycaster, outPoint?: THREE.Vector3): string | null {
     const interior = this.current;
     if (!interior || interior.fade < 0.3) return null;
     // Raycaster does not look at `visible`, so a part an atlas module has hidden would
     // still be hit. A tap is rare; filtering here costs nothing that matters.
     const targets = interior.meshes.filter((m) => m.visible);
     if (targets.length === 0) return null;
-    const hits = raycaster.intersectObjects(targets, false);
+    const allHits = raycaster.intersectObjects(targets, false);
+    // WHAT THE SLICE REMOVED CANNOT BE TAPPED. The raycaster knows nothing of the shader's
+    // discard, so a hit inside the removed half would pick a part the eye cannot see and
+    // the tap would not go through to what is visible behind it. Drop those hits; the
+    // back wall of a cut solid part lies in the kept half and is still found.
+    const plane = this.cutPlane;
+    const hits = plane
+      ? allHits.filter((h) => sliceKeeps(plane, h.point.x, h.point.y, h.point.z))
+      : allHits;
     if (hits.length === 0) return null;
     // A tap goes to what the user SEES as a thing: the nearest solid part under the finger,
     // through any glass in front of it. Only where there is nothing but glass does the tap
     // pick the glass, so the cortex is still pickable everywhere a nucleus is not behind it.
     for (const hit of hits) {
       const id = hit.object.userData.partId as string | undefined;
-      if (id && interior.parts.get(id)?.glass === false) return id;
+      if (id && interior.parts.get(id)?.glass === false) {
+        outPoint?.copy(hit.point);
+        return id;
+      }
     }
+    outPoint?.copy(hits[0].point);
     return (hits[0].object.userData.partId as string | undefined) ?? null;
   }
 

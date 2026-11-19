@@ -9,7 +9,7 @@ import styles from './receptors.module.css';
 /**
  * RECEPTOR PANEL (spec 8.5).
  *
- * The only dark surface in the application, matching the reference.
+ * Restyled as the light sheet every other panel uses (only the chart well is dark).
  *
  *  - a 60-second rolling multi-series chart, one line per active receptor
  *  - a dot-matrix occupancy bar, 20 columns at 5 % each
@@ -28,10 +28,10 @@ const RECEPTORS = (receptorsFile as unknown as ReceptorsFile).receptors;
 
 const GROUP_COLOR: Record<string, string> = {
   adrenergic: '#ff2d6b',
-  transporter: '#f0284c',
+  transporter: '#f5516c',
   'trace-amine': '#ff2d6b',
   serotonergic: '#e24be8',
-  histaminergic: '#8b5cf6',
+  histaminergic: '#a07af8',
   dopaminergic: '#ff7a3d',
   cholinergic: '#38c6f4',
   opioid: '#ff2d6b',
@@ -149,7 +149,7 @@ export function ReceptorPanel() {
                 {r.label}
               </span>
               <span className={styles.occupancyValue}>{(r.occupancy * 100).toFixed(0)}%</span>
-              <DotMatrix value={r.occupancy} color="#ffffff" label={r.label} />
+              <DotMatrix value={r.occupancy} color="var(--ink)" label={r.label} />
             </div>
           );
         })}

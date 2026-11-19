@@ -71,3 +71,40 @@ jobs:
       # render order-independence proof, and the tick-budget test.
       - name: Test (shard ${{ matrix.shard }} of 6)
         run: npm test -- --shard=${{ matrix.shard }}/6
+
+  # BROWSER TESTS OF THE PRODUCTION BUILD. Lint, types, the build and the simulation tests
+  # never open the app, so a blank page, a console error on boot, a lost COOP/COEP header
+  # (which silently degrades the waveform channel) or a control painted over by a panel could
+  # reach the live site with every other job green. This job builds the app exactly as
+  # Vercel does and drives it in headless Chromium at a desktop and a phone size.
+  #
+  # It serves the PRODUCTION build (`vite preview` of dist/, started by Playwright itself),
+  # not the dev server: the dev server has `window.__corpus`, unminified code and Vite's own
+  # overlay, none of which a visitor gets, and it hides faults that only a bundle has.
+  #
+  # The runner has no GPU, so the browser is launched with SwiftShader software WebGL (the
+  # flags are in playwright.config.ts). That is slow, which is why the timeouts are generous.
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Browser tests
+        run: npm run e2e
+
+      # The report and the failure screenshots are the only way to see what the runner saw.
+      - name: Upload the report and the failure screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
