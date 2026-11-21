@@ -59,9 +59,9 @@ export function fold(text: string): string {
   return text
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
-    .replace(/œ/g, 'oe')
-    .replace(/æ/g, 'ae')
-    .toLowerCase();
+    .toLowerCase()
+    .replace(/\u0153/g, 'oe')
+    .replace(/\u00e6/g, 'ae');
 }
 
 /** The organs this body has, in organs.json order. */

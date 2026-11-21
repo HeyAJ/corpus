@@ -1,0 +1,82 @@
+/*
+ * THE SEARCH FIELD AT THE TOP OF THE PANELS MENU. It lives inside the launcher card (dock
+ * module), so it adds no surface of its own: only the field, and the result rows that take
+ * the place of the menu list while there is text. Every row and the field are at least 44 px
+ * tall (readability rule 4); text sizes and inks are tokens.
+ */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 0 4px;
+}
+
+.field {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: var(--text-md);
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: var(--radius-pill);
+  outline: none;
+}
+
+.field::placeholder {
+  color: var(--ink-dim);
+}
+
+.field:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--ink-mid);
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  min-height: 44px;
+  padding: 6px 12px;
+  justify-content: center;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  background: none;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.result strong {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.result small {
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
+}
+
+.resultActive {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.none {
+  padding: 10px 12px;
+  font-size: var(--text-md);
+  color: var(--ink-dim);
+}

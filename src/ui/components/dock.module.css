@@ -351,3 +351,47 @@ a.item {
 :global([data-menu='open']) .legends {
   display: none;
 }
+
+/* ------------------------------------------------------- search row and link item */
+
+/* The search field is the first row of the launcher and stays put while the list scrolls
+   under it (the launcher is the scroll container; the background is opaque enough to cover
+   rows, which are the same sheet colour). */
+.searchRow {
+  position: sticky;
+  top: -6px; /* the launcher's own 6px padding sits inside its scrollport */
+  z-index: 1;
+  padding: 6px 4px 2px;
+  margin: -6px -6px 0;
+  background: var(--sheet-bg);
+  border-radius: 18px 18px 0 0;
+}
+
+/* The read-only field that shows the link when the clipboard refused. */
+.fallback {
+  padding: 6px 10px 10px;
+}
+
+.fallback label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fallback small {
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
+}
+
+.fallbackField {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: 12px;
+}

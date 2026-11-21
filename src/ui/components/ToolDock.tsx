@@ -3,6 +3,8 @@ import { useShallow } from 'zustand/react/shallow';
 import type { Viewer } from '../../render/scene/Viewer';
 import { LEGEND_HIGH, LEGEND_LOW, type HormoneLegendEntry } from '../../render/endocrine/HormoneTraffic';
 import { useStore, type ToolMode } from '../store';
+import { SearchBox } from './SearchBox';
+import { buildShareHash, LINK_COPIED_TOAST, LAYER_NAMES, type LayerName } from '../shareLink';
 import { ActivityLegend } from './ActivityLegend';
 import styles from './dock.module.css';
 import { useVitalsAudio } from '../audio/useVitalsAudio';
@@ -272,6 +274,53 @@ function Runner({ filled }: { filled: boolean }) {
   );
 }
 
+/** The view as a link: this body, the open organ and part, the layers and the section. */
+function currentShareHash(): string {
+  const s = useStore.getState();
+  const repro = s.snapshot?.reproductive;
+  const layersOn: Record<LayerName, boolean> = {
+    vessels: s.vascularVisible,
+    nerves: s.nervesVisible,
+    hormones: s.hormonesVisible,
+    activity: s.activityVisible,
+  };
+  return buildShareHash({
+    sex: repro?.sex,
+    weeks: repro?.pregnancy?.pregnant ? Math.round(repro.pregnancy.gestationWeeks) : undefined,
+    organ: s.selectedOrgan ?? undefined,
+    part: s.selectedOrgan && s.selectedPart ? s.selectedPart : undefined,
+    layers: LAYER_NAMES.filter((n) => layersOn[n]),
+    cut: s.selectedOrgan && s.cutAxis ? { axis: s.cutAxis, depth: s.cutDepth } : undefined,
+  });
+}
+
+/**
+ * Copy the link to the clipboard. Resolves null when it was copied (and the toast has been
+ * shown), or with the URL when the clipboard refused (an insecure origin, a blocked
+ * permission), so the menu can show it in a read-only field that is already selected.
+ */
+async function copyViewLink(): Promise<string | null> {
+  const url = window.location.origin + window.location.pathname + window.location.search + currentShareHash();
+  try {
+    await navigator.clipboard.writeText(url);
+    useStore.getState().pushLog(LINK_COPIED_TOAST, 'info');
+    return null;
+  } catch {
+    return url;
+  }
+}
+
+function LinkGlyph() {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <g fill="none" stroke="#1a1a1a" strokeWidth="1.8" strokeLinecap="round">
+        <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+        <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+      </g>
+    </svg>
+  );
+}
+
 function Menu() {
   return (
     <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
@@ -476,6 +525,17 @@ export function ToolDock() {
   const closePanels = useStore((s) => s.closePanels);
   const menuOpen = useStore((s) => s.menuOpen);
   const setMenuOpen = useStore((s) => s.setMenuOpen);
+  // The search text lives here, not in SearchBox, because the menu must swap its own list for the
+  // results while there is text, and must forget the text when it closes.
+  const [query, setQuery] = useState('');
+  // Set only when the clipboard refused the copy: the link is then shown in a read-only field.
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!menuOpen) {
+      setQuery('');
+      setFallbackUrl(null);
+    }
+  }, [menuOpen]);
 
   // Only the panel flags and their toggles - a bare useStore() would re-render the dock
   // on every snapshot, twenty times a second, for nothing.
@@ -574,7 +634,10 @@ export function ToolDock() {
           {/* Tapping anywhere outside the list closes it. */}
           <button className={styles.scrim} aria-label="Close panels menu" onClick={() => setMenuOpen(false)} />
           <ul className={styles.launcher} role="menu" aria-label="Panels">
-            {items.map((i) => (
+            <li role="none" className={styles.searchRow}>
+              <SearchBox query={query} onQuery={setQuery} onChosen={() => setMenuOpen(false)} />
+            </li>
+            {query.trim() === '' && items.map((i) => (
               <li key={i.key}>
                 <button
                   role="menuitemcheckbox"
@@ -593,7 +656,43 @@ export function ToolDock() {
                 </button>
               </li>
             ))}
-            <li className={styles.phoneOnly}>
+            {query.trim() === '' && (
+              <li>
+                <button
+                  role="menuitem"
+                  className={styles.item}
+                  onClick={() => {
+                    void copyViewLink().then((url) => {
+                      if (url === null) setMenuOpen(false);
+                      else setFallbackUrl(url);
+                    });
+                  }}
+                >
+                  <span className={styles.itemIcon} aria-hidden="true">
+                    <LinkGlyph />
+                  </span>
+                  <span className={styles.itemText}>
+                    <strong>Copy link to this view</strong>
+                    <small>this body, organ, layers and cut</small>
+                  </span>
+                </button>
+              </li>
+            )}
+            {fallbackUrl !== null && query.trim() === '' && (
+              <li className={styles.fallback}>
+                <label>
+                  <small>Copy this link by hand</small>
+                  <input
+                    className={styles.fallbackField}
+                    readOnly
+                    value={fallbackUrl}
+                    onFocus={(e) => e.currentTarget.select()}
+                    ref={(el) => el?.select()}
+                  />
+                </label>
+              </li>
+            )}
+            <li className={styles.phoneOnly} hidden={query.trim() !== ''}>
               <a className={styles.item} href="docs/MODEL_LIMITATIONS.md" target="_blank" rel="noreferrer">
                 <span className={styles.itemIcon} aria-hidden="true">
                   !

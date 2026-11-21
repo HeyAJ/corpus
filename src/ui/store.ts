@@ -16,6 +16,8 @@ import type { SimSnapshot, SimIntent, Route } from '../bridge/types';
  */
 
 export type ToolMode = 'none' | 'body' | 'procedure' | 'drugs' | 'defib' | 'circulation';
+/** Which side of the open organ a section removes; mirrors the viewer's SliceAxis. */
+export type CutAxis = 'front' | 'side' | 'top';
 export type DrawerTab = 'drugs' | 'food' | 'biologics';
 
 export type EventKind = 'drug' | 'food' | 'procedure' | 'state';
@@ -121,6 +123,24 @@ interface UiState {
   /** Recolour every unselected organ by how far it is above its own rest (the Activity switch). */
   activityVisible: boolean;
   toggleActivity: () => void;
+  /**
+   * The section through the selected organ (Structures panel "Cut"). The viewer owns the real
+   * state and clears it whenever the selection changes; this mirror exists so the panel, a
+   * shared link and the viewer agree, and it is cleared by `setSelected` for the same reason.
+   */
+  cutAxis: CutAxis | null;
+  cutDepth: number;
+  setCut: (axis: CutAxis | null, depth?: number) => void;
+  /**
+   * A part the camera should fly to as soon as the selected organ's interior is built (the
+   * interior takes a moment, and `Viewer.focusPart` does nothing before it exists). Set by
+   * the search box and by a shared link; consumed (and cleared) by App.tsx.
+   */
+  pendingFocusPart: string | null;
+  requestFocusPart: (id: string | null) => void;
+  /** False once the visitor has moved the camera away from the home view (the Reset view pill). */
+  viewAtHome: boolean;
+  setViewAtHome: (atHome: boolean) => void;
   /** Keep the brain scan inset on screen when the brain is not the selected organ. */
   scanPinned: boolean;
   toggleScanPinned: () => void;
@@ -272,13 +292,17 @@ export const useStore = create<UiState>((set, get) => ({
   setSelected: (id) =>
     set((s) => {
       if (id === s.selectedOrgan) return {};
-      if (id === null) return { selectedOrgan: null, selectedPart: null, partLabels: [], anatomyPanelOpen: false };
-      if (!s.anatomyAuto) return { selectedOrgan: id, selectedPart: null };
+      // A section belongs to the organ it was made in (the viewer clears its own on every
+      // selection change), so the mirror is cleared with it.
+      if (id === null) return { selectedOrgan: null, selectedPart: null, partLabels: [], anatomyPanelOpen: false, cutAxis: null, cutDepth: 0.5 };
+      if (!s.anatomyAuto) return { selectedOrgan: id, selectedPart: null, cutAxis: null, cutDepth: 0.5 };
       return {
         ...CLOSED,
         tool: s.tool === 'body' || s.tool === 'drugs' ? ('none' as ToolMode) : s.tool,
         selectedOrgan: id,
         selectedPart: null,
+        cutAxis: null,
+        cutDepth: 0.5,
         anatomyPanelOpen: true,
       };
     }),
@@ -330,6 +354,13 @@ export const useStore = create<UiState>((set, get) => ({
   toggleHormones: () => set((s) => ({ hormonesVisible: !s.hormonesVisible })),
   activityVisible: false,
   toggleActivity: () => set((s) => ({ activityVisible: !s.activityVisible })),
+  cutAxis: null,
+  cutDepth: 0.5,
+  setCut: (axis, depth) => set((s) => ({ cutAxis: axis, cutDepth: depth === undefined ? s.cutDepth : Math.max(0, Math.min(1, Number.isFinite(depth) ? depth : 0.5)) })),
+  pendingFocusPart: null,
+  requestFocusPart: (id) => set({ pendingFocusPart: id }),
+  viewAtHome: true,
+  setViewAtHome: (atHome) => set({ viewAtHome: atHome }),
   scanPinned: false,
   toggleScanPinned: () => set((s) => ({ scanPinned: !s.scanPinned })),
   menuOpen: false,
