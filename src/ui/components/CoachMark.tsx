@@ -39,7 +39,7 @@ function remember(): void {
   }
 }
 
-export function CoachMark() {
+export function CoachMark({ covered }: { covered: boolean }) {
   const accepted = useStore((s) => s.firstRunAccepted);
   const selected = useStore((s) => s.selectedOrgan);
   const [seen, setSeen] = useState(alreadySeen);
@@ -61,7 +61,11 @@ export function CoachMark() {
     if (visible && selected) dismiss();
   }, [visible, selected, dismiss]);
 
-  if (!visible) return null;
+  // On a phone the panels menu and the sheets do not span the whole width, so the hint used to
+  // show beside and through them, and its text ran over the menu's last row. While anything
+  // covers the stage the hint is simply not drawn. Its 12-second clock keeps running in the
+  // meantime, so it never reappears later than a visitor would expect.
+  if (!visible || covered) return null;
   return (
     <div className={styles.hint} role="status" data-coach-mark onPointerDown={dismiss}>
       {coarse ? 'Tap any organ to look inside' : 'Click any organ to look inside'}

@@ -383,7 +383,7 @@ export function App() {
         <HormonesToggle />
         <ActivityToggle />
         <LegendStack viewerRef={viewerRef} ready={ready} />
-        <CoachMark />
+        <CoachMark covered={sheetOpen || menuOpen} />
         <NoticeToasts />
         <BrainScanInset viewerRef={viewerRef} ready={ready} />
 
