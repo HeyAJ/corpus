@@ -761,3 +761,233 @@ extending Hyett's line backwards would be an invented number. The fetus is drawn
 **Rejected.** Simulating a fetal circulation: nothing here would constrain it. Beat-to-beat
 variability or accelerations: no cited model of them is in the data. Putting the rate on the
 effect bus: the mother does not read it. A sine beat: a heart contracts faster than it fills.
+
+## ADR-035 — Organ colour is a pale tint, and Activity mode is one amber ramp
+
+The unselected organs were pink. `REST_TINT_MIX` was 0.84, so an organ's own hue was mixed
+almost completely into the page-coloured shell, and the body read as one pink mass in which the
+organs could not be told apart; the active tint, `ACTIVE_TINT_MIX`, was 0.5. Both are in
+`src/render/organs/OrganSet.ts`.
+
+**The decision.** The mixes are now 0.45 at rest and 0.2 when active. Three pairs were rendered
+before this was chosen: 0.6 and 0.3 was still pink, 0.45 and 0.2 kept each organ's identity
+without saturating, and 0.3 and 0.1 went muddy and lilac. A fourth overlay switch, **Activity**,
+is off at start. While it is on, every unselected shell takes its colour from ONE sequential
+amber ramp, indexed by the organ's eased engagement above its own rest
+(`snapshot.anatomy.organs[id]`, which is `clamp01(1.6 x max over parts of (activity - rest))`
+and was not changed). The ramp lives in `src/render/organs/activityRamp.ts` with no three.js
+import so that a test and the legend can read it: 0 is #f6ece0, 0.2 #f4d8b0, 0.4 #efbd78, 0.6
+#e29a3a, 0.8 #c0731a and 1 #8a4a0a. Density in Activity mode is 0.55 + 0.9 x activity, so an
+engaged organ is both darker and denser. The legend, "Activity above rest", carries the ramp bar
+and says in words that the colour is an index of how far each organ is from its own resting
+state, not a measurement.
+
+**Why one amber hue.** Red is already the alarm colour and the colour of arterial blood, and
+blue already means venous; a red or blue activity ramp would be read as a warning or as a
+vessel. A single hue also lets the eye rank organs by lightness alone. The ramp is a display
+choice, not a measured quantity.
+
+**Why tint and density, not glow.** The page is pale. An additive glow brightens toward white
+and therefore vanishes on it, which is the same reason the stream particles stopped being
+additive (see the anatomy notes in `CLAUDE.md`). Darkening a tint and raising the density of the
+multiply-blended absorption (ADR-002) is the direction in which a pale page can show a change.
+
+**Measured.** The liver's rendered centre luminance at activity 0, 0.25, 0.5, 0.75 and 1 was
+230.3, 212.2, 185.3, 154.9 and 126.7, strictly falling, so a darker organ always means a more
+engaged one.
+
+**Rejected.** A red-to-yellow thermal ramp (it reads as temperature and as an alarm; the brain
+scan already uses a thermal ramp and has to say it is not a temperature, ADR-033). Additive glow,
+for the reason above.
+
+## ADR-036 — The alarm pulse is a table from condition to organ, and an unlisted condition fails a test
+
+A condition that fires should be visible on the body as well as in the pills, but the body must
+not be lit by guesswork.
+
+**The decision.** `src/render/organs/alarmOrgans.ts` holds two explicit tables. `CONDITION_ORGANS`
+maps a condition to the organs that carry it: the heart for afib, arrest, asystole,
+bradycardia, pea, tachycardia, vfib and vt; both lungs for hypoxemia, hypercapnia and
+resp_depression; both kidneys for renal_failure; the brain for unconscious.
+`SYSTEMIC_CONDITIONS` lists the ones that belong to no single organ and therefore light none:
+hypovolemia, hypotension, hypertension, hypoglycemia, hyperglycemia, hyperkalemia, hypokalemia,
+lactic_acidosis, hyperthermia and hypothermia. (`oxygen`, `glucose` and `lactate` appear in
+`transport.ts` as blood-channel ids and are not conditions.) A warn or critical condition makes
+its organs pulse at about 1 Hz, mixing 0.75 toward `ALARM_HEX` (#c8433a, copied from
+`--severity-critical-bg`) with a density gain of 0.6; a `watch` condition never pulses, and
+under reduced motion the pulse is a steady 0.6. The 1 Hz is a display rhythm, not the heart rate,
+and a tachycardic heart does not pulse faster. `viewer.alarmOrgans` lists the organs pulsing now.
+
+**The guard.** `tests/render/activity.test.ts` reads `conditions.ts` and fails if a condition id
+is in neither table. A new condition therefore cannot ship silently unlit, and cannot be put on
+an organ without someone deciding that it belongs there.
+
+**Rejected.** Pulsing the whole body for a systemic
+condition: hypotension has no single organ, and a pulsing body would hide the one organ that
+is failing. Defaulting an unlisted condition to some organ: that is a plausible guess, and the house
+rule is that a documented absence beats one.
+
+## ADR-037 — The glass body outline is fitted to the model's own organs and vessels
+
+The organs float in empty space, and a visitor cannot tell which way up they are or where the
+body ends.
+
+**The decision.** `src/render/body/outlineModel.ts` is a pure signed-distance model built
+from THIS body: a loft of ellipses, one per 12 mm of height, fitted to the organ vertices and
+vessel centreline points (`organSamples.ts`), with the arms and legs as capsule chains along the
+subclavian and brachial and the femoral and popliteal centrelines, joined by a smooth union and
+checked by an enclosure guard that evaluates the field at every point it is meant to enclose
+(a 6 mm margin).
+`outlineMesh.ts` polygonises it (15k triangle cap, per-vertex fade), `BodyOutline.ts` owns the
+scene object, and `src/render/materials/BodyGlass.ts` draws it as a Fresnel-alpha ink. It is
+built in the geometry worker, rebuilt at most every 500 ms and one at a time, fades to 0.33
+while an organ is open and is never picked. Margins are display choices: 0.03 m of skin on the
+trunk, 0.014 m on the head and neck. In a pregnancy the abdomen follows the week only through
+the uterus model's own `gravidBody(weeks)`; no growth curve was added. The trunk loft ends at the
+pelvic floor; the external genitalia have their own blob; the thighs are separate capsule chains
+offset outward so that their outer edge meets the hip's; the legs fade over the lower half of the
+femoral centreline with a linear ramp.
+
+**Why fitted.** Typed-in body proportions would be a second description of the body that
+disagrees with the first one wherever the organ layout differs from them, and would then cut
+through organs. Fitting to the model's own geometry means the outline cannot contradict it, and
+the enclosure guard checks it (`tests/render/body-outline.test.ts`).
+
+**The floor shadow.** A contact shadow under the figure was tried and removed. A torso that
+dissolves at mid-thigh touches no floor, and the shadow read as a smudge about 4 cm below the
+fade.
+
+**Rejected.** A smoothstep leg fade: it was nearly flat at its top. The outline has no interface
+switch; it is always on.
+
+## ADR-038 — A readability contract: one type scale, ink tokens, WCAG AA, 44 px touch areas
+
+The interface had grown 16 to 18 different font sizes, text as small as 9 px rendering at 2:1
+contrast, and controls too small to tap. Each panel had been right locally.
+
+**The decision.** `src/ui/tokens.css` defines the contract. Seven type steps, `--text-xs` 11,
+`--text-sm` 12, `--text-md` 13, `--text-lg` 15, `--text-xl` 18, `--text-2xl` 24 and
+`--text-display` 32 px; the older `--size-chip/tag/label/body` point at them so there is one scale
+and not two. Ink tokens: `--ink` #141414, `--ink-mid` #4a4a4a, `--ink-dim` #595959 (it was
+#6e6e6e, which failed), `--ink-inverse` #fff for dark fills only, and the coloured inks
+`--ink-alarm` #a8322c, `--ink-warn` #8a5a00, `--ink-ok` #1f6b3a and `--ink-info` #1d5fa8.
+`--ink-faint` #a8a8a8 is for NON-TEXT only (hairlines, ticks), because it does not reach 4.5:1.
+An `--accent-*` is never used as text. Text meets WCAG AA, 4.5:1 on every light surface. Any
+tappable control has a 44 x 44 px effective area; where the drawn control is smaller, an
+invisible hit area supplies the rest. Hierarchy is carried by size and weight, not by paleness.
+The top readouts are one block drawn with a single `transform: scale(0.86)` at every width,
+because the phone's earlier 0.78 rendered 12 px text at 9.4 px; the smallest readout text is
+`--text-md`, which renders at 11.2 px. Panels share `PanelHeader.tsx` (title exactly as in the
+menu, an optional meta chip, a close button drawn at 32 px with a 44 x 44 hit area), and every
+selected chip, segment and tab is `--accent-selected` #c8433a (white on it 4.86:1). Blue is kept
+only where it means venous.
+
+**How it is measured.** A script walks 27 interface states and reports, for the phone (390 x
+844) and the desktop (1440 x 900), text rendered below 11 px, WCAG AA failures, distinct font
+sizes and touch areas under 44 x 44. Before: phone 125, 206, 18 and 57; desktop 196, 281 and 16
+sizes. After: 0, 0, 7 and 1 on the phone (the one remaining touch offender is `.more`), and 0, 0
+and 7 on the desktop. The Playwright layout checks (ADR-041) also fail on any covered control
+and any text painted over text.
+
+**The measurement had a false positive.** The first audit's Food tab reported 1.3:1 contrast.
+That was not a defect: under software WebGL on a loaded machine the sheet's 300 ms fade had not
+advanced, so the capture photographed it mid-fade. Both capture tools now wait for every finite
+CSS animation to finish before measuring (`settle` in `tests/e2e/helpers.ts`).
+
+**Rejected.** A per-panel size for each need (the cause of the 18 sizes). Making the faint ink
+darker: it exists so that hairlines can be quiet, and its rule is that text never uses it.
+Keeping 11 px for reference ranges, units, sources and the Structures summaries: it
+measured 10.8 to 10.9 px rendered, so they are `--text-sm`, 12 px.
+
+## ADR-039 — The slice plane: semantics, picking through the cut, and a cut-edge contour
+
+An organ's interior is easier to read in section, and a glass organ cut open shows nothing
+unless the cut is marked.
+
+**The decision.** `Viewer.setSlice(axis, depth)` with `axis` one of `'front'`, `'side'`, `'top'`
+or null and `depth` from 0 to 1. It applies to the selected organ's parts, streams and shell and
+never to the body outline, and it returns to null on any selection change. Depth 0 removes
+nothing, 0.5 passes through the centre of the organ's bounding sphere and 1 removes everything.
+`'front'` removes from the patient's front, a coronal section. `'side'` removes from scene +x,
+which is the patient's LEFT, because the body is mirrored in x; orbit to azimuth +90 degrees to
+face the cut. `'top'` removes from the top down; orbit over the top to face it. The plane is
+fixed when it is set, so a beating heart moves slightly against it. Picking ignores cut-away
+tissue: a click inside a cut kidney picks `renal_pelvis` or `renal_cortex`, not the part that
+was removed. Back faces of cut solid parts are drawn flat at 0.55 x the part's colour so that a
+hollow organ reads as hollow.
+
+**The cut-edge contour.** `src/render/materials/sliceCut.ts` patches each fragment shader: the
+original `main` becomes `cutMain`, and a wrapper redraws kept-side fragments that lie within
+`uCutEdge` of the plane at `SLICE_EDGE_DARKEN` 0.35 x their colour with alpha 1, for parts, walls
+and the organ shell; streams opt out. The width is the larger of `SLICE_EDGE_WIDTH` (1.2 percent of
+the organ's bounding radius) and `SLICE_EDGE_MIN_PX` (3 px at the framing distance), computed in
+`Viewer.setSlice`. A glass organ cut open needed this: its walls are drawn after the solids at
+low opacity, so the cut had no visible edge and the wall appeared to end for no reason. With the
+contour, the kidney's capsule and cortex boundary read as rings. The dither pass makes the
+contour dotted rather than solid; that is stated as a limitation.
+
+**Accepted costs.** The plane does not follow the heart, and the contour is dotted by the
+dither pass. Both are stated in `docs/MODEL_LIMITATIONS.md`.
+
+## ADR-040 — The drug database is loaded on demand, and fetched, not imported
+
+The entry chunk carried all 152 drugs although most visits never open the drug sheet.
+
+**The decision.** `src/ui/drugData.ts` holds `loadDrugData()`, one shared promise that is
+memoised on success only, `drugDataIfLoaded()` and `useDrugData(enabled)`, so a closed sheet
+loads nothing. The first engine snapshot arms a prefetch that runs 3 s later at browser idle
+(`requestIdleCallback`, 10 s timeout, a `setTimeout` fallback); boot never waits for it. The
+sheet shows "Loading the drug list..." while it waits and "The drug list could not be loaded"
+with a Retry button on failure. `causeOf` in `explanations.ts` reads the loaded map and skips
+the drug-group step if it is absent; the invariant, kept in a comment, is that a drug can only be
+in the blood after the sheet or a scenario has loaded the data, so `causeOf` stays synchronous.
+`resolveIntents(sc)` in `scenarios.ts` awaits the loader, and the Body panel's `runScenario`
+awaits it before RESET. The simulation worker still bundles all 152 drugs.
+
+**Measured.** The main script went from 1,764.63 kB (346 kB gzip) to 867.22 kB (255.69 kB gzip).
+The data is its own file, `drugs-<hash>.json`, 1,178.84 kB (103.36 kB gzip), served as
+application/json with the COOP and COEP headers.
+
+**Why fetch and not `import()`.** The first version was a dynamic `import()` and it worked until a
+download failed. After one failed download Retry did nothing, because Chromium caches a failed
+dynamic import of a module and returns the same rejection. The data is now
+`import drugsUrl from '../data/drugs.json?url'` and a `fetch`, which is not cached on failure.
+Anything that must be retryable is fetched. The orchestrator reproduced it by failing the download
+once and pressing Retry, and the list then appeared.
+
+**Rejected.** Leaving it in the entry chunk (the size above). Importing it dynamically (the
+cached failure). `tests/sim/scenarios.test.ts` stubs `fetch` to read `src/data/drugs.json` from disk,
+because the asset URL does not exist under node.
+
+## ADR-041 — CI is split into shards, and the built app is tested in a browser under software GL
+
+One CI job ran the whole suite in about 36 minutes, and no test ever loaded the production build.
+A page that was blank while `tsc` was clean has happened before (see the Vite cache trap in
+`CLAUDE.md`).
+
+**The decision.** `.github/workflows/ci.yml` has three jobs. `verify` runs npm ci, lint,
+typecheck, build, the ingest idempotence check and the placeholder triangle budget. `test` is a
+six-way matrix running `npm test -- --shard=N/6` with `fail-fast: false`; Vitest assigns each file
+to a shard by a hash of its path, so a new test file is always picked up. `e2e` installs
+Chromium, builds, runs `npm run e2e`, and uploads `playwright-report/` and `test-results/` for
+7 days on failure. A run takes about 15 minutes end to end (the slowest shard was 14), against
+about 36. To make the shards balance, `tests/sim/nutrition.test.ts` (45 simulated hours, about
+19 minutes on one runner) was split into `nutrition-glycaemic`, `nutrition-absorption`,
+`nutrition-ethanol` and `nutrition-caffeine` test files with shared helpers in
+`nutrition-helpers.ts`: 11 tests and 21 assertions, moved verbatim.
+
+**The browser tests.** `playwright.config.ts` has a `desktop` project (1440 x 900) and a `phone`
+project (390 x 844, touch), Chromium with software-GL flags (`--use-gl=angle
+--use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`), 120 s per test, one
+retry and two workers on CI, and `vite preview` on port 4173. `@playwright/test` is pinned to
+1.63.0 to match the browser preinstalled in the cloud sandbox. The specs are `tests/e2e/*.spec.ts`
+(Vitest collects only `*.test.ts`, so neither runner sees the other's files): boot (title, banner,
+cross-origin isolation, no "degraded waveform transport", clean console), welcome (shown once),
+select, layout (no covered control, no text over text, over rest, the menu, panels, the drug sheet
+and a selected organ) and nogl (the fallback card). `settle()` in `helpers.ts` waits for every
+finite CSS animation first, because on a loaded runner a 300 ms fade was still at opacity 0
+after 1.5 s. Two local runs of the final code passed 9 tests with 1 skipped (nogl runs on the
+desktop project only), in about 4.4 minutes with one worker.
+
+**Why the production build.** The tests run against `vite preview`, so they see the built
+chunks and the COOP and COEP headers that the boot spec asserts; the dev server would not.

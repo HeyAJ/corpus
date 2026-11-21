@@ -745,3 +745,51 @@ the pH edge in pregnancy; they are not repeated here.
 
 **Not modelled at all:** bile and gallbladder emptying, lactation, thymic involution, and
 calcium (the parathyroids and C cells have no drive).
+
+---
+
+## 18. Design packages A to E (2026-11-19)
+
+These are limits of the things drawn on the body in the 2026-11-19 design work (ADR-035
+to ADR-041). None of them changes a number the simulation computes.
+
+**The body outline is an illustration.**
+
+- It is an illustrative surface drawn around the model's organs and vessels, not an anatomical
+  surface. Its proportions follow the model's organ layout, not anthropometry, because it is
+  fitted to the organ vertices and vessel centrelines of this body (ADR-037).
+- It has no face and no jaw: the model has no data for them.
+- The arms and legs end in fades, and the legs fade out over the lower half of the femoral
+  centreline instead of ending in feet.
+- Seen from the front there is no notch between the thighs. The external genitalia sit on the
+  midline and are enclosed by the outline.
+- In pregnancy the abdomen follows the week only through the uterus model's own body shape. No
+  growth curve was added to the outline.
+
+**The Activity colour is an index, not a measurement.**
+
+- It shows how far an organ is from its own settled resting state (`clamp01(1.6 x the largest
+  part departure from rest)`), through one amber ramp. It is not a metabolic rate, a blood flow
+  or a temperature, and a darker organ is not a hotter one (ADR-035).
+- The stomach never rose above 0.05 in any of the four whole-body triggers measured: fright,
+  exertion at 0.8 for 30 s, a 2 L bleed and cardiac arrest. In Activity mode it stayed at
+  rest colour in all four. Why the stomach does not respond has not been investigated, and it
+  has not been fixed.
+
+**The alarm pulse is a display convention.**
+
+- A condition on an organ pulses at about 1 Hz, a fixed display rhythm. It is not the heart
+  rate, and a faster arrhythmia does not pulse faster (ADR-036).
+- Systemic conditions (hypovolemia, hypotension, hypertension, hypoglycemia, hyperglycemia,
+  hyperkalemia, hypokalemia, lactic acidosis, hyperthermia, hypothermia) light no organ,
+  because no single organ carries them. A body in shock can therefore show no pulsing organ
+  while the pills are red.
+
+**The slice cuts illustrative geometry.**
+
+- The organ interiors are procedural drawings (section 17), so a slice shows a cut through a
+  drawing, not a section of tissue.
+- The plane is fixed when it is set, so a beating heart moves slightly against it.
+- The cut lines are dotted rather than solid, because the dither pass breaks them up (ADR-039).
+- A double-tap on an organ opens it as well as moving the camera closer, because the first tap
+  of the pair selects it as any tap does.
