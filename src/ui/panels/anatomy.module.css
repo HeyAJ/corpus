@@ -388,8 +388,10 @@
   cursor: pointer;
 }
 
+/* Every selected chip, segment and tab in the app uses --accent-selected (white text on it
+ * measures 4.86:1); the Cut control was the one still drawn in the dark chip colour. */
 .segmentOn {
-  background: var(--chip-darker);
+  background: var(--accent-selected);
   color: var(--ink-inverse);
 }
 

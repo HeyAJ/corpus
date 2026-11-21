@@ -33,6 +33,10 @@
     right: var(--inset-hud);
     transform: none;
   }
+
+  .pill[data-covered='true'] {
+    display: none;
+  }
 }
 
 @keyframes pillIn {

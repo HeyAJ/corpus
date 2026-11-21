@@ -9,7 +9,6 @@ import { useStore } from './store';
 import { ToolDock, VesselToggle, NervesToggle, HormonesToggle, ActivityToggle, LegendStack } from './components/ToolDock';
 import { CoachMark } from './components/CoachMark';
 import { ResetViewButton } from './components/ResetViewButton';
-import { HoverLabel } from './components/HoverLabel';
 import { buildCatalogue } from './search';
 import { parseShareHash, LINK_OPENED_TOAST, type ShareState } from './shareLink';
 import { DrugDrawer } from './panels/DrugDrawer';
@@ -380,7 +379,9 @@ export function App() {
     viewerRef.current?.select(selectedOrgan);
   }, [selectedOrgan]);
 
-  /* ---- the pointer cursor over an organ (mouse only: the viewer never reports hover for touch) ---- */
+  /* ---- the pointer cursor over an organ (mouse only: the viewer never reports hover for touch) ----
+   * The viewer already shows the hovered organ's name as its big label; a second tag near the
+   * pointer duplicated it and was removed, so the cursor is the only extra cue. */
   useEffect(() => {
     const canvas = canvasRef.current;
     if (canvas) canvas.style.cursor = hoveredOrgan ? 'pointer' : '';
@@ -401,6 +402,11 @@ export function App() {
     }
     viewer.setSlice(cutAxis, cutDepth);
     const finish = () => {
+      // The viewer reports "no part picked" when it selects an organ, which clears a part the
+      // search or a link set a moment earlier (seen: a search for "pyr" ended with an open
+      // kidney and no part). The requested part is therefore set again here, once the
+      // interior exists, before the camera is sent to it.
+      if (pendingFocusPart) useStore.getState().setSelectedPart(pendingFocusPart);
       viewer.highlightPart(useStore.getState().selectedPart);
       viewer.setSlice(cutAxis, cutDepth);
       if (pendingFocusPart) {
@@ -536,7 +542,6 @@ export function App() {
         <LegendStack viewerRef={viewerRef} ready={ready} />
         <CoachMark covered={sheetOpen || menuOpen} />
         <ResetViewButton viewerRef={viewerRef} covered={sheetOpen || menuOpen} />
-        <HoverLabel />
         <NoticeToasts />
         <BrainScanInset viewerRef={viewerRef} ready={ready} />
 

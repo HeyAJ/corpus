@@ -13,14 +13,17 @@ import styles from './resetview.module.css';
  *
  * WHERE IT SITS (see the stylesheet): one row above the bottom bar, clear of the corner
  * switches and the first-visit hint, centred on a wide screen and at the right on a phone.
- * `covered` hides it while a sheet or the panels menu is over the stage, because on a phone
- * the sheet would paint straight over it and a control that cannot be tapped must not be drawn.
+ * `covered` (a sheet or the panels menu is open) hides it on a PHONE only, in CSS: there the
+ * bottom sheet would paint straight over it and a control that cannot be tapped must not be
+ * drawn. On a wide screen the sheet is a card at the right and the pill, centred, stays free of
+ * it, which matters because an open organ always has its Structures sheet open and is exactly
+ * when a way back is wanted.
  */
 export function ResetViewButton({ viewerRef, covered }: { viewerRef: RefObject<Viewer | null>; covered: boolean }) {
   const atHome = useStore((s) => s.viewAtHome);
-  if (atHome || covered) return null;
+  if (atHome) return null;
   return (
-    <button type="button" className={styles.pill} onClick={() => viewerRef.current?.resetView()} data-reset-view>
+    <button type="button" className={styles.pill} data-covered={covered ? 'true' : undefined} onClick={() => viewerRef.current?.resetView()} data-reset-view>
       Reset view
     </button>
   );

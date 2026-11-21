@@ -13,8 +13,8 @@ import styles from './searchbox.module.css';
  *
  * The component is controlled (the menu owns the text) because the menu must replace its own
  * list with the results while there is text, and must close on a choice. Keys: arrows move
- * the highlight, Enter opens the highlighted result, Escape clears the text (and, with the
- * text already empty, is left to the menu to close itself). The ranking and what the body
+ * the highlight, Enter opens the highlighted result, and Escape clears the text; a second
+ * Escape, with the text already empty, closes the panels menu from here. The ranking and what the body
  * has are in src/ui/search.ts; this file is only the interface to them.
  *
  * CHOOSING A PART selects its organ, then the part, then asks for the camera to fly to it
@@ -68,11 +68,13 @@ export function SearchBox({
       ev.preventDefault();
       const hit = results[active];
       if (hit) choose(hit);
-    } else if (ev.key === 'Escape' && query !== '') {
-      // Only clear: a second Escape (nothing left to clear) falls through to the menu.
+    } else if (ev.key === 'Escape') {
+      // The first Escape clears the text; with the text already empty, a further Escape closes
+      // the panels menu, which otherwise had no keyboard way out while the field had focus.
       ev.preventDefault();
       ev.stopPropagation();
-      onQuery('');
+      if (query !== '') onQuery('');
+      else useStore.getState().setMenuOpen(false);
     }
   };
 
