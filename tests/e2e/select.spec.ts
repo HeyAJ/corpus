@@ -10,7 +10,9 @@ test('tapping the chest selects an organ and empty space clears it', async ({ pa
 
   await tapAt(page, 0.5, 0.4, touch);
   const structures = page.getByRole('region', { name: 'Structures' });
-  await expect(structures).toContainText(/Structures\s+·\s+\d+ parts/, { timeout: 20_000 });
+  // The shared panel header shows the title and, in a separate meta element, "Heart · 17 parts",
+  // so a visitor reads the part count beside the organ name rather than in one "Structures · N" run.
+  await expect(structures).toContainText(/\d+ parts/, { timeout: 20_000 });
 
   await tapAt(page, 0.02, 0.5, touch);
   await expect(structures).toHaveCount(0, { timeout: 20_000 });

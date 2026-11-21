@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { boot, collectProblems, layoutChecks, tapAt } from './helpers';
+import { boot, collectProblems, layoutChecks, settle, tapAt } from './helpers';
 
 // Guards the layout a visitor sees: in each reachable state no control may be painted over by
 // something else and no text may run through other text. This is the check that catches a
@@ -51,6 +51,15 @@ test('no covered control and no overlapping text in the main states', async ({ p
   await page.getByRole('button', { name: 'Administer' }).click();
   await expectClean(page, 'administration sheet');
   await page.getByRole('button', { name: 'Administer' }).click();
+
+  // Wait the way a visitor does. On a wide screen the sheet docks at the right, so closing it
+  // makes the camera re-frame the body for about 600 ms (FLIGHT_MS); a tap during that slide
+  // lands on the moving body and selects nothing (reproduced: a tap 0 ms after closing missed,
+  // 1500 ms later hit the heart). So wait until the sheet's dialog is gone, let the animations
+  // finish, then pause briefly for the flight before tapping the chest.
+  await expect(page.getByRole('dialog', { name: 'Administration drawer' })).toBeHidden({ timeout: 20_000 });
+  await settle(page);
+  await page.waitForTimeout(1000);
 
   await tapAt(page, 0.5, 0.4, touch);
   await expect(page.getByRole('region', { name: 'Structures' })).toBeVisible({ timeout: 20_000 });
