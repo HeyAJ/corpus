@@ -142,6 +142,10 @@
 }
 
 .more {
+  /* Drawn 32 px tall, as before; the touch area is widened to 44 x 44 by the ::after below
+     (readability rule 4), which is invisible and so does not make the link look bigger. It
+     stays clear of the 12 px gap above the next row, so it overlaps no other control. */
+  position: relative;
   min-height: 32px;
   padding: 0;
   font: inherit;
@@ -347,4 +351,74 @@
 .sources a {
   color: var(--ink-mid);
   overflow-wrap: anywhere;
+}
+
+.more::after {
+  content: '';
+  position: absolute;
+  inset: -6px -8px;
+}
+
+/* ------------------------------------------------------------------------- the cut row */
+
+.cut {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.segments {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--chip-bg);
+  border-radius: var(--radius-pill);
+}
+
+.segment {
+  flex: 1 1 0;
+  min-height: 44px;
+  font: inherit;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink);
+  background: none;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.segmentOn {
+  background: var(--chip-darker);
+  color: var(--ink-inverse);
+}
+
+.depth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-mid);
+}
+
+.depth span {
+  flex: none;
+  min-width: 78px;
+}
+
+.depth input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.cutNote {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--ink-dim);
 }

@@ -8,6 +8,10 @@ import type { WaveformChannel } from '../bridge/types';
 import { useStore } from './store';
 import { ToolDock, VesselToggle, NervesToggle, HormonesToggle, ActivityToggle, LegendStack } from './components/ToolDock';
 import { CoachMark } from './components/CoachMark';
+import { ResetViewButton } from './components/ResetViewButton';
+import { HoverLabel } from './components/HoverLabel';
+import { buildCatalogue } from './search';
+import { parseShareHash, LINK_OPENED_TOAST, type ShareState } from './shareLink';
 import { DrugDrawer } from './panels/DrugDrawer';
 import { ReceptorPanel } from './panels/ReceptorPanel';
 import { ProcedurePanel } from './panels/ProcedurePanel';
@@ -47,6 +51,80 @@ const ORGANS = organDefs();
 /** Fastest the interface re-renders from snapshots, ms (the 3D view takes every one). */
 const UI_SNAPSHOT_MS = 100;
 
+/** How long to wait for a selected organ's interior before giving up on a cut or a flight, ms (a display choice). */
+const INTERIOR_WAIT_MS = 8000;
+
+/** How long a link waits for the engine to take the new body before showing the view anyway, ms (a display choice). */
+const BODY_WAIT_MS = 5000;
+
+/**
+ * Apply the URL fragment, if it holds a valid share link (see shareLink.ts for the whitelist).
+ * Order: the body first (SET_BODY, then SET_PREGNANCY), because the organ a link names may exist
+ * only in that body; then, once a snapshot shows the body has changed, the layers, the organ, the
+ * part (with the camera flight) and the cut. A field the link does not carry is left as it is.
+ * Only parsed numbers are ever dispatched. Returns a function that cancels the wait.
+ */
+function applyShareLink(): () => void {
+  const st = useStore.getState();
+  const repro = st.snapshot?.reproductive;
+  const parsed: ShareState = parseShareHash(window.location.hash, buildCatalogue, {
+    sex: repro?.sex ?? 'male',
+    pregnant: repro?.pregnancy?.pregnant ?? false,
+  });
+  if (Object.keys(parsed).length === 0) return () => undefined;
+
+  if (parsed.sex) st.dispatch({ type: 'SET_BODY', sex: parsed.sex });
+  if (parsed.weeks !== undefined) st.dispatch({ type: 'SET_PREGNANCY', pregnant: parsed.weeks > 0, weeks: parsed.weeks });
+
+  let done = false;
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  let unsubscribe: (() => void) | null = null;
+  const settle = () => {
+    if (done) return;
+    done = true;
+    unsubscribe?.();
+    if (timer !== null) clearTimeout(timer);
+    const s = useStore.getState();
+    if (parsed.layers) {
+      useStore.setState({
+        vascularVisible: parsed.layers.includes('vessels'),
+        nervesVisible: parsed.layers.includes('nerves'),
+        hormonesVisible: parsed.layers.includes('hormones'),
+        activityVisible: parsed.layers.includes('activity'),
+      });
+    }
+    if (parsed.organ) {
+      s.setSelected(parsed.organ as OrganId);
+      if (parsed.part) {
+        s.setSelectedPart(parsed.part);
+        s.requestFocusPart(parsed.part);
+      }
+      if (parsed.cut) s.setCut(parsed.cut.axis, parsed.cut.depth);
+    }
+    s.pushLog(LINK_OPENED_TOAST, 'info');
+  };
+  const bodyIsReady = () => {
+    const r = useStore.getState().snapshot?.reproductive;
+    if (!r) return false;
+    if (parsed.sex && r.sex !== parsed.sex) return false;
+    if (parsed.weeks !== undefined && r.pregnancy.pregnant !== parsed.weeks > 0) return false;
+    return true;
+  };
+  if (bodyIsReady() && parsed.sex === undefined && parsed.weeks === undefined) {
+    settle();
+  } else {
+    unsubscribe = useStore.subscribe(() => {
+      if (bodyIsReady()) settle();
+    });
+    timer = setTimeout(settle, BODY_WAIT_MS);
+  }
+  return () => {
+    done = true;
+    unsubscribe?.();
+    if (timer !== null) clearTimeout(timer);
+  };
+}
+
 export function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const bottomBarRef = useRef<HTMLDivElement | null>(null);
@@ -61,6 +139,13 @@ export function App() {
   const setLabels = useStore((s) => s.setLabels);
   const setSelectedPart = useStore((s) => s.setSelectedPart);
   const setPartLabels = useStore((s) => s.setPartLabels);
+  const setHovered = useStore((s) => s.setHovered);
+  const setViewAtHome = useStore((s) => s.setViewAtHome);
+  const hoveredOrgan = useStore((s) => s.hoveredOrgan);
+  const cutAxis = useStore((s) => s.cutAxis);
+  const cutDepth = useStore((s) => s.cutDepth);
+  const pendingFocusPart = useStore((s) => s.pendingFocusPart);
+  const requestFocusPart = useStore((s) => s.requestFocusPart);
   const selectedPart = useStore((s) => s.selectedPart);
   const selectedOrgan = useStore((s) => s.selectedOrgan);
   const setShock = useStore((s) => s.setShock);
@@ -187,6 +272,12 @@ export function App() {
       onPart: (p) => setSelectedPart(p ? p.part : null),
       onPartLabels: (l) => setPartLabels(l),
     });
+    // The Reset view pill and the hover label read the store, so the viewer's two one-slot
+    // callbacks are mirrored into it here (a pointer over an organ is reported for a MOUSE only).
+    if (viewer) {
+      viewer.onViewChanged = (atHome) => setViewAtHome(atHome);
+      viewer.onHoverChanged = (id) => setHovered((id as OrganId | null) ?? null);
+    }
     viewer?.start();
 
     // DEVELOPMENT ONLY. The browser probes that check the renderer (.cache/probes) need to
@@ -273,7 +364,7 @@ export function App() {
       viewerRef.current = null;
       clientRef.current = null;
     };
-  }, [setConnected, setDispatch, setLabels, setSelected, setSelectedPart, setPartLabels, setShock, setSnapshot, pushLog, pushEvent]);
+  }, [setConnected, setDispatch, setLabels, setSelected, setSelectedPart, setPartLabels, setShock, setSnapshot, pushLog, pushEvent, setHovered, setViewAtHome]);
 
   useEffect(() => {
     if (viewerRef.current) viewerRef.current.reducedMotion = reducedMotion;
@@ -288,6 +379,66 @@ export function App() {
   useEffect(() => {
     viewerRef.current?.select(selectedOrgan);
   }, [selectedOrgan]);
+
+  /* ---- the pointer cursor over an organ (mouse only: the viewer never reports hover for touch) ---- */
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (canvas) canvas.style.cursor = hoveredOrgan ? 'pointer' : '';
+  }, [hoveredOrgan]);
+
+  /* ---- the section and the camera flight wait for the organ's interior ----
+   * `Viewer.select` clears the slice and builds the interior in a worker, and `focusPart` does
+   * nothing before the interior exists. The cut is applied at once (it is harmless before the
+   * interior is ready) and again, with the highlight and any requested flight, as soon as
+   * `interiorReady` reads true. The poll gives up after INTERIOR_WAIT_MS so a failed build
+   * cannot leave a timer running. */
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    if (!selectedOrgan) {
+      viewer.setSlice(null, 0);
+      return;
+    }
+    viewer.setSlice(cutAxis, cutDepth);
+    const finish = () => {
+      viewer.highlightPart(useStore.getState().selectedPart);
+      viewer.setSlice(cutAxis, cutDepth);
+      if (pendingFocusPart) {
+        viewer.focusPart(pendingFocusPart);
+        requestFocusPart(null);
+      }
+    };
+    if (viewer.interiorReady) {
+      finish();
+      return;
+    }
+    const started = performance.now();
+    const timer = window.setInterval(() => {
+      if (viewer.interiorReady) {
+        window.clearInterval(timer);
+        finish();
+      } else if (performance.now() - started > INTERIOR_WAIT_MS) {
+        window.clearInterval(timer);
+      }
+    }, 100);
+    return () => window.clearInterval(timer);
+  }, [selectedOrgan, cutAxis, cutDepth, pendingFocusPart, requestFocusPart]);
+
+  /* ---- a shared link: restore a body and a view once the engine is up ---- */
+  useEffect(() => {
+    if (!ready) return;
+    let stop: (() => void) | null = null;
+    const apply = () => {
+      stop?.();
+      stop = applyShareLink();
+    };
+    apply();
+    window.addEventListener('hashchange', apply);
+    return () => {
+      window.removeEventListener('hashchange', apply);
+      stop?.();
+    };
+  }, [ready]);
 
   /* ---- vascular overlay follows the tool dock's blood-drop button ---- */
   useEffect(() => {
@@ -384,6 +535,8 @@ export function App() {
         <ActivityToggle />
         <LegendStack viewerRef={viewerRef} ready={ready} />
         <CoachMark covered={sheetOpen || menuOpen} />
+        <ResetViewButton viewerRef={viewerRef} covered={sheetOpen || menuOpen} />
+        <HoverLabel />
         <NoticeToasts />
         <BrainScanInset viewerRef={viewerRef} ready={ready} />
 

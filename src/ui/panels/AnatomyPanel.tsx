@@ -3,7 +3,7 @@ import { organDefs } from '../../render/organs/OrganSet';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
 import type { AnatomyFile, AnatomyPartDef } from '../../data/anatomy-types';
 import type { BodySystem, OrganDef, OrganId } from '../../data/types';
-import { useStore } from '../store';
+import { useStore, type CutAxis } from '../store';
 import styles from './anatomy.module.css';
 import { PanelHeader } from '../components/PanelHeader';
 
@@ -194,6 +194,74 @@ function OrganList() {
   );
 }
 
+/**
+ * THE CUT ROW: a section through the open organ.
+ *
+ * One flat plane through the organ's bounding sphere removes one side of it, so the glass walls
+ * and the parts inside them can be read as a section drawing. The panel only sets the store's
+ * `cutAxis` and `cutDepth`; App.tsx hands them to `Viewer.setSlice`, which owns the real state and
+ * resets itself whenever the selection changes (the store does the same, so the row returns to
+ * Off with it). The one-line explanations name the side the viewer ACTUALLY removes, from the
+ * JSDoc of materials/sliceCut.ts: the body is drawn mirrored in x, so the plane that removes
+ * scene +x removes the patient's LEFT. The plane is a viewing aid and says nothing physiological.
+ */
+const CUT_CHOICES: { id: CutAxis | null; label: string }[] = [
+  { id: null, label: 'Off' },
+  { id: 'front', label: 'Front' },
+  { id: 'side', label: 'Side' },
+  { id: 'top', label: 'Top' },
+];
+
+const CUT_EXPLAIN: Record<CutAxis, string> = {
+  front: 'Front: removes the front half, like a coronal section.',
+  side: 'Side: removes the patient\u2019s left half, like a sagittal section.',
+  top: 'Top: removes the top half, like a transverse section read from above.',
+};
+
+function CutRow() {
+  const axis = useStore((s) => s.cutAxis);
+  const depth = useStore((s) => s.cutDepth);
+  const setCut = useStore((s) => s.setCut);
+  return (
+    <div className={styles.cut} data-cut-row>
+      <span className={styles.activeTitle} id="cut-title">
+        Cut
+      </span>
+      <div className={styles.segments} role="radiogroup" aria-labelledby="cut-title">
+        {CUT_CHOICES.map((c) => (
+          <button
+            key={c.label}
+            type="button"
+            role="radio"
+            aria-checked={axis === c.id}
+            className={`${styles.segment} ${axis === c.id ? styles.segmentOn : ''}`}
+            onClick={() => setCut(c.id)}
+            data-cut={c.id ?? 'off'}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+      {axis && (
+        <label className={styles.depth}>
+          <span>Depth {Math.round(depth * 100)}%</span>
+          <input
+            type="range"
+            min={0}
+            max={100}
+            step={1}
+            value={Math.round(depth * 100)}
+            onChange={(e) => setCut(axis, Number(e.target.value) / 100)}
+            aria-label="Cut depth, percent"
+            data-cut-depth
+          />
+        </label>
+      )}
+      <p className={styles.cutNote}>{axis ? CUT_EXPLAIN[axis] : 'Choose a side to slice the organ open and look at the section.'}</p>
+    </div>
+  );
+}
+
 function OrganAtlas({ organ }: { organ: OrganDef }) {
   const selectedPart = useStore((s) => s.selectedPart);
   const reducedMotion = useStore((s) => s.reducedMotion);
@@ -224,6 +292,7 @@ function OrganAtlas({ organ }: { organ: OrganDef }) {
               {more ? 'less' : 'more'}
             </button>
           </div>
+          <CutRow />
           <MostActive organId={organ.id} parts={atlas.parts} />
           <ul className={styles.parts} ref={listRef}>
             {atlas.parts.map((p) => (

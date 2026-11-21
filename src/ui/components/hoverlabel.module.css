@@ -1,0 +1,21 @@
+/*
+ * THE HOVER LABEL (HoverLabel.tsx). Positioned by an inline transform written on pointer move,
+ * so it is anchored at the stage's top-left and never takes a pointer event (it must not steal
+ * the hover from the canvas under it). A dark chip with white text for 4.5:1 on any part of the
+ * body; text is on the type scale.
+ */
+.label {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 12;
+  padding: 4px 10px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--ink-inverse);
+  background: var(--chip-darker);
+  border-radius: var(--radius-chip);
+  pointer-events: none;
+  will-change: transform;
+}
