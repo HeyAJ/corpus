@@ -723,7 +723,7 @@ velocity; rate follows autonomic tone. Hormone arcs are a diagram, since hormone
 the blood, and droplet rate follows level over resting level. The brain scan is a
 maximum-intensity projection of the activity index (ADR-029) through a thermal ramp, cool at
 rest and warm when active, captioned "activity index, not temperature", with nothing on the
-card in degrees. Hormones, Nerves and Vessels are three labelled switches, all off at start.
+card in degrees. Hormones, Nerves and Vessels are three labelled switches, all off at start (a fourth, Activity, was added in ADR-035).
 
 **Rejected.** A ramp that reads as a temperature or BOLD signal: neither is simulated.
 Showing a conduction speed: none is modelled. Always-on overlays: they would bury the body.

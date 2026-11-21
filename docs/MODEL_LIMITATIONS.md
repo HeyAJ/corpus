@@ -361,7 +361,7 @@ uses, and one that it does not.
 still gives up all of its carbohydrate eventually, so the index changes the shape of the
 curve and not the area under it. That distinction is the whole point: an index that
 altered total absorption would be a fudge factor on energy rather than a model of how
-fast a food is digested, and `tests/sim/nutrition.test.ts` asserts the area is preserved.
+fast a food is digested, and `tests/sim/nutrition-absorption.test.ts` asserts the area is preserved.
 
 **Fibre slows absorption in proportion to the parcel's own carbohydrate**, because 5 g of
 fibre alongside 10 g of carbohydrate is a quite different food from 5 g alongside 80 g.
