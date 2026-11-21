@@ -885,7 +885,7 @@ only where it means venous.
 **How it is measured.** A script walks 27 interface states and reports, for the phone (390 x
 844) and the desktop (1440 x 900), text rendered below 11 px, WCAG AA failures, distinct font
 sizes and touch areas under 44 x 44. Before: phone 125, 206, 18 and 57; desktop 196, 281 and 16
-sizes. After: 0, 0, 7 and 1 on the phone (the one remaining touch offender is `.more`), and 0, 0
+sizes. After: 0, 0, 7 and 1 on the phone (the one touch offender, `.more` in the Structures panel, has since been given a 44 px invisible hit area), and 0, 0
 and 7 on the desktop. The Playwright layout checks (ADR-041) also fail on any covered control
 and any text painted over text.
 
@@ -991,3 +991,75 @@ desktop project only), in about 4.4 minutes with one worker.
 
 **Why the production build.** The tests run against `vite preview`, so they see the built
 chunks and the COOP and COEP headers that the boot spec asserts; the dev server would not.
+
+## ADR-042 — A share link restores the body and the view, through a strict whitelist
+
+A visitor should be able to send someone the same body, looking at the same organ, and the
+address bar is the only thing both browsers share. It is also text that anyone can edit by hand
+and that a stranger can send, so every value in it is untrusted input to a simulation.
+
+**The decision.** `src/ui/shareLink.ts` is pure: `buildShareHash(state)` writes the link and
+`parseShareHash(hash, catalogue)` reads it. The format is
+`#v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=vessels,nerves,hormones,activity&cut=front:0.5`.
+The parser is a whitelist, and a value that fails its rule is dropped, never repaired:
+
+- `v` must be 1. Without `v=1` nothing at all is applied, so a link from a future format is
+  ignored instead of half understood.
+- `sex` is `male` or `female`.
+- `weeks` is an integer from 0 to `pregnancy.maxWeeks`, read from `reproduction.json` and not
+  typed again here, and only for a female body.
+- `organ` must exist in the catalogue of that body (a prostate in a female link is dropped), and
+  `part` must belong to that organ's atlas.
+- `layers` must be a subset of the four overlay names; one bad name drops the whole key.
+- `cut` is `axis:number` with the number in [0, 1].
+- Unknown keys are ignored, a duplicated key is dropped, any value longer than 64 characters is
+  dropped, and values are limited to a safe character set.
+
+A link is applied once the engine is ready, on load and again on `hashchange`, in this order:
+`SET_BODY`, then `SET_PREGNANCY` with the parsed numbers only, then the layers, the organ, the
+part and the cut. A field that is absent leaves that part of the view as it was. The welcome
+dialog still shows to a first-time visitor who arrives by a link, because the not-for-clinical-use
+notice must be read before anything. "Copy link to this view" sits at the end of the panels menu
+(the clipboard, with a read-only field as the fallback). The toasts say what a link is:
+"Link copied. It opens this body and this view, not what has happened to it." and "Link opened. It
+restores this body and this view, not what has happened to it."
+
+**A link restores the body and the view, never the history.** Drugs given and events are not in
+it. The toasts say so in words, so that two people opening the same link do not expect to see the
+same history. Nothing in a link can carry a dose.
+
+**Rejected.** Applying a link before the engine is ready: it is applied once the engine is ready, so
+its intents reach a running engine. A permissive parser that clamps a bad number: a clamped value is a
+body nobody asked for, and a dropped one leaves the visitor's own state. Encoding the whole
+snapshot: it would be long, and most of it is not the visitor's to set. `tests/ui/shareLink.test.ts`
+has 38 tests, 28 of them malformed inputs, and none throws.
+
+## ADR-043 — Search finds organs and structures, and Reset view appears only when the view has moved
+
+With 32 organs and 301 parts in the atlases, finding the renal medulla meant opening the kidney
+and scrolling.
+
+**The decision.** `src/ui/search.ts` is pure and builds a catalogue of the organs and parts THIS
+body has, because sex and pregnancy decide which exist. Paired organs list a part once per side
+("Medullary Pyramids, left kidney"). Ranking is label prefix, then word start, then substring; on
+a tie an organ comes before a part; at most 8 results; matching ignores case and accents
+(`tests/ui/search.test.ts`, 8 tests). `SearchBox.tsx`, "Find an organ or structure", is at the
+top of the panels menu and its results replace the list while it has text. Arrows move, Enter
+opens the highlighted result, Escape clears the text and a second Escape closes the menu.
+Choosing a part selects its organ, then the part, then flies the camera to it
+(`viewer.focusPart`) once `viewer.interiorReady`; `App` re-applies the part because selecting an
+organ clears the picked part.
+
+**Reset view.** `ResetViewButton.tsx` is a pill shown only while `viewer.viewAtHome` is false
+(store `viewAtHome`, fed by `viewer.onViewChanged`), so it appears when the camera has been moved
+and offers the way back, and is absent when there is nothing to reset. On a phone it is hidden
+while a sheet or the menu is open; on a wide screen it stays visible beside an open sheet.
+
+**Hover.** A mouse hover sets the store's `hoveredOrgan` (from `viewer.onHoverChanged`) and the
+canvas cursor becomes a pointer. A separate name tag beside the pointer was built and removed:
+the viewer already draws the hovered organ's name as its big label, and the two names sat side
+by side.
+
+**Rejected.** Searching only the organ names (the parts are the reason to search). Showing the
+Reset view pill always (it would be a control that does nothing at rest). A second name tag, for
+the reason above.

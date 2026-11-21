@@ -793,3 +793,10 @@ to ADR-041). None of them changes a number the simulation computes.
 - The cut lines are dotted rather than solid, because the dither pass breaks them up (ADR-039).
 - A double-tap on an organ opens it as well as moving the camera closer, because the first tap
   of the pair selects it as any tap does.
+
+**A share link restores the starting point, not the history.**
+
+- A link carries the body (sex and gestational week) and the view (organ, part, overlay layers
+  and cut). It does not carry the drugs given or the events that have happened (ADR-042).
+  Two people opening the same link see the same starting point and not the same history, and the
+  link's toasts say so.
