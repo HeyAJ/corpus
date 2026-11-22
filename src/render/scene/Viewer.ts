@@ -173,6 +173,8 @@ export class Viewer {
   private selected: OrganId | null = null;
   /** The user's own Vessels switch; the heart can force the overlay on above it. */
   private vascularSwitch = false;
+  /** The last visibility given to the vascular layer, so it is only toggled when it changes. */
+  private vascularShown: boolean | null = null;
   private callbacks: ViewerCallbacks = {};
   private backgroundMode: BackgroundMode = 'idle';
   private backgroundColor = new THREE.Color(BACKGROUNDS.idle);
@@ -761,7 +763,17 @@ export class Viewer {
    * deselected. The UI reads the same rule (ToolDock VesselToggle) so the switch shows ON.
    */
   private applyVascularVisibility(): void {
-    this.vascular.setVisible(this.vascularSwitch || this.selected === 'heart');
+    // WHY the close look ends the borrowing: once a part of the heart is under close study the
+    // forced overlay washed the frame pink and hid the valve cusps it was meant to show. Focus
+    // narrows attention to the structure in hand, so above half a close look the heart stops
+    // forcing the overlay. The user's own Vessels switch still shows vessels during a close look.
+    // The close look eases in over several frames, so this is re-evaluated every frame from
+    // update(); the cache keeps the vascular layer from being toggled when nothing has changed.
+    const forced = this.selected === 'heart' && this.detail.closeLookAmount < 0.5;
+    const shown = this.vascularSwitch || forced;
+    if (shown === this.vascularShown) return;
+    this.vascularShown = shown;
+    this.vascular.setVisible(shown);
   }
 
   /** Show or hide the glass body outline and its floor shadow. On by default. */
@@ -910,6 +922,8 @@ export class Viewer {
     this.organs.closeLook = this.detail.closeLookAmount;
     this.organs.update(dtMs);
     this.vascular.update(dtMs / 1000);
+    // The heart's forced overlay depends on the close look, which eases in per frame.
+    this.applyVascularVisibility();
     // CLOSE LOOK: while a part with finer structures is under study, thin the vessel overlay
     // inside the open organ (the heart forces it on) so it does not lie over those structures.
     const openOrgan = this.selected ? this.organs.organs.get(this.selected) : undefined;
