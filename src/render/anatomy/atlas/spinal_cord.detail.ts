@@ -30,6 +30,35 @@ import { cordLine } from './spinal_cord.parts';
  * otherwise.
  */
 
+/**
+ * WHICH PARTS ARE GLASS, AND HOW MUCH. The first version drew the three lengths of cord as
+ * solid tubes with the grey matter inside them, so the butterfly of grey matter, and now the
+ * tracts, horns and canal, were completely hidden. A part drawn below 0.98 opacity stops
+ * writing depth and lets what is behind it show, so everything that CONTAINS something is
+ * glass (the cord lengths, the grey matter, the three funiculi, the membranes, the canal)
+ * and what it contains is solid. These opacities are display choices, picked so that the
+ * nested layers (membranes, white matter, grey matter, then tracts) can each be told apart
+ * without any one of them blanking the rest; they are not measured transparency.
+ */
+const GLASS: Readonly<Record<string, number>> = {
+  cervical_cord: 0.2,
+  thoracic_cord: 0.2,
+  lumbar_cord: 0.2,
+  cervical_enlargement: 0.16,
+  lumbar_enlargement: 0.16,
+  conus_medullaris: 0.22,
+  grey_matter: 0.34,
+  meninges: 0.14,
+  dura_mater: 0.16,
+  arachnoid_mater: 0.12,
+  pia_mater: 0.18,
+  central_canal: 0.5,
+  dorsal_funiculus: 0.24,
+  lateral_funiculus: 0.24,
+  ventral_funiculus: 0.24,
+  dorsal_horn: 0.45,
+};
+
 const TOP = 0.385;
 const BOTTOM = 0.05;
 const STEPS = 12;
@@ -76,6 +105,7 @@ export const detail: OrganDetailSpec = {
   ],
 
   animate: (ctx) => {
+    for (const id of Object.keys(GLASS)) ctx.part(id)?.setOpacity(GLASS[id]);
     const traffic = [
       clamp01(ctx.lerp((s) => s.anatomy.nerves.motor)),
       clamp01(ctx.lerp((s) => s.anatomy.nerves.sensory)),

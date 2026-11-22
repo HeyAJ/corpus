@@ -88,6 +88,8 @@ export const PARENT_GLASS_DROP = 0.55;
  *                          pop; under reduced motion it is instant.
  */
 export const FOCUS_FAINT_OPACITY = 0.12;
+/** The same for an ANCESTOR of the focused part (the chamber round a valve), a little firmer so the context still reads. Display constant. */
+export const FOCUS_ANCESTOR_OPACITY = 0.25;
 export const FOCUS_PARENT_GLASS_DROP = 0.8;
 export const FOCUS_STREAM_FRACTION = 0.3;
 export const FOCUS_OVERLAY_DIM = 0.85;

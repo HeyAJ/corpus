@@ -612,7 +612,7 @@ export class OrganSet {
     }
     this.focus += ((anySelected ? 1 : 0) - this.focus) * (1 - Math.exp(-dtMs / RECEDE_TAU_MS));
     const recedeDensity = (1 - (1 - RECEDE_DENSITY) * this.focus) * (1 - CLOSE_LOOK_RECEDE_CUT * this.closeLook);
-    const recedeRim = 1 - (1 - RECEDE_RIM) * this.focus;
+    const recedeRim = (1 - (1 - RECEDE_RIM) * this.focus) * (1 - CLOSE_LOOK_RECEDE_CUT * this.closeLook);
 
     // The Activity mode cross-fades over the same time as the activity smoothing, so
     // switching it never pops.

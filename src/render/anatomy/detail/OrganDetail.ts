@@ -14,6 +14,7 @@ import type { DetailContext, FlowSpec, OrganDetailSpec, PartHandle } from './typ
 import {
   PARENT_GLASS_DROP,
   FOCUS_EASE_S,
+  FOCUS_ANCESTOR_OPACITY,
   FOCUS_FAINT_OPACITY,
   FOCUS_PARENT_GLASS_DROP,
   FOCUS_STREAM_FRACTION,
@@ -659,8 +660,10 @@ export class OrganDetail {
       // An ancestor of the picked part is its context (the ventricle round a papillary muscle)
       // and keeps the gentle dimming; anything else unrelated goes faint in a close look.
       const dimTarget = pick !== null && p.id !== pick && !family ? 1 : 0;
-      const faint = dimTarget === 1 && !ancestorsOfPick.includes(p.id) ? close : 0;
-      const dimMul = (1 - (1 - DIMMED) * p.dim) * (1 - (1 - FOCUS_FAINT_OPACITY / DIMMED) * faint * p.dim);
+      // The ancestors (the chamber wall round a valve) are context but, seen from 0.1 m, are the
+      // wall of pink in front of the cusps, so they go fainter too, just not as faint as the rest.
+      const floor = ancestorsOfPick.includes(p.id) ? FOCUS_ANCESTOR_OPACITY : FOCUS_FAINT_OPACITY;
+      const dimMul = (1 - (1 - DIMMED) * p.dim) * (1 - (1 - floor / DIMMED) * close * p.dim);
       p.hl += (hlTarget - p.hl) * blend;
       p.dim += (dimTarget - p.dim) * blend;
       const u = p.material.uniforms;
