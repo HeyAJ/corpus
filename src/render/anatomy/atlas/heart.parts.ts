@@ -581,13 +581,13 @@ function papillaryTip(base: V3, v: ValvePlane, fraction: number): V3 {
 }
 
 /** The two papillary muscles of the left ventricle: the anterolateral and the posteromedial. */
-const LV_PAP_BASES: V3[] = (() => {
+export const LV_PAP_BASES: V3[] = (() => {
   const s = lvAnteriorSign();
   return [lvWallPoint(0.52, Math.PI - s * 0.8, 0.0006), lvWallPoint(0.46, Math.PI + s * 0.75, 0.0006)];
 })();
 
 /** The three papillary muscles of the right ventricle: anterior, posterior and septal. */
-const RV_PAP_BASES: V3[] = (() => {
+export const RV_PAP_BASES: V3[] = (() => {
   const s = rvAnteriorSign();
   return [
     rvFreeWallPoint(0.55, s * 0.9, 0.0006),
@@ -610,7 +610,8 @@ function ridges(
     const span = 0.07 + 0.05 * frac(i * 0.7 + 0.3);
     const r = 0.001 + 0.0006 * frac(i * 0.45 + 0.2);
     const pts: V3[] = [point(t0, phi), point(t0 + span / 2, phi + 0.05), point(Math.min(0.97, t0 + span), phi)];
-    pieces.push(tubeAlong(pts, (t) => r * Math.sqrt(Math.max(0.05, Math.sin(Math.PI * t))), { tubular: 8, radial: 5 }));
+    // radial 5 -> 4: lowered to keep the heart within twice its pre-children triangle count (`tests/render/reveal.test.ts`).
+    pieces.push(tubeAlong(pts, (t) => r * Math.sqrt(Math.max(0.05, Math.sin(Math.PI * t))), { tubular: 8, radial: 4 }));
   }
   return mergeParts(pieces);
 }
@@ -718,9 +719,16 @@ const PERICARDIUM_PARIETAL = 0.004;
 const PERICARDIUM_EPICARDIUM = 0.0016;
 
 /** One layer of the pericardium: the body outline pushed out by `distance`. Coarse cells on purpose: the field is smooth. */
-function pericardialSurface(distance: number): THREE.BufferGeometry {
-  return polygonise(offset(heartBodyField(), distance), [-0.074, -0.078, -0.058], [0.068, 0.066, 0.062], { cell: 0.0075 });
+function pericardialSurface(distance: number, cell = 0.0075): THREE.BufferGeometry {
+  return polygonise(offset(heartBodyField(), distance), [-0.074, -0.078, -0.058], [0.068, 0.066, 0.062], { cell });
 }
+
+/**
+ * The child layers use a coarser cell (8.5 mm, was 7.5 mm): they are the outermost, least visible
+ * surfaces of the heart and the outline is smooth. Lowered to keep the heart within twice its
+ * pre-children triangle count (`tests/render/reveal.test.ts`).
+ */
+const PERICARDIUM_CHILD_CELL = 0.0085;
 
 /* ----------------------------------------------------------------- the children */
 
@@ -854,8 +862,8 @@ function finerStructures(c: HeartCavities): { id: string; geometry: THREE.Buffer
   out.push({ id: 'purkinje_fibres', geometry: strands([7, 8], 0.0009) });
 
   /* Pericardium: its three layers. */
-  out.push({ id: 'fibrous_pericardium', geometry: pericardialSurface(PERICARDIUM_FIBROUS) });
-  out.push({ id: 'parietal_pericardium', geometry: pericardialSurface(PERICARDIUM_PARIETAL) });
-  out.push({ id: 'epicardium', geometry: pericardialSurface(PERICARDIUM_EPICARDIUM) });
+  out.push({ id: 'fibrous_pericardium', geometry: pericardialSurface(PERICARDIUM_FIBROUS, PERICARDIUM_CHILD_CELL) });
+  out.push({ id: 'parietal_pericardium', geometry: pericardialSurface(PERICARDIUM_PARIETAL, PERICARDIUM_CHILD_CELL) });
+  out.push({ id: 'epicardium', geometry: pericardialSurface(PERICARDIUM_EPICARDIUM, PERICARDIUM_CHILD_CELL) });
   return out;
 }
