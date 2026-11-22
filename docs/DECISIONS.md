@@ -778,7 +778,7 @@ amber ramp, indexed by the organ's eased engagement above its own rest
 and was not changed). The ramp lives in `src/render/organs/activityRamp.ts` with no three.js
 import so that a test and the legend can read it: 0 is #f6ece0, 0.2 #f4d8b0, 0.4 #efbd78, 0.6
 #e29a3a, 0.8 #c0731a and 1 #8a4a0a. Density in Activity mode is 0.55 + 0.9 x activity, so an
-engaged organ is both darker and denser. The legend, "Activity above rest", carries the ramp bar
+engaged organ is both darker and denser. The legend, then titled "Activity above rest" (it is now "Change from rest", ADR-044), carries the ramp bar
 and says in words that the colour is an index of how far each organ is from its own resting
 state, not a measurement.
 
@@ -1036,7 +1036,7 @@ has 38 tests, 28 of them malformed inputs, and none throws.
 
 ## ADR-043 — Search finds organs and structures, and Reset view appears only when the view has moved
 
-With 32 organs and 301 parts in the atlases, finding the renal medulla meant opening the kidney
+With 32 organs and 301 parts in the atlases (the count when this was decided; the 2026-11-22 round, ADR-045, took the atlas files to 963 entries), finding the renal medulla meant opening the kidney
 and scrolling.
 
 **The decision.** `src/ui/search.ts` is pure and builds a catalogue of the organs and parts THIS
@@ -1063,3 +1063,154 @@ by side.
 **Rejected.** Searching only the organ names (the parts are the reason to search). Showing the
 Reset view pill always (it would be a control that does nothing at rest). A second name tag, for
 the reason above.
+
+## ADR-044 — Activity is diverging: suppression is shown in teal, from a second index
+
+The Activity switch of ADR-035 colours an organ by how far it has risen above its own rest.
+Testing found the stomach never rose above 0.05 in fright, exertion, a 2 L bleed or cardiac
+arrest, and the model's limitations page recorded that as unexplained. It was explained once
+looked at: every response the stomach and bowel have to stress is a decrease (sympathetic
+inhibition, vagal withdrawal), and `organs[id]` counted only rises. The display was deaf to half
+of physiology, and a viewer watching a bleed saw the gut stay pale while it was being shut down.
+
+**The decision.** `snapshot.anatomy.organsBelow[id]` is a second index,
+`clamp01(1.6 x max over parts of (rest - activity))`, computed beside `organs[id]` in
+`src/sim/derive/anatomy.ts` and typed in `src/bridge/types.ts`; `organs` is unchanged. Above rest
+the shell keeps the amber `ACTIVITY_RAMP`; below rest it takes the teal `ACTIVITY_RAMP_BELOW`
+in `activityRamp.ts` (t 0, .2, .4, .6, .8, 1 = #f6ece0, #cde6dc, #9dd0c4, #5fb2a7, #2a8680,
+#0f5855). The two ramps share the pale at-rest stop, so a resting organ is the same colour
+either way and the two arms leave it in opposite directions. `OrganSet.setActivityBelow` takes
+the suppression arm and an organ shows its LARGER departure, because an organ can have parts
+both above and below rest (in arrest the brain reads 0.44 up and 0.47 down). The legend is
+titled "Change from rest" and is labelled "suppressed", "at rest", "engaged"; it still says it is
+an index and not a measurement. Rendered liver luminance falls strictly with the index on both
+arms (engaged 219.2, 194.5, 162.9, 128.3, 100.4; suppressed 221.5, 196.7, 160.2, 124.0, 98.0 at
+0, .25, .5, .75, 1), so the eye can still rank by lightness.
+
+**The gut needed drives to suppress.** Its parts had no negative drive, so there was nothing to
+show. Stomach body and antrum got a `sympathetic` weight of -0.3, and the small-bowel and
+colonic parts -0.2, source `GH14`. These are display weights, not measured gains: at -0.2 the
+stomach in exertion stayed below the 0.15 visibility threshold, which is why it is -0.3. Measured
+after the change (departures over 0.15): fright, stomach 0.40, small bowel 0.35, large bowel
+0.32; exertion, stomach 0.17; a 2 L bleed, stomach and kidneys 0.40; arrest, stomach 0.36 and
+kidneys 0.40. At rest every `organsBelow` is under 0.05.
+
+**Why teal.** Red is the alarm and arterial colour and blue means venous (ADR-035), so a cold
+colour for "less" that is blue would read as a vein. Teal is neither, is far from amber in hue,
+and the two arms stay distinguishable to a viewer who cannot tell hues apart because the
+below-rest arm also darkens.
+
+**Why a twin index and not one signed number.** A signed index would cancel inside an organ with
+parts moving both ways, and would show an organ whose parts rose and fell as at rest, the
+opposite of a departure. Two non-negative indices keep `organs` meaning what every existing
+reader, test and the alarm logic took it to mean.
+
+**Rejected.** Raising the stomach's rest value so a fall reads as a rise (it would break the
+"a resting part sits at its JSON rest" contract of the atlases). Making the stomach respond by
+inventing an excitatory drive (rule 1: a decrease is what the physiology says). A blue
+below-rest ramp (above). Raising the gain on the existing index so a small rise shows (the
+stomach had no rise to amplify).
+
+## ADR-045 — Structures within structures: a `parent` field, a depth of three, and a reveal rule
+
+Textbook depth means the papillary muscles inside the left ventricle, the nephron inside the
+kidney and the lobule inside the liver. Drawn all at once they hide each other and cost too many
+triangles; the atlases (one flat list of parts per organ) had no way to say "inside".
+
+**The decision.** A part has an optional `parent`, another part id in the same atlas, and
+`MAX_PART_DEPTH = 3` in `src/data/anatomy-types.ts` caps the chain. Where a real hierarchy is
+deeper it is flattened to siblings: airway generations are siblings under `bronchial_tree`,
+alveolar cells sit under the alveolar sac, and breast TDLU, alveoli and myoepithelial cells are
+siblings under `breast_lobule`. The atlases grew from a few hundred parts to 963 entries; the heart
+17 to 52, the brain 21 to 137.
+
+**The reveal rule** is the pure `src/render/anatomy/detail/reveal.ts`. A child is visible when the
+selected or flown-to part is its parent, an ancestor, itself or a sibling, or when the camera is
+near the parent: within `max(0.13 m, min(6.5 x parent radius, 3.5 x organ radius))`, constants
+measured at 1280 x 860 where the rig frames the left ventricle at about 9 radii. A level-3 child
+also needs its parent shown. Children fade in over 0.35 s and out over 0.25 s (instant under
+reduced motion), the parent's glass drops 55 % while its children show, hidden children are
+neither picked nor labelled, a child with no drives shows its parent's activity, and children ride
+their parent's pose. These are display constants.
+
+**What went wrong, twice.** (1) The proximity floor was an ABSOLUTE distance. The systematic
+probe (every organ opened, expecting no child shown) passed 31 of 32 and failed the right
+adrenal: the rig frames a small organ so closely (0.119 m) that opening it already sat inside the
+0.13 m floor, and all nine children appeared at once (the left, at 0.135 m, did not). The fix is
+the organ-relative `zoomedIn`: proximity also requires the camera to be closer to the open
+organ's centre than `REVEAL_ZOOM_FRACTION` 0.75 x the distance the rig framed it at on open
+(`rig.framingDistance`, passed by `Viewer` each frame). Re-run 32 of 32. (2) Focusing deep inside
+an organ still revealed OTHER parents' children by proximity: a thalamus focus showed 55 children
+instead of 5, and a mitral focus revealed the pericardium's three closed shells, washing the view
+pink. A focused part now narrows proximity reveal to its own descendants.
+
+**The panel and search.** The Structures panel is a tree (`src/ui/anatomyTree.ts`,
+`AnatomyPanel.tsx`) with a count, a disclosure and indentation; selecting a parent selects it,
+flies to it and unfolds it. Search and share links include children, and a search result's
+subtitle names its parents so it is clear where a part sits.
+
+**Triangle guideline.** An organ may grow to about twice its previous triangle count and no more,
+so that a deepened organ does not cost the renderer an unbounded amount more; the figure is a guideline chosen in this round, not a measured budget. The heart (24,276 before) is guarded by a test;
+the brain went 39,922 to 79,594 against a ceiling of 79,844, the kidney is 2.01x with perirenal
+fat and renal fascia drawn as single closed surfaces to hold it, and the eyes are about 0.5 % over
+after the sclera and retina caps were thinned.
+
+**Rejected.** Revealing children only on selection (a visitor who zooms by hand would never find
+them). Revealing by camera distance alone (the adrenal bug). An absolute floor with a smaller
+number (it moves the failure to the next small organ). Unlimited depth (the cell-level chains are
+schematic anyway, and the panel tree becomes unreadable). Showing all children always (the
+structures hide each other and the count rises past the triangle budget).
+
+## ADR-046 — Close-look legibility: particles are capped in pixels, and what is not in focus recedes
+
+Zoomed to a mitral valve, the stream and vessel particles became huge red rings that hid the
+cusps. The children were also faint behind glass shells and the forced vessel overlay.
+
+**The decision.** The cause was world-sized particles: a droplet sized in metres grows without
+limit as the camera comes close. Organ-stream droplets (`FlowField.ts`) are now capped at
+`MAX_POINT_PX` 14 px and vessel-overlay particles (`VascularSystem.ts`) at
+`MAX_VESSEL_POINT_PX` 12 px, and both fade out between 0.07 m and 0.03 m from the camera. In a
+**close look** (`reveal.ts` `isCloseLook`: the selected or focused part has children or is a
+child; the amount is eased over `FOCUS_EASE_S` 0.15 and instant under reduced motion) non-family
+and non-ancestor parts go to faint glass without depth write (`FOCUS_FAINT_OPACITY` 0.12), the
+focused parent thins (`FOCUS_PARENT_GLASS_DROP` 0.8), organ streams fall to
+`FOCUS_STREAM_FRACTION` 0.3, the vessel overlay is thinned inside 1.15 x the organ radius
+(`setFocusDim`, `FOCUS_OVERLAY_DIM` 0.85), an ancestor dims to `FOCUS_ANCESTOR_OPACITY` 0.25, and
+the neighbours' recede density and rim are cut by `CLOSE_LOOK_RECEDE_CUT` 0.75 while the open
+organ's own glass shell is cut by `CLOSE_LOOK_SHELL_CUT` 0.85 (`OrganSet.closeLook`). Parts below
+`PICK_MIN_OPACITY` 0.05 are not picked. `focusPart` frames the part with its descendants
+(`familySphere`) and the rig never comes nearer than `FOCUS_MIN_RADII` 4 x that radius
+(`OrbitRig.ts`), a framing floor so that a small part is not approached to the point where its
+children fill the lens. Every one of these is a display constant.
+
+**What it achieved, and what it did not.** A left ventricle focus shows its papillary muscles and
+chordae without a cut and a mitral focus has no particle rings with a crisp annulus. The mitral
+leaflets, however, are thin and faint in their open pose behind a remaining pink wash: partly
+legible, not clearly so. That is recorded as a limit, not as fixed.
+
+**Rejected.** Hiding the particles entirely in a close look (a part with a stream, such as a
+valve, then looks dead). A smaller world size for every particle (they would vanish at the
+framing the rest of the interface is calibrated to). Cutting the neighbours altogether (the
+visitor loses where they are).
+
+## ADR-047 — The textbook-depth content standard
+
+Deepening 31 atlases to textbook level is a large amount of anatomy to draw, and the greatest
+risk in it is the one rule 1 exists for: a plausible number that is not a number anyone measured.
+
+**The decision.** Structure and naming come chiefly from the two reference texts cited in the atlases,
+`GRAYS42` (Gray's Anatomy, 42nd edition) and `GH14` (Guyton and Hall, 14th edition), and every
+new part carries a source. No number appears unless it is cited: counts of glands, villi,
+cavernous spaces, follicles, lobules, alveoli and the like are layout choices (stated as
+"schematic counts"), layer depths and radii are drawing proportions, and a cell-level part is a
+magnified single example, never a map. A part that is a schematic is labelled as one in the
+atlas, and `docs/MODEL_LIMITATIONS.md` section 19 says so per group. A display rhythm (the cilia
+sweep, the aqueous circuit) is a display rate.
+
+**OpenStax is excluded.** Its anatomy and physiology texts are licensed CC BY-NC-SA and its terms
+forbid ingestion into AI systems without permission. Its licence is non-commercial and share-alike and its terms forbid ingestion into AI systems without permission, so it was not used as a source, even for naming.
+
+**Rejected.** Typing in textbook dimensions for the sake of realism (rule 1; a plausible figure
+without a source is worse than a drawing proportion plainly called one). Leaving the cell-level
+parts out (the depth is the point). Calling the schematics anatomy (a visitor could read a bead
+scatter as a count of cells).

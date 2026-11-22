@@ -768,13 +768,19 @@ to ADR-041). None of them changes a number the simulation computes.
 
 **The Activity colour is an index, not a measurement.**
 
-- It shows how far an organ is from its own settled resting state (`clamp01(1.6 x the largest
-  part departure from rest)`), through one amber ramp. It is not a metabolic rate, a blood flow
-  or a temperature, and a darker organ is not a hotter one (ADR-035).
-- The stomach never rose above 0.05 in any of the four whole-body triggers measured: fright,
-  exertion at 0.8 for 30 s, a 2 L bleed and cardiac arrest. In Activity mode it stayed at
-  rest colour in all four. Why the stomach does not respond has not been investigated, and it
-  has not been fixed.
+- It shows how far an organ is from its own settled resting state, in two parts: the rise
+  above rest (`clamp01(1.6 x the largest part departure above rest)`, an amber ramp) and the
+  fall below rest (`organsBelow`, `clamp01(1.6 x the largest part departure below rest)`, a teal
+  ramp). It is not a metabolic rate, a blood flow or a temperature, and a darker organ is not a
+  hotter one (ADR-035, ADR-044).
+- An organ with parts moving both ways shows the larger departure, so the other is not shown.
+- The stomach used to stay at rest colour in all four whole-body triggers measured, because all
+  its responses are decreases and the index counted only rises. It now responds as suppression.
+  The gut's negative sympathetic drives are display weights (stomach body and antrum -0.3,
+  bowel -0.2, source GH14), not measured gains, and -0.3 was chosen because -0.2 left the stomach
+  under the visibility threshold in exertion. Measured departures over 0.15: fright, stomach
+  0.40, small bowel 0.35, large bowel 0.32; exertion, stomach 0.17; a 2 L bleed, stomach 0.40 and
+  kidneys 0.40; arrest, stomach 0.36 and kidneys 0.40.
 
 **The alarm pulse is a display convention.**
 
@@ -800,3 +806,92 @@ to ADR-041). None of them changes a number the simulation computes.
   and cut). It does not carry the drugs given or the events that have happened (ADR-042).
   Two people opening the same link see the same starting point and not the same history, and the
   link's toasts say so.
+
+## 19. Textbook depth (2026-11-22)
+
+These are limits of the interior structures drawn in the 2026-11-22 textbook-depth work
+(ADR-044 to ADR-047). None of them changes a number the simulation computes. Structure and
+naming follow Gray's Anatomy and Guyton and Hall; no new physiological number was added, so
+every size, count and spacing below is a drawing choice. Where a part is a schematic it is
+described as one, never as a measurement.
+
+**Everywhere.**
+
+- Part positions are drawn, and sizes, counts and layer spacings are chosen to be seen. A
+  count of cells, glands, villi, lobules, alveoli, follicles or vessels is a layout choice and
+  not a census.
+- Cell-level and microscopic parts are magnified single examples, many times life size, and
+  not a map of the organ. They sit beside their parent rather than at a measured position.
+- A part that spans a paired organ (the retina in both eyes, the testis tubules in both testes)
+  or a long organ (spinal grey matter) is framed from far, so its children are small until the
+  visitor zooms in by hand. This is known and not fixed.
+- The mitral leaflets, as measured after the close-look work, are thin and faint in their open
+  pose behind a remaining pink wash: partly legible, not clearly so (ADR-046).
+- Display rhythms (the cilia sweep at 0.28 mm and 9 rad/s, the slow aqueous circuit, the
+  ureter's glow while a bolus travels) are display rates; the ureter muscle glows and does not
+  carry a travelling squeeze band.
+
+**Brain.** Positions are drawn by eye and deep structures are packed tighter than in life.
+Nerves, arteries and sinuses follow plausible, not measured, paths. Pituitary cell types and the
+cortical layers (one schematic column under the somatosensory cortex) are magnified schematics.
+Hippocampal subfields are offset tubes. The falx and the tentorium are not drawn. The brain-scan
+inset maps level-1 regions only and skips the vessels, nerves and sulci.
+
+**Lungs, trachea, diaphragm.** Bronchopulmonary segment borders are a Voronoi division of each
+lobe by hand-picked seeds: the names are Gray's, the borders are a drawing choice. Lung surfaces
+are cut from one coarse mesh by centre position. Alveolar cells, capillaries, pores, the
+respiratory membrane, cilia, goblet cells and glands are magnified schematics with schematic
+counts. Pleural layers are offset copies of the lung surface (-1.6, +1.8 and +3.6 mm; recess
++7 mm). Arcuate ligament endpoints and the dome split are by eye. Larynx parts ride the swallow
+lift. The depth cap flattens the airway chain into siblings.
+
+**Oesophagus, stomach, intestines.** Layer radii are drawing proportions, not thicknesses, and
+so are the narrowings, the Z-line, the duodenal cuts and the start of the anal canal. Cells,
+glands, the villus and the crypt are many times life size with schematic counts, and the
+magnified villus and crypts float above the villus patch. Omenta, the mesentery and the
+mesocolons are flat sheets; epiploic appendages are a schematic scatter; the vagal trunks end at
+the pylorus; the nerve plexuses are decorative braids. `pyloric_sphincter` overlaps `pylorus`
+in meaning.
+
+**Kidney, ureters, bladder, prostate, testes, penis.** All new parts are schematic. The
+glomerulus, the nephron segments, the juxtaglomerular apparatus, the macula densa and the
+tubule's cell layers are magnified single examples (about 3x for the tubule). The thin ascending
+limb is drawn as the first 30 % of the ascending leg, a drawing choice and not a measured
+proportion. The macula densa contact is a thin bridge, because the enlarged nephron cannot loop
+back to its own glomerulus. Counts of cavernous spaces, helicine arteries, prostatic lobules,
+umbrella cells and pyramids are chosen. The tunica vaginalis is drawn closed all round, where the
+real sac is bare at the back. The sperm tail is a fixed shape; the urothelium is the mucosa grown
+0.7 mm; ureter wall layers are nested sleeves; bladder muscle is a few schematic bundles.
+Perirenal fat, renal fascia, scrotum, dartos, parietal tunica vaginalis, prepuce, the median
+umbilical ligament and the Cowper glands lie partly outside the organ shell, as in life. Perirenal
+fat and renal fascia are single closed surfaces, to stay inside the triangle guideline.
+
+**Spinal cord and eyes.** Tract and funiculus positions are a schematic cross-section with drawn
+start and end heights. Retinal and corneal layer spacing is about 0.1 mm each, not to scale. The
+lid opening is a round window, not an almond. The extraocular muscles share one origin ring and
+their insertions are approximate. Ganglion, nerve and rami lengths are a few millimetres.
+Lacrimal drainage is placed by eye. Motor-neuron beads are not counted cells. The eyes are about
+0.5 % over the 2x triangle guideline, with the sclera and retina caps thinned to compensate. The
+eyelids read as white halos in the focused eye view, which has not been fixed.
+
+**Liver, gallbladder, pancreas.** The lobule, the acinus and the islet are single magnified
+schematics with layout-chosen counts; islet cell types are laid out in bands (beta central) only
+to tell them apart. Couinaud boundaries are straight planes, where the real ones follow the
+hepatic and portal veins. Acinar zones are concentric rings, the textbook simplification.
+Surface landmarks are placed from description. Gallbladder wall layers are about 0.3 mm apart,
+which is not their relative thickness. The ampulla and the sphincter of Oddi sit just past the
+shell because the duodenal wall is not drawn in this atlas.
+
+**Adrenal, thyroid, thymus, spleen.** Cell-level parts are seeded schematic scatters. The three
+enlarged follicles per thyroid lobe are diagrams, not a follicle map. Alternating chromaffin
+nests are a device: the two cell kinds intermingle in life. Germinal centres sit in every third
+follicle by design. Ligament extents are drawing choices. Thymic adipose replacement is a
+descriptive faint part and is not simulated.
+
+**Female organs and fetus.** Ligament courses are hand-placed and the broad ligament is a flat
+sheet. Counts of glands, spiral arteries, villi and alveoli are schematic, and layer depths are
+drawing proportions. The labia, mons and orifice positions are display placements, and the vulval
+pads extend slightly beyond the shell. The hymen is a simple ring. Fetal organ positions are
+drawing proportions. The uterus draws only the first stretch of the umbilical cord, which is not
+aligned with the fetus atlas's own cord end. Breast TDLU, alveoli and myoepithelial cells are
+flattened to siblings by the depth cap.
