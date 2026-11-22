@@ -569,6 +569,166 @@
       "layoutOffset": [0, 0, 0],
       "volume_mL": null,
       "labelBias": [0.9, 0]
+    },
+    {
+      "id": "mouth",
+      "displayName": "Mouth",
+      "system": "digestive",
+      "group": "cranial",
+      "panel": "headneck",
+      "selectedColor": "#CC4B6E",
+      "placeholder": {
+        "kind": "model",
+        "model": "mouth"
+      },
+      "position": [0, 0.32, 0.042],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0, -0.9]
+    },
+    {
+      "id": "salivary_glands",
+      "displayName": "Salivary Glands",
+      "system": "digestive",
+      "group": "cranial",
+      "panel": "headneck",
+      "selectedColor": "#D9A441",
+      "placeholder": {
+        "kind": "model",
+        "model": "salivary_glands"
+      },
+      "position": [0, 0.33, 0.02],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, 0]
+    },
+    {
+      "id": "pharynx",
+      "displayName": "Pharynx",
+      "system": "digestive",
+      "group": "axial",
+      "panel": "headneck",
+      "selectedColor": "#BF6B52",
+      "placeholder": {
+        "kind": "model",
+        "model": "pharynx"
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [-0.9, 0]
+    },
+    {
+      "id": "nasal_cavity",
+      "displayName": "Nasal Cavity and Sinuses",
+      "system": "respiratory",
+      "group": "cranial",
+      "panel": "headneck",
+      "selectedColor": "#5FA8B8",
+      "placeholder": {
+        "kind": "model",
+        "model": "nasal_cavity"
+      },
+      "position": [0, 0.352, 0.05],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0, 0.9]
+    },
+    {
+      "id": "ears",
+      "displayName": "Ears",
+      "system": "nervous",
+      "group": "cranial",
+      "panel": "headneck",
+      "selectedColor": "#7B8FD0",
+      "placeholder": {
+        "kind": "model",
+        "model": "ears"
+      },
+      "position": [0, 0.386, -0.012],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null,
+      "labelBias": [0.9, 0]
+    },
+    {
+      "id": "skull",
+      "displayName": "Skull",
+      "system": "skeletal",
+      "group": "cranial",
+      "layer": "bones",
+      "panel": "skeletal",
+      "selectedColor": "#D9D0B6",
+      "placeholder": {
+        "kind": "model",
+        "model": "skull"
+      },
+      "position": [0, 0.42, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "vertebral_column",
+      "displayName": "Vertebral Column",
+      "system": "skeletal",
+      "group": "axial",
+      "layer": "bones",
+      "panel": "skeletal",
+      "selectedColor": "#CEC4A0",
+      "placeholder": {
+        "kind": "model",
+        "model": "vertebral_column"
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "thoracic_cage",
+      "displayName": "Rib Cage",
+      "system": "skeletal",
+      "group": "thoracic",
+      "layer": "bones",
+      "panel": "skeletal",
+      "selectedColor": "#D4C7A0",
+      "placeholder": {
+        "kind": "model",
+        "model": "thoracic_cage"
+      },
+      "position": [0, 0.2, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "upper_limb_bones",
+      "displayName": "Shoulder and Arm Bones",
+      "system": "skeletal",
+      "group": "thoracic",
+      "layer": "bones",
+      "panel": "skeletal",
+      "selectedColor": "#C9BE9A",
+      "placeholder": {
+        "kind": "model",
+        "model": "upper_limb_bones"
+      },
+      "position": [0, 0.2, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "lower_limb_bones",
+      "displayName": "Hip and Thigh Bones",
+      "system": "skeletal",
+      "group": "pelvic",
+      "layer": "bones",
+      "panel": "skeletal",
+      "selectedColor": "#DCD2B3",
+      "placeholder": {
+        "kind": "model",
+        "model": "lower_limb_bones"
+      },
+      "position": [0, -0.2, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
     }
   ],
   "giCentrelines": [

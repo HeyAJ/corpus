@@ -25,7 +25,11 @@ export type OrganId =
   | 'kidney_l' | 'kidney_r' | 'ureters' | 'bladder'
   | 'intestine_small' | 'intestine_large'
   | 'prostate' | 'testes' | 'penis'
-  | 'uterus' | 'ovaries' | 'vagina' | 'breasts' | 'fetus';
+  | 'uterus' | 'ovaries' | 'vagina' | 'breasts' | 'fetus'
+  /* head and neck */
+  | 'mouth' | 'salivary_glands' | 'pharynx' | 'nasal_cavity' | 'ears'
+  /* skeleton (layer organs) */
+  | 'skull' | 'vertebral_column' | 'thoracic_cage' | 'upper_limb_bones' | 'lower_limb_bones';
 
 /**
  * Body regions of the exploded stack. `axial` is for structures that run through more
@@ -37,11 +41,11 @@ export type OrganGroup = 'cranial' | 'thoracic' | 'abdominal' | 'pelvic' | 'axia
 /** Which body system an organ belongs to: drives the layer switches and the grouping in lists. */
 export type BodySystem =
   | 'nervous' | 'cardiovascular' | 'respiratory' | 'digestive'
-  | 'urinary' | 'endocrine' | 'lymphatic' | 'reproductive';
+  | 'urinary' | 'endocrine' | 'lymphatic' | 'reproductive' | 'skeletal';
 
 export type OrganPanel =
   | 'cardiac' | 'neuro' | 'respiratory' | 'renal' | 'gastric' | 'hepatic' | 'gi' | 'bladder'
-  | 'pancreatic' | 'endocrine' | 'reproductive' | 'fetal' | 'ocular' | 'spinal' | 'generic';
+  | 'pancreatic' | 'endocrine' | 'reproductive' | 'fetal' | 'ocular' | 'spinal' | 'headneck' | 'skeletal' | 'generic';
 
 export interface OrganDef {
   id: OrganId;
@@ -68,6 +72,17 @@ export interface OrganDef {
    */
   shellDensity?: number;
   group: OrganGroup;
+  /**
+   * Present on the organs that are not part of the default body but of an optional
+   * LAYER. A layer organ is built, drawn and picked only while its layer is switched on
+   * or while it is itself the selected organ; with the layer off, and nothing selected, it
+   * costs the load nothing. The reason is the budget: a whole skeleton is far more
+   * triangles than the organs combined, and most visitors never turn it on, so it must
+   * not be paid for by everyone at start. `'bones'` is the first layer; `'muscles'` and
+   * `'lymph'` are expected to follow and will be added to this union when they exist.
+   * Until the layer control exists, a layer organ is simply not built (OrganSet.wants).
+   */
+  layer?: 'bones';
   /** Which panel layout the UI shows on selection. */
   panel: OrganPanel;
   /** Saturated colour when selected (spec 6.4, measured in VISUAL_AUDIT 2.1). */
