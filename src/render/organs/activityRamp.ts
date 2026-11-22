@@ -50,7 +50,7 @@ export const ACTIVITY_RAMP_BELOW: readonly { t: number; hex: string }[] = [
   { t: 0.4, hex: '#9dd0c4' },
   { t: 0.6, hex: '#5fb2a7' },
   { t: 0.8, hex: '#2a8680' },
-  { t: 1.0, hex: '#0f5557' },
+  { t: 1.0, hex: '#0f5855' },
 ];
 
 interface Stop {

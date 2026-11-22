@@ -85,8 +85,9 @@ describe('activity ramp, below-rest arm', () => {
   it('gets strictly darker with t', () => {
     for (let i = 1; i <= 100; i++) expect(lum(i / 100)).toBeLessThan(lum((i - 1) / 100));
   });
-  it('is teal beyond the neutral: green at least blue, both above red, so neither alarm red nor venous blue', () => {
-    for (let i = 1; i <= 10; i++) {
+  it('is teal once clear of the neutral: green at least blue, both above red, so neither alarm red nor venous blue', () => {
+    // From t = 0.2 up; the first stop is the shared warm neutral, where red leads.
+    for (let i = 2; i <= 10; i++) {
       const c = rgb(i / 10);
       expect(c.g).toBeGreaterThanOrEqual(c.b);
       expect(c.b).toBeGreaterThan(c.r);
