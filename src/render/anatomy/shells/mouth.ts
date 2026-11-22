@@ -17,7 +17,7 @@ import { ellipsoid, polygonise, smoothUnion } from '../sdf';
  * teeth; the interior atlas (src/data/anatomy/mouth.json) already names those four parts.
  * The radii are drawing choices against that anatomy, not measurements.
  *
- * COST. Cell 3.5 mm keeps it to a few hundred triangles; the budget is for the finished
+ * COST. Cell 4.2 mm keeps it to about a thousand triangles; the budget is for the finished
  * organ to be decided by the agent who draws it.
  */
 export function mouth(): THREE.BufferGeometry {
@@ -26,5 +26,5 @@ export function mouth(): THREE.BufferGeometry {
     ellipsoid([0, 0, 0], [0.027, 0.012, 0.027]), // the oral cavity
     ellipsoid([0, -0.001, 0.025], [0.019, 0.008, 0.007]), // the lips, a flatter cap on the front
   );
-  return polygonise(field, [-0.03, -0.014, -0.03], [0.03, 0.014, 0.036], { cell: 0.0035 });
+  return polygonise(field, [-0.03, -0.014, -0.03], [0.03, 0.014, 0.036], { cell: 0.0042 });
 }

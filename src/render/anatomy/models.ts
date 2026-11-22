@@ -21,6 +21,16 @@ import {
 } from './sdf';
 import { fbm, ridged } from './noise';
 import { giPath, giSegment, organDef, warpGeometry } from './layout';
+import { mouth } from './shells/mouth';
+import { salivaryGlands } from './shells/salivary_glands';
+import { pharynx } from './shells/pharynx';
+import { nasalCavity } from './shells/nasal_cavity';
+import { ears } from './shells/ears';
+import { skull } from './shells/skull';
+import { vertebralColumn } from './shells/vertebral_column';
+import { thoracicCage } from './shells/thoracic_cage';
+import { upperLimbBones } from './shells/upper_limb_bones';
+import { lowerLimbBones } from './shells/lower_limb_bones';
 
 /**
  * THE ORGAN SHELLS.
@@ -1039,6 +1049,18 @@ const BUILDERS: Record<string, (params: ModelParams) => THREE.BufferGeometry> = 
   vagina,
   breasts,
   fetus,
+  // Head and neck, then the skeleton. One file per organ under ./shells/, so the people
+  // who draw them edit those files and not this registry.
+  mouth,
+  salivary_glands: salivaryGlands,
+  pharynx,
+  nasal_cavity: nasalCavity,
+  ears,
+  skull,
+  vertebral_column: vertebralColumn,
+  thoracic_cage: thoracicCage,
+  upper_limb_bones: upperLimbBones,
+  lower_limb_bones: lowerLimbBones,
 };
 
 export function modelNames(): string[] {

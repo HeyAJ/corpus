@@ -27,7 +27,7 @@ export function ears(): THREE.BufferGeometry {
     );
     const x0 = Math.min(s * 0.026, s * 0.082);
     const x1 = Math.max(s * 0.026, s * 0.082);
-    parts.push(polygonise(field, [x0, -0.014, -0.014], [x1, 0.012, 0.014], { cell: 0.0016 }));
+    parts.push(polygonise(field, [x0, -0.014, -0.014], [x1, 0.012, 0.014], { cell: 0.0027 }));
   }
   return mergeParts(parts);
 }

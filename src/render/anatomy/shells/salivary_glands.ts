@@ -35,7 +35,7 @@ export function salivaryGlands(): THREE.BufferGeometry {
     // each side is polygonised on its own box and the two sides are merged.
     const x0 = Math.min(s * 0.005, s * 0.07);
     const x1 = Math.max(s * 0.005, s * 0.07);
-    parts.push(polygonise(field, [x0, -0.04, -0.034], [x1, 0.046, 0.056], { cell: 0.003, maxCells: 120000 }));
+    parts.push(polygonise(field, [x0, -0.04, -0.034], [x1, 0.046, 0.056], { cell: 0.0055, maxCells: 120000 }));
   }
   return mergeParts(parts);
 }

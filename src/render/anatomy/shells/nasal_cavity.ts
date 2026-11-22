@@ -25,5 +25,5 @@ export function nasalCavity(): THREE.BufferGeometry {
     ellipsoid([0.026, -0.012, -0.002], [0.011, 0.011, 0.014]), // right maxillary sinus
     ellipsoid([-0.026, -0.012, -0.002], [0.011, 0.011, 0.014]), // left maxillary sinus
   );
-  return polygonise(field, [-0.04, -0.026, -0.02], [0.04, 0.026, 0.036], { cell: 0.003 });
+  return polygonise(field, [-0.04, -0.026, -0.02], [0.04, 0.026, 0.036], { cell: 0.0055 });
 }
