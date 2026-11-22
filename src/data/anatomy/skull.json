@@ -1,0 +1,56 @@
+{
+  "atlas": "skull",
+  "about": "The skull as an anatomy textbook draws it: the cranium that encloses the brain, the facial bones, the mandible and the hyoid bone that hangs free in the neck. Bone is not simulated as tissue, so no part has a live drive. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "cranium",
+      "label": "Cranium",
+      "summary": "Bones that enclose the brain",
+      "function": "The cranium is made of the frontal, parietal, temporal, occipital, sphenoid and ethmoid bones, joined by fixed joints called sutures. It protects the brain and the organs of hearing and balance.",
+      "color": "#d9d0b6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "facial_skeleton",
+      "label": "Facial Skeleton",
+      "summary": "Bones of the face: orbits, nose, cheeks, upper jaw",
+      "function": "The facial bones frame the eye sockets, the nasal cavity and the upper teeth. They include the maxillae, the zygomatic bones and the nasal bones.",
+      "color": "#cfc6aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mandible",
+      "label": "Mandible",
+      "summary": "The lower jaw",
+      "function": "The mandible is the only skull bone that moves. It carries the lower teeth and hinges on each side with the temporal bone, which lets the mouth open and close.",
+      "color": "#e0d8c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hyoid",
+      "label": "Hyoid Bone",
+      "summary": "U-shaped bone in the neck above the larynx",
+      "function": "The hyoid does not join any other bone. It is held by muscles and ligaments, anchors the tongue and takes part in swallowing.",
+      "color": "#c6bd9f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

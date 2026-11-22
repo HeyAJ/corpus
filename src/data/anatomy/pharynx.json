@@ -1,0 +1,60 @@
+{
+  "atlas": "pharynx",
+  "about": "The pharynx, the muscular tube behind the nose, mouth and larynx that carries both air and food. It is drawn in its three levels. Only swallowing is simulated, as a signal that something is in the oesophagus, so the two lower parts carry that as a weak display drive and the nasopharynx has none. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "nasopharynx",
+      "label": "Nasopharynx",
+      "summary": "Upper part, behind the nasal cavity",
+      "function": "The nasopharynx lies above the soft palate and receives the back openings of the nose. The auditory tubes from the middle ears open into its side walls. Air passes through it; food normally does not.",
+      "color": "#bf6b52",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oropharynx",
+      "label": "Oropharynx",
+      "summary": "Middle part, behind the mouth",
+      "function": "The oropharynx lies behind the mouth from the soft palate down to the level of the hyoid bone and holds the tonsils. Air and food both pass through it. It brightens a little when a swallow is under way.",
+      "color": "#c97a5c",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "The pharyngeal stage of a swallow drives the bolus down through the oropharynx.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "laryngopharynx",
+      "label": "Laryngopharynx",
+      "summary": "Lower part, behind the larynx",
+      "function": "The laryngopharynx runs from the hyoid bone to the lower border of the cricoid cartilage, where it becomes the oesophagus. The larynx opens into its front wall, and the epiglottis covers that opening during a swallow. It brightens a little when a swallow is under way.",
+      "color": "#b35f48",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "The pharyngeal stage of a swallow drives the bolus down through the laryngopharynx.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

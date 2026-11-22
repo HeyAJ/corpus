@@ -454,6 +454,13 @@ export class OrganSet {
   }
 
   private wants(def: OrganDef): boolean {
+    // A LAYER ORGAN (the bones, and later the muscles and lymph) is not part of the default
+    // body: it is built, drawn and picked only while its layer is on or it is selected, so
+    // that a visitor who never opens the layer never pays for a skeleton's worth of triangles.
+    // The layer switch does not exist yet, so for now a layer organ is simply never wanted:
+    // it is not built, not drawn, not picked and not in the outline's fit. The follow-up
+    // (agent ls) replaces this line with lazy building driven by the layer control.
+    if (def.layer) return false;
     if (def.sex && def.sex !== this.body.sex) return false;
     if (def.pregnancyOnly) return this.body.pregnant && this.body.gestationWeeks >= 8;
     return true;

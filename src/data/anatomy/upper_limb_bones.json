@@ -1,0 +1,46 @@
+{
+  "atlas": "upper_limb_bones",
+  "about": "The bones of the shoulder girdle and upper arm as an anatomy textbook draws them: the clavicle, the scapula and the humerus on each side. They follow the brachial vessels to the point where the glass arm fades. Bone is not simulated as tissue, so no part has a live drive. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "clavicles",
+      "label": "Clavicles",
+      "summary": "Collarbones, joining the sternum to the shoulder",
+      "function": "Each clavicle is a long slender bone that braces the shoulder away from the chest and passes force from the arm to the trunk.",
+      "color": "#c9be9a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scapulae",
+      "label": "Scapulae",
+      "summary": "Shoulder blades, flat bones on the back of the ribs",
+      "function": "Each scapula carries the socket of the shoulder joint and gives attachment to the muscles that move the arm. It glides over the back of the rib cage.",
+      "color": "#d3c8a4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "humeri",
+      "label": "Humeri",
+      "summary": "Upper arm bones",
+      "function": "The humerus runs from the shoulder joint to the elbow. Its rounded head fits the socket of the scapula, which gives the shoulder its wide range of movement.",
+      "color": "#bfb48f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

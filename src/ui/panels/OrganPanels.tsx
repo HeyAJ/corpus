@@ -490,6 +490,52 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
           { label: 'Consc', value: pct(s.neuro.consciousness), digits: 0, unit: '%' },
         ],
       };
+    case 'mouth':
+      return {
+        chips: [
+          { label: 'Osm', value: s.fluids.osmolality_mOsm_per_kg, digits: 0, unit: 'mOsm/kg' },
+          { label: 'Nausea', value: pct(s.mind.nausea), digits: 0, unit: '%' },
+        ],
+        caption: 'Chewing, taste, speech and saliva are not simulated. Plasma osmolality is shown because it is what thirst would follow.',
+      };
+    case 'salivary_glands':
+      return {
+        chips: [
+          { label: 'Para', value: pct(nerves.parasympathetic), digits: 0, unit: '%' },
+          { label: 'Symp', value: pct(nerves.sympathetic), digits: 0, unit: '%' },
+        ],
+        caption: 'Saliva flow is not simulated. The glands are shown against autonomic outflow above rest.',
+      };
+    case 'pharynx':
+      return {
+        chips: [
+          { label: 'RR', value: s.resp.rate_per_min, digits: 0, unit: '/min' },
+          { label: 'Nausea', value: pct(s.mind.nausea), digits: 0, unit: '%' },
+        ],
+        caption: 'Air and food share this passage. Swallowing as a movement is not simulated; breathing rate and nausea are the live readings.',
+      };
+    case 'nasal_cavity':
+      return {
+        chips: [
+          { label: 'RR', value: s.resp.rate_per_min, digits: 0, unit: '/min' },
+          { label: 'FiO2', value: pct(s.environment.fio2), digits: 0, unit: '%' },
+        ],
+        caption: 'Smell and the resistance of the nasal airway are not simulated.',
+      };
+    case 'ears':
+      return {
+        chips: [],
+        caption: 'Hearing and balance are not simulated, so no ear reading is shown.',
+      };
+    case 'skull':
+    case 'vertebral_column':
+    case 'thoracic_cage':
+    case 'upper_limb_bones':
+    case 'lower_limb_bones':
+      return {
+        chips: [hormoneChip(s, 'epo', 'EPO', 1), { label: 'Hct', value: pct(s.chem.haematocrit), digits: 0, unit: '%' }],
+        caption: 'Bone itself, calcium and bone remodelling are not simulated. Red cells are made in the marrow in response to EPO, so those two readings are shown.',
+      };
     case 'spinal_cord':
       return {
         chips: [
@@ -733,6 +779,8 @@ export const PANELS = {
   pancreatic: OrganTelemetryPanel,
   reproductive: OrganTelemetryPanel,
   fetal: OrganTelemetryPanel,
+  headneck: OrganTelemetryPanel,
+  skeletal: OrganTelemetryPanel,
 } as const;
 
 export function ConditionStack({ conditions }: { conditions: SimSnapshot['conditions'] }) {

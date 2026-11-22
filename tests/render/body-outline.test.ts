@@ -46,6 +46,9 @@ function shell(def: OrganDef, weeks: number): THREE.BufferGeometry {
 
 function organsOf(body: OutlineBody): OrganDef[] {
   return ORGAN_DEFS.filter((d) => {
+    // The same rule as OrganSet.wants: a layer organ (the bones) is not part of the default body
+    // and so is not in the figure's fit.
+    if (d.layer) return false;
     if (d.sex && d.sex !== body.sex) return false;
     if (d.pregnancyOnly) return body.weeks >= 8;
     return true;

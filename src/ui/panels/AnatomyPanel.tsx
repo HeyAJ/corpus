@@ -49,6 +49,7 @@ const SYSTEM_ORDER: { id: BodySystem; label: string }[] = [
   { id: 'endocrine', label: 'Endocrine' },
   { id: 'lymphatic', label: 'Lymphatic' },
   { id: 'reproductive', label: 'Reproductive' },
+  { id: 'skeletal', label: 'Skeleton' },
 ];
 
 /** A part must beat its own resting value by this much to be called "most active". */
@@ -241,7 +242,10 @@ function OrganList() {
   const pregnant = useStore((s) => s.snapshot?.reproductive?.pregnancy?.pregnant ?? false);
 
   const groups = useMemo(() => {
-    const visible = ORGANS.filter((o) => (!o.sex || !sex || o.sex === sex) && (!o.pregnancyOnly || pregnant));
+    // Layer organs (the bones) are not listed until the layers control can build them; see
+    // OrganSet.wants. Their group, `skeletal`, is already in SYSTEM_ORDER and appears on its own
+    // once they are.
+    const visible = ORGANS.filter((o) => !o.layer && (!o.sex || !sex || o.sex === sex) && (!o.pregnancyOnly || pregnant));
     return SYSTEM_ORDER.map((g) => ({ ...g, organs: visible.filter((o) => o.system === g.id) })).filter((g) => g.organs.length > 0);
   }, [sex, pregnant]);
 

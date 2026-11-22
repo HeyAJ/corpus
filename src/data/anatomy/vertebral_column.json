@@ -1,0 +1,76 @@
+{
+  "atlas": "vertebral_column",
+  "about": "The vertebral column as an anatomy textbook draws it, in its five regions from the base of the skull to the tailbone, with the discs between the vertebrae. It encloses the spinal cord. Bone is not simulated as tissue, so no part has a live drive. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "cervical_vertebrae",
+      "label": "Cervical Vertebrae",
+      "summary": "Seven vertebrae of the neck, C1 to C7",
+      "function": "The cervical vertebrae support the skull and give the neck its range of movement. The first two, the atlas and the axis, are shaped to let the head nod and turn.",
+      "color": "#cec4a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thoracic_vertebrae",
+      "label": "Thoracic Vertebrae",
+      "summary": "Twelve vertebrae of the chest, T1 to T12",
+      "function": "Each thoracic vertebra carries a pair of ribs, which is what ties the spine to the rib cage and limits its movement.",
+      "color": "#c4ba96",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lumbar_vertebrae",
+      "label": "Lumbar Vertebrae",
+      "summary": "Five large vertebrae of the lower back, L1 to L5",
+      "function": "The lumbar vertebrae are the largest and carry most of the body's weight above the pelvis.",
+      "color": "#d6ccaa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sacrum",
+      "label": "Sacrum",
+      "summary": "Five fused vertebrae wedged between the hip bones",
+      "function": "The sacrum joins the spine to the pelvis at the two sacroiliac joints and forms the back wall of the pelvic cavity.",
+      "color": "#bfb590",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coccyx",
+      "label": "Coccyx",
+      "summary": "Small fused tailbone below the sacrum",
+      "function": "The coccyx is the last few vertebrae fused into one small bone. It is an attachment for some of the muscles and ligaments of the pelvic floor.",
+      "color": "#d9cfae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intervertebral_discs",
+      "label": "Intervertebral Discs",
+      "summary": "Cushions between the vertebral bodies",
+      "function": "Each disc has a tough fibrous ring around a soft, gel-like centre. The discs absorb load and allow the spine to bend.",
+      "color": "#9fb7b0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

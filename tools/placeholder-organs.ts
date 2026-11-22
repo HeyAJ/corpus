@@ -51,6 +51,19 @@ const BUDGET: Record<string, number> = {
 const DEFAULT_BUDGET = 8000;
 const TOTAL_BUDGET = 240000;
 
+/**
+ * One budget per LAYER (`layer` in organs.json), kept apart from the total above.
+ *
+ * A layer organ is built only while its layer is on or it is selected (OrganSet), so what it
+ * costs is paid by the visitor who asks for it and not by every load. It therefore must not
+ * count against TOTAL_BUDGET, which protects the default body's load time. It still has to be
+ * bounded, because a layer with everything switched on is a body with its layer's triangles
+ * added. The figure is a LOAD AND PERFORMANCE CHOICE, not an anatomical or physiological
+ * number: it says how many triangles the bones may add to the screen before frame rate on a
+ * phone is put at risk, and it is raised or lowered by measuring that, not by looking up bones.
+ */
+const LAYER_BUDGET: Record<string, number> = { bones: 60000 };
+
 interface Row {
   id: string;
   triangles: number;
@@ -62,12 +75,15 @@ interface Row {
 function main(): void {
   const rows: Row[] = [];
   let total = 0;
+  const layerTotals = new Map<string, number>();
 
   for (const def of FILE.organs) {
     const geometry = buildPlaceholderGeometry(def.placeholder);
     geometry.computeBoundingSphere();
     const tris = triangleCount(geometry);
-    total += tris;
+    // Layer organs are counted per layer, never in the default body's total.
+    if (def.layer) layerTotals.set(def.layer, (layerTotals.get(def.layer) ?? 0) + tris);
+    else total += tris;
 
     const group = FILE.groupLayout[def.group];
     const sphere = geometry.boundingSphere!;
@@ -102,7 +118,16 @@ function main(): void {
 
   process.stdout.write('  ' + '-'.repeat(74) + '\n');
   process.stdout.write(`  TOTAL            ${String(total).padStart(6)}${String(TOTAL_BUDGET).padStart(10)}` +
-    `${(total > TOTAL_BUDGET ? 'OVER' : 'ok').padStart(8)}\n\n`);
+    `${(total > TOTAL_BUDGET ? 'OVER' : 'ok').padStart(8)}\n`);
+  if (layerTotals.size > 0) process.stdout.write('  (the total above excludes layer organs, which have a budget of their own:)\n');
+  for (const [layer, tris] of layerTotals) {
+    const budget = LAYER_BUDGET[layer] ?? 0;
+    process.stdout.write(
+      `  LAYER ${layer.padEnd(11)}${String(tris).padStart(6)}${String(budget).padStart(10)}` +
+        `${(tris > budget ? 'OVER' : 'ok').padStart(8)}\n`,
+    );
+  }
+  process.stdout.write('\n');
 
   if (over > 0) {
     process.stdout.write(

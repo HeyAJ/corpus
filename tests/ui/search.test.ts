@@ -34,6 +34,15 @@ describe('search catalogue and ranking', () => {
     expect(search(male, 'oesoph')[0].organId).toBe('oesophagus');
   });
 
+  it('finds the five head and neck organs and their parts, and lists no layer organ', () => {
+    for (const [query, organId] of [['mouth', 'mouth'], ['salivary', 'salivary_glands'], ['pharynx', 'pharynx'], ['nasal cav', 'nasal_cavity'], ['ears', 'ears']] as const) {
+      expect(search(male, query).some((e) => e.kind === 'organ' && e.organId === organId), query).toBe(true);
+    }
+    expect(search(male, 'tongue').some((e) => e.organId === 'mouth' && e.partId === 'tongue')).toBe(true);
+    // The bones are layer organs: not built until the layers control exists, so not offered.
+    for (const e of male) expect(['skull', 'vertebral_column', 'thoracic_cage', 'upper_limb_bones', 'lower_limb_bones']).not.toContain(e.organId);
+  });
+
   it('never returns more than the limit and nothing for a blank query', () => {
     expect(search(male, 'e').length).toBeLessThanOrEqual(MAX_RESULTS);
     expect(search(male, '   ')).toEqual([]);

@@ -302,7 +302,7 @@ describe('organs.json', () => {
     // back to the generic panel (App.tsx), so a new organ can never blank the HUD.
     const panels = [
       'cardiac', 'neuro', 'respiratory', 'renal', 'gastric', 'hepatic', 'gi', 'bladder',
-      'pancreatic', 'endocrine', 'reproductive', 'fetal', 'ocular', 'spinal', 'generic',
+      'pancreatic', 'endocrine', 'reproductive', 'fetal', 'ocular', 'spinal', 'headneck', 'skeletal', 'generic',
     ];
     for (const o of ORGANS.organs) expect(panels, o.id).toContain(o.panel);
   });
@@ -329,7 +329,7 @@ describe('organs.json', () => {
   });
 
   it('every organ belongs to a body system, and sex-specific organs say which sex', () => {
-    const systems = ['nervous', 'cardiovascular', 'respiratory', 'digestive', 'urinary', 'endocrine', 'lymphatic', 'reproductive'];
+    const systems = ['nervous', 'cardiovascular', 'respiratory', 'digestive', 'urinary', 'endocrine', 'lymphatic', 'reproductive', 'skeletal'];
     for (const o of ORGANS.organs) {
       expect(systems, o.id).toContain(o.system);
       if (o.sex !== undefined) expect(['male', 'female'], o.id).toContain(o.sex);

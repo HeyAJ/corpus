@@ -1,0 +1,67 @@
+{
+  "atlas": "salivary_glands",
+  "about": "The three pairs of large salivary glands drawn as one organ: the parotid in front of the ear, the submandibular under the jaw and the sublingual in the floor of the mouth. Saliva is not simulated, so the only drive is the direction textbooks give: parasympathetic outflow raises secretion. The weight is a display scale and the index is not a flow rate. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "parotid_glands",
+      "label": "Parotid Glands",
+      "summary": "Largest pair, in front of and below each ear",
+      "function": "Each parotid lies against the cheek in front of the ear and drains by a duct that opens inside the cheek. Its saliva is thin and watery and rich in digestive enzyme. It brightens with parasympathetic outflow.",
+      "color": "#d9a441",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Parasympathetic nerves stimulate the salivary glands to secrete.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "submandibular_glands",
+      "label": "Submandibular Glands",
+      "summary": "Pair under the body of the jaw",
+      "function": "Each gland lies beneath the jaw and drains by a duct that opens beside the tongue's frenulum. It makes a mixed watery and mucous saliva. It brightens with parasympathetic outflow.",
+      "color": "#c99236",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Parasympathetic nerves stimulate the salivary glands to secrete.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sublingual_glands",
+      "label": "Sublingual Glands",
+      "summary": "Smallest pair, in the floor of the mouth",
+      "function": "Each gland sits under the tongue and opens through many small ducts. Its saliva is mostly mucus, which lubricates the mouth. It brightens with parasympathetic outflow.",
+      "color": "#e0b866",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Parasympathetic nerves stimulate the salivary glands to secrete.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

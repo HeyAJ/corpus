@@ -29,6 +29,16 @@ import { detail as ovaries } from './ovaries.detail';
 import { detail as vagina } from './vagina.detail';
 import { detail as breasts } from './breasts.detail';
 import { detail as fetus } from './fetus.detail';
+import { detail as mouth } from './mouth.detail';
+import { detail as salivaryGlands } from './salivary_glands.detail';
+import { detail as pharynx } from './pharynx.detail';
+import { detail as nasalCavity } from './nasal_cavity.detail';
+import { detail as ears } from './ears.detail';
+import { detail as skull } from './skull.detail';
+import { detail as vertebralColumn } from './vertebral_column.detail';
+import { detail as thoracicCage } from './thoracic_cage.detail';
+import { detail as upperLimbBones } from './upper_limb_bones.detail';
+import { detail as lowerLimbBones } from './lower_limb_bones.detail';
 
 /**
  * Flows and animation for each atlas, keyed by atlas name. The main-thread half of the
@@ -65,4 +75,14 @@ export const DETAIL_SPECS: Record<string, OrganDetailSpec> = {
   vagina: vagina,
   breasts: breasts,
   fetus: fetus,
+  mouth: mouth,
+  salivary_glands: salivaryGlands,
+  pharynx: pharynx,
+  nasal_cavity: nasalCavity,
+  ears: ears,
+  skull: skull,
+  vertebral_column: vertebralColumn,
+  thoracic_cage: thoracicCage,
+  upper_limb_bones: upperLimbBones,
+  lower_limb_bones: lowerLimbBones,
 };

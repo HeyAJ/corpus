@@ -1,0 +1,56 @@
+{
+  "atlas": "mouth",
+  "about": "The oral cavity as an anatomy textbook draws it: the lips, the palate that roofs it, the tongue on its floor and the teeth in the jaws. Nothing in the engine models chewing, taste, speech or saliva, so no part here has a live drive and every part rests at its display anchor. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "lips",
+      "label": "Lips",
+      "summary": "Muscular folds that close the front of the mouth",
+      "function": "The lips are a ring of muscle (orbicularis oris) covered by skin outside and mucous membrane inside. They seal the mouth, take in food and drink and shape speech.",
+      "color": "#d9667a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palate",
+      "label": "Palate",
+      "summary": "Roof of the mouth: hard bone in front, soft muscle behind",
+      "function": "The hard palate separates the mouth from the nasal cavity and the soft palate behind it lifts during swallowing to close the way into the nose. The soft palate ends in the uvula.",
+      "color": "#e08a8a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tongue",
+      "label": "Tongue",
+      "summary": "Muscular organ on the floor of the mouth",
+      "function": "The tongue is a mass of interlaced muscle carrying the taste buds. It moves food during chewing, pushes the bolus back to begin a swallow and shapes speech sounds.",
+      "color": "#c8505f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "teeth",
+      "label": "Teeth",
+      "summary": "Thirty-two permanent teeth set in the jaws",
+      "function": "Teeth are hard enamel-covered structures rooted in sockets of the upper and lower jaw. Incisors cut, canines tear, premolars and molars grind food before it is swallowed.",
+      "color": "#efe8d8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

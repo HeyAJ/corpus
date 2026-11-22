@@ -1,0 +1,56 @@
+{
+  "atlas": "lower_limb_bones",
+  "about": "The bones of the hip and thigh as an anatomy textbook draws them: the hip bones, their joints and the femurs, following the femoral vessels to the point where the glass leg fades. Bone is not simulated as tissue, so no part has a live drive. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "hip_bones",
+      "label": "Hip Bones",
+      "summary": "Two broad bones of the pelvis",
+      "function": "Each hip bone is the fusion of three bones, the ilium, ischium and pubis. Together with the sacrum they form the pelvic ring that carries the weight of the trunk and protects the pelvic organs.",
+      "color": "#dcd2b3",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "femora",
+      "label": "Femora",
+      "summary": "Thigh bones, the longest bones in the body",
+      "function": "Each femur runs from the hip joint to the knee. Its rounded head sits in the hip socket and its lower end forms the thigh side of the knee joint.",
+      "color": "#d2c7a5",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hip_joints",
+      "label": "Hip Joints",
+      "summary": "Ball-and-socket joints between femur and hip bone",
+      "function": "The head of the femur fits into the cup-shaped acetabulum of the hip bone. The joint carries the body's weight and allows movement in every direction.",
+      "color": "#b9d0cc",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pubic_symphysis",
+      "label": "Pubic Symphysis",
+      "summary": "Joint at the front of the pelvis",
+      "function": "The two pubic bones meet at the midline in a cartilage joint that allows very little movement.",
+      "color": "#a9c4c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

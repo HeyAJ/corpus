@@ -29,6 +29,16 @@ import ovaries from './ovaries.json';
 import vagina from './vagina.json';
 import breasts from './breasts.json';
 import fetus from './fetus.json';
+import mouth from './mouth.json';
+import salivaryGlands from './salivary_glands.json';
+import pharynx from './pharynx.json';
+import nasalCavity from './nasal_cavity.json';
+import ears from './ears.json';
+import skull from './skull.json';
+import vertebralColumn from './vertebral_column.json';
+import thoracicCage from './thoracic_cage.json';
+import upperLimbBones from './upper_limb_bones.json';
+import lowerLimbBones from './lower_limb_bones.json';
 
 /**
  * Every anatomy atlas file, keyed by atlas name. Assembly only: this module imports the
@@ -66,6 +76,16 @@ export const ANATOMY: Record<string, AnatomyFile> = {
   vagina: vagina as unknown as AnatomyFile,
   breasts: breasts as unknown as AnatomyFile,
   fetus: fetus as unknown as AnatomyFile,
+  mouth: mouth as unknown as AnatomyFile,
+  salivary_glands: salivaryGlands as unknown as AnatomyFile,
+  pharynx: pharynx as unknown as AnatomyFile,
+  nasal_cavity: nasalCavity as unknown as AnatomyFile,
+  ears: ears as unknown as AnatomyFile,
+  skull: skull as unknown as AnatomyFile,
+  vertebral_column: vertebralColumn as unknown as AnatomyFile,
+  thoracic_cage: thoracicCage as unknown as AnatomyFile,
+  upper_limb_bones: upperLimbBones as unknown as AnatomyFile,
+  lower_limb_bones: lowerLimbBones as unknown as AnatomyFile,
 };
 
 export const ANATOMY_ATLASES: readonly string[] = Object.keys(ANATOMY);

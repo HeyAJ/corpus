@@ -29,6 +29,16 @@ import { parts as ovaries } from './ovaries.parts';
 import { parts as vagina } from './vagina.parts';
 import { parts as breasts } from './breasts.parts';
 import { parts as fetus } from './fetus.parts';
+import { parts as mouth } from './mouth.parts';
+import { parts as salivaryGlands } from './salivary_glands.parts';
+import { parts as pharynx } from './pharynx.parts';
+import { parts as nasalCavity } from './nasal_cavity.parts';
+import { parts as ears } from './ears.parts';
+import { parts as skull } from './skull.parts';
+import { parts as vertebralColumn } from './vertebral_column.parts';
+import { parts as thoracicCage } from './thoracic_cage.parts';
+import { parts as upperLimbBones } from './upper_limb_bones.parts';
+import { parts as lowerLimbBones } from './lower_limb_bones.parts';
 
 /**
  * The registry of organ interiors, keyed by ATLAS name (see src/data/anatomy/index.ts).
@@ -68,4 +78,14 @@ export const PART_BUILDERS: Record<string, PartBuilder> = {
   vagina: vagina,
   breasts: breasts,
   fetus: fetus,
+  mouth: mouth,
+  salivary_glands: salivaryGlands,
+  pharynx: pharynx,
+  nasal_cavity: nasalCavity,
+  ears: ears,
+  skull: skull,
+  vertebral_column: vertebralColumn,
+  thoracic_cage: thoracicCage,
+  upper_limb_bones: upperLimbBones,
+  lower_limb_bones: lowerLimbBones,
 };

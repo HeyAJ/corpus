@@ -1,0 +1,73 @@
+{
+  "atlas": "nasal_cavity",
+  "about": "The nasal cavity and its sinuses as an anatomy textbook draws them: the septum dividing the two sides, the turbinates that warm and moisten the air, the smell-sensing roof and the air-filled sinuses in the surrounding bones. Smell and nasal resistance are not simulated, so only the mucosa carries a drive, the direction textbooks give for histamine. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "nasal_septum",
+      "label": "Nasal Septum",
+      "summary": "Wall that divides the cavity into left and right",
+      "function": "The septum is cartilage in front and thin bone behind, covered with mucous membrane. It divides the nasal cavity into two passages.",
+      "color": "#7fb8c6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "turbinates",
+      "label": "Nasal Turbinates",
+      "summary": "Scroll-shaped shelves on the outer walls",
+      "function": "The superior, middle and inferior turbinates fold the cavity wall into shelves. They slow and swirl the air so that it is warmed, moistened and filtered. Their blood-rich lining is the part that swells when histamine is released.",
+      "color": "#d9798a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "histamine",
+          "weight": 0.3,
+          "note": "Histamine dilates the vessels of the nasal lining and makes them leak, which swells the mucosa.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "olfactory_region",
+      "label": "Olfactory Region",
+      "summary": "Smell-sensing lining of the cavity roof",
+      "function": "A small patch of specialised lining high in the cavity holds the smell receptor cells. Their fibres pass up through the roof of the cavity to the brain. Smell is not simulated.",
+      "color": "#a98bd0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "maxillary_sinuses",
+      "label": "Maxillary Sinuses",
+      "summary": "Largest sinuses, in the cheekbones below the orbits",
+      "function": "Each maxillary sinus is an air-filled space in the upper jaw bone that drains into the nasal cavity. The sinuses lighten the skull and add resonance to the voice.",
+      "color": "#8fd0dc",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "frontal_sinuses",
+      "label": "Frontal Sinuses",
+      "summary": "Air spaces in the forehead bone",
+      "function": "The frontal sinuses lie above the orbits and drain into the nasal cavity. Their size varies a good deal from person to person.",
+      "color": "#a6dbe4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "atlas": "thoracic_cage",
+  "about": "The rib cage as an anatomy textbook draws it: the sternum in front, the twelve pairs of ribs and the costal cartilages that join most of them to it. It surrounds the lungs and the heart. Bone is not simulated as tissue, so no part has a live drive; how far the cage moves in breathing is not modelled. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "sternum",
+      "label": "Sternum",
+      "summary": "Breastbone, in the middle of the front of the chest",
+      "function": "The sternum is made of the manubrium, the body and the xiphoid process. The clavicles and the first seven pairs of costal cartilages join it.",
+      "color": "#d4c7a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "true_ribs",
+      "label": "True Ribs",
+      "summary": "Ribs 1 to 7, joined to the sternum",
+      "function": "Each true rib reaches the sternum through its own costal cartilage. Together they form the firm upper part of the cage.",
+      "color": "#cabd96",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "false_and_floating_ribs",
+      "label": "False and Floating Ribs",
+      "summary": "Ribs 8 to 12",
+      "function": "Ribs 8 to 10 join the cartilage above them instead of the sternum. Ribs 11 and 12 end free in the muscle of the back wall and are called floating.",
+      "color": "#dccfa8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "costal_cartilages",
+      "label": "Costal Cartilages",
+      "summary": "Bars of cartilage between the ribs and the sternum",
+      "function": "The cartilages let the front of the cage spring and move, so that the chest can expand and recoil.",
+      "color": "#a9c4c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

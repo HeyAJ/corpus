@@ -1,0 +1,63 @@
+{
+  "atlas": "ears",
+  "about": "Both ears drawn as one organ, as the eyes are: the external ear canal, the middle ear with its three small bones, the cochlea that senses sound and the vestibular apparatus that senses head position. Hearing and balance are not simulated, so the only drive is the vertigo signal on the balance organ. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "external_canal",
+      "label": "External Ear Canal",
+      "summary": "Tube from the outer ear to the eardrum",
+      "function": "The canal carries sound inward to the tympanic membrane, the eardrum, which closes its inner end. Its outer part has skin that makes ear wax.",
+      "color": "#7b8fd0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "middle_ear",
+      "label": "Middle Ear",
+      "summary": "Air-filled space with the three ear bones",
+      "function": "The malleus, incus and stapes carry vibrations from the eardrum to the inner ear. The auditory tube joins the space to the pharynx so that the pressure on both sides of the eardrum can be equalised.",
+      "color": "#93a3dc",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cochlea",
+      "label": "Cochlea",
+      "summary": "Snail-shaped organ of hearing",
+      "function": "The cochlea is a fluid-filled coil lined with hair cells that turn the movement of sound into nerve signals. Different parts of its length respond to different pitches. Hearing is not simulated.",
+      "color": "#6a7fc4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibular_apparatus",
+      "label": "Vestibular Apparatus",
+      "summary": "Organs of balance: three canals and two sacs",
+      "function": "The semicircular canals sense turning of the head and the utricle and saccule sense tilt and straight-line acceleration. Their signals help hold the eyes steady and the body upright. It brightens with the vertigo signal.",
+      "color": "#5a6fb4",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "vertigo",
+          "weight": 0.4,
+          "note": "Vertigo is the sensation that the vestibular system is reporting a movement that is not happening.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

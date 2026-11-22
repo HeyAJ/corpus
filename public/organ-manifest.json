@@ -1,7 +1,7 @@
 {
   "generatedBy": "tools/placeholder-organs.ts",
   "note": "Bounding spheres and centroids of the authored organ shells, in the BODY frame (+x = the patient's right; the renderer mirrors x). Anything that replaces a shell must match these within a few millimetres, or the camera focus animation and the sim-driven pulse scaling will be framed on the wrong point.",
-  "totalTriangles": 218172,
+  "totalTriangles": 222940,
   "organs": [
     {
       "id": "brain",
@@ -353,6 +353,116 @@
         0,
         0.0357,
         -0.006
+      ]
+    },
+    {
+      "id": "thoracic_cage",
+      "triangles": 1464,
+      "budget": 8000,
+      "boundingRadius_m": 0.17709,
+      "worldCentre_m": [
+        0,
+        0.2188,
+        0.0023
+      ]
+    },
+    {
+      "id": "lower_limb_bones",
+      "triangles": 1456,
+      "budget": 8000,
+      "boundingRadius_m": 0.16926,
+      "worldCentre_m": [
+        0,
+        -0.2359,
+        -0.0019
+      ]
+    },
+    {
+      "id": "ears",
+      "triangles": 1220,
+      "budget": 8000,
+      "boundingRadius_m": 0.07746,
+      "worldCentre_m": [
+        0,
+        0.443,
+        -0.0126
+      ]
+    },
+    {
+      "id": "skull",
+      "triangles": 1144,
+      "budget": 8000,
+      "boundingRadius_m": 0.11462,
+      "worldCentre_m": [
+        0,
+        0.454,
+        -0.004
+      ]
+    },
+    {
+      "id": "nasal_cavity",
+      "triangles": 1116,
+      "budget": 8000,
+      "boundingRadius_m": 0.03943,
+      "worldCentre_m": [
+        0,
+        0.4114,
+        0.0503
+      ]
+    },
+    {
+      "id": "mouth",
+      "triangles": 1056,
+      "budget": 8000,
+      "boundingRadius_m": 0.03068,
+      "worldCentre_m": [
+        0,
+        0.38,
+        0.0446
+      ]
+    },
+    {
+      "id": "vertebral_column",
+      "triangles": 960,
+      "budget": 8000,
+      "boundingRadius_m": 0.32687,
+      "worldCentre_m": [
+        0,
+        0.0805,
+        -0.0439
+      ]
+    },
+    {
+      "id": "upper_limb_bones",
+      "triangles": 912,
+      "budget": 8000,
+      "boundingRadius_m": 0.19172,
+      "worldCentre_m": [
+        0,
+        0.1985,
+        0.0007
+      ]
+    },
+    {
+      "id": "salivary_glands",
+      "triangles": 896,
+      "budget": 8000,
+      "boundingRadius_m": 0.07847,
+      "worldCentre_m": [
+        0,
+        0.3918,
+        0.0314
+      ]
+    },
+    {
+      "id": "pharynx",
+      "triangles": 480,
+      "budget": 8000,
+      "boundingRadius_m": 0.04757,
+      "worldCentre_m": [
+        0.0008,
+        0.4153,
+        -0.0096
       ]
     }
   ]
