@@ -28,6 +28,31 @@ export const ACTIVITY_RAMP: readonly { t: number; hex: string }[] = [
   { t: 1.0, hex: '#8a4a0a' },
 ];
 
+/**
+ * THE BELOW-REST ARM: THE SAME INDEX, MIRRORED, FOR "HOW FAR WAS THIS ORGAN SWITCHED DOWN".
+ *
+ * Why it exists: the stomach, and the gut generally, answers fright, exertion, haemorrhage
+ * and arrest by being SUPPRESSED (sympathetic outflow and vagal withdrawal inhibit motility
+ * and secretion). With one ramp that only counts rises, that real response was invisible
+ * and the stomach never left the neutral colour. The Activity display is therefore a
+ * DIVERGING scale: the neutral at-rest stop in the middle, amber above it, teal below it.
+ *
+ * Hue choice (a display choice): teal is the one cool hue that is neither red (alarm,
+ * arterial blood) nor the blue that reads as venous blood, so a suppressed organ is not
+ * mistaken for either clinical statement. It starts from the SAME neutral `#f6ece0` as the
+ * amber arm, so the two arms meet with no seam, and its lightness falls strictly with `t`
+ * exactly as the amber arm's does (tests/render/activity.test.ts checks both arms).
+ * `t` is the organ's departure below its own rest, 0..1, as `snapshot.anatomy.organsBelow`.
+ */
+export const ACTIVITY_RAMP_BELOW: readonly { t: number; hex: string }[] = [
+  { t: 0.0, hex: '#f6ece0' },
+  { t: 0.2, hex: '#cde6dc' },
+  { t: 0.4, hex: '#9dd0c4' },
+  { t: 0.6, hex: '#5fb2a7' },
+  { t: 0.8, hex: '#2a8680' },
+  { t: 1.0, hex: '#0f5557' },
+];
+
 interface Stop {
   t: number;
   r: number;
@@ -36,26 +61,39 @@ interface Stop {
 }
 
 /** Parsed once at module load, so `activityColour` allocates nothing per call. */
-const STOPS: readonly Stop[] = ACTIVITY_RAMP.map(({ t, hex }) => ({
-  t,
-  r: parseInt(hex.slice(1, 3), 16) / 255,
-  g: parseInt(hex.slice(3, 5), 16) / 255,
-  b: parseInt(hex.slice(5, 7), 16) / 255,
-}));
+function parseStops(ramp: readonly { t: number; hex: string }[]): readonly Stop[] {
+  return ramp.map(({ t, hex }) => ({
+    t,
+    r: parseInt(hex.slice(1, 3), 16) / 255,
+    g: parseInt(hex.slice(3, 5), 16) / 255,
+    b: parseInt(hex.slice(5, 7), 16) / 255,
+  }));
+}
+const STOPS: readonly Stop[] = parseStops(ACTIVITY_RAMP);
+const STOPS_BELOW: readonly Stop[] = parseStops(ACTIVITY_RAMP_BELOW);
+
+function sample(stops: readonly Stop[], t: number, out: { r: number; g: number; b: number }): { r: number; g: number; b: number } {
+  const x = Number.isFinite(t) ? Math.max(0, Math.min(1, t)) : 0;
+  let i = 1;
+  while (i < stops.length - 1 && x > stops[i].t) i++;
+  const a = stops[i - 1];
+  const b = stops[i];
+  const f = (x - a.t) / (b.t - a.t);
+  out.r = a.r + (b.r - a.r) * f;
+  out.g = a.g + (b.g - a.g) * f;
+  out.b = a.b + (b.b - a.b) * f;
+  return out;
+}
 
 /**
  * Fill `out` with the sRGB (0..1, NOT linear) colour of the ramp at `t`, interpolated
  * piecewise-linearly between stops. `t` is clamped; NaN reads as 0. Returns `out`.
  */
 export function activityColour(t: number, out: { r: number; g: number; b: number }): { r: number; g: number; b: number } {
-  const x = Number.isFinite(t) ? Math.max(0, Math.min(1, t)) : 0;
-  let i = 1;
-  while (i < STOPS.length - 1 && x > STOPS[i].t) i++;
-  const a = STOPS[i - 1];
-  const b = STOPS[i];
-  const f = (x - a.t) / (b.t - a.t);
-  out.r = a.r + (b.r - a.r) * f;
-  out.g = a.g + (b.g - a.g) * f;
-  out.b = a.b + (b.b - a.b) * f;
-  return out;
+  return sample(STOPS, t, out);
+}
+
+/** The same for the below-rest (teal) arm. */
+export function activityColourBelow(t: number, out: { r: number; g: number; b: number }): { r: number; g: number; b: number } {
+  return sample(STOPS_BELOW, t, out);
 }

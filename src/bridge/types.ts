@@ -526,6 +526,13 @@ export interface ReproductiveSnapshot {
 export interface AnatomySnapshot {
   /** Engagement above rest of each organ, 0..1, keyed by organ id. Tints the dormant shell. */
   organs: Record<string, number>;
+  /**
+   * Suppression below rest of each organ, 0..1, keyed by organ id: the mirror of `organs`
+   * (same gain, largest part departure BELOW its own resting level). Stress inhibits gut
+   * motility and secretion, so the stomach never rose in fright and looked inert while the
+   * body was in fact switching it down; the Activity display needs this arm to say so.
+   */
+  organsBelow: Record<string, number>;
   /** Activity of each part, 0..1, keyed `<organId>.<partId>`. */
   parts: Record<string, number>;
   /** Nerve traffic by class, each 0..1 above rest: what the nervous-system overlay animates. */

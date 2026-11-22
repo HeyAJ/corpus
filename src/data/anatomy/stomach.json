@@ -48,7 +48,8 @@
         { "signal": "digestion", "weight": 0.35, "note": "Mixing and secretion occur while food is in the stomach.", "source": "GH14" },
         { "signal": "gastricFill", "weight": 0.2, "note": "Stretch of the wall increases motility and secretion.", "source": "GH14" },
         { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility strengthens the mixing waves.", "source": "GH14" },
-        { "signal": "motilityFall", "weight": -0.2, "note": "Reduced gut motility weakens the mixing waves.", "source": "GH14" }
+        { "signal": "motilityFall", "weight": -0.2, "note": "Reduced gut motility weakens the mixing waves.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits gastric motility, so in fright or exertion this part is drawn BELOW its resting level. Sign from the textbook; the weight is a display coupling on this part's own scale (the same as the gland's), not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },
@@ -63,7 +64,8 @@
         { "signal": "digestion", "weight": 0.4, "note": "The antral pump works while there is food to process.", "source": "GH14" },
         { "signal": "gastricFill", "weight": 0.15, "note": "Distension of the stomach strengthens antral contraction.", "source": "GH14" },
         { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility strengthens antral contractions.", "source": "GH14" },
-        { "signal": "motilityFall", "weight": -0.2, "note": "Reduced gut motility weakens antral contractions.", "source": "GH14" }
+        { "signal": "motilityFall", "weight": -0.2, "note": "Reduced gut motility weakens antral contractions.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits gastric motility, so in fright or exertion this part is drawn BELOW its resting level. Sign from the textbook; the weight is a display coupling on this part's own scale (the same as the gland's), not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },

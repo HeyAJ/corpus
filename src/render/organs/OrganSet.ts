@@ -7,7 +7,7 @@ import { createOrganSolidMaterial, createFluidMaterial } from '../materials/Orga
 import { GeometryFactory } from '../anatomy/GeometryFactory';
 import { GI_CENTRELINES, ORGAN_DEFS, groupOffset as layoutGroupOffset, organPosition } from '../anatomy/layout';
 import { fetalFit, gravidBody, type FetalFit } from '../anatomy/models';
-import { activityColour } from './activityRamp';
+import { activityColour, activityColourBelow } from './activityRamp';
 import { ALARM_HEX } from './alarmOrgans';
 import { amnioticSacRadii } from '../anatomy/atlas/uterus.parts';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
@@ -231,6 +231,9 @@ export interface OrganHandle {
   /** Smoothed engagement above rest, 0..1, and the value it is heading for. */
   activity: number;
   activityTarget: number;
+  /** Smoothed suppression below rest, 0..1, and its target (the teal arm of Activity mode). */
+  activityBelow: number;
+  activityBelowTarget: number;
   /** 0..1 eased alarm emphasis and where it is heading (see setAlarmOrgans). */
   alarm: number;
   alarmTarget: number;
@@ -401,6 +404,8 @@ export class OrganSet {
       appear: 0,
       activity: 0,
       activityTarget: 0,
+      activityBelow: 0,
+      activityBelowTarget: 0,
       alarm: 0,
       alarmTarget: 0,
       hasInterior,
@@ -556,6 +561,15 @@ export class OrganSet {
     if (h) h.activityTarget = Number.isFinite(activity) ? Math.max(0, Math.min(1, activity)) : 0;
   }
 
+  /**
+   * How far BELOW rest the engine says this organ is, 0..1 (smoothed like `setActivity`).
+   * Only Activity mode draws it, as the teal arm; the normal view ignores it.
+   */
+  setActivityBelow(id: OrganId, below: number): void {
+    const h = this.organs.get(id);
+    if (h) h.activityBelowTarget = Number.isFinite(below) ? Math.max(0, Math.min(1, below)) : 0;
+  }
+
   /** Switch the Activity display mode: shell colour from the one sequential ramp. */
   setActivityMode(on: boolean): void {
     this.activityMode = on;
@@ -604,6 +618,7 @@ export class OrganSet {
 
       h.alarm += (h.alarmTarget - h.alarm) * alarmBlend;
       h.activity += (h.activityTarget - h.activity) * activityBlend;
+      h.activityBelow += (h.activityBelowTarget - h.activityBelow) * activityBlend;
       if (h.appear < 1) h.appear = Math.min(1, h.appear + dtMs / APPEAR_MS);
       if (h.tween < 1) h.tween = Math.min(1, h.tween + dtMs / TWEEN_MS);
       // Ease-out cubic: fast start, gentle settle. Matches the camera focus easing.
@@ -620,8 +635,11 @@ export class OrganSet {
       // density 0) rather than being switched off, so there is no pop and no change in
       // draw order; bucket 3 owns its look.
       // In Activity mode the density gain is the ramp's own (quiet recedes, engaged is dense).
+      // The organ shows its LARGER departure from rest, so a suppressed organ is as dense as an
+      // engaged one of the same size of change (a departure is a departure, either way).
+      const departure = Math.max(h.activity, h.activityBelow);
       const gain = (1 - mode) * (1 + ACTIVE_DENSITY_GAIN * h.activity)
-        + mode * (ACTIVITY_QUIET_DENSITY + ACTIVITY_DENSITY_SPAN * h.activity);
+        + mode * (ACTIVITY_QUIET_DENSITY + ACTIVITY_DENSITY_SPAN * departure);
       // An alarming organ is also denser at the top of its swing, so it reads on the pale page.
       const alarmAmount = h.alarm * swing;
       const activeGain = selected ? 0 : (gain + ALARM_DENSITY_GAIN * alarmAmount) * (h.def.shellDensity ?? 1);
@@ -640,7 +658,8 @@ export class OrganSet {
       if (mode > 0.001) {
         // The ramp replaces the organ's own colour. Authored in sRGB, so it is set with
         // the colour space named; the working space is linear.
-        activityColour(h.activity, this.rampRgb);
+        if (h.activityBelow > h.activity) activityColourBelow(h.activityBelow, this.rampRgb);
+        else activityColour(h.activity, this.rampRgb);
         this.rampColor.setRGB(this.rampRgb.r, this.rampRgb.g, this.rampRgb.b, THREE.SRGBColorSpace);
         this.restTint.lerp(this.rampColor, mode);
       }

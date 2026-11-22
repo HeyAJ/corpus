@@ -22,7 +22,8 @@
       "drives": [
         { "signal": "digestion", "weight": 0.45, "note": "Food in the stomach and upper bowel means chyme is arriving here to be mixed with bile and pancreatic juice.", "source": "GH14" },
         { "signal": "fatLoad", "weight": 0.2, "note": "Fat in the duodenum is the stimulus for bile release and for slowing gastric emptying.", "source": "GH14" },
-        { "signal": "parasympathetic", "weight": 0.15, "note": "Vagal outflow raises secretion and motility in the upper gut.", "source": "GH14" }
+        { "signal": "parasympathetic", "weight": 0.15, "note": "Vagal outflow raises secretion and motility in the upper gut.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },
@@ -36,7 +37,8 @@
       "drives": [
         { "signal": "absorption", "weight": 0.4, "note": "The jejunum is the principal absorbing region, so it follows the absorption signal.", "source": "GH14" },
         { "signal": "digestion", "weight": 0.25, "note": "Digestion in the upper gut sends chyme on into the jejunum.", "source": "GH14" },
-        { "signal": "intestinalTransit", "weight": 0.2, "note": "Contents in the small bowel mean the region is working.", "source": "GH14" }
+        { "signal": "intestinalTransit", "weight": 0.2, "note": "Contents in the small bowel mean the region is working.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },
@@ -50,7 +52,8 @@
       "drives": [
         { "signal": "intestinalTransit", "weight": 0.3, "note": "Chyme that has passed the jejunum arrives here.", "source": "GH14" },
         { "signal": "absorption", "weight": 0.2, "note": "The ileum absorbs the remainder of the nutrient load.", "source": "GH14" },
-        { "signal": "motilityRise", "weight": 0.3, "note": "Raised gut motility drives chyme through the ileum faster.", "source": "GH14" }
+        { "signal": "motilityRise", "weight": 0.3, "note": "Raised gut motility drives chyme through the ileum faster.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },

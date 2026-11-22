@@ -47,7 +47,8 @@
       "rest": 0.2,
       "drives": [
         { "signal": "colonTransit", "weight": 0.35, "note": "Contents in the colon mean the segment is working.", "source": "GH14" },
-        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" }
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits colonic motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },
@@ -60,7 +61,8 @@
       "rest": 0.2,
       "drives": [
         { "signal": "colonTransit", "weight": 0.35, "note": "Contents in the colon mean the segment is working.", "source": "GH14" },
-        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" }
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits colonic motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },
@@ -73,7 +75,8 @@
       "rest": 0.2,
       "drives": [
         { "signal": "colonTransit", "weight": 0.35, "note": "Contents in the colon mean the segment is working.", "source": "GH14" },
-        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" }
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits colonic motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },
@@ -86,7 +89,8 @@
       "rest": 0.2,
       "drives": [
         { "signal": "colonTransit", "weight": 0.35, "note": "Contents in the colon mean the segment is working.", "source": "GH14" },
-        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" }
+        { "signal": "motilityRise", "weight": 0.25, "note": "Raised gut motility moves contents through faster.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits colonic motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },
@@ -113,7 +117,8 @@
       "drives": [
         { "signal": "motilityRise", "weight": 0.4, "note": "Raised motility is carried out by this muscle.", "source": "GH14" },
         { "signal": "motilityFall", "weight": -0.3, "note": "Reduced motility quietens it.", "source": "GH14" },
-        { "signal": "parasympathetic", "weight": 0.2, "note": "Parasympathetic outflow excites colonic smooth muscle.", "source": "GH14" }
+        { "signal": "parasympathetic", "weight": 0.2, "note": "Parasympathetic outflow excites colonic smooth muscle.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits colonic motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.", "source": "GH14" }
       ],
       "source": "GRAYS42"
     },

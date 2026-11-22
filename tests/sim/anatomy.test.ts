@@ -108,6 +108,17 @@ describe('anatomy signals respond to the body', () => {
     expect(scared.sympathetic).toBeGreaterThan(rest.sympathetic + 0.3);
   });
 
+  it('fright suppresses the stomach: organsBelow is visible there, and ~0 everywhere at rest', () => {
+    // WHAT WAS WRONG: the organ index counted rises only, and the stomach answers fright by
+    // being switched DOWN, so it never left 0.05 and looked inert. organsBelow is the mirror.
+    const e = new Engine(0x5eed);
+    advance(e, 10);
+    for (const v of Object.values(buildAnatomy(e.state).organsBelow)) expect(v).toBeLessThan(0.05);
+    e.applyIntent({ type: 'FRIGHTEN', intensity: 1 } as never);
+    advance(e, 5);
+    expect(buildAnatomy(e.state).organsBelow.stomach).toBeGreaterThan(0.15);
+  });
+
   it('a 1.5 L haemorrhage raises hypovolaemia', () => {
     const e = new Engine(0x5eed);
     advance(e, 10);

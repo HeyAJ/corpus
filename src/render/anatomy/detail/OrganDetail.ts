@@ -11,6 +11,15 @@ import { FlowField } from './FlowField';
 import { createPartMaterial } from './PartMaterial';
 import { patchForCut, setCut, sliceKeeps, type CutUniforms, type SlicePlane } from '../../materials/sliceCut';
 import type { DetailContext, FlowSpec, OrganDetailSpec, PartHandle } from './types';
+import {
+  PARENT_GLASS_DROP,
+  REVEAL_PICKABLE,
+  buildRevealTree,
+  revealReach,
+  revealedSet,
+  stepReveal,
+  type RevealTree,
+} from './reveal';
 
 /**
  * THE INSIDE OF THE SELECTED ORGAN: MESHES, MATERIALS, PARTICLES AND THE FRAME LOOP.
@@ -39,6 +48,17 @@ import type { DetailContext, FlowSpec, OrganDetailSpec, PartHandle } from './typ
  *      `animate` second, so a module says only what is different about its organ. The call
  *      is wrapped: a module that throws is logged once per organ and skipped from then on,
  *      because one broken interior must not stop the frame loop for the whole body.
+ *
+ * STRUCTURES WITHIN STRUCTURES. An atlas part may name a `parent` (anatomy-types.ts), and the
+ * parts builder draws the child like any other part. What is new here is only WHEN it shows:
+ * every frame `updateReveal` asks the pure rule in ./reveal.ts which children are wanted (the
+ * selected or flown-to part is their parent or ancestor, or the camera is close to the parent)
+ * and fades each one towards that. A hidden child is not drawn, picked or labelled. While a
+ * part's children show, the part itself is thinned to glass (PARENT_GLASS_DROP), otherwise a
+ * solid septum or a picked ventricle would hide what is inside it. A child with no drives of its
+ * own shows its parent's activity, worked out here from the data and never from the simulation.
+ * Triangles: the heart's interior went from 24,276 to the figure in reveal.ts's notes, well under
+ * the 2x at which a lazy build would be needed, so every child is built with its organ.
  *
  * NOTHING HERE WRITES TO THE SIMULATION.
  *
@@ -107,12 +127,21 @@ class PartEntry implements PartHandle {
   dim = 0;
   /** Whether the mesh is currently set up as glass (no depth write, drawn late). */
   glass = false;
+  /** 1 for a level-1 part; for a child, the smoothed 0..1 fade of its reveal (see reveal.ts). */
+  reveal = 1;
+  /** The level in the part tree: 1 = no parent, 2 = a child, 3 = a grandchild. */
+  level = 1;
+  /** The id whose activity this part displays: itself, or its nearest ancestor with drives. */
+  activityId: string;
+  /** The strongest reveal among this part's children this frame, 0 when it has none or none show. */
+  childReveal = 0;
 
   constructor(
     readonly id: string,
     readonly mesh: THREE.Mesh,
     colour: THREE.ColorRepresentation,
   ) {
+    this.activityId = id;
     this.baseColor.set(colour);
     this.color.copy(this.baseColor);
     this.material = mesh.material as THREE.ShaderMaterial;
@@ -195,6 +224,12 @@ class Interior {
   /** Seconds since this interior was last shown from nothing. */
   time = 0;
   failedOnce = false;
+  /** The part tree of this atlas (parents before children); empty for an atlas with no children. */
+  tree: RevealTree | null = null;
+  /** Parts that have children, with the entries to ask about, in tree order. */
+  readonly parents: PartEntry[] = [];
+  /** Scratch for the reveal rule, reused every frame. */
+  readonly shown = new Set<string>();
 
   constructor(
     readonly organId: OrganId,
@@ -237,6 +272,11 @@ export class OrganDetail {
   private cutEdge = 0;
   private viewport = { height: 900, fov: 40 };
   private readonly warned = new Set<string>();
+  /** The part the visitor flew to (`Viewer.focusPart`); a second route to "selected" for the reveal rule. */
+  private focused: string | null = null;
+  /** The camera, in the BODY frame (the same frame `partSphere` reports), for the proximity rule. */
+  private readonly cameraBody = new THREE.Vector3(Infinity, Infinity, Infinity);
+  private readonly sphereCentre = new THREE.Vector3();
 
   // The frame context, one object reused for every call of every module.
   private previousSnap: SimSnapshot | null = null;
@@ -304,7 +344,10 @@ export class OrganDetail {
     const week = Math.max(0, Math.round(Number.isFinite(gestationWeeks) ? gestationWeeks : 0));
     const key = WEEK_ATLASES.has(atlas) ? `${handle.id}:${week}` : handle.id;
     if (this.target && this.target.key === key) return;
-    if (this.target?.id !== handle.id) this.highlighted = null;
+    if (this.target?.id !== handle.id) {
+      this.highlighted = null;
+      this.focused = null;
+    }
     this.target = { id: handle.id, key };
     this.targetHandle = handle;
 
@@ -338,6 +381,7 @@ export class OrganDetail {
     this.target = null;
     this.targetHandle = null;
     this.highlighted = null;
+    this.focused = null;
     if (this.current) this.leave(this.current);
   }
 
@@ -421,6 +465,25 @@ export class OrganDetail {
       interior.partList.push(entry);
       interior.meshes.push(mesh);
       interior.group.add(mesh);
+    }
+
+    // THE PART TREE. Levels, the id each part takes its activity from, and which parts have
+    // children (those are the ones the proximity rule measures the camera against).
+    const tree = buildRevealTree(data.map((d) => ({ id: d.id, parent: d.parent ?? null })));
+    interior.tree = tree;
+    for (const entry of interior.partList) {
+      entry.level = tree.depth.get(entry.id) ?? 1;
+      entry.reveal = entry.level > 1 ? 0 : 1;
+      let source = entry.id;
+      for (const up of [entry.id, ...(tree.ancestors.get(entry.id) ?? [])]) {
+        source = up;
+        if ((data.find((d) => d.id === up)?.drives.length ?? 0) > 0) break;
+      }
+      entry.activityId = source;
+    }
+    for (const node of tree.order) {
+      const entry = interior.parts.get(node.id);
+      if (entry && (tree.children.get(node.id)?.length ?? 0) > 0) interior.parents.push(entry);
     }
 
     if (flows.length > 0) {
@@ -511,9 +574,10 @@ export class OrganDetail {
     const parts = this.currentSnap?.anatomy.parts;
     for (const p of interior.partList) {
       p.reset();
-      p.glow = parts ? (parts[`${interior.organId}.${p.id}`] ?? 0) : 0;
+      p.glow = parts ? (parts[`${interior.organId}.${p.activityId}`] ?? 0) : 0;
     }
     interior.flow?.resetDefaults();
+    if (animate) this.updateReveal(interior, dt, reducedMotion);
 
     // THE ATLAS MODULE.
     const snap = this.currentSnap;
@@ -542,6 +606,9 @@ export class OrganDetail {
     const pick = this.highlighted;
     const blend = 1 - Math.exp(-dt / HIGHLIGHT_TAU_S);
     for (const p of interior.partList) {
+      // A child that is not on show is not drawn at all; one fading in or out is scaled by an
+      // eased reveal, and the part that holds children shows through them (see reveal.ts).
+      const revealEase = p.reveal * p.reveal * (3 - 2 * p.reveal);
       const hlTarget = pick !== null && p.id === pick ? 1 : 0;
       const dimTarget = pick !== null && p.id !== pick ? 1 : 0;
       p.hl += (hlTarget - p.hl) * blend;
@@ -550,7 +617,7 @@ export class OrganDetail {
       u.uGlow.value = p.glow;
       u.uHighlight.value = p.hl;
       // The picked part is never glass: picking a lobe from the list should show the lobe.
-      const own = p.opacity + (1 - p.opacity) * p.hl;
+      const own = (p.opacity + (1 - p.opacity) * p.hl) * (1 - PARENT_GLASS_DROP * p.childReveal);
       const glass = own < GLASS_BELOW;
       if (glass !== p.glass) {
         p.glass = glass;
@@ -558,7 +625,7 @@ export class OrganDetail {
         p.mesh.renderOrder = glass ? GLASS_RENDER_ORDER : PART_RENDER_ORDER;
       }
       u.uGlass.value = glass ? 1 : 0;
-      const opacity = own * fade * (1 - (1 - DIMMED) * p.dim);
+      const opacity = own * fade * revealEase * (1 - (1 - DIMMED) * p.dim);
       u.uOpacity.value = opacity;
       p.mesh.visible = p.visible && opacity > 0.003;
       p.applyTransform();
@@ -577,6 +644,61 @@ export class OrganDetail {
       interior.flow.object.visible = fade > 0.003;
       interior.flow.update(reducedMotion ? 0 : dt);
     }
+  }
+
+  /**
+   * Step every child's fade towards what the reveal rule wants, and record on each parent how
+   * strongly its children show. Called with the interior being shown only; one fading out keeps
+   * the reveal it had.
+   */
+  private updateReveal(interior: Interior, dt: number, reducedMotion: boolean): void {
+    const tree = interior.tree;
+    if (!tree) return;
+    let any = false;
+    for (const p of interior.partList) {
+      p.childReveal = 0;
+      if (p.level > 1) any = true;
+    }
+    if (!any) return;
+    const selected = this.highlighted ?? this.focused;
+    const cam = this.cameraBody;
+    const near = (parentId: string, childLevel: number): boolean => {
+      const parent = interior.parts.get(parentId);
+      if (!parent || !Number.isFinite(cam.x)) return false;
+      const radius = this.sphereOf(interior, parent, this.sphereCentre);
+      if (!(radius >= 0)) return false;
+      return this.sphereCentre.distanceTo(cam) < revealReach(childLevel, radius);
+    };
+    revealedSet(tree, selected, near, interior.shown);
+    for (const p of interior.partList) {
+      if (p.level < 2) continue;
+      p.reveal = stepReveal(p.reveal, interior.shown.has(p.id) ? 1 : 0, dt, reducedMotion);
+      const parent = interior.parts.get(tree.ancestors.get(p.id)?.[0] ?? '');
+      if (parent && p.reveal > parent.childReveal) parent.childReveal = p.reveal;
+    }
+  }
+
+  /**
+   * Tell the detail layer where the camera is, in the BODY frame (the frame partSphere reports:
+   * the renderer's mirror already undone). The proximity half of the reveal rule reads it.
+   */
+  setCamera(bodyX: number, bodyY: number, bodyZ: number): void {
+    this.cameraBody.set(bodyX, bodyY, bodyZ);
+  }
+
+  /** The part the visitor flew to (null when none): a second way, beside the picked part, to select. */
+  setFocusedPart(partId: string | null): void {
+    this.focused = partId;
+  }
+
+  /**
+   * For probes and tests: the ids of the open organ's parts that are on show enough to be
+   * picked, and every child's reveal amount (0..1) by id.
+   */
+  revealState(): Record<string, number> {
+    const out: Record<string, number> = {};
+    for (const p of this.current?.partList ?? []) if (p.level > 1) out[p.id] = Number(p.reveal.toFixed(3));
+    return out;
   }
 
   setViewport(heightPx: number, fovDegrees: number): void {
@@ -634,6 +756,10 @@ export class OrganDetail {
     const interior = this.current;
     const p = interior?.parts.get(partId);
     if (!interior || !p) return -1;
+    return this.sphereOf(interior, p, out);
+  }
+
+  private sphereOf(interior: Interior, p: PartEntry, out: THREE.Vector3): number {
     const geometry = p.mesh.geometry;
     if (!geometry.boundingSphere) geometry.computeBoundingSphere();
     const sphere = geometry.boundingSphere;
@@ -652,7 +778,10 @@ export class OrganDetail {
     if (!interior || interior.fade < 0.3) return null;
     // Raycaster does not look at `visible`, so a part an atlas module has hidden would
     // still be hit. A tap is rare; filtering here costs nothing that matters.
-    const targets = interior.meshes.filter((m) => m.visible);
+    // A child still fading in (or out) is not yet there to be tapped: only revealed ones count.
+    const targets = interior.meshes.filter(
+      (m) => m.visible && (interior.parts.get(m.userData.partId as string)?.reveal ?? 1) >= REVEAL_PICKABLE,
+    );
     if (targets.length === 0) return null;
     const allHits = raycaster.intersectObjects(targets, false);
     // WHAT THE SLICE REMOVED CANNOT BE TAPPED. The raycaster knows nothing of the shader's
@@ -681,6 +810,9 @@ export class OrganDetail {
   /** Mark one part as picked (white rim), others dimmed slightly; null clears. */
   highlight(partId: string | null): void {
     this.highlighted = partId;
+    // Clearing the pick also clears a flight target, so a part the visitor has deselected stops
+    // holding its children open.
+    if (partId === null) this.focused = null;
   }
 
   /** Screen anchors of the visible parts, for labels. Reuses its output array. */
@@ -694,7 +826,7 @@ export class OrganDetail {
     interior.group.updateMatrix();
     let n = 0;
     for (const p of interior.partList) {
-      if (!p.mesh.visible) continue;
+      if (!p.mesh.visible || p.reveal < REVEAL_PICKABLE) continue;
       // Body frame: the part's centre through its own pose and the organ's live
       // transform, then the renderer's mirror, then the camera. Done by hand rather than
       // from matrixWorld because that is only refreshed at render time, a frame late.

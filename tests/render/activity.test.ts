@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import organsFile from '../../src/data/organs.json';
 import { CONDITION_ORGANS, SYSTEMIC_CONDITIONS, collectAlarmOrgans } from '../../src/render/organs/alarmOrgans';
-import { ACTIVITY_RAMP, activityColour } from '../../src/render/organs/activityRamp';
+import { ACTIVITY_RAMP, ACTIVITY_RAMP_BELOW, activityColour, activityColourBelow } from '../../src/render/organs/activityRamp';
 
 /**
  * An organ that cannot show an alarm, and an activity colour that lies.
@@ -68,5 +68,28 @@ describe('activity ramp', () => {
     const o = { r: 0, g: 0, b: 0 };
     expect(activityColour(NaN, o).r).toBeCloseTo(activityColour(0, { r: 0, g: 0, b: 0 }).r);
     expect(activityColour(9, o).r).toBeCloseTo(activityColour(1, { r: 0, g: 0, b: 0 }).r);
+  });
+});
+
+describe('activity ramp, below-rest arm', () => {
+  const rgb = (t: number) => activityColourBelow(t, { r: 0, g: 0, b: 0 });
+  const lum = (t: number): number => {
+    const c = rgb(t);
+    return 0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b;
+  };
+  it('starts at the same neutral stop as the amber arm', () => {
+    expect(ACTIVITY_RAMP_BELOW[0].hex).toBe(ACTIVITY_RAMP[0].hex);
+    expect(ACTIVITY_RAMP_BELOW[0].t).toBe(0);
+    expect(ACTIVITY_RAMP_BELOW[ACTIVITY_RAMP_BELOW.length - 1].t).toBe(1);
+  });
+  it('gets strictly darker with t', () => {
+    for (let i = 1; i <= 100; i++) expect(lum(i / 100)).toBeLessThan(lum((i - 1) / 100));
+  });
+  it('is teal beyond the neutral: green at least blue, both above red, so neither alarm red nor venous blue', () => {
+    for (let i = 1; i <= 10; i++) {
+      const c = rgb(i / 10);
+      expect(c.g).toBeGreaterThanOrEqual(c.b);
+      expect(c.b).toBeGreaterThan(c.r);
+    }
   });
 });

@@ -20,6 +20,19 @@
  * index of how hard the model's own drives are pushing a structure. It is not a firing
  * rate, a BOLD signal, a blood flow or a metabolic rate, and it never feeds back into
  * the simulation. docs/MODEL_LIMITATIONS.md says so.
+ *
+ * STRUCTURES WITHIN STRUCTURES (`parent`). A part may name another part of the SAME file as
+ * its parent, and is then a finer structure of that part: the papillary muscles of the left
+ * ventricle, the cusps of a valve. A part without a `parent` is level 1, exactly as every part
+ * was before the field existed; a part whose parent is level 1 is level 2; the deepest level
+ * allowed is 3, because a fourth level would need a camera closer than the organ's own
+ * framing can reach and a tree the Structures panel cannot show on a phone. The renderer shows
+ * a child only when its parent (or an ancestor) is the part the visitor selected or flew to,
+ * or when the camera has come close to the parent (src/render/anatomy/detail/reveal.ts), so a
+ * child costs the opened organ nothing until somebody looks for it. A child with no drives
+ * shows its parent's activity. tests/data/anatomy.test.ts checks that the parent exists, that
+ * there is no cycle and that the depth is at most 3. Children are drawn by the atlas's own
+ * `*.parts.ts` exactly like any other part (same builder, same id).
  */
 
 /**
@@ -165,6 +178,11 @@ export interface AnatomyDrive {
 export interface AnatomyPartDef {
   /** Local to the organ: lower-case letters and underscores. Runtime id is `<organId>.<id>`. */
   id: string;
+  /**
+   * The id of the part (in the same file) this is a finer structure of; absent for a level-1
+   * part. See "STRUCTURES WITHIN STRUCTURES" in the header. At most three levels deep.
+   */
+  parent?: string;
   label: string;
   /** One short line: what it is. Shown under the label in the list. */
   summary: string;
@@ -209,3 +227,6 @@ export const ANATOMY_SIGNALS: readonly AnatomySignal[] = [
   'estradiol', 'progesterone', 'lh', 'fsh', 'testosterone', 'prolactin', 'oxytocin', 'hcg', 'follicle',
   'corpusLuteum', 'endometrium', 'menstruating', 'pregnancy', 'sexualArousal', 'orgasm', 'vasocongestion',
 ];
+
+/** The deepest level a part may sit at (level 1 = no `parent`). Checked by tests/data/anatomy.test.ts. */
+export const MAX_PART_DEPTH = 3;

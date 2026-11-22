@@ -598,11 +598,14 @@ export class Viewer {
     const h = this.organs.organs.get(this.selected);
     if (!h) return;
     if (partId === null) {
+      this.detail.setFocusedPart(null);
       this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius, this.flightMs());
       return;
     }
     const r = this.detail.partSphere(partId, this.partCentre);
     if (!(r > 0)) return;
+    // The part flown to counts as selected for the reveal rule, so its finer structures show.
+    this.detail.setFocusedPart(partId);
     this.toScene(this.partCentre, this.focusPoint);
     this.rig.flyTo(this.focusPoint, this.rig.framingDistance(r), r, this.flightMs());
   }
@@ -656,6 +659,11 @@ export class Viewer {
   /** The shared geometry factory, so the brain scan inset builds its meshes from the same cache. */
   get geometryFactory() {
     return this.organs.geometryFactory;
+  }
+
+  /** For probes: each finer structure of the open organ and how far it is revealed, 0..1. */
+  get revealState(): Record<string, number> {
+    return this.detail.revealState();
   }
 
   /** True once the selected organ's interior has been built and is on screen. */
@@ -811,6 +819,12 @@ export class Viewer {
       const id = key as OrganId;
       if (this.organs.organs.has(id)) this.organs.setActivity(id, engagement[key]);
     }
+    // The suppression arm of the Activity display (see AnatomySnapshot.organsBelow).
+    const suppression = s.anatomy.organsBelow;
+    for (const key in suppression) {
+      const id = key as OrganId;
+      if (this.organs.organs.has(id)) this.organs.setActivityBelow(id, suppression[key]);
+    }
 
     // Organs behind a warn or critical condition pulse; `watch` does not.
     collectAlarmOrgans(s.conditions, this.alarming);
@@ -896,6 +910,10 @@ export class Viewer {
     this.applySnapshotToScene(now);
     // After the shells have taken this frame's pulse and pose: the interior copies them.
     this.syncDetailViewport();
+    // The camera in the body frame (the renderer's mirror undone), for the proximity half of
+    // the rule that reveals a part's finer structures.
+    const camera = this.rig.camera.position;
+    this.detail.setCamera(camera.x * BODY_MIRROR_X, camera.y, camera.z);
     this.detail.update(
       dtMs / 1000,
       this.snapshots.current,

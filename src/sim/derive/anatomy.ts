@@ -474,19 +474,29 @@ export function buildAnatomy(s: SimState): AnatomySnapshot {
   const pregnant = sig.pregnancy > 0;
 
   const organs: Record<string, number> = {};
+  const organsBelow: Record<string, number> = {};
   const parts: Record<string, number> = {};
   for (const o of plan) {
     if (o.sex !== undefined && o.sex !== s.body.sex) continue;
     if (o.pregnancyOnly && !pregnant) continue;
     let lift = 0;
+    let drop = 0;
     for (const p of o.parts) {
       let a = p.rest;
       for (let i = 0; i < p.signals.length; i++) a += p.weights[i] * sig[p.signals[i]];
       a = clamp01(a);
       parts[p.key] = a;
       if (a - p.rest > lift) lift = a - p.rest;
+      if (p.rest - a > drop) drop = p.rest - a;
     }
     organs[o.id] = clamp01(1.6 * lift);
+    // The symmetric twin, on the same 1.6 gain so the two arms are directly comparable. The
+    // stomach never rose above 0.05 in fright, exertion, a 2 L bleed or arrest because its
+    // drives answer those states only NEGATIVELY (sympathetic outflow and vagal withdrawal
+    // inhibit gastric motility and secretion), and an index that counts rises alone cannot
+    // show a real, teachable suppression. `organs` is left exactly as it was for its other
+    // consumers; the Activity display reads this beside it.
+    organsBelow[o.id] = clamp01(1.6 * drop);
   }
 
   // The gland multipliers are DISPLAY SCALES (1 = basal), not secretion rates: they say how
@@ -507,6 +517,7 @@ export function buildAnatomy(s: SimState): AnatomySnapshot {
 
   return {
     organs,
+    organsBelow,
     parts,
     nerves: {
       sympathetic: sig.sympathetic,
