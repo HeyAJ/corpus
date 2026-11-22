@@ -13,13 +13,18 @@ async function openLink(page: Page, hash: string): Promise<void> {
   await acceptWelcome(page);
 }
 
-test('searching "pyr" opens a kidney and selects a renal pyramid', async ({ page }) => {
+// The bare query "pyr" stopped reaching the kidney once new anatomy arrived: the thyroid's
+// "Pyramidal Lobe" matches by label prefix, which outranks a word-start match, and the brain's
+// "Cortical Layer III/V (... Pyramidal)" match by word-start and sits earlier in catalogue order,
+// so Enter opened the thyroid. The ranking is correct; the query was ambiguous. "medullary pyr"
+// resolves to exactly the kidney's "Medullary Pyramids" (left, then right) in every body.
+test('searching "medullary pyr" opens a kidney and selects its medullary pyramids', async ({ page }) => {
   const problems = collectProblems(page);
   await boot(page);
 
   await page.getByRole('button', { name: 'Panels', exact: true }).click();
   const field = page.getByRole('combobox', { name: 'Find an organ or structure' });
-  await field.fill('pyr');
+  await field.fill('medullary pyr');
   await expect(page.getByRole('listbox', { name: 'Search results' })).toBeVisible();
   await field.press('Enter');
 
