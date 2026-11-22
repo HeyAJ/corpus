@@ -4,7 +4,9 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
-import { OrganSet, type OrganState } from '../organs/OrganSet';
+import { OrganSet, type OrganHandle, type OrganState } from '../organs/OrganSet';
+import { triangleCount as triangleCountOf } from '../organs/placeholder';
+import type { LayerId } from '../organs/layers';
 import { OrbitRig } from '../camera/OrbitRig';
 import { slicePlane, sliceKeeps, sliceEdgeWidth, type SliceAxis, type SlicePlane } from '../materials/sliceCut';
 import { BodyOutline } from '../body/BodyOutline';
@@ -171,6 +173,12 @@ export class Viewer {
 
   private hovered: OrganId | null = null;
   private selected: OrganId | null = null;
+  /**
+   * The selected organ was not built yet when it was chosen (a layer organ opened from a search,
+   * the Structures list or a share link with its layer off), so the camera flight and the
+   * interior wait for its geometry: `frame()` completes the open once the shell arrives.
+   */
+  private openPending = false;
   /** The user's own Vessels switch; the heart can force the overlay on above it. */
   private vascularSwitch = false;
   /** The last visibility given to the vascular layer, so it is only toggled when it changes. */
@@ -219,6 +227,35 @@ export class Viewer {
   setActivityVisible(on: boolean): void {
     this.activityOn = on;
     this.organs.setActivityMode(on);
+  }
+
+  /**
+   * Switch a LAYER of optional organs (today `'bones'`) on or off. The first time a layer is on its
+   * organs are built in the geometry worker; afterwards they are only shown and hidden. Never
+   * touches the selection: an open organ of the layer stays open, because selection is its own
+   * reason to be drawn (see organs/layers.ts).
+   */
+  setLayerVisible(layer: LayerId, on: boolean): void {
+    this.organs.setLayer(layer, on);
+    // A layer organ the pointer was over is no longer there to be hovered.
+    if (this.hovered && !this.organs.organs.get(this.hovered)?.drawn) this.setHover(null);
+  }
+
+  /** For probes: each layer organ's build and draw state and its triangle count. */
+  layerProbe(): { id: string; layer: string; built: boolean; building: boolean; drawn: boolean; triangles: number }[] {
+    const out: { id: string; layer: string; built: boolean; building: boolean; drawn: boolean; triangles: number }[] = [];
+    for (const h of this.organs.organs.values()) {
+      if (!h.def.layer) continue;
+      out.push({
+        id: h.id,
+        layer: h.def.layer,
+        built: h.built,
+        building: h.building,
+        drawn: h.drawn,
+        triangles: h.built ? triangleCountOf(h.geometry) : 0,
+      });
+    }
+    return out;
   }
 
   /** The organ ids pulsing toward alarm red right now (read-only view). */
@@ -693,17 +730,19 @@ export class Viewer {
     // still the one the detail layer holds, so that shell is restored whole.
     this.setSlice(null, 0);
     this.selected = id;
+    this.openPending = false;
+    // Before anything reads the handle: a layer organ that is selected is built and drawn here.
+    this.organs.setSelection(id);
     this.outline.setFocus(id !== null);
     this.applyVascularVisibility();
     this.organs.clearStates(id ?? undefined);
     if (id) {
       const h = this.organs.organs.get(id);
       this.organs.setState(id, 'selected');
-      if (h) this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius, this.flightMs());
-      if (h) {
-        this.interiorWeeks = this.currentWeeks();
-        this.detail.show(h, this.interiorWeeks);
-      }
+      if (h?.built) this.openSelected(h);
+      // Not built yet: its centroid and radius are placeholders, so framing it now would fly to
+      // the wrong place and the interior would be asked for against an empty shell.
+      else if (h) this.openPending = true;
     } else {
       this.rig.reset(this.flightMs());
       this.detail.hide();
@@ -713,6 +752,13 @@ export class Viewer {
     // A picked part belongs to the organ it was picked in.
     this.callbacks.onPart?.(null);
     this.callbacks.onSelect?.(id);
+  }
+
+  /** Frame the selected organ and build its interior; only ever called for a built organ. */
+  private openSelected(h: OrganHandle): void {
+    this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius, this.flightMs());
+    this.interiorWeeks = this.currentWeeks();
+    this.detail.show(h, this.interiorWeeks);
   }
 
   private setHover(id: OrganId | null): void {
@@ -918,6 +964,14 @@ export class Viewer {
       this.setHover(this.pick());
     }
 
+    if (this.openPending && this.selected) {
+      const waiting = this.organs.organs.get(this.selected);
+      if (waiting?.built) {
+        this.openPending = false;
+        this.openSelected(waiting);
+      }
+    }
+
     this.organs.reducedMotion = this.reducedMotion;
     this.organs.closeLook = this.detail.closeLookAmount;
     this.organs.update(dtMs);
@@ -1026,7 +1080,7 @@ export class Viewer {
     const height = this.renderer.domElement.clientHeight;
 
     for (const h of this.organs.organs.values()) {
-      if (h.state === 'dormant' || !h.built || !h.wanted) continue;
+      if (h.state === 'dormant' || !h.built || !h.drawn) continue;
       this.toScene(h.centroid, this.projected).project(this.rig.camera);
       const bias = h.def.labelBias ?? [0, 0];
       // labelBias is authored in the body frame too: a positive x pushes the label

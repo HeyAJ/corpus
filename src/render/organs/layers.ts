@@ -97,3 +97,11 @@ export const BONE_DENSITY = 0.42;
  * skeleton stays recognisably bone while a future signal would still tint it. A display choice.
  */
 export const BONE_ACTIVITY_COLOUR_MIX = 0.35;
+
+/**
+ * The look of each layer, gathered so OrganSet reads one table and the muscles and the lymph
+ * layers add a row instead of a branch. Bones only today.
+ */
+export const LAYER_LOOK: Record<LayerId, { tint: number; density: number; activityColourMix: number }> = {
+  bones: { tint: BONE_TINT, density: BONE_DENSITY, activityColourMix: BONE_ACTIVITY_COLOUR_MIX },
+};

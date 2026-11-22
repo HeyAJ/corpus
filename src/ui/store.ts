@@ -115,6 +115,19 @@ interface UiState {
   /** Reproduction: sex, the menstrual cycle, pregnancy and the sexual response. */
   reproductionPanelOpen: boolean;
   toggleReproductionPanel: () => void;
+  /**
+   * The skeleton layer ("Bones" in the Layers control). Off at start; while off no bone geometry is
+   * even built (OrganSet builds a layer organ on first need). Selecting a bone organ does NOT change
+   * this flag: a selected organ is drawn because it is selected, not because its layer is on.
+   */
+  bonesVisible: boolean;
+  toggleBones: () => void;
+  /**
+   * The Layers popover (ToolDock.tsx). It is NOT a panel and takes no part in `openOnly`: it is a
+   * small anchored menu that closes on an outside tap, Escape, or the opening of any panel.
+   */
+  layersOpen: boolean;
+  setLayersOpen: (open: boolean) => void;
   /** Body-wide overlays, like the vessels: the nerves, and hormones leaving their glands. */
   nervesVisible: boolean;
   toggleNerves: () => void;
@@ -348,6 +361,10 @@ export const useStore = create<UiState>((set, get) => ({
   setPartLabels: (l) => set({ partLabels: l }),
   reproductionPanelOpen: false,
   toggleReproductionPanel: () => set((s) => openOnly(s, 'reproductionPanelOpen')),
+  bonesVisible: false,
+  toggleBones: () => set((s) => ({ bonesVisible: !s.bonesVisible })),
+  layersOpen: false,
+  setLayersOpen: (open) => set({ layersOpen: open }),
   nervesVisible: false,
   toggleNerves: () => set((s) => ({ nervesVisible: !s.nervesVisible })),
   hormonesVisible: false,

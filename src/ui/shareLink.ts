@@ -4,7 +4,7 @@ import { buildCatalogue, partBelongsTo, type BodyKind, type SearchEntry } from '
 /**
  * SHAREABLE LINKS: build and parse the URL fragment that restores a BODY and a VIEW.
  *
- *   #v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=vessels,nerves,hormones,activity&cut=front:0.5
+ *   #v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=bones,vessels,nerves,hormones,activity&cut=front:0.5
  *
  * WHAT A LINK IS NOT. It restores who the body is (sex, gestational age) and how it is being
  * looked at (the open organ and part, the overlays, the section). It never carries, and
@@ -23,7 +23,7 @@ import { buildCatalogue, partBelongsTo, type BodyKind, type SearchEntry } from '
  *   - `sex` is male or female; `weeks` is one or two digits, at most `pregnancy.maxWeeks`,
  *     read from reproduction.json, and only for a female body; `organ` must be an organ THIS
  *     body has (the search catalogue is the single definition of that); `part` must be a part
- *     of that organ's atlas; `layers` must be a comma list of the four layer names (one bad
+ *     of that organ's atlas; `layers` must be a comma list of the five layer names (bones, vessels, nerves, hormones, activity) (one bad
  *     name drops the whole key, not just the name); `cut` is an axis and a number in 0..1.
  *   - a parsed string is only ever COMPARED against the catalogue and the fixed name lists.
  *     The values that leave this module are members of those lists or numbers this file
@@ -34,7 +34,7 @@ import { buildCatalogue, partBelongsTo, type BodyKind, type SearchEntry } from '
  * percent sign is outside it, so an encoded payload is simply dropped.
  */
 
-export const LAYER_NAMES = ['vessels', 'nerves', 'hormones', 'activity'] as const;
+export const LAYER_NAMES = ['bones', 'vessels', 'nerves', 'hormones', 'activity'] as const;
 export type LayerName = (typeof LAYER_NAMES)[number];
 export const CUT_AXES = ['front', 'side', 'top'] as const;
 export type ShareAxis = (typeof CUT_AXES)[number];

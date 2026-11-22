@@ -11,6 +11,7 @@ import { activityColour, activityColourBelow } from './activityRamp';
 import { ALARM_HEX } from './alarmOrgans';
 import { amnioticSacRadii } from '../anatomy/atlas/uterus.parts';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
+import { LAYER_LOOK, layerBuildNeeded, layerOrganVisible, noLayers, type LayerFlags, type LayerId } from './layers';
 
 /**
  * THE ORGAN SET.
@@ -241,8 +242,16 @@ export interface OrganHandle {
   built: boolean;
   /** True while a build is in flight, so it is not asked for twice. */
   building: boolean;
-  /** The organ belongs to the body as it currently is. */
+  /**
+   * The organ belongs to the body as it currently is. A LAYER organ is never `wanted`: the glass
+   * outline is fitted to the organs the body always has, and it reads this flag.
+   */
   wanted: boolean;
+  /**
+   * The organ is drawn, picked, labelled and animated right now: `wanted` for an ordinary organ;
+   * for a layer organ, its layer is on or it is selected (see layers.ts).
+   */
+  drawn: boolean;
   /** 0..1 fade-in after the geometry arrives. */
   appear: number;
   /** Smoothed engagement above rest, 0..1, and the value it is heading for. */
@@ -280,6 +289,9 @@ export class OrganSet {
   totalTriangles = 0;
 
   private body: BodyKind = { sex: 'male', pregnant: false, gestationWeeks: 0 };
+  /** Which layers are switched on, and the selected organ: together they decide what a layer organ does. */
+  private layers: LayerFlags = noLayers();
+  private selectedId: OrganId | null = null;
   private readonly scratchColor = new THREE.Color();
   private readonly scratchFit = new THREE.Vector3();
   private readonly restTint = new THREE.Color();
@@ -325,7 +337,7 @@ export class OrganSet {
   /** Organs wanted by the current body whose geometry has not arrived yet. */
   get pendingCount(): number {
     let n = 0;
-    for (const h of this.organs.values()) if (h.wanted && !h.built) n++;
+    for (const h of this.organs.values()) if ((h.wanted || h.drawn) && !h.built) n++;
     return n;
   }
 
@@ -337,7 +349,8 @@ export class OrganSet {
     geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(0), 3));
 
     const ownColor = new THREE.Color(def.selectedColor);
-    const tint = ownColor.clone().lerp(PINK, REST_TINT_MIX);
+    // A layer organ starts from its layer's own tint (ivory for bone), not the pink mix.
+    const tint = def.layer ? new THREE.Color(LAYER_LOOK[def.layer].tint) : ownColor.clone().lerp(PINK, REST_TINT_MIX);
     const absorptionMaterial = createOrganAbsorptionMaterial({ tint, density: 0 });
     const rimMaterial = createOrganRimMaterial({ gain: 0 });
     assertOrderIndependent(absorptionMaterial);
@@ -423,6 +436,7 @@ export class OrganSet {
       built: false,
       building: false,
       wanted: false,
+      drawn: false,
       appear: 0,
       activity: 0,
       activityTarget: 0,
@@ -454,41 +468,82 @@ export class OrganSet {
   }
 
   private wants(def: OrganDef): boolean {
-    // A LAYER ORGAN (the bones, and later the muscles and lymph) is not part of the default
-    // body: it is built, drawn and picked only while its layer is on or it is selected, so
-    // that a visitor who never opens the layer never pays for a skeleton's worth of triangles.
-    // The layer switch does not exist yet, so for now a layer organ is simply never wanted:
-    // it is not built, not drawn, not picked and not in the outline's fit. The follow-up
-    // (agent ls) replaces this line with lazy building driven by the layer control.
+    // A LAYER ORGAN (the bones, and later the muscles and lymph) is never part of the body's own
+    // set: it is built, drawn and picked on demand (see layers.ts and `syncLayerOrgans`), and it
+    // is kept out of `wanted` so the glass outline, which is fitted to `wanted` organs, does not
+    // change shape when a skeleton is shown.
     if (def.layer) return false;
     if (def.sex && def.sex !== this.body.sex) return false;
     if (def.pregnancyOnly) return this.body.pregnant && this.body.gestationWeeks >= 8;
     return true;
   }
 
+  /** Change whether an organ is drawn, hiding it at once or fading it back in. */
+  private setDrawn(h: OrganHandle, drawn: boolean): void {
+    if (drawn === h.drawn) return;
+    h.drawn = drawn;
+    if (!drawn) {
+      // Gone at once: an organ this body does not have, or a layer that was switched off, must
+      // not linger half-faded.
+      h.appear = 0;
+      this.setMeshVisibility(h);
+      if (h.state !== 'dormant') this.setState(h.id, 'dormant');
+    } else if (h.built) {
+      h.appear = 0; // fade back in
+    }
+  }
+
   private applyBody(): void {
     const order = [...BUILD_ORDER, ...ORGAN_DEFS.map((d) => d.id).filter((id) => !BUILD_ORDER.includes(id))];
     for (const id of order) {
       const h = this.organs.get(id);
-      if (!h) continue;
+      if (!h || h.def.layer) continue;
       const wanted = this.wants(h.def);
-      if (wanted !== h.wanted) {
-        h.wanted = wanted;
-        if (!wanted) {
-          // Gone at once: an organ this body does not have must not linger half-faded.
-          h.appear = 0;
-          this.setMeshVisibility(h);
-          if (h.state !== 'dormant') this.setState(id, 'dormant');
-        } else if (h.built) {
-          h.appear = 0; // fade back in
-        }
-      }
+      h.wanted = wanted;
+      this.setDrawn(h, wanted);
       if (!wanted) continue;
 
       const week = id === 'uterus' && this.body.pregnant ? Math.max(0, Math.round(this.body.gestationWeeks)) : 0;
       if ((!h.built || h.builtForWeek !== week) && !h.building) this.build(h, week);
     }
+    this.syncLayerOrgans();
+  }
+
+  /**
+   * Which layer organs are drawn, and which must be built now. Called whenever a layer flag or the
+   * selection changes. The rule is layers.ts's; nothing here is built at boot.
+   */
+  private syncLayerOrgans(): void {
+    for (const h of this.organs.values()) {
+      const layer = h.def.layer;
+      if (!layer) continue;
+      const selected = this.selectedId === h.id;
+      this.setDrawn(h, layerOrganVisible(layer, this.layers, selected));
+      if (layerBuildNeeded(layer, this.layers, selected, h.built, h.building)) this.build(h, 0);
+    }
     this.refreshPickTargets();
+  }
+
+  /** Switch a layer on or off. Its organs are built the first time it is on, then only shown or hidden. */
+  setLayer(layer: LayerId, on: boolean): void {
+    if (this.layers[layer] === on) return;
+    this.layers = { ...this.layers, [layer]: on };
+    this.syncLayerOrgans();
+  }
+
+  /** Whether a layer is on (a read-only view for probes and the Viewer). */
+  layerOn(layer: LayerId): boolean {
+    return this.layers[layer];
+  }
+
+  /**
+   * Tell the set which organ is open, so a layer organ that is selected is built and drawn
+   * whatever its layer says, and hidden again when it is not. Never changes a layer flag.
+   */
+  setSelection(id: OrganId | null): void {
+    if (this.selectedId === id) return;
+    this.selectedId = id;
+    this.syncLayerOrgans();
   }
 
   private build(h: OrganHandle, week: number): void {
@@ -547,7 +602,7 @@ export class OrganSet {
   }
 
   private setMeshVisibility(h: OrganHandle): void {
-    const on = h.built && h.wanted;
+    const on = h.built && h.drawn;
     h.absorption.visible = on;
     h.rim.visible = on;
     if (!on) {
@@ -558,7 +613,7 @@ export class OrganSet {
 
   private refreshPickTargets(): void {
     this.pickTargets.length = 0;
-    for (const h of this.organs.values()) if (h.built && h.wanted) this.pickTargets.push(h.absorption);
+    for (const h of this.organs.values()) if (h.built && h.drawn) this.pickTargets.push(h.absorption);
   }
 
   /* --------------------------------------------------------------- states */
@@ -620,7 +675,7 @@ export class OrganSet {
     // See RECEDE_DENSITY: 1 while some organ is open, eased so nothing pops.
     let anySelected = false;
     for (const h of this.organs.values()) {
-      if (h.built && h.wanted && h.state === 'selected') {
+      if (h.built && h.drawn && h.state === 'selected') {
         anySelected = true;
         break;
       }
@@ -643,7 +698,7 @@ export class OrganSet {
     const alarmBlend = 1 - Math.exp(-dtMs / ALARM_TAU_MS);
 
     for (const h of this.organs.values()) {
-      if (!h.built || !h.wanted) continue;
+      if (!h.built || !h.drawn) continue;
 
       h.alarm += (h.alarmTarget - h.alarm) * alarmBlend;
       h.activity += (h.activityTarget - h.activity) * activityBlend;
@@ -671,7 +726,8 @@ export class OrganSet {
         + mode * (ACTIVITY_QUIET_DENSITY + ACTIVITY_DENSITY_SPAN * departure);
       // An alarming organ is also denser at the top of its swing, so it reads on the pale page.
       const alarmAmount = h.alarm * swing;
-      const activeGain = selected ? 0 : (gain + ALARM_DENSITY_GAIN * alarmAmount) * (h.def.shellDensity ?? 1);
+      const layerLook = h.def.layer ? LAYER_LOOK[h.def.layer] : null;
+      const activeGain = selected ? 0 : (gain + ALARM_DENSITY_GAIN * alarmAmount) * (h.def.shellDensity ?? 1) * (layerLook?.density ?? 1);
       const density = h.fromDensity + (target.density * activeGain - h.fromDensity) * e;
       const rimGain = h.fromRim + (target.rimGain - h.fromRim) * e;
       h.ownDensity = density;
@@ -683,14 +739,15 @@ export class OrganSet {
       abs.uniforms.uDensity.value = density * fade * (selected || exempt ? 1 : recedeDensity);
       rim.uniforms.uRimGain.value = rimGain * fade * (selected || exempt ? 1 : recedeRim);
 
-      this.restTint.copy(h.ownColor).lerp(PINK, REST_TINT_MIX + (ACTIVE_TINT_MIX - REST_TINT_MIX) * h.activity);
+      if (layerLook) this.restTint.set(layerLook.tint);
+      else this.restTint.copy(h.ownColor).lerp(PINK, REST_TINT_MIX + (ACTIVE_TINT_MIX - REST_TINT_MIX) * h.activity);
       if (mode > 0.001) {
         // The ramp replaces the organ's own colour. Authored in sRGB, so it is set with
         // the colour space named; the working space is linear.
         if (h.activityBelow > h.activity) activityColourBelow(h.activityBelow, this.rampRgb);
         else activityColour(h.activity, this.rampRgb);
         this.rampColor.setRGB(this.rampRgb.r, this.rampRgb.g, this.rampRgb.b, THREE.SRGBColorSpace);
-        this.restTint.lerp(this.rampColor, mode);
+        this.restTint.lerp(this.rampColor, mode * (layerLook?.activityColourMix ?? 1));
       }
       if (alarmAmount > 0.001 && !selected) this.restTint.lerp(this.alarmColor, ALARM_TINT_MIX * alarmAmount);
       (abs.uniforms.uTint.value as THREE.Color).lerpColors(h.fromTint, selected ? WHITE : this.restTint, e);
