@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { tubeAlong, type V3 } from '../sdf';
-import { SPINAL_CORD_PATH } from '../models';
+import { SPINAL_CORD_PATH } from '../paths';
 import { warpGeometry } from '../layout';
 
 /**

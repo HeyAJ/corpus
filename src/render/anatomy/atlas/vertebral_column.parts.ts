@@ -1,7 +1,7 @@
 import type * as THREE from 'three';
 import type { PartBuilder } from '../parts';
 import { warpGeometry } from '../layout';
-import { SPINAL_CORD_PATH } from '../models';
+import { SPINAL_CORD_PATH } from '../paths';
 import { mergeParts, tubeAlong, type V3 } from '../sdf';
 import { blob } from './stub_shared';
 

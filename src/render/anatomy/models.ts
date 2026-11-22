@@ -20,6 +20,7 @@ import {
   type V3,
 } from './sdf';
 import { fbm, ridged } from './noise';
+import { SPINAL_CORD_PATH } from './paths';
 import { giPath, giSegment, organDef, warpGeometry } from './layout';
 import { mouth } from './shells/mouth';
 import { salivaryGlands } from './shells/salivary_glands';
@@ -164,19 +165,8 @@ function eyes(): THREE.BufferGeometry {
 
 /* ------------------------------------------------------------ spinal cord */
 
-/** Spinal cord centreline, unexploded body coordinates, foramen magnum to the sacrum. */
-export const SPINAL_CORD_PATH: [number, number, number][] = [
-  [0, 0.39, -0.026],
-  [0, 0.36, -0.03],
-  [0, 0.33, -0.034],
-  [0, 0.29, -0.05],
-  [0, 0.22, -0.078],
-  [0, 0.15, -0.08],
-  [0, 0.09, -0.07],
-  [0, 0.045, -0.062],
-  [0, -0.03, -0.066],
-  [0, -0.1, -0.078],
-];
+/** The cord's centreline now lives in paths.ts (shared with the vertebral column, which encloses it). */
+export { SPINAL_CORD_PATH };
 
 /**
  * Cord radius at a body height. Two enlargements - cervical for the arms, lumbar for
