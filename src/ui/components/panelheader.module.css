@@ -42,9 +42,16 @@
   inset: -8px -6px;
 }
 
+/* The meta chip is the part of the header that gives way. A long chip ("Small Intestine ·
+   17 parts · 25 finer") used to sit on top of the title on a 390 px phone, because the
+   chip was `flex: none` and the title had only what was left. Now the chip may shrink,
+   is capped at 60 % of the row, and ellipsises; its full text is in the `title` attribute
+   (PanelHeader.tsx) so a visitor can still read all of it on hover or long-press. The
+   title keeps its place in the row: it is never the one that is truncated. */
 .meta {
-  flex: none;
-  max-width: 55%;
+  min-width: 0;
+  flex: 0 1 auto;
+  max-width: 60%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -54,8 +54,15 @@ export function PanelHeader({ title, onClose, meta, metaTone, metaTitle, before,
           title
         )}
       </h2>
+      {/* The chip can ellipsise on a narrow phone, so its full text must stay readable: the
+          tooltip shows the whole string on hover or long-press. An explicit `metaTitle` wins;
+          otherwise a plain-text meta is its own tooltip. A node meta has no text to offer, so
+          it gets no tooltip rather than a wrong one. */}
       {hasMeta && (
-        <span className={`${styles.meta} ${metaTone ? styles[`tone_${metaTone}`] : ''}`} title={metaTitle}>
+        <span
+          className={`${styles.meta} ${metaTone ? styles[`tone_${metaTone}`] : ''}`}
+          title={metaTitle ?? (typeof meta === 'string' ? meta : undefined)}
+        >
           {meta}
         </span>
       )}

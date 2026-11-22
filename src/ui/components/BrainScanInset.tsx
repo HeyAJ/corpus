@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import type { Viewer } from '../../render/scene/Viewer';
-import { BrainScan, SCAN_LEGEND } from '../../render/scan/BrainScan';
+import { BrainScan, BRAIN_SCAN_IDS, SCAN_LEGEND } from '../../render/scan/BrainScan';
 import { SCAN_STOPS, thermalColor } from '../../render/anatomy/detail/thermal';
 import { ANATOMY } from '../../data/anatomy';
 import { useStore } from '../store';
@@ -46,7 +46,14 @@ const BAR_GRADIENT = (() => {
 /** Points of activity index above rest below which the line says "steady". */
 const STEADY_MARGIN = 0.05;
 
-const BRAIN_PARTS = ANATOMY.brain?.parts ?? [];
+/**
+ * WHY ONLY THE SCAN'S OWN REGIONS. The readout must name what the picture shows. The atlas
+ * also holds nerves, vessels, membranes and magnified schematics (137 parts in all), and a
+ * schematic's activity can sit above its own rest while the coloured scan, which maps only
+ * `BRAIN_SCAN_IDS`, shows nothing there. Naming such a part would send the user looking for
+ * a colour that is not on the card, so the readout reads the same level-1 set the scan draws.
+ */
+const BRAIN_PARTS = (ANATOMY.brain?.parts ?? []).filter((p) => BRAIN_SCAN_IDS.has(p.id));
 
 function topChange(parts: Record<string, number> | undefined): string {
   if (!parts) return 'steady';
