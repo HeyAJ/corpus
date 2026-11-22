@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
 import { ellipsoid, mergeParts, polygonise, smoothUnion, tubeAlong, type V3 } from '../sdf';
 import { mulberry32 } from '../noise';
+import { add, bead as beadAt, beads as beadsOf, cord, fibonacciSphere, sample, unit } from './gland_shared';
 
 /**
  * INTERIOR OF THE THYMUS. The shell in models.ts is two lobes (centres x = +-11 mm, y +2 mm
@@ -81,6 +82,50 @@ export const parts: PartBuilder = () => {
     vessels.push(tubeAlong(v.artery, () => 0.0007, { tubular: 14, radial: 6 }), tubeAlong(v.vein, () => 0.0008, { tubular: 12, radial: 6 }));
   }
 
+  /* ---- finer structures ---- */
+  const cortexF = (s: number) => lobeAt(s, [0.75, 0.86, 0.55]);
+  const medullaF = (s: number) => lobeAt(s, [0.42, 0.8, 0.34]);
+  const cells = (s: number, seed: number, n: number, sep: number, inside: (x: number, y: number, z: number) => boolean) => {
+    const [mn, mx] = lobeBox(s);
+    return sample(inside, mn, mx, n, seed, sep);
+  };
+  const thymocytes: V3[] = [];
+  const corticalEpi: THREE.BufferGeometry[] = [];
+  const medullaryEpi: V3[] = [];
+  const dendritic: THREE.BufferGeometry[] = [];
+  const fat: V3[] = [];
+  const dirs = fibonacciSphere(8);
+  for (const s of [1, -1]) {
+    const c = LOBE(s);
+    const cf = cortexF(s);
+    const mf = medullaF(s);
+    const inCortex = (x: number, y: number, z: number) => cf(x, y, z) < -0.0003 && mf(x, y, z) > 0.0004;
+    thymocytes.push(...cells(s, 0x71c0 + s, 50, 0.0007, inCortex));
+    const nodes = cells(s, 0xce11 + s, 10, 0.003, inCortex);
+    nodes.forEach((a, i) => {
+      corticalEpi.push(beadAt(a, 0.00045, 6, 4));
+      // Join each node to its two nearest neighbours by a thin process (duplicates are harmless).
+      nodes
+        .map((b, j) => ({ j, d: Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) }))
+        .filter((e) => e.j !== i)
+        .sort((p, q) => p.d - q.d)
+        .slice(0, 2)
+        .forEach((e) => corticalEpi.push(cord([a, nodes[e.j]], 0.00014, 2, 4)));
+    });
+    const inMedulla = (x: number, y: number, z: number) => mf(x, y, z) < -0.0004;
+    medullaryEpi.push(...cells(s, 0xed11 + s, 10, 0.0016, inMedulla));
+    for (const a of cells(s, 0xdc11 + s, 6, 0.004, inMedulla)) {
+      dendritic.push(beadAt(a, 0.0003, 6, 4));
+      for (let k = 0; k < 4; k++) {
+        const d = unit([Math.cos(k * 1.57 + a[0] * 900), Math.sin(k * 1.57 + a[1] * 900), 0.5 * (k % 2 ? 1 : -1)]);
+        const e = add(a, d, 0.0009);
+        if (inMedulla(e[0], e[1], e[2])) dendritic.push(cord([a, e], 0.00012, 2, 3));
+      }
+    }
+    // Fat: pale beads halfway between the cortex surface and the lobe surface, around the lobe.
+    for (const d of dirs) fat.push([c[0] + d[0] * R[0] * 0.81, c[1] + d[1] * R[1] * 0.81, d[2] * R[2] * 0.81 * 0.9]);
+  }
+
   const [bmin, bmax]: [V3, V3] = [[-0.028, -0.036, -0.008], [0.028, 0.036, 0.008]];
   return [
     { id: 'right_lobe', geometry: polygonise(lobeAt(1, [0.87, 0.93, 0.75]), ...lobeBox(1), { cell }) },
@@ -91,5 +136,11 @@ export const parts: PartBuilder = () => {
     { id: 'thymic_corpuscles', geometry: mergeParts(corpuscles) },
     { id: 'septa', geometry: mergeParts(septa) },
     { id: 'vessels', geometry: mergeParts(vessels) },
+    // Level 2, children of the cortex and the medulla, and the descriptive fat part.
+    ...(thymocytes.length ? [{ id: 'thymocytes', geometry: beadsOf(thymocytes, 0.00026, 5, 3) }] : []),
+    ...(corticalEpi.length ? [{ id: 'cortical_epithelial_cells', geometry: mergeParts(corticalEpi) }] : []),
+    ...(medullaryEpi.length ? [{ id: 'medullary_epithelial_cells', geometry: beadsOf(medullaryEpi, 0.0004, 7, 5) }] : []),
+    ...(dendritic.length ? [{ id: 'dendritic_cells', geometry: mergeParts(dendritic) }] : []),
+    { id: 'adipose_replacement', geometry: beadsOf(fat, 0.0007, 8, 5) },
   ];
 };

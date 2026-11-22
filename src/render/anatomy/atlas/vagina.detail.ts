@@ -38,6 +38,16 @@ const scratch = new THREE.Color();
 const blood = new THREE.Color();
 const BEAT_HZ = 0.8;
 
+const NEW_GLASS: readonly (readonly [string, number])[] = [
+  ['vaginal_adventitia', 0.14],
+  ['vaginal_muscularis', 0.16],
+  ['vaginal_lamina_propria', 0.16],
+  ['vaginal_epithelium', 0.18],
+  ['labia_majora', 0.22],
+  ['mons_pubis', 0.2],
+  ['vaginal_artery', 0.5],
+];
+
 export const detail: OrganDetailSpec = {
   flows: () => {
     const artery = (id: string, path: FlowSpec['path'], size: number): FlowSpec => ({ id, path, count: 30, size, color: OXYGENATED, speed: 0.008, spread: 0.0006 });
@@ -59,6 +69,12 @@ export const detail: OrganDetailSpec = {
     // Glass: the wall deepens with congestion.
     ctx.part('vaginal_wall')?.setOpacity(0.2 + 0.15 * vc + 0.1 * ctx.activity('vaginal_wall'));
     ctx.part('vestibule')?.setOpacity(0.18 + 0.1 * vc);
+    // FINER STRUCTURES (T2): the wall's layers, the folds and pads and the artery are glass (display
+    // opacities); the labia minora and the artery fill with blood with the erectile tissue.
+    for (const [id, o] of NEW_GLASS) ctx.part(id)?.setOpacity(o);
+    ctx.part('labia_minora')?.setOpacity(0.28 + 0.12 * vc);
+    bloodColour(blood, ctx.lerp(arterial));
+    ctx.part('vaginal_artery')?.setColor(blood);
 
     // Erectile tissue: deeper colour and glow as it fills.
     for (const id of ERECTILE) {

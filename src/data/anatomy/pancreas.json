@@ -141,6 +141,131 @@
         { "signal": "hypovolaemia", "weight": -0.1, "note": "When blood volume is low the splanchnic vessels constrict.", "source": "GH14" }
       ],
       "source": "GRAYS42"
+    },
+    {
+      "id": "acinar_cells",
+      "parent": "acinar_tissue",
+      "label": "Acinar Cells",
+      "summary": "The enzyme-making cells of the pancreas, shown in one enlarged acinus",
+      "function": "Acinar cells make the digestive enzymes of pancreatic juice and release them into the lumen of the acinus. This acinus is drawn far larger than life and is a schematic example.",
+      "color": "#e0b360",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "zymogen_granules",
+      "parent": "acinar_cells",
+      "label": "Zymogen Granules",
+      "summary": "The packets of inactive enzymes stored in acinar cells",
+      "function": "Acinar cells store their enzymes as inactive precursors in granules at the end facing the lumen. They are released when the cell is stimulated, and are activated only in the gut.",
+      "color": "#b86a3a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "centroacinar_cells",
+      "parent": "acinar_tissue",
+      "label": "Centroacinar Cells",
+      "summary": "Small cells at the mouth of an acinus",
+      "function": "Centroacinar cells lie at the start of the duct system, inside the acinus. They add a watery, bicarbonate-rich fluid that washes the enzymes along.",
+      "color": "#f0d98a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intercalated_ducts",
+      "parent": "acinar_tissue",
+      "label": "Intercalated Ducts",
+      "summary": "The smallest ducts, leading from the acini",
+      "function": "Intercalated ducts begin at the acini and join into larger ducts, which in turn drain into the main pancreatic duct.",
+      "color": "#d9c07a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "beta_cells",
+      "parent": "islets",
+      "label": "Beta Cells (Insulin)",
+      "summary": "The islet cells that make insulin",
+      "function": "Beta cells release insulin when blood glucose rises. Insulin lets the body take up and store glucose. They are shown as beads in one enlarged schematic islet.",
+      "color": "#4aa3e0",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "hyperglycaemia",
+          "weight": 0.35,
+          "note": "A high blood glucose drives insulin secretion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "absorption",
+          "weight": 0.2,
+          "note": "Glucose arriving from the gut stimulates insulin secretion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alpha_cells",
+      "parent": "islets",
+      "label": "Alpha Cells (Glucagon)",
+      "summary": "The islet cells that make glucagon",
+      "function": "Alpha cells release glucagon when blood glucose falls. Glucagon makes the liver release glucose into the blood.",
+      "color": "#e8a838",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "hypoglycaemia",
+          "weight": 0.35,
+          "note": "A low blood glucose drives glucagon secretion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.1,
+          "note": "Sympathetic outflow promotes glucagon release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "delta_cells",
+      "parent": "islets",
+      "label": "Delta Cells (Somatostatin)",
+      "summary": "The islet cells that make somatostatin",
+      "function": "Delta cells release somatostatin, a hormone that restrains the release of both insulin and glucagon.",
+      "color": "#8a6ad0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pp_cells",
+      "parent": "islets",
+      "label": "PP Cells (Pancreatic Polypeptide)",
+      "summary": "The islet cells that make pancreatic polypeptide",
+      "function": "PP cells release pancreatic polypeptide, a hormone that is thought to help regulate pancreatic secretion and appetite.",
+      "color": "#6ab07a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epsilon_cells",
+      "parent": "islets",
+      "label": "Epsilon Cells (Ghrelin)",
+      "summary": "A scarce islet cell that makes ghrelin",
+      "function": "Epsilon cells release ghrelin, a hormone better known for being made in the stomach. They are the least common of the five islet cell types.",
+      "color": "#d06a9a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
     }
   ]
 }

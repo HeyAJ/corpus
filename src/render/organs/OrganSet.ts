@@ -139,6 +139,14 @@ const RECEDE_DENSITY = 0.22;
  * its cusps. A DISPLAY factor, not a physical one.
  */
 const CLOSE_LOOK_RECEDE_CUT = 0.75;
+
+/**
+ * The same close look also thins the OPEN organ's own glass shell (the solid mesh, bucket 3):
+ * from 0.1 m inside the heart that shell, at 0.92, was the sheet of pink in front of the mitral
+ * cusps (a probe listed it as the only large near-opaque layer; neighbours, vessels and the body
+ * glass were all faint). A DISPLAY factor.
+ */
+const CLOSE_LOOK_SHELL_CUT = 0.85;
 const RECEDE_RIM = 0.4;
 /** Time constant of the recede, ms. */
 const RECEDE_TAU_MS = 160;
@@ -687,7 +695,7 @@ export class OrganSet {
       }
 
       h.solid.visible = selected && e > 0.05;
-      (h.solid.material as THREE.ShaderMaterial).uniforms.uOpacity.value = selected ? 0.92 * e * fade : 0;
+      (h.solid.material as THREE.ShaderMaterial).uniforms.uOpacity.value = selected ? 0.92 * e * fade * (1 - CLOSE_LOOK_SHELL_CUT * this.closeLook) : 0;
       if (h.fluid) h.fluid.visible = selected && e > 0.05;
 
       this.applyTransform(h);

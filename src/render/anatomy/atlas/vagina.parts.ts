@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
-import { chain, intersect, mergeParts, polygonise, tubeAlong, type Sdf, type V3 } from '../sdf';
+import { chain, ellipsoid, intersect, mergeParts, polygonise, tubeAlong, type Sdf, type V3 } from '../sdf';
 import { fbm } from '../noise';
 
 /**
@@ -26,10 +26,18 @@ import { fbm } from '../noise';
  * drawn as glass by the detail module. The folds, the cervix, the os, the muscle cuff, the
  * erectile tissue and the glands are content and stay solid.
  *
- * NOT DRAWN. The layers of the wall, the hymen, the labia majora and minora as skin folds,
- * the urethral opening, the perineal body and the levator ani; the shell has no room for
- * them. The cervix is only its lower part, a dome hanging from the roof of the shell, sized
- * to read, and its os faces straight down for clarity.
+ * FINER STRUCTURES (T2; src/data/anatomy/vagina.json `parent`). The four layers of the wall are
+ * children of `vaginal_wall` and the prepuce and frenulum children of the clitoral glans. The
+ * layers are four closed surfaces at fixed depths inside the wall's own surface (the shell's
+ * canal field, repeated above); the depths are drawing proportions, not measured thicknesses. The
+ * hymen, the vaginal and urethral orifices, the labia, the mons, the paraurethral glands, the
+ * perineal body and the vaginal artery are new level-1 parts. The vulva's soft parts (labia
+ * minora and majora, mons) are drawn as glass pads beside and in front of the vestibule at
+ * display positions chosen to read, not traced, and they extend a little past the shell's box.
+ * The orifices are drawn as rings; the hymen as a simple ring, because its real form varies.
+ * NOT DRAWN. The levator ani, the bladder neck, the fat of the labia as separate tissue and the
+ * nerve supply. The cervix is only its lower part, a dome hanging from the roof of the shell,
+ * sized to read, and its os faces straight down for clarity.
  */
 
 const CANAL_PTS: V3[] = [
@@ -151,5 +159,50 @@ export const parts: PartBuilder = () => {
     id: 'vestibular_glands',
     geometry: mergeParts([1, -1].map((s) => scaledSphere([s * 0.0095, -0.0855, 0.0405], [0.0016, 0.0016, 0.0016], 10))),
   });
+
+  // THE FOUR LAYERS OF THE WALL, outermost first, as closed surfaces inside the wall's own surface
+  // (which is WALL below the shell). Coarse cells because they are smooth and nearly parallel.
+  const layer = (depth: number): THREE.BufferGeometry => polygonise((x, y, z) => e(x, y, z) + WALL - depth, LO, HI, { cell: 0.0022 });
+  out.push({ id: 'vaginal_adventitia', geometry: layer(-0.0004) });
+  out.push({ id: 'vaginal_muscularis', geometry: layer(0.0002) });
+  out.push({ id: 'vaginal_lamina_propria', geometry: layer(0.0007) });
+  out.push({ id: 'vaginal_epithelium', geometry: layer(0.0011) });
+
+  // The clitoral prepuce: the upper half of a slightly larger shell round the glans.
+  const gl = GLANS_CENTRE;
+  const hood = intersect(ellipsoid([gl[0], gl[1] + 0.0004, gl[2]], [0.0038, 0.0034, 0.0038]), (_x, y) => gl[1] + 0.0003 - y);
+  out.push({ id: 'clitoral_prepuce', geometry: polygonise(hood, [gl[0] - 0.005, gl[1] - 0.0005, gl[2] - 0.005], [gl[0] + 0.005, gl[1] + 0.005, gl[2] + 0.005], { cell: 0.0004 }) });
+  out.push({
+    id: 'clitoral_frenulum',
+    geometry: mergeParts(
+      [1, -1].map((s) => tubeAlong([[0, gl[1] - 0.0022, gl[2] - 0.0006], [s * 0.0016, gl[1] - 0.0048, gl[2] - 0.0028], [s * 0.0024, gl[1] - 0.0068, gl[2] - 0.0052]], (t) => 0.0004 - 0.00012 * t, { tubular: 10, radial: 4 })),
+    ),
+  });
+
+  // THE VULVA'S OTHER PARTS: rings, folds, pads, glands and the artery of the wall.
+  const ringTilted = (c: V3, ax: number, az: number, r: number): V3[] => {
+    // A ring in the plane of the vaginal opening: x across, and (0, 0.6, 0.8) up and forward.
+    const pts: V3[] = [];
+    for (let k = 0; k < 16; k++) {
+      const a = (k / 16) * Math.PI * 2;
+      pts.push([c[0] + ax * Math.cos(a), c[1] + 0.6 * az * Math.sin(a), c[2] + 0.8 * az * Math.sin(a)]);
+    }
+    void r;
+    return pts;
+  };
+  out.push({ id: 'hymen', geometry: tubeAlong(ringTilted([0, -0.0715, 0.0355], 0.0066, 0.0046, 0), () => 0.0006, { tubular: 32, radial: 6, closed: true }) });
+  out.push({ id: 'vaginal_orifice', geometry: tubeAlong(ringTilted([0, -0.0748, 0.0372], 0.0072, 0.005, 0), () => 0.0004, { tubular: 32, radial: 5, closed: true }) });
+  out.push({ id: 'external_urethral_orifice', geometry: scaledSphere([0, -0.0725, 0.0418], [0.0009, 0.0009, 0.0007], 8) });
+  out.push({ id: 'labia_minora', geometry: mergeParts([1, -1].map((s) => scaledSphere([s * 0.0125, -0.0755, 0.0415], [0.001, 0.012, 0.0052], 14))) });
+  out.push({ id: 'labia_majora', geometry: mergeParts([1, -1].map((s) => scaledSphere([s * 0.019, -0.0735, 0.0415], [0.0035, 0.016, 0.0065], 14))) });
+  out.push({ id: 'mons_pubis', geometry: scaledSphere([0, -0.048, 0.0555], [0.016, 0.0075, 0.0065], 16) });
+  out.push({ id: 'paraurethral_glands', geometry: mergeParts([1, -1].map((s) => scaledSphere([s * 0.0035, -0.0722, 0.0405], [0.0007, 0.0009, 0.0007], 8))) });
+  out.push({ id: 'perineal_body', geometry: scaledSphere([0, -0.0795, 0.0305], [0.0055, 0.0045, 0.004], 14) });
+  const arteries: THREE.BufferGeometry[] = [];
+  for (const s of [1, -1]) {
+    const pts: V3[] = [-0.062, -0.05, -0.038, -0.026, -0.014].map((y) => [s * 0.008, y, axisZ(y)] as V3);
+    arteries.push(tubeAlong(pts, () => 0.0006, { tubular: 24, radial: 5 }));
+  }
+  out.push({ id: 'vaginal_artery', geometry: mergeParts(arteries) });
   return out;
 };

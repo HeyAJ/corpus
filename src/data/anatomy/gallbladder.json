@@ -194,6 +194,111 @@
         }
       ],
       "source": "GRAYS42"
+    },
+    {
+      "id": "hartmanns_pouch",
+      "label": "Hartmann's Pouch",
+      "summary": "A bulge on the underside of the gallbladder neck",
+      "function": "Hartmann's pouch is a small outpouching where the neck begins. It points towards the duodenum, and it is where a gallstone is most likely to lodge.",
+      "color": "#6f8f4a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mucosal_folds",
+      "label": "Mucosal Folds",
+      "summary": "The ridges of the lining inside the gallbladder",
+      "function": "The lining of the gallbladder is thrown into many folds that form a honeycomb pattern. They give the lining a large surface for taking water out of the bile, which concentrates it.",
+      "color": "#c8d89a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cystic_artery",
+      "label": "Cystic Artery",
+      "summary": "The artery that supplies the gallbladder",
+      "function": "The cystic artery usually comes from the right hepatic artery. Near the neck it divides into branches that run over the wall.",
+      "color": "#c8454a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hepatopancreatic_ampulla",
+      "label": "Hepatopancreatic Ampulla (of Vater)",
+      "summary": "Where the bile duct and pancreatic duct meet",
+      "function": "The common bile duct and the main pancreatic duct join in a short dilated chamber, the ampulla, which opens into the duodenum. In life it lies in the duodenal wall, which is not drawn here.",
+      "color": "#98b030",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sphincter_of_oddi",
+      "label": "Sphincter of Oddi",
+      "summary": "The ring of muscle that guards the ampulla",
+      "function": "The sphincter of Oddi is a ring of smooth muscle round the end of the ampulla. Between meals it stays closed so bile backs up into the gallbladder, and after a fatty meal it relaxes to let bile and pancreatic juice into the gut.",
+      "color": "#b06a4a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serosa",
+      "parent": "body",
+      "label": "Serosa",
+      "summary": "The outer covering of the gallbladder wall",
+      "function": "The serosa is the thin layer of peritoneum on the free surface of the gallbladder. The side against the liver has no serosa and is attached to it instead.",
+      "color": "#d9c9a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perimuscular_connective_tissue",
+      "parent": "body",
+      "label": "Perimuscular Connective Tissue",
+      "summary": "The loose tissue between muscle and serosa",
+      "function": "This connective-tissue layer lies outside the muscle and carries the blood vessels, lymph vessels and nerves of the wall.",
+      "color": "#e0b89a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscularis",
+      "parent": "body",
+      "label": "Muscularis (Smooth Muscle)",
+      "summary": "The thin muscle layer of the wall",
+      "function": "The muscle fibres of the wall run in several directions. They contract when fat in the duodenum releases a hormone, squeezing bile out through the cystic duct.",
+      "color": "#b06a6a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lamina_propria",
+      "parent": "body",
+      "label": "Lamina Propria",
+      "summary": "The layer of connective tissue under the lining",
+      "function": "The lamina propria supports the epithelium and holds small vessels and nerves. It follows the folds of the lining.",
+      "color": "#d8c27a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "columnar_epithelium",
+      "parent": "body",
+      "label": "Columnar Epithelium",
+      "summary": "The single layer of tall cells that lines the lumen",
+      "function": "These cells take water and salts out of the bile and so concentrate it. They also secrete mucus that protects the lining from bile.",
+      "color": "#a8c060",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
     }
   ]
 }

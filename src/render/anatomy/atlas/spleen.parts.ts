@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
 import { ellipsoid, mergeParts, polygonise, smoothSubtract, sphere, tubeAlong, type Sdf, type V3 } from '../sdf';
 import { fbm, mulberry32 } from '../noise';
+import { add, beads as beadsOf, cord, perpendicular, ribbon, sample, unit } from './gland_shared';
 
 /**
  * THE INSIDE OF THE SPLEEN: capsule, trabeculae, red pulp, white pulp with its marginal
@@ -32,6 +33,18 @@ import { fbm, mulberry32 } from '../noise';
  * to read clearly and to stay inside the shell; none is measured, and the real follicles
  * are far smaller and far more numerous. The artery and vein are drawn in three branches
  * each; the real hilum has more.
+ *
+ * THE FINER STRUCTURES (reveal.ts), all schematic. Each follicle gets its own central
+ * arteriole (the twig that already feeds it, continued through its middle), a thin glass
+ * sheath of lymphoid tissue round that arteriole (the periarteriolar lymphoid sheath) and,
+ * in every third follicle, a small solid germinal centre off to one side. That is a drawing
+ * device: in life germinal centres come and go with immune activity, and this atlas does not
+ * model when. The red pulp holds glass venous sinuses, a solid meshwork of short splenic
+ * cords between them and macrophage beads lining the sinuses. The artery's children are its
+ * three branches redrawn thinner (the trabecular arteries) and a small brush of fine twigs
+ * leaving every second follicle into the red pulp (the penicillar arterioles). The two
+ * peritoneal ligaments are thin glass sheets that run from the hilum towards the stomach
+ * (anterior) and the left kidney (posterior); their extent is a drawing choice.
  */
 
 const HILUM_X = 0.0065;
@@ -162,5 +175,85 @@ export const parts: PartBuilder = () => {
     cords.push(tubeAlong([start, mid, end], (t) => 0.0007 * (1 - 0.4 * t), { tubular: 14, radial: 5 }));
   }
   out.push({ id: 'trabeculae', geometry: mergeParts(cords) });
+
+  /* ---- finer structures ---- */
+  const dirOf = (i: number): V3 => unit([centres[i][0] - twigs[i][0][0], centres[i][1] - twigs[i][0][1], centres[i][2] - twigs[i][0][2]]);
+  if (centres.length) {
+    out.push({
+      id: 'central_arteriole',
+      geometry: mergeParts(centres.map((c, i) => tubeAlong([twigs[i][1], c, add(c, dirOf(i), 0.0009)], () => 0.0003, { tubular: 8, radial: 5 }))),
+    });
+    out.push({
+      id: 'periarteriolar_lymphoid_sheath',
+      geometry: mergeParts(centres.map((c, i) => cord([add(c, dirOf(i), -0.0016), add(c, dirOf(i), 0.0016)], 0.0006, 2, 8))),
+    });
+    const gcs = centres.filter((_, i) => i % 3 === 0).map((c, j) => add(c, perpendicular(dirOf(j * 3)), 0.0013));
+    out.push({ id: 'germinal_centre', geometry: beadsOf(gcs, 0.00075, 8, 5) });
+
+    const brush: THREE.BufferGeometry[] = [];
+    centres.forEach((c, i) => {
+      if (i % 2) return;
+      const d = dirOf(i);
+      const u = perpendicular(d);
+      const o = add(c, d, 0.0009);
+      for (const spread of [-0.5, 0, 0.5]) {
+        const mid = add(add(o, d, 0.0016), u, spread * 0.0016);
+        const end = add(add(o, d, 0.0033), u, spread * 0.0036);
+        if (f(end[0], end[1], end[2]) < -0.0035) brush.push(cord([o, mid, end], 0.00018, 6, 4));
+      }
+    });
+    if (brush.length) out.push({ id: 'penicillar_arterioles', geometry: mergeParts(brush) });
+  }
+  out.push({
+    id: 'trabecular_arteries',
+    geometry: mergeParts(arteryBranches().map((b) => tubeAlong([ARTERY_ENTRY, ...b], (t) => 0.6 * (0.0014 - 0.0006 * t), { tubular: 36, radial: 6 }))),
+  });
+
+  // Red pulp: sinuses as long glass tubes, cords as short solid ones, macrophages as beads on the sinus walls.
+  const inPulp = (x: number, y: number, z: number) => f(x, y, z) < -0.0042;
+  const sinusRnd = mulberry32(0x51e5);
+  const sinuses: THREE.BufferGeometry[] = [];
+  const lining: V3[] = [];
+  for (const p of sample(inPulp, min, max, 14, 0x51a1, 0.006)) {
+    const d = unit([sinusRnd() - 0.5, sinusRnd() * 1.4 - 0.7, sinusRnd() - 0.5]);
+    const u = perpendicular(d);
+    const mid = add(add(p, d, 0.004), u, 0.0012);
+    const end = add(p, d, 0.008);
+    if (!inPulp(end[0], end[1], end[2]) || !inPulp(mid[0], mid[1], mid[2])) continue;
+    sinuses.push(tubeAlong([p, mid, end], () => 0.0006, { tubular: 10, radial: 6 }));
+    lining.push(add(mid, u, 0.0009), add(p, perpendicular(u), 0.0009));
+  }
+  if (sinuses.length) {
+    out.push({ id: 'venous_sinuses', geometry: mergeParts(sinuses) });
+    out.push({ id: 'red_pulp_macrophages', geometry: beadsOf(lining, 0.0005, 6, 4) });
+  }
+  const cordRnd = mulberry32(0xc0d5);
+  const cordTubes: THREE.BufferGeometry[] = [];
+  for (const p of sample(inPulp, min, max, 36, 0xc0a1, 0.0035)) {
+    const d = unit([cordRnd() - 0.5, cordRnd() - 0.5, cordRnd() - 0.5]);
+    const a = add(p, d, -0.0013);
+    const b = add(p, d, 0.0013);
+    if (inPulp(a[0], a[1], a[2]) && inPulp(b[0], b[1], b[2])) cordTubes.push(cord([a, b], 0.0003, 2, 5));
+  }
+  if (cordTubes.length) out.push({ id: 'splenic_cords', geometry: mergeParts(cordTubes) });
+
+  // Ligaments: three rows from the attachment line at the hilum out to a free edge.
+  const sheet = (a0: V3, a1: V3, b0: V3, b1: V3): THREE.BufferGeometry => {
+    const rows: V3[][] = [];
+    for (let r = 0; r < 3; r++) {
+      const t = r / 2;
+      const row: V3[] = [];
+      for (let k = 0; k < 4; k++) {
+        const u = k / 3;
+        const a: V3 = [a0[0] + (a1[0] - a0[0]) * u, a0[1] + (a1[1] - a0[1]) * u, a0[2] + (a1[2] - a0[2]) * u];
+        const b: V3 = [b0[0] + (b1[0] - b0[0]) * u, b0[1] + (b1[1] - b0[1]) * u, b0[2] + (b1[2] - b0[2]) * u];
+        row.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t + 0.0015 * Math.sin(Math.PI * t) * (k % 2 ? 1 : -1)]);
+      }
+      rows.push(row);
+    }
+    return ribbon(rows, 0.0006);
+  };
+  out.push({ id: 'gastrosplenic_ligament', geometry: sheet([0.0088, 0.026, 0.0125], [0.0088, 0.004, 0.0125], [0.022, 0.032, 0.0205], [0.022, 0.008, 0.0205]) });
+  out.push({ id: 'splenorenal_ligament', geometry: sheet([0.0118, 0.006, 0.0035], [0.0118, -0.022, 0.0035], [0.0235, 0.0, -0.0035], [0.0235, -0.02, -0.0035]) });
   return out;
 };

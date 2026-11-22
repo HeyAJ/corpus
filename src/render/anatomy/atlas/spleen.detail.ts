@@ -33,6 +33,21 @@ const GLASS: readonly [string, number][] = [
   ['splenic_vein', 0.42],
 ];
 
+/**
+ * THE FINER STRUCTURES. Vessels, the lymphoid sheath, the sinuses and the ligament sheets
+ * enclose or carry something, so they are glass; germinal centres, cords and macrophages are
+ * content and stay solid. Opacities are drawing choices.
+ */
+const CHILD_GLASS: readonly [string, number][] = [
+  ['central_arteriole', 0.55],
+  ['periarteriolar_lymphoid_sheath', 0.3],
+  ['trabecular_arteries', 0.55],
+  ['penicillar_arterioles', 0.6],
+  ['venous_sinuses', 0.3],
+  ['gastrosplenic_ligament', 0.28],
+  ['splenorenal_ligament', 0.28],
+];
+
 const FOLLICLE_BRIGHT = new THREE.Color(0xf4efe6);
 const tmp = new THREE.Color();
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
@@ -51,6 +66,7 @@ export const detail: OrganDetailSpec = {
 
   animate: (ctx: DetailContext) => {
     for (const [id, o] of GLASS) ctx.part(id)?.setOpacity(o);
+    for (const [id, o] of CHILD_GLASS) ctx.part(id)?.setOpacity(o);
     ctx.part('red_pulp')?.setOpacity(0.2 + 0.2 * ctx.activity('red_pulp'));
     const white = ctx.activity('white_pulp');
     ctx.part('marginal_zone')?.setOpacity(0.18 + 0.3 * ctx.activity('marginal_zone'));

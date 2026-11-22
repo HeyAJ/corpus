@@ -28,6 +28,19 @@ function feeder(vein: V3[], z: number, dy: number): V3[] {
 
 const GLASS = ['capsule', 'zona_glomerulosa', 'zona_fasciculata', 'zona_reticularis', 'central_vein', 'suprarenal_arteries'];
 
+/**
+ * THE FINER STRUCTURES. The nests that hold the chromaffin cells and the three artery groups
+ * (children of the medulla and of the suprarenal arteries) enclose or carry something, so
+ * they are glass; the cell cords and the small cell beads are content and stay solid. The
+ * opacities are drawing choices, kept low enough that a bead inside a nest shows through.
+ */
+const CHILD_GLASS: readonly [string, number][] = [
+  ['chromaffin_cells', 0.22],
+  ['superior_suprarenal_arteries', 0.5],
+  ['middle_suprarenal_artery', 0.5],
+  ['inferior_suprarenal_artery', 0.5],
+];
+
 export const detail: OrganDetailSpec = {
   flows: (organId) => {
     const k: 'l' | 'r' = organId === 'adrenal_l' ? 'l' : 'r';
@@ -43,6 +56,7 @@ export const detail: OrganDetailSpec = {
   },
   animate: (ctx) => {
     for (const id of GLASS) ctx.part(id)?.setOpacity(0.2 + 0.25 * ctx.activity(id));
+    for (const [id, o] of CHILD_GLASS) ctx.part(id)?.setOpacity(o);
 
     const cortex = ctx.lerp((s) => s.anatomy?.glands?.adrenal_cortex ?? 1);
     const medulla = ctx.lerp((s) => s.anatomy?.glands?.adrenal_medulla ?? 1);

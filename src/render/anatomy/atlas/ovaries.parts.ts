@@ -26,11 +26,21 @@ import { mulberry32 } from '../noise';
  * Which ovary carries the follicle is a drawing choice: in a real cycle the dominant follicle
  * alternates unpredictably, and the model has no side.
  *
- * NOT DRAWN. The ovarian ligament, the mesovarium, the nerve plexus, the theca and
- * granulosa layers of the follicle wall, the stroma's cell types, or any particular
- * count of follicles: the small follicles are scattered beads whose number and sizes were
- * chosen to read clearly, not counted. Primordial follicles are drawn far larger than they
- * are, because at true scale they would be invisible.
+ * FINER STRUCTURES (T2; src/data/anatomy/ovaries.json `parent`). The suspensory and ovarian
+ * ligaments, the mesovarium, the hilum and the surface epithelium are new level-1 parts. The
+ * follicle stages are children of the growing follicles (primary, secondary) and of the dominant
+ * (mature, Graafian) follicle, whose own wall layers, antrum and cumulus are children of it; the
+ * zona pellucida and the corona radiata are children of the oocyte (the oocyte already existed as
+ * a level-1 part and ids are not renamed); the two lutein cell types are children of the corpus
+ * luteum. The layers of the follicle are drawn as nested closed spheres at radii chosen to read
+ * clearly (every sphere sits inside the follicle the shell already drew) and the cell-level parts
+ * (the corona's beads, the theca-lutein beads) are a MAGNIFIED SCHEMATIC of a cluster of cells,
+ * not a count. Depth stays at two.
+ *
+ * NOT DRAWN. The nerve plexus, the stroma's cell types, the follicle count (the small follicles
+ * are scattered beads whose number and sizes were chosen to read clearly, not counted) and the
+ * ovary's lymphatics. Primordial follicles are drawn far larger than they are, because at true
+ * scale they would be invisible.
  */
 
 /** Ellipsoid radii of the shell, metres, and the x of the right ovary's centre. */
@@ -113,6 +123,18 @@ function beads(side: 1 | -1, count: number, seed: number, rMin: number, rMax: nu
   return mergeParts(geoms);
 }
 
+/** Small beads spread evenly over a sphere (golden-angle spiral): a schematic ring of cells. */
+function sphereOfBeads(c: V3, radius: number, count: number, r: number): THREE.BufferGeometry {
+  const gs: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < count; i++) {
+    const y = 1 - (2 * (i + 0.5)) / count;
+    const rr = Math.sqrt(1 - y * y);
+    const a = i * 2.399963;
+    gs.push(scaledSphere([c[0] + radius * rr * Math.cos(a), c[1] + radius * y, c[2] + radius * rr * Math.sin(a)], [r, r, r], 6));
+  }
+  return mergeParts(gs);
+}
+
 export const parts: PartBuilder = () => {
   const out: { id: string; geometry: THREE.BufferGeometry }[] = [];
   const sides = [1, -1] as const;
@@ -179,6 +201,53 @@ export const parts: PartBuilder = () => {
       { cell: 0.0004 },
     ),
   });
+
+  // FINER STRUCTURES. Follicle stages: a few larger beads in the cortex band, clear of the dominant
+  // follicle in the right ovary and of the scar in the left.
+  out.push({ id: 'primary_follicles', geometry: mergeParts([beads(1, 4, 0x1a11, 0.0009, 0.0011, clearR), beads(-1, 4, 0x1b22, 0.0009, 0.0011, clearL)]) });
+  out.push({ id: 'secondary_follicles', geometry: mergeParts([beads(1, 3, 0x1c33, 0.0015, 0.0019, clearR), beads(-1, 3, 0x1d44, 0.0015, 0.0019, clearL)]) });
+
+  // The dominant follicle's wall, from outside in: theca externa, theca interna, granulosa, and
+  // the fluid-filled antrum. Nested closed spheres, all inside the follicle sphere.
+  const fc = FOLLICLE_CENTRE;
+  out.push({ id: 'theca_externa', geometry: scaledSphere(fc, [0.0036, 0.0036, 0.0036], 22) });
+  out.push({ id: 'theca_interna', geometry: scaledSphere(fc, [0.0033, 0.0033, 0.0033], 22) });
+  out.push({ id: 'granulosa_cells', geometry: scaledSphere(fc, [0.0029, 0.0029, 0.0029], 22) });
+  out.push({ id: 'antrum', geometry: scaledSphere(fc, [0.0023, 0.0023, 0.0023], 20) });
+  // The cumulus: a mound on the wall that carries the oocyte, leaning from it towards the antrum.
+  const towardAntrum: V3 = [fc[0] - OOCYTE_CENTRE[0], fc[1] - OOCYTE_CENTRE[1], fc[2] - OOCYTE_CENTRE[2]];
+  const tl = Math.hypot(towardAntrum[0], towardAntrum[1], towardAntrum[2]) || 1;
+  out.push({
+    id: 'cumulus_oophorus',
+    geometry: scaledSphere(
+      [OOCYTE_CENTRE[0] + (0.0004 * towardAntrum[0]) / tl, OOCYTE_CENTRE[1] + (0.0004 * towardAntrum[1]) / tl, OOCYTE_CENTRE[2] + (0.0004 * towardAntrum[2]) / tl],
+      [0.0015, 0.0013, 0.0013],
+      16,
+    ),
+  });
+  // Round the oocyte: the zona pellucida (a thin glass coat) and the corona radiata (a ring of
+  // cells on the outside of it).
+  out.push({ id: 'zona_pellucida', geometry: scaledSphere(OOCYTE_CENTRE, [0.00068, 0.00068, 0.00068], 14) });
+  out.push({ id: 'corona_radiata', geometry: sphereOfBeads(OOCYTE_CENTRE, 0.00105, 14, 0.00026) });
+
+  // The corpus luteum's two cell types: a glass core of granulosa-lutein cells and a ring of
+  // theca-lutein cells in the folds at its edge.
+  out.push({ id: 'granulosa_lutein_cells', geometry: scaledSphere(fc, [0.0025, 0.0025, 0.0025], 20) });
+  out.push({ id: 'theca_lutein_cells', geometry: sphereOfBeads(fc, 0.0030, 18, 0.00045) });
+
+  // The ligaments, the mesovarium, the hilum and the surface epithelium (new level-1 parts).
+  const lig: { susp: THREE.BufferGeometry[]; ov: THREE.BufferGeometry[]; meso: THREE.BufferGeometry[]; hil: THREE.BufferGeometry[] } = { susp: [], ov: [], meso: [], hil: [] };
+  for (const s of sides) {
+    lig.susp.push(tubeAlong([[s * (CX + 0.0138), 0.0035, 0], [s * (CX + 0.022), 0.015, -0.002], [s * (CX + 0.034), 0.03, -0.004]], (t) => 0.0009 - 0.0003 * t, { tubular: 18, radial: 6 }));
+    lig.ov.push(tubeAlong([[s * (CX - 0.0145), -0.001, 0], [s * (CX - 0.0215), 0.001, 0.0005], [s * 0.021, 0.004, 0.001]], () => 0.0008, { tubular: 14, radial: 6 }));
+    lig.meso.push(scaledSphere([s * (CX + 0.0012), -0.0022, 0.0082], [0.01, 0.003, 0.0007], 18));
+    lig.hil.push(scaledSphere(hilum(s), [0.0055, 0.0016, 0.001], 14));
+  }
+  out.push({ id: 'suspensory_ligament', geometry: mergeParts(lig.susp) });
+  out.push({ id: 'ovarian_ligament', geometry: mergeParts(lig.ov) });
+  out.push({ id: 'mesovarium', geometry: mergeParts(lig.meso) });
+  out.push({ id: 'ovarian_hilum', geometry: mergeParts(lig.hil) });
+  out.push({ id: 'surface_epithelium', geometry: both([SHELL[0] - 0.0003, SHELL[1] - 0.0003, SHELL[2] - 0.0003], 0.0014) });
 
   // Corpus albicans: a small, irregular scar.
   const alb = ellipsoid(ALBICANS_CENTRE, [0.0017, 0.001, 0.0012]);

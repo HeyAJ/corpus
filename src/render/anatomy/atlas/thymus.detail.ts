@@ -15,6 +15,8 @@ const SIDES = [
   ['l', -1],
 ] as const;
 const GLASS = ['right_lobe', 'left_lobe', 'capsule', 'cortex', 'vessels'];
+/** The descriptive fat beads are drawn as faint glass so they read as a ghost of tissue, not a structure. Display choice. */
+const FAT_OPACITY = 0.2;
 
 export const detail: OrganDetailSpec = {
   flows: () => {
@@ -28,6 +30,7 @@ export const detail: OrganDetailSpec = {
   },
   animate: (ctx) => {
     for (const id of GLASS) ctx.part(id)?.setOpacity(0.2 + 0.25 * ctx.activity(id));
+    ctx.part('adipose_replacement')?.setOpacity(FAT_OPACITY);
     const rate = 0.4 + 2 * ctx.activity('vessels');
     for (const [k] of SIDES) {
       ctx.flow(`artery_${k}`)?.setRate(rate);

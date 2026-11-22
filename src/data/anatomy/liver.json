@@ -140,6 +140,337 @@
         { "signal": "stressAxis", "weight": 0.1, "note": "Stress hormones raise glucose production.", "source": "GH14" }
       ],
       "source": "GRAYS42"
+    },
+    {
+      "id": "bare_area",
+      "label": "Bare Area",
+      "summary": "The part of the liver's back with no peritoneal covering",
+      "function": "On the upper back of the right lobe the liver is fixed directly to the diaphragm and has no covering of peritoneum. It is bounded by the layers of the coronary ligament.",
+      "color": "#c47a5a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coronary_ligament",
+      "label": "Coronary Ligament",
+      "summary": "The peritoneal fold that frames the bare area",
+      "function": "The coronary ligament is formed where the peritoneum passes from the diaphragm onto the back of the liver. It holds the liver up against the diaphragm.",
+      "color": "#d9c9a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "triangular_ligaments",
+      "label": "Triangular Ligaments",
+      "summary": "Peritoneal folds at the two side tips of the liver",
+      "function": "At each side tip of the liver the layers of the coronary ligament come together into a narrow fold, the right and left triangular ligaments. They anchor the tips to the diaphragm.",
+      "color": "#d9c9a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ligamentum_teres",
+      "label": "Round Ligament (Ligamentum Teres)",
+      "summary": "A fibrous cord in the free edge of the falciform ligament",
+      "function": "The round ligament is the remnant of the fetal umbilical vein. It runs in the free edge of the falciform ligament towards the underside of the liver.",
+      "color": "#efe6c8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ligamentum_venosum",
+      "label": "Venous Ligament (Ligamentum Venosum)",
+      "summary": "A fibrous cord in a fissure between the left lobe and the caudate lobe",
+      "function": "The venous ligament is the remnant of the fetal ductus venosus, which let blood bypass the liver before birth. It lies in a fissure on the back of the liver.",
+      "color": "#efe6c8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "porta_hepatis",
+      "label": "Porta Hepatis",
+      "summary": "The gateway on the underside of the liver",
+      "function": "The porta hepatis is the deep transverse fissure where the portal vein and hepatic artery enter the liver and the bile ducts leave it. It lies between the caudate and quadrate lobes.",
+      "color": "#8a6a9a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fibrous_capsule",
+      "label": "Fibrous Capsule (of Glisson)",
+      "summary": "The thin connective-tissue coat round the whole liver",
+      "function": "Glisson capsule is a fine fibrous layer under the peritoneum that covers the liver. At the porta hepatis it continues inward along the vessels and ducts.",
+      "color": "#e0b89a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ivc_groove",
+      "label": "Groove for the Inferior Vena Cava",
+      "summary": "The channel on the back of the liver that holds the great vein",
+      "function": "The inferior vena cava runs in a groove on the back of the liver, where the hepatic veins open into it. It sits beside the caudate lobe.",
+      "color": "#5a6a9a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "segment_ii",
+      "parent": "left_lobe",
+      "label": "Segment II (Couinaud)",
+      "summary": "The upper outer region of the left lobe",
+      "function": "The liver is divided into eight segments, each with its own branches of portal vein, hepatic artery and bile duct. Segment II is the upper part of the left lateral region.",
+      "color": "#b5604a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "segment_iii",
+      "parent": "left_lobe",
+      "label": "Segment III (Couinaud)",
+      "summary": "The lower outer region of the left lobe",
+      "function": "Segment III is the lower part of the left lateral region of the liver. It is served by its own portal and arterial branches.",
+      "color": "#bd6a52",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "segment_iv",
+      "parent": "left_lobe",
+      "label": "Segment IV (Couinaud)",
+      "summary": "The inner region of the left lobe",
+      "function": "Segment IV is the medial region of the left lobe, lying next to the falciform ligament. Its lower part is the quadrate lobe. Segment I is the caudate lobe.",
+      "color": "#c06c54",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "segment_v",
+      "parent": "right_lobe",
+      "label": "Segment V (Couinaud)",
+      "summary": "The lower front region of the right lobe",
+      "function": "Segment V is the lower, anterior region of the right lobe, beside the gallbladder. It is one of the right anterior segments.",
+      "color": "#a8503c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "segment_vi",
+      "parent": "right_lobe",
+      "label": "Segment VI (Couinaud)",
+      "summary": "The lower back region of the right lobe",
+      "function": "Segment VI is the lower, posterior region of the right lobe. It is one of the right posterior segments.",
+      "color": "#9a4636",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "segment_vii",
+      "parent": "right_lobe",
+      "label": "Segment VII (Couinaud)",
+      "summary": "The upper back region of the right lobe",
+      "function": "Segment VII is the upper, posterior region of the right lobe, close to the diaphragm. It is one of the right posterior segments.",
+      "color": "#8e4030",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "segment_viii",
+      "parent": "right_lobe",
+      "label": "Segment VIII (Couinaud)",
+      "summary": "The upper front region of the right lobe",
+      "function": "Segment VIII is the upper, anterior region of the right lobe, under the diaphragm. It is one of the right anterior segments.",
+      "color": "#b45a44",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "central_vein",
+      "parent": "lobules",
+      "label": "Central Vein",
+      "summary": "The small vein in the middle of every lobule",
+      "function": "Blood that has passed along the sinusoids collects in the central vein. Central veins join to form the hepatic veins that leave the liver.",
+      "color": "#5a4a8a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "hepaticOutput",
+          "weight": 0.25,
+          "note": "Glucose and other products leave the lobule in this blood.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "portal_triad",
+      "parent": "lobules",
+      "label": "Portal Triad",
+      "summary": "A venule, an arteriole and a bile ductule travelling together",
+      "function": "At each corner of a lobule a small branch of the portal vein, a branch of the hepatic artery and a bile ductule run side by side in a sheath of connective tissue. Blood flows from here towards the central vein.",
+      "color": "#d9c9a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "portal_venule",
+      "parent": "portal_triad",
+      "label": "Portal Venule",
+      "summary": "The branch of the portal vein in a triad",
+      "function": "It brings blood from the gut, rich in absorbed nutrients, to the edge of the lobule. This blood then flows into the sinusoids.",
+      "color": "#6f5a9a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hepatic_arteriole",
+      "parent": "portal_triad",
+      "label": "Hepatic Arteriole",
+      "summary": "The branch of the hepatic artery in a triad",
+      "function": "It brings oxygen-rich blood to the edge of the lobule, where it mixes with portal blood in the sinusoids. It also supplies the bile ducts.",
+      "color": "#c8454a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bile_ductule",
+      "parent": "portal_triad",
+      "label": "Bile Ductule",
+      "summary": "The small duct that carries bile out of the lobule",
+      "function": "Bile made by the liver cells drains from the canaliculi into the bile ductule at the edge of the lobule. It then joins larger bile ducts.",
+      "color": "#8aa83a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hepatocyte_plates",
+      "parent": "lobules",
+      "label": "Hepatocyte Plates",
+      "summary": "Sheets of liver cells between the sinusoids",
+      "function": "Liver cells are arranged in plates one cell thick that radiate from the central vein. Each plate lies between two sinusoids, so every cell touches blood on one side and a bile canaliculus on the other.",
+      "color": "#d08a3c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sinusoids",
+      "parent": "lobules",
+      "label": "Sinusoids",
+      "summary": "The leaky blood channels between the plates",
+      "function": "Sinusoids are wide, thin-walled channels that carry mixed portal and arterial blood past the liver cells towards the central vein. Their walls have gaps that let plasma reach the cells.",
+      "color": "#a05a6a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "kupffer_cells",
+      "parent": "sinusoids",
+      "label": "Kupffer Cells",
+      "summary": "Scavenger cells lining the sinusoids",
+      "function": "Kupffer cells are macrophages in the sinusoid wall. They remove worn-out blood cells, debris and microbes from the blood passing through.",
+      "color": "#6a3a3a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perisinusoidal_space",
+      "parent": "lobules",
+      "label": "Perisinusoidal Space (of Disse)",
+      "summary": "The narrow gap between sinusoid wall and liver cells",
+      "function": "Plasma seeps through the sinusoid wall into this space and bathes the liver cells directly. That is how the cells take up nutrients and release their products into the blood.",
+      "color": "#e0c89a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "stellate_cells",
+      "parent": "perisinusoidal_space",
+      "label": "Stellate (Ito) Cells",
+      "summary": "Cells in the perisinusoidal space that store vitamin A",
+      "function": "Stellate cells lie in the space of Disse. They store vitamin A and, when the liver is injured, can lay down scar tissue.",
+      "color": "#c8a84a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bile_canaliculi",
+      "parent": "lobules",
+      "label": "Bile Canaliculi",
+      "summary": "Tiny channels between liver cells that collect bile",
+      "function": "Bile canaliculi are grooves between neighbouring liver cells into which bile is secreted. They run the opposite way to the blood, from the centre of the lobule towards the portal triads.",
+      "color": "#a8c040",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.3,
+          "note": "Bile salts are needed to digest and absorb fat.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.15,
+          "note": "Bile secretion rises with digestion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "acinar_zone_1",
+      "parent": "lobules",
+      "label": "Acinar Zone 1 (Periportal)",
+      "summary": "The ring of cells nearest the portal triads",
+      "function": "Cells in zone 1 receive blood first, so they get the most oxygen and nutrients. In the simple picture of the acinus they are the last to be harmed by poor supply.",
+      "color": "#d4806a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "acinar_zone_2",
+      "parent": "lobules",
+      "label": "Acinar Zone 2 (Midzonal)",
+      "summary": "The middle ring of cells",
+      "function": "Zone 2 lies between the zone nearest the portal triads and the zone nearest the central vein. Its cells see blood that has already given up some oxygen.",
+      "color": "#c4a24a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "acinar_zone_3",
+      "parent": "lobules",
+      "label": "Acinar Zone 3 (Pericentral)",
+      "summary": "The ring of cells nearest the central vein",
+      "function": "Cells in zone 3 receive blood last, so they get the least oxygen. They are the first to suffer when supply falls.",
+      "color": "#8a6aa0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
     }
   ]
 }

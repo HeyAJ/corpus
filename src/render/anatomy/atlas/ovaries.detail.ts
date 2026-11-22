@@ -57,6 +57,22 @@ let ovulationStart = -1;
 let lastTime = 0;
 const scratch = new THREE.Color();
 
+/** Children that follow their parent's visibility, and the glass opacities of the new parts. */
+const FOLLICLE_KIDS = ['antrum', 'granulosa_cells', 'theca_interna', 'theca_externa', 'cumulus_oophorus'] as const;
+const OOCYTE_KIDS = ['zona_pellucida', 'corona_radiata'] as const;
+const LUTEUM_KIDS = ['granulosa_lutein_cells', 'theca_lutein_cells'] as const;
+const CHILD_GLASS: readonly (readonly [string, number])[] = [
+  ['theca_externa', 0.16],
+  ['theca_interna', 0.2],
+  ['granulosa_cells', 0.22],
+  ['antrum', 0.18],
+  ['cumulus_oophorus', 0.35],
+  ['zona_pellucida', 0.35],
+  ['granulosa_lutein_cells', 0.3],
+  ['surface_epithelium', 0.14],
+  ['mesovarium', 0.3],
+];
+
 export const detail: OrganDetailSpec = {
   flows: () => {
     const blood = (id: string, path: FlowSpec['path'], color: number): FlowSpec => ({ id, path, count: 26, size: 0.0007, color, speed: 0.006, spread: 0.0002 });
@@ -85,6 +101,11 @@ export const detail: OrganDetailSpec = {
     ctx.part('medulla')?.setOpacity(0.3);
     ctx.part('ovarian_artery')?.setOpacity(0.5);
     ctx.part('ovarian_vein')?.setOpacity(0.5);
+    // FINER STRUCTURES (T2): the follicle's nested wall layers, the zona, the lutein core and the
+    // surface skin are glass so what lies inside them can be seen; the opacities are display
+    // choices. The follicle, oocyte and corpus luteum children are shown and hidden with their
+    // parent below (a child does not inherit visibility, only pose).
+    for (const [id, o] of CHILD_GLASS) ctx.part(id)?.setOpacity(o);
 
     // Ovulation timer.
     const ovulating = cyc.active && cyc.phase === 'ovulation';
@@ -107,10 +128,12 @@ export const detail: OrganDetailSpec = {
         fPart.setGlow(clamp01(0.15 + 0.85 * e2));
       }
     }
+    for (const id of FOLLICLE_KIDS) ctx.part(id)?.setVisible(showFollicle);
     if (oPart) {
       // The oocyte leaves with the stream, so it is hidden once the follicle is half collapsed.
       const showOocyte = showFollicle && rupture < 0.5;
       oPart.setVisible(showOocyte);
+      for (const id of OOCYTE_KIDS) ctx.part(id)?.setVisible(showOocyte);
       if (showOocyte) oPart.setScale(Math.max(0.01, 0.18 + 0.82 * f), FOLLICLE_CENTRE);
     }
     const stream = ctx.flow('oocyte_release');
@@ -125,6 +148,7 @@ export const detail: OrganDetailSpec = {
     const clPart = ctx.part('corpus_luteum');
     if (clPart) {
       clPart.setVisible(cl > 0.03);
+      for (const id of LUTEUM_KIDS) ctx.part(id)?.setVisible(cl > 0.03);
       clPart.setScale(0.3 + 0.7 * cl, FOLLICLE_CENTRE);
       clPart.setGlow(cl);
     }

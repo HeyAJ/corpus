@@ -41,6 +41,13 @@ const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.m
 const WALL_PIECES = ['fundus', 'body', 'neck'];
 const DUCTS = ['cystic_duct', 'common_hepatic_duct', 'common_bile_duct'];
 const SQUEEZE_THRESHOLD = 0.15;
+/**
+ * Finer structures added later (T2). The five wall layers, the folds and the pouch belong to
+ * the wall, so they shrink with it; the layers are glass, as they enclose the bile. The
+ * opacities are display choices.
+ */
+const WALL_LAYERS = ['serosa', 'perimuscular_connective_tissue', 'muscularis', 'lamina_propria', 'columnar_epithelium'];
+const WALL_RIDERS = [...WALL_LAYERS, 'mucosal_folds', 'hartmanns_pouch'];
 
 const pivotArr = GB_NECK;
 
@@ -59,12 +66,24 @@ export const detail: OrganDetailSpec = {
 
     for (const id of WALL_PIECES) ctx.part(id)?.setOpacity(0.2 + 0.25 * ctx.activity(id));
     for (const id of DUCTS) ctx.part(id)?.setOpacity(0.45);
+    for (const id of WALL_LAYERS) ctx.part(id)?.setOpacity(0.18);
+    ctx.part('hartmanns_pouch')?.setOpacity(0.35);
+    ctx.part('hepatopancreatic_ampulla')?.setOpacity(0.45);
+    // The sphincter of Oddi is closed between meals and relaxes as the bag squeezes: the ring widens
+    // and flattens. The factors are a display choice, not a measured opening.
+    if (ctx.reducedMotion) {
+      ctx.part('sphincter_of_oddi')?.setScale(1);
+    } else {
+      ctx.part('sphincter_of_oddi')?.setScale([1 + 0.35 * squeeze, 1 - 0.4 * squeeze, 1 + 0.35 * squeeze]);
+    }
 
     if (ctx.reducedMotion) {
       ctx.part('bile')?.setScale(1, pivotArr);
+      for (const id of WALL_RIDERS) ctx.part(id)?.setScale(1, pivotArr);
     } else {
       ctx.part('bile')?.setScale(1 - 0.55 * squeeze, pivotArr);
       for (const id of WALL_PIECES) ctx.part(id)?.setScale(1 - 0.2 * squeeze, pivotArr);
+      for (const id of WALL_RIDERS) ctx.part(id)?.setScale(1 - 0.2 * squeeze, pivotArr);
     }
 
     const hepatic = ctx.flow('hepatic');

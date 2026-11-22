@@ -78,6 +78,31 @@ const tmp = new THREE.Color();
 const LOBES = ['right_lobe', 'left_lobe', 'caudate_lobe', 'quadrate_lobe'];
 const CONDUITS = ['portal_vein', 'hepatic_artery', 'hepatic_veins', 'bile_ducts', 'lobules'];
 
+/**
+ * Glass for the finer structures added later (T2). Each of these encloses or surrounds
+ * something that must stay visible: the capsule and the eight segments sit round the trees,
+ * the lobule's sheath, central vein, sinusoids, perisinusoidal space and zone rings hold the
+ * streams or the cells drawn inside them. The values are display choices.
+ */
+const FINE_GLASS: readonly (readonly [string, number])[] = [
+  ['fibrous_capsule', 0.12],
+  ['segment_ii', 0.22],
+  ['segment_iii', 0.22],
+  ['segment_iv', 0.22],
+  ['segment_v', 0.22],
+  ['segment_vi', 0.22],
+  ['segment_vii', 0.22],
+  ['segment_viii', 0.22],
+  ['portal_triad', 0.35],
+  ['central_vein', 0.45],
+  ['sinusoids', 0.5],
+  ['perisinusoidal_space', 0.25],
+  ['hepatocyte_plates', 0.55],
+  ['acinar_zone_1', 0.3],
+  ['acinar_zone_2', 0.3],
+  ['acinar_zone_3', 0.3],
+];
+
 /** Flow ids built once in `flows`, so `animate` allocates nothing per frame. */
 const ids = (prefix: string, n: number): string[] => Array.from({ length: n }, (_, i) => `${prefix}_${i}`);
 let names = { portal: [] as string[], artery: [] as string[], bile: [] as string[], vein: [] as string[], sinusoid: ids('sinusoid', 6), canaliculus: ids('canaliculus', 6) };
@@ -111,6 +136,7 @@ export const detail: OrganDetailSpec = {
     // Glass: lobes by their own activity; vessels and the lobule frame a steady 0.45.
     for (const id of LOBES) ctx.part(id)?.setOpacity(0.2 + 0.25 * ctx.activity(id));
     for (const id of CONDUITS) ctx.part(id)?.setOpacity(0.45);
+    for (const [id, o] of FINE_GLASS) ctx.part(id)?.setOpacity(o);
 
     const venousSat = ctx.lerp((s) => s.transport.venousSat);
     const arterialSat = ctx.lerp((s) => s.transport.arterialSat);

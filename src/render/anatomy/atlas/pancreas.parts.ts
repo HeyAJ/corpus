@@ -199,5 +199,159 @@ export const parts: PartBuilder = () => {
       tubeAlong(veinPath(), (t) => 0.0014 + 0.0006 * t, { tubular: 40, radial: 8 }),
     ]),
   });
+  out.push(...finerParts(g));
   return out;
 };
+
+/* -------------------------------------------------- finer structures (T2) */
+
+/**
+ * ONE MAGNIFIED ACINUS AND ONE MAGNIFIED ISLET, DRAWN INSIDE THE GLAND.
+ *
+ * Added after the first atlas as pure additions (no id moved). The cells of the pancreas are
+ * thousands of times smaller than the gland is drawn, so, as for the liver's lobule, one
+ * example of each is drawn enlarged inside the tissue that holds it and labelled as such:
+ *
+ *   - THE ACINUS (children of the acinar tissue): a ring of pyramid-shaped acinar cells round a
+ *     small lumen, their narrow ends towards it, each holding a few zymogen granules at the
+ *     lumen end, where the cell releases them; one or two centroacinar cells at the mouth of
+ *     the acinus; and an intercalated duct that leads away to join the main duct (GRAYS42,
+ *     GH14 ch. 65). The cell count, the number of granules and the sizes are LAYOUT CHOICES
+ *     for legibility, not measurements. The acinus is placed beside the main duct, in
+ *     whichever direction leaves the most room inside the gland.
+ *   - THE ISLET (children of the islets part): a cluster of beads, one per cell, in the five
+ *     types the texts name (alpha, beta, delta, PP and epsilon). The beads are laid out in
+ *     bands only so that the types can be told apart; the bands, the proportions of the
+ *     types and the bead size are drawing choices and are not an arrangement taken from
+ *     any text. Placement is seeded, so it is identical on every load.
+ *
+ * Nothing here changes the existing parts. Every bead and cell is kept inside the gland field
+ * with the same margin the existing islet beads use, so none can poke through the shell.
+ */
+
+/** The main duct's centre at fraction f (0..1) of the way along its path, by piecewise-linear interpolation. */
+function ductAt(f: number): V3 {
+  const n = DUCT_PATH.length - 1;
+  const x = Math.min(n - 1e-9, Math.max(0, f * n));
+  const i = Math.floor(x);
+  const u = x - i;
+  const a = DUCT_PATH[i];
+  const b = DUCT_PATH[i + 1];
+  return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u];
+}
+
+/** Of eight directions round the duct, the centre that sits deepest inside the gland. */
+function roomiest(g: Sdf, from: V3, dist: number): V3 {
+  let best: V3 = from;
+  let bestD = Infinity;
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2;
+    // The duct runs mostly along x, so the room lies in the y-z plane.
+    const c: V3 = [from[0], from[1] + dist * Math.cos(a), from[2] + dist * Math.sin(a)];
+    const d = g(c[0], c[1], c[2]);
+    if (d < bestD) {
+      bestD = d;
+      best = c;
+    }
+  }
+  return best;
+}
+
+const sub3 = (a: V3, b: V3): V3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const len3 = (a: V3): number => Math.hypot(a[0], a[1], a[2]);
+const unit3 = (a: V3): V3 => {
+  const l = len3(a) || 1;
+  return [a[0] / l, a[1] / l, a[2] / l];
+};
+const mix3 = (a: V3, b: V3, t: number): V3 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+
+function ball(c: V3, r: number): THREE.BufferGeometry {
+  const s = new THREE.SphereGeometry(r, 6, 4);
+  s.translate(c[0], c[1], c[2]);
+  s.deleteAttribute('uv');
+  return s;
+}
+
+function finerParts(g: Sdf): { id: string; geometry: THREE.BufferGeometry }[] {
+  const out: { id: string; geometry: THREE.BufferGeometry }[] = [];
+  const rnd = mulberry32(0x2ac14);
+
+  // ---- the acinus
+  const D = ductAt(0.22);
+  const A = roomiest(g, D, 0.0048);
+  const toDuct = unit3(sub3(D, A));
+  const rho = 0.0031;
+  const cells: THREE.BufferGeometry[] = [];
+  const granules: THREE.BufferGeometry[] = [];
+  const dirs: V3[] = [];
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  const total = 14;
+  for (let i = 0; i < total; i++) {
+    const y = 1 - (2 * (i + 0.5)) / total;
+    const rr = Math.sqrt(Math.max(0, 1 - y * y));
+    const d = unit3([Math.cos(golden * i) * rr, y, Math.sin(golden * i) * rr]);
+    // Leave the side facing the duct open: the lumen's mouth.
+    if (d[0] * toDuct[0] + d[1] * toDuct[1] + d[2] * toDuct[2] > 0.62) continue;
+    dirs.push(d);
+  }
+  for (const d of dirs) {
+    const apex: V3 = [A[0] + d[0] * 0.0007, A[1] + d[1] * 0.0007, A[2] + d[2] * 0.0007];
+    const base: V3 = [A[0] + d[0] * rho, A[1] + d[1] * rho, A[2] + d[2] * rho];
+    cells.push(tubeAlong([apex, mix3(apex, base, 0.5), base], (t) => 0.00035 + 0.0008 * t, { tubular: 4, radial: 6 }));
+    for (let k = 0; k < 2; k++) {
+      const at = 0.0011 + 0.0006 * k + 0.0002 * rnd();
+      const off: V3 = [(rnd() - 0.5) * 0.0004, (rnd() - 0.5) * 0.0004, (rnd() - 0.5) * 0.0004];
+      granules.push(ball([A[0] + d[0] * at + off[0], A[1] + d[1] * at + off[1], A[2] + d[2] * at + off[2]], 0.00022));
+    }
+  }
+  out.push({ id: 'acinar_cells', geometry: mergeParts(cells) });
+  out.push({ id: 'zymogen_granules', geometry: mergeParts(granules) });
+
+  // Centroacinar cells: two flattened beads at the mouth of the acinus.
+  const mouth = mix3(A, D, 0.3);
+  const cen: THREE.BufferGeometry[] = [];
+  for (const side of [-1, 1]) {
+    const b = new THREE.SphereGeometry(0.0006, 6, 4);
+    b.scale(1, 1, 0.55);
+    b.translate(mouth[0] + side * 0.0007, mouth[1] + side * 0.0004, mouth[2]);
+    b.deleteAttribute('uv');
+    cen.push(b);
+  }
+  out.push({ id: 'centroacinar_cells', geometry: mergeParts(cen) });
+
+  // Intercalated ducts: from the mouth to the main duct, with a short side twig.
+  const via = mix3(mouth, D, 0.55);
+  const twigEnd: V3 = [via[0] - 0.0016, via[1] + 0.0008, via[2] + 0.0006];
+  out.push({
+    id: 'intercalated_ducts',
+    geometry: mergeParts([
+      tubeAlong([mouth, via, mix3(via, D, 0.7)], () => 0.0004, { tubular: 8, radial: 6 }),
+      tubeAlong([via, twigEnd], () => 0.0003, { tubular: 4, radial: 5 }),
+    ]),
+  });
+
+  // ---- the islet
+  const D2 = ductAt(0.45);
+  const C = roomiest(g, D2, 0.0058);
+  const R = 0.0034;
+  const pts: V3[] = [];
+  let guard = 0;
+  while (pts.length < 30 && guard++ < 5000) {
+    const p: V3 = [C[0] + (rnd() * 2 - 1) * R, C[1] + (rnd() * 2 - 1) * R, C[2] + (rnd() * 2 - 1) * R];
+    if (len3(sub3(p, C)) > R) continue;
+    if (g(p[0], p[1], p[2]) > -(MARGIN + 0.0006 + 0.0012)) continue;
+    if (pts.some((q) => len3(sub3(p, q)) < 0.0011)) continue;
+    pts.push(p);
+  }
+  pts.sort((a, b) => len3(sub3(a, C)) - len3(sub3(b, C)));
+  // Innermost 14 beta, next 8 shared by delta (3), PP (3) and epsilon (2), outermost 8 alpha.
+  const band = (from: number, to: number): V3[] => pts.slice(from, Math.min(to, pts.length));
+  const bead = (list: V3[]): THREE.BufferGeometry => mergeParts(list.map((p) => ball(p, 0.00055)));
+  const mid = band(14, 22);
+  out.push({ id: 'beta_cells', geometry: bead(band(0, 14)) });
+  out.push({ id: 'delta_cells', geometry: bead(mid.slice(0, 3)) });
+  out.push({ id: 'pp_cells', geometry: bead(mid.slice(3, 6)) });
+  out.push({ id: 'epsilon_cells', geometry: bead(mid.slice(6, 8)) });
+  out.push({ id: 'alpha_cells', geometry: bead(band(22, 30)) });
+  return out;
+}

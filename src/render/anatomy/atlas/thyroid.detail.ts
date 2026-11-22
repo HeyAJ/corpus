@@ -10,7 +10,19 @@ import { thyroidPaths } from './thyroid.parts';
  */
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-const GLASS = ['right_lobe', 'left_lobe', 'isthmus', 'capsule', 'thyroid_arteries', 'thyroid_veins'];
+const GLASS = ['right_lobe', 'left_lobe', 'isthmus', 'capsule', 'thyroid_arteries', 'thyroid_veins', 'pyramidal_lobe'];
+/**
+ * THE FINER STRUCTURES. The basement membrane and the capillary loops enclose or carry
+ * something, and the child parathyroid glands must let the cell beads inside them show, so
+ * all four are glass; colloid, follicular cells, chief cells and oxyphil cells are content
+ * and stay solid. The opacities are drawing choices.
+ */
+const CHILD_GLASS: readonly [string, number][] = [
+  ['follicle_basement_membrane', 0.14],
+  ['follicle_capillaries', 0.55],
+  ['superior_parathyroid_glands', 0.22],
+  ['inferior_parathyroid_glands', 0.22],
+];
 const SIDES = [
   ['r', 1],
   ['l', -1],
@@ -33,6 +45,7 @@ export const detail: OrganDetailSpec = {
   },
   animate: (ctx) => {
     for (const id of GLASS) ctx.part(id)?.setOpacity(0.2 + 0.25 * ctx.activity(id));
+    for (const [id, o] of CHILD_GLASS) ctx.part(id)?.setOpacity(o);
     const g = ctx.lerp((s) => s.anatomy?.glands?.thyroid ?? 1);
     const inflow = 0.4 + 2 * ctx.activity('thyroid_arteries');
     for (const [k] of SIDES) {

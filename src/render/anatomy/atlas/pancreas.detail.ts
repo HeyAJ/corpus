@@ -40,6 +40,8 @@ const GLASS: readonly [string, number][] = [
   ['uncinate_process', 0.24],
   ['main_duct', 0.45],
   ['splenic_vessels', 0.4],
+  // Finer structures (T2): the intercalated ducts carry the juice away from the acinus.
+  ['intercalated_ducts', 0.45],
 ];
 
 const INSULIN_COLOUR = 0x4aa3e0;

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { DetailContext, FlowSpec, OrganDetailSpec } from '../detail/types';
 import { DEOXYGENATED, OXYGENATED, bloodColour } from '../detail/blood';
-import { arteryTrunk, liningPivot, menstrualPath, placentaPaths, tubeFlowPath } from './uterus.parts';
+import { PLACENTA_KIDS, SAC_KIDS, arteryTrunk, liningPivot, menstrualPath, placentaPaths, tubeFlowPath } from './uterus.parts';
 
 /**
  * THE UTERUS IN MOTION.
@@ -56,6 +56,22 @@ const GLASS: readonly [string, number][] = [
   ['infundibulum_fimbriae', 0.4],
   ['uterine_arteries', 0.45],
   ['amniotic_sac', 0.12],
+  // FINER STRUCTURES (T2). Sheets, vessels and membranes that enclose or carry something are
+  // glass; the opacities are display choices. The ligaments, the glands, the spiral arteries,
+  // the villi and the layers that hold nothing stay solid so they can be tapped.
+  ['broad_ligament', 0.18],
+  ['mesometrium', 0.5],
+  ['mesosalpinx', 0.5],
+  ['intramural_tube', 0.4],
+  ['uterine_veins', 0.45],
+  ['functional_layer', 0.22],
+  ['endometrial_stroma', 0.3],
+  ['intervillous_space', 0.25],
+  ['umbilical_cord', 0.3],
+  ['whartons_jelly', 0.35],
+  ['amnion', 0.12],
+  ['chorion', 0.12],
+  ['amniotic_fluid', 0.08],
 ];
 
 const THIN = new THREE.Color(0xe3b4b0);
@@ -117,6 +133,10 @@ export const detail: OrganDetailSpec = {
       pl.setVisible(placenta);
     }
     ctx.part('amniotic_sac')?.setVisible(placenta);
+    // Before week 8 (and outside pregnancy) every placental and sac child is a hidden sliver, like
+    // its parent; a close camera would otherwise reveal them as stray specks.
+    for (const id of PLACENTA_KIDS) ctx.part(id)?.setVisible(placenta);
+    for (const id of SAC_KIDS) ctx.part(id)?.setVisible(placenta);
 
     // LINING: thickness and colour follow the cycle, or the decidua in pregnancy.
     const lining = ctx.part('endometrium');
@@ -147,6 +167,14 @@ export const detail: OrganDetailSpec = {
       f.setVisible(!pregnant && cyc.active);
       f.setRate(ovulation ? 1.6 : 1);
     }
+    bloodColour(tmp, s.transport.arterialSat);
+    // The new vessels take the same shared ramp: spiral arteries arterial, veins venous. The cord
+    // follows the atlas convention of the fetus atlas (arteries deoxygenated, vein oxygenated).
+    ctx.part('spiral_arteries')?.setColor(tmp);
+    ctx.part('cord_vein')?.setColor(OXYGENATED);
+    ctx.part('cord_arteries')?.setColor(DEOXYGENATED);
+    bloodColour(tmp, s.transport.venousSat);
+    ctx.part('uterine_veins')?.setColor(tmp);
     bloodColour(tmp, s.transport.arterialSat);
     for (let i = 0; i < BINS.length; i++) {
       const on = i === bin;
