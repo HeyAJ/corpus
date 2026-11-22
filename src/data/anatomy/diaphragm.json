@@ -173,6 +173,176 @@
           "source": "GH14"
         }
       ]
+    },
+    {
+      "id": "sternal_part",
+      "label": "Sternal Part",
+      "summary": "Muscle slips from the back of the breastbone",
+      "function": "A small part of the muscle arises from the back of the xiphoid process of the sternum and runs back to the central tendon. It is the most anterior of the diaphragm's three parts.",
+      "color": "#c0645a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "respDrive",
+          "weight": 0.3,
+          "note": "The phrenic motor neurons are driven by the brainstem's respiratory output.",
+          "source": "GH14"
+        },
+        {
+          "signal": "ventilation",
+          "weight": 0.2,
+          "note": "The diaphragm does most of the work of a larger breath.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Loss of skeletal muscle tone silences the muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "apnoea",
+          "weight": -0.3,
+          "note": "No breath means no diaphragmatic contraction.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lumbar_part",
+      "label": "Lumbar Part",
+      "summary": "Muscle arising from the lumbar spine and arcuate ligaments",
+      "function": "The lumbar part arises from the crura and the arcuate ligaments, and sweeps up to the back of the central tendon. The crura are its two thick tendinous columns.",
+      "color": "#a8463f",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "respDrive",
+          "weight": 0.3,
+          "note": "The phrenic motor neurons are driven by the brainstem's respiratory output.",
+          "source": "GH14"
+        },
+        {
+          "signal": "ventilation",
+          "weight": 0.2,
+          "note": "The diaphragm does most of the work of a larger breath.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Loss of skeletal muscle tone silences the muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "apnoea",
+          "weight": -0.3,
+          "note": "No breath means no diaphragmatic contraction.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "median_arcuate_ligament",
+      "label": "Median Arcuate Ligament",
+      "summary": "Fibrous arch in front of the aorta",
+      "function": "The two crura are joined by this arch across the front of the aorta. It forms the upper margin of the aortic hiatus.",
+      "color": "#e6dcc4",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "medial_arcuate_ligament",
+      "label": "Medial Arcuate Ligament",
+      "summary": "Fibrous arch over the psoas muscle",
+      "function": "A thickening of the fascia of the psoas muscle forms an arch from the side of the crus to the transverse process of the first lumbar vertebra. Muscle fibres of the diaphragm arise from it.",
+      "color": "#ddd2b8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_arcuate_ligament",
+      "label": "Lateral Arcuate Ligament",
+      "summary": "Fibrous arch over the quadratus lumborum",
+      "function": "A thickening of the fascia of the quadratus lumborum forms an arch from the transverse process of the first lumbar vertebra to the twelfth rib. Muscle fibres of the diaphragm arise from it.",
+      "color": "#d4c8aa",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "right_dome",
+      "label": "Right Dome",
+      "summary": "The right half of the diaphragm",
+      "function": "The right dome (hemidiaphragm) lies higher than the left, with the liver below it. The right lung and its pleura lie above it.",
+      "color": "#c8756a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "respDrive",
+          "weight": 0.3,
+          "note": "The phrenic motor neurons are driven by the brainstem's respiratory output.",
+          "source": "GH14"
+        },
+        {
+          "signal": "ventilation",
+          "weight": 0.2,
+          "note": "The diaphragm does most of the work of a larger breath.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Loss of skeletal muscle tone silences the muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "apnoea",
+          "weight": -0.3,
+          "note": "No breath means no diaphragmatic contraction.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_dome",
+      "label": "Left Dome",
+      "summary": "The left half of the diaphragm",
+      "function": "The left dome (hemidiaphragm) lies a little lower than the right, with the stomach and spleen below it. The left lung and its pleura lie above it.",
+      "color": "#c8756a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "respDrive",
+          "weight": 0.3,
+          "note": "The phrenic motor neurons are driven by the brainstem's respiratory output.",
+          "source": "GH14"
+        },
+        {
+          "signal": "ventilation",
+          "weight": 0.2,
+          "note": "The diaphragm does most of the work of a larger breath.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Loss of skeletal muscle tone silences the muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "apnoea",
+          "weight": -0.3,
+          "note": "No breath means no diaphragmatic contraction.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
     }
   ]
 }

@@ -1,6 +1,6 @@
 {
   "atlas": "ureters",
-  "about": "The interior of the two ureters: each lumen, the muscular coat shown as ring swellings, the narrow places where a ureter is tightest, and the oblique passage through the bladder wall that acts as a one-way valve. It shows urine moving down each ureter in spaced boluses, as a wave of contraction pushes it. The wall layers are not drawn separately and the calibres and positions are schematic, not measurements.",
+  "about": "The interior of the two ureters: each lumen, the muscular coat shown as ring swellings, the narrow places where a ureter is tightest, and the oblique passage through the bladder wall that acts as a one-way valve. It shows urine moving down each ureter in spaced boluses, as a wave of contraction pushes it. The wall layers are not drawn separately and the calibres and positions are schematic, not measurements. Finer structures (marked as children in the Structures list) appear when their parent is selected or the camera is close; they are schematic drawings, and counts, sizes and layout are illustrative, not measured.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -20,7 +20,12 @@
       "color": "#d9c25a",
       "rest": 0.25,
       "drives": [
-        { "signal": "urineFlow", "weight": 0.35, "note": "The more urine the kidney makes, the more the ureter has to carry.", "source": "GH14" }
+        {
+          "signal": "urineFlow",
+          "weight": 0.35,
+          "note": "The more urine the kidney makes, the more the ureter has to carry.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -32,7 +37,12 @@
       "color": "#d9c25a",
       "rest": 0.25,
       "drives": [
-        { "signal": "urineFlow", "weight": 0.35, "note": "The more urine the kidney makes, the more the ureter has to carry.", "source": "GH14" }
+        {
+          "signal": "urineFlow",
+          "weight": 0.35,
+          "note": "The more urine the kidney makes, the more the ureter has to carry.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -44,7 +54,12 @@
       "color": "#c0715a",
       "rest": 0.25,
       "drives": [
-        { "signal": "urineFlow", "weight": 0.35, "note": "Stretching of the wall by more urine triggers more frequent waves of contraction.", "source": "GH14" }
+        {
+          "signal": "urineFlow",
+          "weight": 0.35,
+          "note": "Stretching of the wall by more urine triggers more frequent waves of contraction.",
+          "source": "GH14"
+        }
       ],
       "source": "GH14"
     },
@@ -66,9 +81,104 @@
       "color": "#b0604a",
       "rest": 0.25,
       "drives": [
-        { "signal": "urineFlow", "weight": 0.3, "note": "Each arriving bolus of urine opens the junction, so more urine means more opening.", "source": "GH14" },
-        { "signal": "bladderFill", "weight": 0.2, "note": "A fuller bladder presses harder on the slanting passage, working the valve more.", "source": "GH14" }
+        {
+          "signal": "urineFlow",
+          "weight": 0.3,
+          "note": "Each arriving bolus of urine opens the junction, so more urine means more opening.",
+          "source": "GH14"
+        },
+        {
+          "signal": "bladderFill",
+          "weight": 0.2,
+          "note": "A fuller bladder presses harder on the slanting passage, working the valve more.",
+          "source": "GH14"
+        }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pelviureteric_junction",
+      "label": "Pelviureteric Junction",
+      "summary": "Where the renal pelvis narrows into the ureter",
+      "function": "The pelviureteric junction is the first narrow point of the ureter, at the exit of the renal pelvis. It is one of three places where a stone can lodge. It is drawn as a flared collar at the top of each ureter.",
+      "color": "#b0a0c8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "urineFlow",
+          "weight": 0.2,
+          "note": "Every bolus of urine passes this point.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pelvic_brim_crossing",
+      "label": "Crossing of the Pelvic Brim",
+      "summary": "Where the ureter passes over the iliac vessels at the edge of the pelvis",
+      "function": "The ureter crosses the pelvic brim in front of the iliac vessels. This is the second narrow point, and a stone often lodges here. It is drawn as a collar with the crossing vessel beside it.",
+      "color": "#9a90c0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "urineFlow",
+          "weight": 0.2,
+          "note": "Every bolus of urine passes this point.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "urothelium",
+      "parent": "peristaltic_wall",
+      "label": "Urothelium",
+      "summary": "The specialised lining of the ureter",
+      "function": "The urothelium is a layered lining, called transitional epithelium, that stretches as a bolus of urine passes and that seals the wall against the urine.",
+      "color": "#f0d890",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lamina_propria",
+      "parent": "peristaltic_wall",
+      "label": "Lamina Propria",
+      "summary": "The loose connective tissue under the lining",
+      "function": "The lamina propria is a supporting layer under the urothelium. It carries small vessels and nerves and lets the lining fold when the ureter is empty.",
+      "color": "#e0b8a0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscle_layers",
+      "parent": "peristaltic_wall",
+      "label": "Muscle Layers",
+      "summary": "The smooth muscle whose waves squeeze urine toward the bladder",
+      "function": "The muscle coat is made of smooth muscle in an inner longitudinal and an outer circular layer, with a further outer longitudinal layer in the lower part. Waves of contraction run down it and push each bolus of urine onward. Here the muscle brightens as a bolus passes.",
+      "color": "#c0715a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "urineFlow",
+          "weight": 0.4,
+          "note": "More urine means more frequent peristaltic waves.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "adventitia",
+      "parent": "peristaltic_wall",
+      "label": "Adventitia",
+      "summary": "The outer connective tissue coat",
+      "function": "The adventitia is the outer coat of the ureter. It blends into the surrounding tissue, holds the tube in place and carries the blood vessels and nerves that reach the wall.",
+      "color": "#d8c8a8",
+      "rest": 0.2,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]

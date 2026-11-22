@@ -1,6 +1,6 @@
 {
   "atlas": "kidney",
-  "about": "The interior of a kidney, drawn once and used for both sides: capsule, cortex, medullary pyramids and renal columns, calyces and pelvis, the renal artery and vein with their branches, a scatter of glomeruli, and one nephron enlarged so that its course from glomerulus to collecting duct can be followed. Activity is the simulator's own filtration, flow and hormone signals pushing on each structure, shown as glow. The layout is schematic: nine pyramids, no arcuate or cortical radiate vessels, one nephron standing for about a million, and no dimension is a measurement.",
+  "about": "The interior of a kidney, drawn once and used for both sides: capsule, cortex, medullary pyramids and renal columns, calyces and pelvis, the renal artery and vein with their branches, a scatter of glomeruli, and one nephron enlarged so that its course from glomerulus to collecting duct can be followed. Activity is the simulator's own filtration, flow and hormone signals pushing on each structure, shown as glow. The layout is schematic: nine pyramids, no arcuate or cortical radiate vessels, one nephron standing for about a million, and no dimension is a measurement. Finer structures (marked as children in the Structures list) appear when their parent is selected or the camera is close; they are schematic drawings, and counts, sizes and layout are illustrative, not measured.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -30,8 +30,18 @@
       "color": "#b5533f",
       "rest": 0.3,
       "drives": [
-        { "signal": "filtrationRise", "weight": 0.45, "note": "A higher glomerular filtration rate means the cortical filters are working harder.", "source": "GH14" },
-        { "signal": "filtrationFall", "weight": -0.25, "note": "When filtration falls the cortical filters are passing less fluid.", "source": "GH14" }
+        {
+          "signal": "filtrationRise",
+          "weight": 0.45,
+          "note": "A higher glomerular filtration rate means the cortical filters are working harder.",
+          "source": "GH14"
+        },
+        {
+          "signal": "filtrationFall",
+          "weight": -0.25,
+          "note": "When filtration falls the cortical filters are passing less fluid.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -43,8 +53,18 @@
       "color": "#8f3a3a",
       "rest": 0.25,
       "drives": [
-        { "signal": "adh", "weight": 0.4, "note": "Vasopressin makes the collecting ducts permeable to water so the medulla can concentrate the urine.", "source": "GH14" },
-        { "signal": "dehydration", "weight": 0.3, "note": "A raised plasma osmolality raises vasopressin and so the concentrating work of the medulla.", "source": "GH14" }
+        {
+          "signal": "adh",
+          "weight": 0.4,
+          "note": "Vasopressin makes the collecting ducts permeable to water so the medulla can concentrate the urine.",
+          "source": "GH14"
+        },
+        {
+          "signal": "dehydration",
+          "weight": 0.3,
+          "note": "A raised plasma osmolality raises vasopressin and so the concentrating work of the medulla.",
+          "source": "GH14"
+        }
       ],
       "source": "GH14"
     },
@@ -66,7 +86,12 @@
       "color": "#d9b45a",
       "rest": 0.25,
       "drives": [
-        { "signal": "urineFlow", "weight": 0.35, "note": "The more urine the papillae deliver, the more the calyces and pelvis have to carry.", "source": "GH14" }
+        {
+          "signal": "urineFlow",
+          "weight": 0.35,
+          "note": "The more urine the papillae deliver, the more the calyces and pelvis have to carry.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -78,9 +103,24 @@
       "color": "#c8323a",
       "rest": 0.3,
       "drives": [
-        { "signal": "outputRise", "weight": 0.3, "note": "More cardiac output sends more blood down the renal artery.", "source": "GH14" },
-        { "signal": "hypotension", "weight": -0.2, "note": "A low arterial pressure reduces the flow the artery carries.", "source": "GH14" },
-        { "signal": "reninDrive", "weight": 0.3, "note": "Renin is released by the juxtaglomerular cells on the finest arterial branches.", "source": "GH14" }
+        {
+          "signal": "outputRise",
+          "weight": 0.3,
+          "note": "More cardiac output sends more blood down the renal artery.",
+          "source": "GH14"
+        },
+        {
+          "signal": "hypotension",
+          "weight": -0.2,
+          "note": "A low arterial pressure reduces the flow the artery carries.",
+          "source": "GH14"
+        },
+        {
+          "signal": "reninDrive",
+          "weight": 0.3,
+          "note": "Renin is released by the juxtaglomerular cells on the finest arterial branches.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -102,8 +142,18 @@
       "color": "#e08a8a",
       "rest": 0.3,
       "drives": [
-        { "signal": "filtrationRise", "weight": 0.45, "note": "Filtration is the glomeruli's work, so a higher rate means brighter glomeruli.", "source": "GH14" },
-        { "signal": "filtrationFall", "weight": -0.25, "note": "When filtration collapses the glomeruli are passing little fluid.", "source": "GH14" }
+        {
+          "signal": "filtrationRise",
+          "weight": 0.45,
+          "note": "Filtration is the glomeruli's work, so a higher rate means brighter glomeruli.",
+          "source": "GH14"
+        },
+        {
+          "signal": "filtrationFall",
+          "weight": -0.25,
+          "note": "When filtration collapses the glomeruli are passing little fluid.",
+          "source": "GH14"
+        }
       ],
       "source": "GH14"
     },
@@ -115,11 +165,560 @@
       "color": "#e6d28a",
       "rest": 0.3,
       "drives": [
-        { "signal": "filtrationRise", "weight": 0.4, "note": "More filtrate means more fluid passing through every nephron.", "source": "GH14" },
-        { "signal": "filtrationFall", "weight": -0.25, "note": "Less filtrate means less fluid in the tubule.", "source": "GH14" },
-        { "signal": "aldosterone", "weight": 0.3, "note": "Aldosterone acts on the distal nephron and collecting duct to retain sodium.", "source": "GH14" }
+        {
+          "signal": "filtrationRise",
+          "weight": 0.4,
+          "note": "More filtrate means more fluid passing through every nephron.",
+          "source": "GH14"
+        },
+        {
+          "signal": "filtrationFall",
+          "weight": -0.25,
+          "note": "Less filtrate means less fluid in the tubule.",
+          "source": "GH14"
+        },
+        {
+          "signal": "aldosterone",
+          "weight": 0.3,
+          "note": "Aldosterone acts on the distal nephron and collecting duct to retain sodium.",
+          "source": "GH14"
+        }
       ],
       "source": "GH14"
+    },
+    {
+      "id": "hilum",
+      "label": "Hilum",
+      "summary": "The notch on the inner edge where vessels and the pelvis enter and leave",
+      "function": "The hilum is the doorway on the medial side of the kidney. The renal artery and vein, nerves, lymphatics and the renal pelvis all pass through it into the renal sinus. It is drawn as a ring where the cortex stops.",
+      "color": "#c9b48a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "renal_sinus",
+      "label": "Renal Sinus",
+      "summary": "The fat-filled space inside the kidney that holds the pelvis and vessels",
+      "function": "The sinus is the cavity that opens at the hilum and lies inside the kidney. It holds the calyces, the pelvis, the main branches of the renal vessels and a packing of fat. It is drawn as a pale glass envelope round that space.",
+      "color": "#e6d9a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perirenal_fat",
+      "label": "Perirenal Fat",
+      "summary": "A cushion of fat round the kidney, outside its capsule",
+      "function": "The perirenal fat lies between the capsule and the renal fascia and surrounds the kidney and the adrenal gland. It cushions the kidney and holds it in place. It is drawn as a loose glass shell with a gap at the hilum.",
+      "color": "#efd98a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "renal_fascia",
+      "label": "Renal Fascia",
+      "summary": "The membrane that encloses the kidney and its fat",
+      "function": "The renal fascia is a sheet of connective tissue that wraps the kidney, the adrenal gland and the perirenal fat. It anchors the kidney to the abdominal wall. It is drawn as a thin glass shell outside the fat.",
+      "color": "#cfc3a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "minor_calyces",
+      "label": "Minor Calyces",
+      "summary": "Cups that catch urine from the tip of each pyramid",
+      "function": "Each minor calyx cups the papilla of one pyramid and collects the urine that drips from it. Several minor calyces join to form a major calyx. In this drawing the cups lie inside the pelvis drawing and show in a stronger colour.",
+      "color": "#e8b84a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "urineFlow",
+          "weight": 0.35,
+          "note": "More urine leaving the papillae means more passing through the calyces.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "major_calyces",
+      "label": "Major Calyces",
+      "summary": "Wider channels that gather the minor calyces into the pelvis",
+      "function": "The major calyces are the next channel in the urine pathway. Each receives several minor calyces and empties into the renal pelvis. They are drawn as the three branches that meet at the pelvis.",
+      "color": "#d9a43a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "urineFlow",
+          "weight": 0.35,
+          "note": "The calyces carry all of the urine the kidney makes.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "renal_papillae",
+      "label": "Renal Papillae",
+      "summary": "The rounded tips of the pyramids that point into the calyces",
+      "function": "A papilla is the apex of a medullary pyramid. The collecting ducts open on its surface, and urine leaves the kidney tissue here for the minor calyx. One cone is drawn on each pyramid.",
+      "color": "#a84a4a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "urineFlow",
+          "weight": 0.4,
+          "note": "Urine drips from the collecting ducts at the papillary tips.",
+          "source": "GH14"
+        },
+        {
+          "signal": "adh",
+          "weight": 0.25,
+          "note": "Vasopressin sets how concentrated the urine is by the time it reaches the tip.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interlobar_arteries",
+      "label": "Interlobar Arteries",
+      "summary": "Arteries that run between the pyramids toward the cortex",
+      "function": "The interlobar arteries are branches of the segmental arteries. They climb through the renal columns between the pyramids and, at the base of each pyramid, turn into the arcuate arteries.",
+      "color": "#d0424a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.25,
+          "note": "A higher cardiac output sends more blood through the renal arteries.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interlobar_veins",
+      "label": "Interlobar Veins",
+      "summary": "Veins that run beside the interlobar arteries",
+      "function": "The interlobar veins drain the arcuate veins and travel back toward the sinus alongside the arteries. They join to form the renal vein.",
+      "color": "#7a5a96",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "arcuate_arteries",
+      "label": "Arcuate Arteries",
+      "summary": "Arteries that arch over the base of each pyramid",
+      "function": "The arcuate arteries bend along the boundary between cortex and medulla, over the base of a pyramid. They give off the interlobular arteries that climb into the cortex.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "arcuate_veins",
+      "label": "Arcuate Veins",
+      "summary": "Veins that arch over the base of each pyramid",
+      "function": "The arcuate veins run along the corticomedullary boundary beside the arteries and collect blood from the interlobular veins. They empty into the interlobar veins.",
+      "color": "#6f5090",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interlobular_arteries",
+      "label": "Interlobular Arteries",
+      "summary": "Fine arteries that rise through the cortex",
+      "function": "The interlobular arteries (also called cortical radiate arteries) rise from the arcuate arteries through the cortex. They give off the afferent arterioles that feed the glomeruli.",
+      "color": "#e04a52",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interlobular_veins",
+      "label": "Interlobular Veins",
+      "summary": "Fine veins that descend through the cortex",
+      "function": "The interlobular veins collect blood from the capillaries around the tubules in the cortex and carry it down to the arcuate veins.",
+      "color": "#8a6aa6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "juxtaglomerular_apparatus",
+      "label": "Juxtaglomerular Apparatus",
+      "summary": "The meeting point of a tubule and its own glomerulus, where renin is made",
+      "function": "At the entry to the glomerulus the distal tubule touches the afferent and efferent arterioles. The cells here sense salt delivery and blood pressure and release renin, which starts a chain of hormones that raises blood pressure. It is drawn enlarged beside the enlarged nephron.",
+      "color": "#e07a5a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "reninDrive",
+          "weight": 0.45,
+          "note": "Renin release rises with sympathetic drive and a fall in perfusion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "hypotension",
+          "weight": 0.3,
+          "note": "A fall in arterial pressure lowers stretch in the afferent arteriole and raises renin release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "afferent_arteriole",
+      "parent": "glomeruli",
+      "label": "Afferent Arteriole",
+      "summary": "The small vessel that brings blood into the glomerulus",
+      "function": "The afferent arteriole delivers blood from the interlobular artery to the tuft of capillaries. Its muscle narrows or widens to control how much blood is filtered.",
+      "color": "#e04a52",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "efferent_arteriole",
+      "parent": "glomeruli",
+      "label": "Efferent Arteriole",
+      "summary": "The small vessel that carries blood out of the glomerulus",
+      "function": "The efferent arteriole drains the tuft and leads on to the capillaries around the tubules. Narrowing it raises the pressure inside the glomerulus.",
+      "color": "#b83a50",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glomerular_capillaries",
+      "parent": "glomeruli",
+      "label": "Glomerular Capillaries",
+      "summary": "The tuft of fenestrated capillaries where blood is filtered",
+      "function": "The glomerular capillaries are a coiled tuft of very leaky capillaries. Water and small solutes cross their wall into the capsule, while blood cells and large proteins stay in the blood.",
+      "color": "#d85a62",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "filtrationRise",
+          "weight": 0.4,
+          "note": "A higher filtration rate means more fluid crossing the capillary wall.",
+          "source": "GH14"
+        },
+        {
+          "signal": "filtrationFall",
+          "weight": -0.25,
+          "note": "A lower filtration rate means less fluid crossing.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bowmans_capsule",
+      "parent": "glomeruli",
+      "label": "Bowman's Capsule",
+      "summary": "The cup that surrounds the glomerulus and catches the filtrate",
+      "function": "Bowman's capsule is the blind, expanded start of the nephron. It wraps the capillary tuft and passes the filtrate on into the proximal tubule. It has an outer parietal layer and an inner visceral layer.",
+      "color": "#e6cf9a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parietal_layer",
+      "parent": "bowmans_capsule",
+      "label": "Parietal Layer",
+      "summary": "The flat outer wall of the capsule",
+      "function": "The parietal layer is a single sheet of flat cells that forms the outer wall of Bowman's capsule. At the urinary pole it becomes the lining of the proximal tubule.",
+      "color": "#d8c488",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "visceral_layer",
+      "parent": "bowmans_capsule",
+      "label": "Visceral Layer",
+      "summary": "The inner layer of the capsule, made of podocytes, that covers the capillaries",
+      "function": "The visceral layer clings to the capillary tuft. Its cells are the podocytes, whose fine processes form the last barrier the filtrate crosses.",
+      "color": "#e8b0a0",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "podocytes",
+      "parent": "glomeruli",
+      "label": "Podocytes",
+      "summary": "Octopus-like cells that wrap the glomerular capillaries",
+      "function": "Podocytes are the cells of the visceral layer. Their foot processes interlock around the capillaries and leave narrow slits that let the filtrate through while holding back large proteins.",
+      "color": "#f0a090",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mesangial_cells",
+      "parent": "glomeruli",
+      "label": "Mesangial Cells",
+      "summary": "Supporting cells between the capillary loops",
+      "function": "Mesangial cells lie among the capillary loops of the glomerulus and hold the tuft together. They can contract and so change the surface available for filtration, and they clear debris from the filter.",
+      "color": "#b87aa0",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "proximal_convoluted_tubule",
+      "parent": "nephron",
+      "label": "Proximal Convoluted Tubule",
+      "summary": "The first coiled stretch, which takes back most of the filtrate",
+      "function": "The proximal tubule has a brush border and many mitochondria. It reabsorbs most of the filtered water, salt, glucose and amino acids and returns them to the blood.",
+      "color": "#e8c860",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "filtrationRise",
+          "weight": 0.35,
+          "note": "More filtrate arriving means more to reabsorb.",
+          "source": "GH14"
+        },
+        {
+          "signal": "filtrationFall",
+          "weight": -0.2,
+          "note": "Less filtrate arriving means less to reabsorb.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "descending_limb",
+      "parent": "nephron",
+      "label": "Descending Limb",
+      "summary": "The thin straight tube that dips into the medulla",
+      "function": "The descending limb of the loop of Henle is thin-walled and permeable to water. As it passes down through salty tissue, water leaves it and the fluid inside becomes more concentrated.",
+      "color": "#f0e0a0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "adh",
+          "weight": 0.2,
+          "note": "The concentrating work of the medulla follows vasopressin.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thin_ascending_limb",
+      "parent": "nephron",
+      "label": "Thin Ascending Limb",
+      "summary": "The thin tube that climbs back after the hairpin bend",
+      "function": "The thin ascending limb is permeable to salt but not to water, so salt leaves it as the fluid climbs. It leads into the thick ascending limb.",
+      "color": "#e8d890",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thick_ascending_limb",
+      "parent": "nephron",
+      "label": "Thick Ascending Limb",
+      "summary": "The thick tube that pumps salt out and returns to the cortex",
+      "function": "The thick ascending limb actively moves salt out of the tubule but is tight to water. This builds the salty tissue of the medulla and dilutes the fluid in the tubule.",
+      "color": "#d8b84a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "aldosterone",
+          "weight": 0.15,
+          "note": "Distal salt handling is tuned by aldosterone.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "macula_densa",
+      "parent": "nephron",
+      "label": "Macula Densa",
+      "summary": "A patch of crowded cells that senses salt in the tubule",
+      "function": "The macula densa is a plaque of tightly packed cells where the thick ascending limb touches its own glomerulus. It senses how much salt is arriving and signals the arterioles and the renin cells.",
+      "color": "#c89a2a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "reninDrive",
+          "weight": 0.25,
+          "note": "Low salt delivery to the macula densa raises renin release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "distal_convoluted_tubule",
+      "parent": "nephron",
+      "label": "Distal Convoluted Tubule",
+      "summary": "The second coiled stretch, where fine adjustment begins",
+      "function": "The distal tubule takes back more salt and, under the control of hormones, adjusts how much calcium and potassium is kept or lost.",
+      "color": "#e0a84a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "aldosterone",
+          "weight": 0.3,
+          "note": "Aldosterone increases salt retention and potassium loss in the distal nephron.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "connecting_tubule",
+      "parent": "nephron",
+      "label": "Connecting Tubule",
+      "summary": "The short link between the distal tubule and the collecting duct",
+      "function": "The connecting tubule joins the distal tubule to the collecting duct and shares features of both. Several nephrons empty into one collecting duct.",
+      "color": "#d09a5a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "aldosterone",
+          "weight": 0.25,
+          "note": "Aldosterone acts on the cells of this segment.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "collecting_duct",
+      "parent": "nephron",
+      "label": "Collecting Duct",
+      "summary": "The straight duct that carries urine through the pyramid to the papilla",
+      "function": "The collecting duct passes down through the medulla. Where vasopressin is present its wall becomes permeable to water, which leaves into the salty tissue and makes the urine more concentrated.",
+      "color": "#c88a3a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "adh",
+          "weight": 0.4,
+          "note": "Vasopressin opens water channels in the duct wall.",
+          "source": "GH14"
+        },
+        {
+          "signal": "dehydration",
+          "weight": 0.25,
+          "note": "Dehydration raises vasopressin.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "principal_cells",
+      "parent": "collecting_duct",
+      "label": "Principal Cells",
+      "summary": "The main cells of the collecting duct, which respond to vasopressin and aldosterone",
+      "function": "Principal cells take back salt and, when vasopressin is present, let water through. They are the larger, paler cells in the wall of the collecting duct.",
+      "color": "#e8c07a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "adh",
+          "weight": 0.4,
+          "note": "Vasopressin inserts water channels in these cells.",
+          "source": "GH14"
+        },
+        {
+          "signal": "aldosterone",
+          "weight": 0.25,
+          "note": "Aldosterone raises their salt uptake.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intercalated_cells",
+      "parent": "collecting_duct",
+      "label": "Intercalated Cells",
+      "summary": "The dark cells that adjust the acid and bicarbonate in the urine",
+      "function": "Intercalated cells are scattered among the principal cells. They secrete acid or bicarbonate and so help to keep the blood's acidity steady.",
+      "color": "#8a5a9a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "peritubular_capillaries",
+      "parent": "nephron",
+      "label": "Peritubular Capillaries",
+      "summary": "The capillary network that surrounds the tubules in the cortex",
+      "function": "The peritubular capillaries continue from the efferent arteriole and twine round the convoluted tubules. They take back the water and solutes the tubules reabsorb.",
+      "color": "#d0525a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vasa_recta",
+      "parent": "nephron",
+      "label": "Vasa Recta",
+      "summary": "Hairpin capillaries that run beside the loops of Henle",
+      "function": "The vasa recta are long, thin capillary loops that follow the loops of Henle into the medulla. Their hairpin shape lets them supply the medulla without washing away its salty gradient.",
+      "color": "#a8485a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "granular_cells",
+      "parent": "juxtaglomerular_apparatus",
+      "label": "Granular (Juxtaglomerular) Cells",
+      "summary": "Modified muscle cells in the afferent arteriole that store and release renin",
+      "function": "The granular cells are specialised smooth-muscle cells in the wall of the afferent arteriole. They hold renin in granules and release it when pressure or salt delivery falls or when sympathetic nerves are active.",
+      "color": "#e8604a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "reninDrive",
+          "weight": 0.5,
+          "note": "Sympathetic drive and low perfusion release renin from these cells.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "macula_densa_link",
+      "parent": "juxtaglomerular_apparatus",
+      "label": "Macula Densa Contact",
+      "summary": "Where the distal tubule's sensing patch meets the glomerulus",
+      "function": "This is the point of contact between the macula densa and the arterioles at the entry to the glomerulus. The signal passes across it from tubule to vessel. In this drawing a thin bridge joins the two, because the enlarged nephron cannot be drawn doubling back on itself.",
+      "color": "#d8aa3a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "extraglomerular_mesangium",
+      "parent": "juxtaglomerular_apparatus",
+      "label": "Extraglomerular Mesangium",
+      "summary": "The cluster of cells in the angle between the arterioles and the macula densa",
+      "function": "The extraglomerular mesangium (also called the lacis cells) fills the space between the two arterioles and the macula densa. It is continuous with the mesangium inside the glomerulus and passes signals between the sensing and renin-making cells.",
+      "color": "#b87aa0",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
     }
   ]
 }

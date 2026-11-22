@@ -163,6 +163,617 @@
       "rest": 0.15,
       "source": "GRAYS42",
       "drives": []
+    },
+    {
+      "id": "apex",
+      "label": "Apex",
+      "summary": "Rounded top of the lung",
+      "function": "The apex rises above the first rib into the root of the neck and is covered by pleura. It is the part of the lung that moves least when the chest wall expands.",
+      "color": "#e6b3b8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.25,
+          "note": "This surface moves with the breath, so it works harder when breathing is deeper or faster.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "costal_surface",
+      "label": "Costal Surface",
+      "summary": "Rib-facing surface, smooth and convex",
+      "function": "It lies against the ribs and intercostal muscles with only the pleura between. Its shape follows the inside of the chest wall, so it moves outward as the ribs lift in breathing.",
+      "color": "#d98a8f",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.25,
+          "note": "This surface moves with the breath, so it works harder when breathing is deeper or faster.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mediastinal_surface",
+      "label": "Mediastinal Surface",
+      "summary": "Surface facing the central compartment of the chest",
+      "function": "It is moulded by the heart, great vessels and oesophagus, and the structures of the lung root enter and leave on it. On the left it carries the deep impression made by the heart.",
+      "color": "#c97b86",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "diaphragmatic_surface",
+      "label": "Diaphragmatic Surface",
+      "summary": "Concave base resting on the diaphragm",
+      "function": "The base of the lung sits on the dome of the diaphragm, so it is pulled downward when the diaphragm contracts and the lung fills with air.",
+      "color": "#b86a78",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.25,
+          "note": "This surface moves with the breath, so it works harder when breathing is deeper or faster.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oblique_fissure",
+      "label": "Oblique Fissure",
+      "summary": "Deep cleft between the upper and lower lobes",
+      "function": "The oblique fissure runs from high behind to low in front and cuts deeply into the lung. It separates the left upper lobe from the left lower lobe, and lets each lobe slide against the other as it expands.",
+      "color": "#f2dcc8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cardiac_notch",
+      "label": "Cardiac Notch",
+      "summary": "Notch in the front border of the left upper lobe",
+      "function": "The front border of the left lung is indented where the heart lies close to the chest wall. This leaves part of the heart covered by pleura but not by lung.",
+      "color": "#e8b7a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lingula",
+      "label": "Lingula",
+      "summary": "Tongue-shaped part of the left upper lobe",
+      "function": "The lingula hangs below the cardiac notch and corresponds to the right middle lobe. It has its own superior and inferior segments.",
+      "color": "#e39aa0",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "The lingula is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hilum",
+      "label": "Hilum (Root of the Lung)",
+      "summary": "Where the airway and vessels enter the lung",
+      "function": "The hilum is the opening on the mediastinal surface through which the main bronchus, the pulmonary artery and veins, the bronchial vessels, nerves and lymphatics pass. Together these structures form the root of the lung.",
+      "color": "#d9b48a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.25,
+          "note": "All of the blood flow to and from the lung passes through the root.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pulmonary_ligament",
+      "label": "Pulmonary Ligament",
+      "summary": "Fold of pleura hanging below the lung root",
+      "function": "A double sheet of pleura hangs below the root of the lung and joins the lower lung to the mediastinum. It anchors the lower lung while allowing the root to move.",
+      "color": "#d8d2c4",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bronchial_arteries",
+      "label": "Bronchial Arteries",
+      "summary": "Small arteries that nourish the airway wall",
+      "function": "They arise from the aorta or its branches and run along the bronchi, supplying the bronchial walls, the connective tissue and the pleura. The alveoli are supplied instead by the pulmonary circulation.",
+      "color": "#c8323a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.2,
+          "note": "Systemic arterial flow to the airway wall follows cardiac output.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bronchial_veins",
+      "label": "Bronchial Veins",
+      "summary": "Small veins that drain the airway wall",
+      "function": "Those near the root of the lung drain into the azygos system. The rest drain into the pulmonary veins, so a little unoxygenated blood joins the oxygenated blood returning to the heart.",
+      "color": "#4a5a9a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.2,
+          "note": "Venous return from the airway wall follows cardiac output.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hilar_lymph_nodes",
+      "label": "Hilar Lymph Nodes",
+      "summary": "Lymph nodes gathered at the lung root",
+      "function": "Lymph from the lung drains first along the bronchi and then to the nodes at the hilum. The nodes filter it on its way to the mediastinum.",
+      "color": "#b9b08a",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "infection",
+          "weight": 0.4,
+          "note": "Nodes draining an infected area become more active.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "visceral_pleura",
+      "parent": "pleura",
+      "label": "Visceral Pleura",
+      "summary": "Pleura that covers the lung itself",
+      "function": "The visceral layer is a thin membrane stuck to the surface of the lung, and it dips into the fissures between the lobes. It is continuous at the root with the parietal layer.",
+      "color": "#e0d9c8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parietal_pleura",
+      "parent": "pleura",
+      "label": "Parietal Pleura",
+      "summary": "Pleura that lines the chest wall",
+      "function": "The parietal layer lines the inside of the chest wall, the diaphragm and the sides of the mediastinum. It is the outer wall of the pleural cavity and is sensitive to pain.",
+      "color": "#cfc7b0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pleural_cavity",
+      "parent": "pleura",
+      "label": "Pleural Cavity",
+      "summary": "Thin space between the two layers of pleura",
+      "function": "The cavity is a potential space holding only a thin film of fluid. The fluid lets the lung slide on the chest wall, and the pull between the layers keeps the lung expanded against the wall.",
+      "color": "#bcd3e0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "costodiaphragmatic_recess",
+      "parent": "pleura",
+      "label": "Costodiaphragmatic Recess",
+      "summary": "Lower pocket of the pleural cavity",
+      "function": "Below the lung, where the parietal pleura turns from the chest wall onto the diaphragm, the cavity forms a recess that the lung enters only in deep inspiration.",
+      "color": "#a9c4d4",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "main_bronchus",
+      "parent": "bronchial_tree",
+      "label": "Main Bronchus",
+      "summary": "The primary bronchus entering the lung",
+      "function": "The windpipe divides at the carina into a right and a left main bronchus, and each enters its lung at the hilum. The left main bronchus is narrower, longer and more horizontal than the right.",
+      "color": "#e8c9a0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "More air moves through the airway when minute ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.3,
+          "note": "Smooth muscle narrows the airway wall.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lobar_bronchi",
+      "parent": "bronchial_tree",
+      "label": "Lobar Bronchi",
+      "summary": "One bronchus for each lobe",
+      "function": "The main bronchus divides into a lobar bronchus for every lobe of the lung. Each lobar bronchus then divides into segmental bronchi.",
+      "color": "#e2bf94",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "More air moves through the airway when minute ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.3,
+          "note": "Smooth muscle narrows the airway wall.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "segmental_bronchi",
+      "parent": "bronchial_tree",
+      "label": "Segmental Bronchi",
+      "summary": "One bronchus for each bronchopulmonary segment",
+      "function": "Each segmental bronchus supplies one bronchopulmonary segment and runs with its own branch of the pulmonary artery. Their walls still contain cartilage.",
+      "color": "#dcb68a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "More air moves through the airway when minute ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.3,
+          "note": "Smooth muscle narrows the airway wall.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bronchioles",
+      "parent": "bronchial_tree",
+      "label": "Bronchioles",
+      "summary": "Small airways without cartilage",
+      "function": "Bronchioles have no cartilage in their walls, so their width is controlled by smooth muscle and held open by the pull of the surrounding lung. They narrow when the muscle contracts in bronchoconstriction.",
+      "color": "#d6ad80",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "More air moves through the airway when minute ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.3,
+          "note": "Smooth muscle narrows the airway wall.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "terminal_bronchioles",
+      "parent": "bronchioles",
+      "label": "Terminal Bronchioles",
+      "summary": "The last airways that only carry air",
+      "function": "The terminal bronchioles are the final purely conducting airways. Beyond them the airway gains alveoli in its wall, and their lining contains club cells rather than goblet cells.",
+      "color": "#d0a576",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "More air moves through the airway when minute ventilation rises.",
+          "source": "WEST10"
+        },
+        {
+          "signal": "bronchoconstriction",
+          "weight": 0.3,
+          "note": "Smooth muscle narrows the airway wall.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "respiratory_bronchioles",
+      "parent": "bronchioles",
+      "label": "Respiratory Bronchioles",
+      "summary": "First airways with alveoli in their walls",
+      "function": "Alveoli open directly from the wall of a respiratory bronchiole, so it carries air and also takes part in gas exchange. It leads on to the alveolar ducts.",
+      "color": "#e9b8a0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "Alveolar ventilation refreshes the air at the start of the exchange zone.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alveolar_ducts",
+      "parent": "alveoli",
+      "label": "Alveolar Ducts",
+      "summary": "Passages lined by openings into alveoli",
+      "function": "An alveolar duct is an airway whose wall is almost all openings into alveoli. It ends in alveolar sacs.",
+      "color": "#f2c6b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alveolar_sacs",
+      "parent": "alveoli",
+      "label": "Alveolar Sacs",
+      "summary": "Clusters of alveoli at the end of a duct",
+      "function": "An alveolar sac is a group of alveoli that share one opening from an alveolar duct. Most gas exchange takes place in the sacs.",
+      "color": "#f0b6c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "type_i_pneumocytes",
+      "parent": "alveolar_sacs",
+      "label": "Type I Pneumocytes",
+      "summary": "Thin, flat cells that form the alveolar surface",
+      "function": "These cells are extremely thin so that gases cross them quickly. They form the air side of the respiratory membrane.",
+      "color": "#f7d6dc",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "type_ii_pneumocytes",
+      "parent": "alveolar_sacs",
+      "label": "Type II Pneumocytes",
+      "summary": "Cells that make surfactant",
+      "function": "They make and release surfactant, which lowers the surface tension of the alveolar lining and helps keep the alveoli from collapsing. They can also divide to replace type I cells.",
+      "color": "#e8a64a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alveolar_macrophages",
+      "parent": "alveolar_sacs",
+      "label": "Alveolar Macrophages",
+      "summary": "Scavenger cells of the air spaces",
+      "function": "They engulf inhaled dust and microbes that reach the alveoli. Many are then carried up the airway on the mucus or leave through the lymphatics.",
+      "color": "#7a6a8a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "infection",
+          "weight": 0.4,
+          "note": "These cells are recruited and activated by infection.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alveolar_capillaries",
+      "parent": "alveolar_sacs",
+      "label": "Alveolar Capillaries",
+      "summary": "Capillary network wrapped round each alveolus",
+      "function": "Blood from the pulmonary arteries passes through them in a thin sheet beside the alveolar air. Oxygen crosses into the blood and carbon dioxide crosses out.",
+      "color": "#b83a52",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.3,
+          "note": "The whole cardiac output passes through the lungs, so flow rises with output.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "respiratory_membrane",
+      "parent": "alveolar_sacs",
+      "label": "Respiratory Membrane",
+      "summary": "The thin barrier that gases cross",
+      "function": "Gas crosses the alveolar lining cell, the fused basement membranes and the capillary lining cell. Because the barrier is so thin, oxygen and carbon dioxide diffuse across it quickly.",
+      "color": "#e6cfe0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "shunt",
+          "weight": -0.2,
+          "note": "Blood that bypasses ventilated alveoli does not cross the membrane.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "alveolar_pores",
+      "parent": "alveolar_sacs",
+      "label": "Alveolar Pores (of Kohn)",
+      "summary": "Small openings between neighbouring alveoli",
+      "function": "The pores let air pass between adjacent alveoli. This lets an alveolus be ventilated through its neighbours if its own airway is blocked.",
+      "color": "#f2e0e4",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seg_apicoposterior",
+      "parent": "upper_lobe",
+      "label": "Apicoposterior Segment",
+      "summary": "Bronchopulmonary segment of the left upper lobe",
+      "function": "Each bronchopulmonary segment has its own segmental bronchus and its own branch of the pulmonary artery, and is separated from its neighbours by connective tissue. It works as a separate unit of the lung.",
+      "color": "#e7a0a6",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "A segment is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seg_anterior",
+      "parent": "upper_lobe",
+      "label": "Anterior Segment (upper lobe)",
+      "summary": "Bronchopulmonary segment of the left upper lobe",
+      "function": "Each bronchopulmonary segment has its own segmental bronchus and its own branch of the pulmonary artery, and is separated from its neighbours by connective tissue. It works as a separate unit of the lung.",
+      "color": "#e7a0a6",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "A segment is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seg_superior_lingular",
+      "parent": "lingula",
+      "label": "Superior Lingular Segment",
+      "summary": "Bronchopulmonary segment of the lingula",
+      "function": "Each bronchopulmonary segment has its own segmental bronchus and its own branch of the pulmonary artery, and is separated from its neighbours by connective tissue. It works as a separate unit of the lung.",
+      "color": "#e7a0a6",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "A segment is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seg_inferior_lingular",
+      "parent": "lingula",
+      "label": "Inferior Lingular Segment",
+      "summary": "Bronchopulmonary segment of the lingula",
+      "function": "Each bronchopulmonary segment has its own segmental bronchus and its own branch of the pulmonary artery, and is separated from its neighbours by connective tissue. It works as a separate unit of the lung.",
+      "color": "#e7a0a6",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "A segment is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seg_superior",
+      "parent": "lower_lobe",
+      "label": "Superior Segment (lower lobe)",
+      "summary": "Bronchopulmonary segment of the left lower lobe",
+      "function": "Each bronchopulmonary segment has its own segmental bronchus and its own branch of the pulmonary artery, and is separated from its neighbours by connective tissue. It works as a separate unit of the lung.",
+      "color": "#e7a0a6",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "A segment is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seg_anteromedial_basal",
+      "parent": "lower_lobe",
+      "label": "Anteromedial Basal Segment",
+      "summary": "Bronchopulmonary segment of the left lower lobe",
+      "function": "Each bronchopulmonary segment has its own segmental bronchus and its own branch of the pulmonary artery, and is separated from its neighbours by connective tissue. It works as a separate unit of the lung.",
+      "color": "#e7a0a6",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "A segment is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seg_lateral_basal",
+      "parent": "lower_lobe",
+      "label": "Lateral Basal Segment",
+      "summary": "Bronchopulmonary segment of the left lower lobe",
+      "function": "Each bronchopulmonary segment has its own segmental bronchus and its own branch of the pulmonary artery, and is separated from its neighbours by connective tissue. It works as a separate unit of the lung.",
+      "color": "#e7a0a6",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "A segment is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seg_posterior_basal",
+      "parent": "lower_lobe",
+      "label": "Posterior Basal Segment",
+      "summary": "Bronchopulmonary segment of the left lower lobe",
+      "function": "Each bronchopulmonary segment has its own segmental bronchus and its own branch of the pulmonary artery, and is separated from its neighbours by connective tissue. It works as a separate unit of the lung.",
+      "color": "#e7a0a6",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "A segment is ventilated in proportion to the breathing the body is doing.",
+          "source": "WEST10"
+        }
+      ],
+      "source": "GRAYS42"
     }
   ]
 }

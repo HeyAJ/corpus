@@ -1,6 +1,6 @@
 {
   "atlas": "penis",
-  "about": "The interior of the penis: the tunica albuginea, the two corpora cavernosa, the corpus spongiosum with its bulb, the glans, the urethra, the paired deep arteries and dorsal arteries, and the deep dorsal vein. How full the erectile tissue is shows in colour, glow and the speed of the streams; the organ's size and pose are not changed here. The circumflex veins, the fascial layers, the nerves, the corona of the glans and the real cross-sectional shapes are left out, and the sizes are chosen to read clearly rather than measured.",
+  "about": "The interior of the penis: the tunica albuginea, the two corpora cavernosa, the corpus spongiosum with its bulb, the glans, the urethra, the paired deep arteries and dorsal arteries, and the deep dorsal vein. How full the erectile tissue is shows in colour, glow and the speed of the streams; the organ's size and pose are not changed here. The circumflex veins, the fascial layers, the nerves, the corona of the glans and the real cross-sectional shapes are left out, and the sizes are chosen to read clearly rather than measured. Finer structures (marked as children in the Structures list) appear when their parent is selected or the camera is close; they are schematic drawings, and counts, sizes and layout are illustrative, not measured.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -20,7 +20,12 @@
       "color": "#e8dcc0",
       "rest": 0.2,
       "drives": [
-        { "signal": "vasocongestion", "weight": 0.4, "note": "The sleeve is stretched as the erectile tissue fills.", "source": "GH14" }
+        {
+          "signal": "vasocongestion",
+          "weight": 0.4,
+          "note": "The sleeve is stretched as the erectile tissue fills.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -32,8 +37,18 @@
       "color": "#c98a8a",
       "rest": 0.2,
       "drives": [
-        { "signal": "vasocongestion", "weight": 0.5, "note": "The tissue fills with blood as the vasocongestion rises.", "source": "GH14" },
-        { "signal": "parasympathetic", "weight": 0.2, "note": "Erection is brought about mainly by parasympathetic nerves.", "source": "GH14" }
+        {
+          "signal": "vasocongestion",
+          "weight": 0.5,
+          "note": "The tissue fills with blood as the vasocongestion rises.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.2,
+          "note": "Erection is brought about mainly by parasympathetic nerves.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -45,8 +60,18 @@
       "color": "#c98a8a",
       "rest": 0.2,
       "drives": [
-        { "signal": "vasocongestion", "weight": 0.5, "note": "The tissue fills with blood as the vasocongestion rises.", "source": "GH14" },
-        { "signal": "parasympathetic", "weight": 0.2, "note": "Erection is brought about mainly by parasympathetic nerves.", "source": "GH14" }
+        {
+          "signal": "vasocongestion",
+          "weight": 0.5,
+          "note": "The tissue fills with blood as the vasocongestion rises.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.2,
+          "note": "Erection is brought about mainly by parasympathetic nerves.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -58,7 +83,12 @@
       "color": "#d9a0a0",
       "rest": 0.2,
       "drives": [
-        { "signal": "vasocongestion", "weight": 0.4, "note": "It fills with blood in erection, though less firmly than the corpora cavernosa.", "source": "GH14" }
+        {
+          "signal": "vasocongestion",
+          "weight": 0.4,
+          "note": "It fills with blood in erection, though less firmly than the corpora cavernosa.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -70,7 +100,12 @@
       "color": "#d98a98",
       "rest": 0.2,
       "drives": [
-        { "signal": "vasocongestion", "weight": 0.3, "note": "The glans fills with blood in erection.", "source": "GH14" }
+        {
+          "signal": "vasocongestion",
+          "weight": 0.3,
+          "note": "The glans fills with blood in erection.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -82,7 +117,12 @@
       "color": "#e3c04a",
       "rest": 0.2,
       "drives": [
-        { "signal": "orgasm", "weight": 0.2, "note": "Semen passes along it at ejaculation.", "source": "GH14" }
+        {
+          "signal": "orgasm",
+          "weight": 0.2,
+          "note": "Semen passes along it at ejaculation.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -94,7 +134,12 @@
       "color": "#c8323a",
       "rest": 0.3,
       "drives": [
-        { "signal": "vasocongestion", "weight": 0.4, "note": "Inflow rises as the arteries dilate.", "source": "GH14" }
+        {
+          "signal": "vasocongestion",
+          "weight": 0.4,
+          "note": "Inflow rises as the arteries dilate.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -106,7 +151,12 @@
       "color": "#d4545a",
       "rest": 0.3,
       "drives": [
-        { "signal": "vasocongestion", "weight": 0.3, "note": "Inflow rises with the filling of the tissue.", "source": "GH14" }
+        {
+          "signal": "vasocongestion",
+          "weight": 0.3,
+          "note": "Inflow rises with the filling of the tissue.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -118,7 +168,225 @@
       "color": "#6a4a7a",
       "rest": 0.3,
       "drives": [
-        { "signal": "vasocongestion", "weight": -0.2, "note": "Outflow is restricted as the tissue fills and compresses the veins.", "source": "GH14" }
+        {
+          "signal": "vasocongestion",
+          "weight": -0.2,
+          "note": "Outflow is restricted as the tissue fills and compresses the veins.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "crura_of_penis",
+      "label": "Crura",
+      "summary": "The two tapering rear ends of the corpora cavernosa, fixed to the pubic bone",
+      "function": "Each crus is the back end of a corpus cavernosum. It is attached to the bone of the pelvis and anchors the penis. It is covered by the ischiocavernosus muscle.",
+      "color": "#c98a8a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": 0.35,
+          "note": "The erectile tissue fills with blood.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bulb_of_penis",
+      "label": "Bulb",
+      "summary": "The expanded back end of the corpus spongiosum",
+      "function": "The bulb is the widened rear end of the corpus spongiosum, below the crura. The urethra enters it from above. It is covered by the bulbospongiosus muscle.",
+      "color": "#d9a0a0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": 0.35,
+          "note": "The erectile tissue fills with blood.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bulbospongiosus",
+      "label": "Bulbospongiosus",
+      "summary": "The muscle that covers the bulb",
+      "function": "The bulbospongiosus is a skeletal muscle that surrounds the bulb and the back of the corpus spongiosum. Its rhythmic contractions at orgasm help to expel semen along the urethra.",
+      "color": "#b05a4a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.4,
+          "note": "It contracts rhythmically at orgasm.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ischiocavernosus",
+      "label": "Ischiocavernosus",
+      "summary": "The muscles that cover the crura",
+      "function": "Each ischiocavernosus is a skeletal muscle that covers a crus. Its contraction squeezes the crus and helps to maintain the erection.",
+      "color": "#b86050",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": 0.25,
+          "note": "It presses on the crus when the tissue is full.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deep_fascia",
+      "label": "Deep (Buck) Fascia",
+      "summary": "The strong sheath that surrounds the three erectile columns together",
+      "function": "Buck fascia is a strong layer of connective tissue that wraps the corpora cavernosa and the corpus spongiosum together. The deep dorsal vein and the dorsal arteries and nerves run beneath it.",
+      "color": "#e8dcc0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "suspensory_ligament",
+      "label": "Suspensory Ligament",
+      "summary": "A fibrous band that holds the root of the penis to the pubic bone",
+      "function": "The suspensory ligament is a fibrous band that runs from the front of the pubic bone to the fascia of the penis. It holds the root of the penis in place.",
+      "color": "#e0d4b8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "prepuce",
+      "label": "Prepuce (Foreskin)",
+      "summary": "The fold of skin that covers the glans",
+      "function": "The prepuce is a double fold of skin that covers the glans. In some men it has been removed by circumcision. It is drawn as a loose glass collar behind the glans.",
+      "color": "#d8a898",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "frenulum",
+      "label": "Frenulum",
+      "summary": "The small fold on the underside that joins the glans to the prepuce",
+      "function": "The frenulum is a small midline fold of skin on the underside of the glans that attaches the prepuce to it.",
+      "color": "#d89090",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "navicular_fossa",
+      "label": "Navicular Fossa",
+      "summary": "The widened end of the urethra inside the glans",
+      "function": "The navicular fossa is a short widening of the urethra just before its opening in the glans.",
+      "color": "#e8c850",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.2,
+          "note": "Semen passes through it at ejaculation.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_urethral_orifice",
+      "label": "External Urethral Orifice",
+      "summary": "The opening of the urethra at the tip of the glans",
+      "function": "The external urethral orifice is the slit-like opening at the tip of the glans where urine and semen leave the body.",
+      "color": "#d8b030",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.2,
+          "note": "Semen leaves the body here.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dorsal_nerves",
+      "label": "Dorsal Nerves",
+      "summary": "The paired sensory nerves that run along the upper surface",
+      "function": "The dorsal nerves of the penis are branches of the pudendal nerve. They run along the upper surface beside the dorsal arteries and carry sensation from the glans and the shaft.",
+      "color": "#f0e060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "sexualArousal",
+          "weight": 0.3,
+          "note": "Touch signals rise with sexual stimulation.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cavernous_spaces",
+      "parent": "corpus_cavernosum_right",
+      "label": "Cavernous Spaces",
+      "summary": "The blood-filled spaces that make up the erectile tissue",
+      "function": "The cavernous spaces are the small chambers, lined by endothelium, that make up the erectile tissue. When the arteries open they fill with blood and the penis hardens. The same arrangement is drawn in both corpora.",
+      "color": "#d86a78",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": 0.45,
+          "note": "Blood fills the spaces as the arteries open.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "helicine_arteries",
+      "parent": "corpus_cavernosum_right",
+      "label": "Helicine Arteries",
+      "summary": "Coiled branches of the cavernosal artery that open into the spaces",
+      "function": "The helicine arteries are coiled small arteries that open into the cavernous spaces. They straighten and widen when the muscle in their walls relaxes, and so let blood rush in.",
+      "color": "#c8323a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": 0.45,
+          "note": "The muscle in their walls relaxes during arousal.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trabeculae",
+      "parent": "corpus_cavernosum_right",
+      "label": "Trabeculae",
+      "summary": "The strands of smooth muscle and connective tissue between the spaces",
+      "function": "The trabeculae are strands of smooth muscle and fibrous tissue that form the walls between the cavernous spaces. When the muscle is relaxed the spaces open and fill.",
+      "color": "#e0b8a8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": -0.15,
+          "note": "The muscle relaxes as the spaces fill.",
+          "source": "GRAYS42"
+        }
       ],
       "source": "GRAYS42"
     }
