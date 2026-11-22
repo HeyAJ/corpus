@@ -7,6 +7,8 @@ import {
   REVEAL_RADII,
   buildRevealTree,
   revealReach,
+  zoomedIn,
+  REVEAL_ZOOM_FRACTION,
   revealedSet,
   selectionReveals,
   stepReveal,
@@ -160,5 +162,46 @@ describe('the heart builder against the heart data', () => {
     let triangles = 0;
     for (const b of built) triangles += b.geometry.index ? b.geometry.index.count / 3 : b.geometry.getAttribute('position').count / 3;
     expect(triangles).toBeLessThanOrEqual(2 * 24276);
+  });
+});
+
+describe('zooming in past the opening view', () => {
+  // The orbit rig frames a sphere at about nine radii, floored by the rig's 0.07 m minimum.
+  const framed = (r: number): number => Math.max(0.07, 9 * r);
+  it.each([0.01, 0.02, 0.05, 0.1, 0.15])('radius %s m: no child shows at the opening view, children show at half of it', (r) => {
+    const tree = buildRevealTree([
+      { id: 'parent', parent: null },
+      { id: 'child', parent: 'parent' },
+    ]);
+    const d = framed(r);
+    const reveal = (dist: number): boolean =>
+      revealedSet(tree, null, (_p, l) => zoomedIn(dist, d) && dist < revealReach(l, r)).has('child');
+    expect(reveal(d)).toBe(false);
+    expect(reveal(0.5 * d)).toBe(true);
+  });
+  it('is false without a usable framing distance', () => {
+    expect(zoomedIn(0.01, Infinity)).toBe(false);
+    expect(zoomedIn(0.01, 0)).toBe(false);
+    expect(zoomedIn(Number.NaN, 0.1)).toBe(false);
+    expect(REVEAL_ZOOM_FRACTION).toBeLessThan(1);
+  });
+});
+
+describe('focus narrows attention (proximity opens only the focused part own descendants)', () => {
+  const everything = () => true;
+
+  it('hides a child of an unrelated parent that is within reach while a part is focused', () => {
+    expect(shown('valve', everything)).toEqual(['cusp']);
+    expect(shown('lone', everything)).toEqual([]);
+  });
+
+  it('shows a descendant of the focused part that is within reach', () => {
+    // Only the grandchild is asked about by proximity: 'muscle' is selected, 'tip' is beneath it.
+    expect(shown('muscle', (p) => p === 'muscle')).toEqual(['cords', 'muscle', 'tip']);
+    expect(shown('ventricle', (p) => p === 'muscle')).toEqual(['cords', 'muscle', 'tip']);
+  });
+
+  it('with nothing focused, proximity reveals every part in reach as before', () => {
+    expect(shown(null, everything)).toEqual(['cords', 'cusp', 'muscle', 'tip']);
   });
 });

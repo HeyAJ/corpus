@@ -43,7 +43,9 @@ export const REVEAL_RADII: Readonly<Record<2 | 3, number>> = { 2: 6.5, 3: 6.5 };
 /**
  * The smallest reach, metres of scene, whatever the parent's size. A valve (radius about
  * 0.01 m) is framed from about 0.1 m, and the orbit rig's floor is 0.07 m, so 0.13 m means
- * "zoomed right in" for a part too small to be reached at eight radii. A display constant.
+ * "zoomed right in" for a part too small to be reached at eight radii. It is only half the test
+ * now: the camera must also be zoomed in past the organ's own opening view (REVEAL_ZOOM_FRACTION),
+ * because for an organ framed from inside 0.13 m this floor alone was met at once. A display constant.
  */
 export const REVEAL_FLOOR_M = 0.13;
 
@@ -54,6 +56,29 @@ export const REVEAL_FLOOR_M = 0.13;
  * as the organ appear on their own. A display constant.
  */
 export const REVEAL_ORGAN_CAP = 3.5;
+
+/**
+ * ZOOMING IN, whatever the organ's size. The reach above is an absolute distance, and that went
+ * wrong for small organs: the right adrenal is framed on open from 0.119 m, which is already
+ * inside the 0.13 m floor, so all nine of its children showed the instant it opened (and the left
+ * adrenal, framed from 0.135 m because of the panel offset, showed none until a hand zoom). Progressive
+ * disclosure means "closer than where the organ was framed when opened", so the proximity route
+ * ALSO requires the camera to be nearer the open organ's centre than this fraction of the distance
+ * the rig frames that organ at. 0.75 means a quarter of the way in from the opening view. A display
+ * constant, not an anatomical one.
+ */
+export const REVEAL_ZOOM_FRACTION = 0.75;
+
+/**
+ * Has the visitor zoomed in on the open organ? `distanceToOrgan` is camera to the organ's centre,
+ * `framingDistance` the distance the orbit rig frames that organ at on open. A non-finite or
+ * non-positive framing distance (no organ, no rig yet) answers false, so nothing is revealed by
+ * a number that does not exist.
+ */
+export function zoomedIn(distanceToOrgan: number, framingDistance: number): boolean {
+  if (!(framingDistance > 0) || !Number.isFinite(framingDistance) || !Number.isFinite(distanceToOrgan)) return false;
+  return distanceToOrgan < REVEAL_ZOOM_FRACTION * framingDistance;
+}
 
 /** Seconds for a child to fade in, and out. Instant under reduced motion. Display constants. */
 export const REVEAL_FADE_IN_S = 0.35;
@@ -210,7 +235,19 @@ export function revealedSet(
     const parent = up[0];
     // A level-3 child cannot be on show unless its parent is.
     if (level >= 3 && !out.has(parent)) continue;
-    if (selectionReveals(tree, node.id, selected) || withinReach(parent, level)) out.add(node.id);
+    if (selectionReveals(tree, node.id, selected)) {
+      out.add(node.id);
+      continue;
+    }
+    // FOCUS NARROWS ATTENTION. While a part is selected or flown to, proximity may only open
+    // that part's OWN descendants. Before this, the camera sitting close to a focused part was
+    // also close to everybody else's centre: focusing the thalamus (5 children) showed 55, and
+    // focusing the mitral valve showed all 33 heart children, including the pericardium's three
+    // closed shells round the whole heart, a pink wash over the cusps (the very failure the
+    // brain scan had with the meninges). With nothing focused (free zoom) proximity applies to
+    // every part, as it always did.
+    if (selected !== null && !up.includes(selected)) continue;
+    if (withinReach(parent, level)) out.add(node.id);
   }
   return out;
 }

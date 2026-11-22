@@ -930,7 +930,13 @@ export class Viewer {
     // The camera in the body frame (the renderer's mirror undone), for the proximity half of
     // the rule that reveals a part's finer structures.
     const camera = this.rig.camera.position;
-    this.detail.setCamera(camera.x * BODY_MIRROR_X, camera.y, camera.z);
+    const opened = this.selected ? this.organs.organs.get(this.selected) : undefined;
+    this.detail.setCamera(
+      camera.x * BODY_MIRROR_X,
+      camera.y,
+      camera.z,
+      opened ? this.rig.framingDistance(opened.boundingRadius) : Infinity,
+    );
     this.detail.update(
       dtMs / 1000,
       this.snapshots.current,

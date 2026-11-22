@@ -20,6 +20,7 @@ import {
   FOCUS_STREAM_FRACTION,
   isCloseLook,
   REVEAL_PICKABLE,
+  zoomedIn,
   buildRevealTree,
   revealReach,
   revealedSet,
@@ -291,6 +292,8 @@ export class OrganDetail {
   private readonly warned = new Set<string>();
   /** The part the visitor flew to (`Viewer.focusPart`); a second route to "selected" for the reveal rule. */
   private focused: string | null = null;
+  /** The distance the rig frames the open organ at (Viewer passes it each frame); Infinity = unknown, which reveals nothing by proximity. */
+  private framingDistance = Infinity;
   /** The camera, in the BODY frame (the same frame `partSphere` reports), for the proximity rule. */
   private readonly cameraBody = new THREE.Vector3(Infinity, Infinity, Infinity);
   private readonly sphereCentre = new THREE.Vector3();
@@ -720,9 +723,12 @@ export class OrganDetail {
     if (!any) return;
     const selected = this.highlighted ?? this.focused;
     const cam = this.cameraBody;
+    // Route (b) also needs the camera zoomed in past where this organ was framed on open (see
+    // REVEAL_ZOOM_FRACTION): measured to the organ's centre, whatever the organ's size.
+    const zoomed = zoomedIn(interior.handle.centroid.distanceTo(cam), this.framingDistance);
     const near = (parentId: string, childLevel: number): boolean => {
       const parent = interior.parts.get(parentId);
-      if (!parent || !Number.isFinite(cam.x)) return false;
+      if (!parent || !zoomed || !Number.isFinite(cam.x)) return false;
       // The part's size and place as DRAWN AT REST: a valve shrinks by two thirds as it opens, and
       // a reach that followed that would flicker its cusps in and out with every beat.
       const radius = this.sphereOf(interior, parent, this.sphereCentre, false);
@@ -742,8 +748,9 @@ export class OrganDetail {
    * Tell the detail layer where the camera is, in the BODY frame (the frame partSphere reports:
    * the renderer's mirror already undone). The proximity half of the reveal rule reads it.
    */
-  setCamera(bodyX: number, bodyY: number, bodyZ: number): void {
+  setCamera(bodyX: number, bodyY: number, bodyZ: number, framingDistance = Infinity): void {
     this.cameraBody.set(bodyX, bodyY, bodyZ);
+    this.framingDistance = framingDistance;
   }
 
   /** The part the visitor flew to (null when none): a second way, beside the picked part, to select. */
