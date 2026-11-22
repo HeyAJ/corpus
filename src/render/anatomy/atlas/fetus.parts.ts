@@ -358,7 +358,7 @@ export const parts: PartBuilder = () => {
   // The four chambers, as children of the heart: the same lumps, drawn at 85 % so they sit inside it.
   const chamber = (id: string, c: V3, r: V3): void => {
     const l = lump(c[0], c[1], c[2], r[0] * 0.85, r[1] * 0.85, r[2] * 0.85);
-    out.push({ id, geometry: lumpsToGeometry([l], 0, 0.0016) });
+    out.push({ id, geometry: lumpsToGeometry([l], 0.0001, 0.0016) });
   };
   chamber('fetal_right_atrium', [0.01, 0.056, 0.022], [0.009, 0.01, 0.009]);
   chamber('fetal_left_atrium', [-0.002, 0.062, 0.01], [0.008, 0.008, 0.008]);
@@ -368,12 +368,12 @@ export const parts: PartBuilder = () => {
   // Kidneys and adrenals: behind the abdomen, either side of the aorta; the adrenal sits on the
   // top of its kidney and is drawn large, as it is before birth.
   const kid = [1, -1].map((s) => lump(s * 0.022, -0.014, -0.018, 0.0065, 0.013, 0.007));
-  out.push({ id: 'fetal_kidneys', geometry: lumpsToGeometry(kid, 0, 0.0016) });
+  out.push({ id: 'fetal_kidneys', geometry: lumpsToGeometry(kid, 0.0001, 0.0016) });
   const adr = [1, -1].map((s) => lump(s * 0.021, 0.002, -0.018, 0.0055, 0.004, 0.0035));
-  out.push({ id: 'fetal_adrenals', geometry: lumpsToGeometry(adr, 0, 0.0012) });
+  out.push({ id: 'fetal_adrenals', geometry: lumpsToGeometry(adr, 0.0001, 0.0012) });
 
   // Stomach: on the fetal left, under the left lobe of the liver.
-  out.push({ id: 'fetal_stomach', geometry: lumpsToGeometry([lump(-0.026, -0.012, 0.006, 0.01, 0.013, 0.008)], 0, 0.0018) });
+  out.push({ id: 'fetal_stomach', geometry: lumpsToGeometry([lump(-0.026, -0.012, 0.006, 0.01, 0.013, 0.008)], 0.0001, 0.0018) });
 
   // Vertebral column: a row of bodies along the back, behind the aorta, from the sacrum to the neck.
   const bodies: THREE.BufferGeometry[] = [];
