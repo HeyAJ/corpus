@@ -20,7 +20,16 @@ import { mulberry32 } from '../noise';
  *
  * Lobe count and lobule placement are a clear schematic: twelve lobes a side, placed by a
  * fixed pattern and a seeded generator so the result is deterministic. A real breast has
- * about fifteen to twenty, and no number here is a measurement. GLASS versus SOLID is
+ * about fifteen to twenty, and no number here is a measurement.
+ *
+ * FINER STRUCTURES (T2; src/data/anatomy/breasts.json `parent`). New level-1 parts: the lactiferous
+ * sinuses (a swelling on each duct behind the nipple), the areolar (Montgomery) glands, the
+ * retromammary space and the axillary tail. One lobule per breast is drawn as a MAGNIFIED
+ * SCHEMATIC at the end of a single lobe (a glass sphere), holding a terminal duct that branches,
+ * a handful of alveoli and a basket of myoepithelial cells round each: the numbers of twigs and
+ * alveoli are chosen to read, not counted. The textbook puts the alveoli inside the terminal duct
+ * lobular unit, a fourth level; the three are drawn as siblings under the lobule to keep the tree
+ * at three levels. GLASS versus SOLID is
  * decided in the detail file: the adipose envelope, ducts, lymph vessels and fascia are
  * glass; lobes, nipple, areola, ligaments and nodes are solid.
  */
@@ -68,6 +77,59 @@ export function breastPaths(s: number): { ducts: V3[][]; lymph: V3[][]; nodeAt: 
     [[s * 0.062, 0.01, 0.015], [s * 0.08, 0.022, 0.006], [s * 0.094, 0.027, -0.006], E],
   ];
   return { ducts, lymph, nodeAt: E };
+}
+
+/** The one schematic lobule: where it is, how big, and which way its duct enters. */
+function lobuleFrame(s: number): { centre: V3; radius: number; inward: V3 } {
+  const end = lobeEnd(s, 2);
+  const d = P0(s);
+  const l = Math.hypot(d[0] - end[0], d[1] - end[1], d[2] - end[2]) || 1;
+  return { centre: end, radius: 0.0042, inward: [(d[0] - end[0]) / l, (d[1] - end[1]) / l, (d[2] - end[2]) / l] };
+}
+
+function lobuleParts(s: number): { lobule: THREE.BufferGeometry; duct: THREE.BufferGeometry; alveoli: THREE.BufferGeometry; myo: THREE.BufferGeometry } {
+  const f = lobuleFrame(s);
+  const [cx, cy, cz] = f.centre;
+  const duct: THREE.BufferGeometry[] = [];
+  const alv: THREE.BufferGeometry[] = [];
+  const myo: THREE.BufferGeometry[] = [];
+  const entry: V3 = [cx + f.inward[0] * 0.0036, cy + f.inward[1] * 0.0036, cz + f.inward[2] * 0.0036];
+  const hub: V3 = [cx, cy, cz];
+  duct.push(tubeAlong([entry, lerp3(entry, hub, 0.5), hub], () => 0.00032, { tubular: 8, radial: 4 }));
+  // Twigs fan away from the entry, over the half of the sphere that faces away from it.
+  const TWIGS = 5;
+  for (let k = 0; k < TWIGS; k++) {
+    const a = (k / TWIGS) * Math.PI * 2 + 0.4;
+    // A direction mostly opposite the entry, spread round it.
+    const ref: V3 = Math.abs(f.inward[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0];
+    const e1: V3 = [f.inward[1] * ref[2] - f.inward[2] * ref[1], f.inward[2] * ref[0] - f.inward[0] * ref[2], f.inward[0] * ref[1] - f.inward[1] * ref[0]];
+    const l1 = Math.hypot(e1[0], e1[1], e1[2]) || 1;
+    const u1: V3 = [e1[0] / l1, e1[1] / l1, e1[2] / l1];
+    const u2: V3 = [f.inward[1] * u1[2] - f.inward[2] * u1[1], f.inward[2] * u1[0] - f.inward[0] * u1[2], f.inward[0] * u1[1] - f.inward[1] * u1[0]];
+    const dir: V3 = [
+      -0.6 * f.inward[0] + 0.8 * (Math.cos(a) * u1[0] + Math.sin(a) * u2[0]),
+      -0.6 * f.inward[1] + 0.8 * (Math.cos(a) * u1[1] + Math.sin(a) * u2[1]),
+      -0.6 * f.inward[2] + 0.8 * (Math.cos(a) * u1[2] + Math.sin(a) * u2[2]),
+    ];
+    const tip: V3 = [cx + dir[0] * 0.0026, cy + dir[1] * 0.0026, cz + dir[2] * 0.0026];
+    duct.push(tubeAlong([hub, lerp3(hub, tip, 0.6), tip], (t) => 0.00026 - 0.0001 * t, { tubular: 8, radial: 4 }));
+    // Two alveoli at each twig's end, each wrapped by a basket of two thin rings.
+    for (const off of [-1, 1]) {
+      const c: V3 = [tip[0] + off * u1[0] * 0.0005, tip[1] + off * u1[1] * 0.0005, tip[2] + off * u1[2] * 0.0005];
+      alv.push(bead(c, [0.0006, 0.0006, 0.0006], 8, 5));
+      for (const plane of [0, 1]) {
+        const ring: V3[] = [];
+        for (let m = 0; m < 10; m++) {
+          const b = (m / 10) * Math.PI * 2;
+          const x = 0.00082 * Math.cos(b);
+          const y = 0.00082 * Math.sin(b);
+          ring.push(plane === 0 ? [c[0] + x, c[1] + y, c[2]] : [c[0], c[1] + x, c[2] + y]);
+        }
+        myo.push(tubeAlong(ring, () => 0.00011, { tubular: 10, radial: 3, closed: true }));
+      }
+    }
+  }
+  return { lobule: bead(f.centre, [f.radius, f.radius, f.radius], 20, 14), duct: mergeParts(duct), alveoli: mergeParts(alv), myo: mergeParts(myo) };
 }
 
 export const parts: PartBuilder = () => {
@@ -130,7 +192,38 @@ export const parts: PartBuilder = () => {
     nodes.push(bead([E[0] + s * 0.0005, E[1] - 0.007, E[2] + 0.001], [0.0018, 0.0015, 0.0015], 8, 5));
   }
 
+  // FINER STRUCTURES and the new level-1 parts.
+  const sinuses: THREE.BufferGeometry[] = [];
+  const montgomery: THREE.BufferGeometry[] = [];
+  const retro: THREE.BufferGeometry[] = [];
+  const tail: THREE.BufferGeometry[] = [];
+  const lob: ReturnType<typeof lobuleParts>[] = [];
+  for (const s of [1, -1]) {
+    const c = C(s);
+    const nip = NIP(s);
+    for (const d of breastPaths(s).ducts) {
+      // The sinus: the swelling at about three quarters of the way from the lobe to the nipple.
+      sinuses.push(bead(lerp3(d[1], d[2], 0.45), [0.0011, 0.0011, 0.0015], 8, 5));
+    }
+    for (let i = 0; i < 10; i++) {
+      const a = (i / 10) * Math.PI * 2 + 0.2;
+      montgomery.push(bead([nip[0] + 0.0085 * Math.cos(a), nip[1] + 0.0085 * Math.sin(a), 0.0207], [0.0007, 0.0007, 0.0006], 6, 4));
+    }
+    retro.push(bead([c[0], c[1], -0.0245], [0.036, 0.038, 0.0007], 24, 8));
+    const E = breastPaths(s).nodeAt;
+    tail.push(tubeAlong([[s * 0.086, 0.016, -0.009], [s * 0.094, 0.022, -0.0115], [E[0] - s * 0.004, E[1] - 0.001, E[2] + 0.0005]], (t) => 0.0042 - 0.0022 * t, { tubular: 14, radial: 8 }));
+    lob.push(lobuleParts(s));
+  }
+
   return [
+    { id: 'lactiferous_sinuses', geometry: mergeParts(sinuses) },
+    { id: 'areolar_glands', geometry: mergeParts(montgomery) },
+    { id: 'retromammary_space', geometry: mergeParts(retro) },
+    { id: 'axillary_tail', geometry: mergeParts(tail) },
+    { id: 'breast_lobule', geometry: mergeParts(lob.map((l) => l.lobule)) },
+    { id: 'terminal_duct_lobular_unit', geometry: mergeParts(lob.map((l) => l.duct)) },
+    { id: 'alveoli', geometry: mergeParts(lob.map((l) => l.alveoli)) },
+    { id: 'myoepithelial_cells', geometry: mergeParts(lob.map((l) => l.myo)) },
     { id: 'glandular_lobes', geometry: mergeParts(lobes) },
     { id: 'lactiferous_ducts', geometry: mergeParts(ducts) },
     { id: 'nipple', geometry: mergeParts(nipple) },

@@ -2,8 +2,14 @@
   "atlas": "thyroid",
   "about": "The thyroid gland as an anatomy textbook draws it: two lobes joined by an isthmus, colloid-filled follicles, the calcitonin-making C cells, the capsule, the arterial supply and venous drainage, and the four parathyroid glands on the back. Follicles and C cells are drawn as representative beads, not counted. Activity is a display index driven by the engine's thyroid-hormone signal; it is not a hormone secretion rate. Calcium handling, parathyroid hormone and calcitonin are not simulated, so the C cells and parathyroids have no live drive.",
   "sources": {
-    "GH14": { "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.", "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8" },
-    "GRAYS42": { "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.", "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0" }
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
   },
   "parts": [
     {
@@ -14,7 +20,12 @@
       "color": "#b8553c",
       "rest": 0.3,
       "drives": [
-        { "signal": "thyroid", "weight": 0.35, "note": "The lobe is the source of thyroid hormone.", "source": "GH14" }
+        {
+          "signal": "thyroid",
+          "weight": 0.35,
+          "note": "The lobe is the source of thyroid hormone.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -26,7 +37,12 @@
       "color": "#b8553c",
       "rest": 0.3,
       "drives": [
-        { "signal": "thyroid", "weight": 0.35, "note": "The lobe is the source of thyroid hormone.", "source": "GH14" }
+        {
+          "signal": "thyroid",
+          "weight": 0.35,
+          "note": "The lobe is the source of thyroid hormone.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -38,7 +54,12 @@
       "color": "#c4694a",
       "rest": 0.3,
       "drives": [
-        { "signal": "thyroid", "weight": 0.35, "note": "It is follicular tissue making thyroid hormone.", "source": "GH14" }
+        {
+          "signal": "thyroid",
+          "weight": 0.35,
+          "note": "It is follicular tissue making thyroid hormone.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -50,7 +71,12 @@
       "color": "#e8c56a",
       "rest": 0.3,
       "drives": [
-        { "signal": "thyroid", "weight": 0.4, "note": "Follicular cells make and release thyroid hormone.", "source": "GH14" }
+        {
+          "signal": "thyroid",
+          "weight": 0.4,
+          "note": "Follicular cells make and release thyroid hormone.",
+          "source": "GH14"
+        }
       ],
       "source": "GH14"
     },
@@ -82,8 +108,18 @@
       "color": "#c8323a",
       "rest": 0.3,
       "drives": [
-        { "signal": "outputRise", "weight": 0.3, "note": "Arterial inflow follows the output of the heart.", "source": "GH14" },
-        { "signal": "outputFall", "weight": -0.2, "note": "A falling output means less inflow.", "source": "GH14" }
+        {
+          "signal": "outputRise",
+          "weight": 0.3,
+          "note": "Arterial inflow follows the output of the heart.",
+          "source": "GH14"
+        },
+        {
+          "signal": "outputFall",
+          "weight": -0.2,
+          "note": "A falling output means less inflow.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -95,7 +131,12 @@
       "color": "#6a4a7a",
       "rest": 0.3,
       "drives": [
-        { "signal": "thyroid", "weight": 0.3, "note": "Hormone leaves the gland in these veins.", "source": "GH14" }
+        {
+          "signal": "thyroid",
+          "weight": 0.3,
+          "note": "Hormone leaves the gland in these veins.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -108,6 +149,131 @@
       "rest": 0.2,
       "drives": [],
       "source": "GH14"
+    },
+    {
+      "id": "pyramidal_lobe",
+      "label": "Pyramidal Lobe",
+      "summary": "A narrow, variable finger of thyroid tissue rising from the isthmus",
+      "function": "It is not present in everyone. When present it rises from the isthmus or a lobe towards the hyoid bone, and is the same kind of tissue as the rest of the gland.",
+      "color": "#c4694a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "thyroid",
+          "weight": 0.35,
+          "note": "It is follicular tissue making thyroid hormone, like the lobes.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "follicular_cells",
+      "parent": "follicles",
+      "label": "Follicular Cells",
+      "summary": "The cells that form the wall of each follicle (enlarged schematic)",
+      "function": "They take up iodine, build thyroid hormone on the protein in the colloid, and release it into the blood. Follicles are microscopic; three are drawn enlarged per lobe.",
+      "color": "#e8a85a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "thyroid",
+          "weight": 0.4,
+          "note": "These cells make and release thyroid hormone.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "colloid",
+      "parent": "follicles",
+      "label": "Colloid (Thyroglobulin)",
+      "summary": "The store in the middle of each follicle (enlarged schematic)",
+      "function": "A gel rich in thyroglobulin, the protein on which thyroid hormone is built. It holds a store of hormone until the follicular cells take it back in and release it.",
+      "color": "#f0d070",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "follicle_basement_membrane",
+      "parent": "follicles",
+      "label": "Follicle Basement Membrane",
+      "summary": "The thin supporting sheet round each follicle (enlarged schematic)",
+      "function": "A thin layer outside the follicular cells that supports them and separates them from the capillaries around the follicle.",
+      "color": "#d8c8a0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "follicle_capillaries",
+      "parent": "follicles",
+      "label": "Follicle Capillaries",
+      "summary": "Fine blood vessels wrapped round the follicles (schematic)",
+      "function": "Capillaries run between and around follicles, bringing in what the cells need and carrying hormone away into the blood.",
+      "color": "#c8505a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.3,
+          "note": "Blood flow through the gland follows the output of the heart.",
+          "source": "GH14"
+        },
+        {
+          "signal": "outputFall",
+          "weight": -0.2,
+          "note": "A falling output means less flow.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "superior_parathyroid_glands",
+      "parent": "parathyroids",
+      "label": "Superior Parathyroid Glands",
+      "summary": "The upper pair of parathyroid glands",
+      "function": "Two small glands on the back of the thyroid, higher up. Together with the lower pair they make parathyroid hormone, which raises blood calcium.",
+      "color": "#9a7fb5",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "inferior_parathyroid_glands",
+      "parent": "parathyroids",
+      "label": "Inferior Parathyroid Glands",
+      "summary": "The lower pair of parathyroid glands",
+      "function": "Two small glands on the back of the thyroid, lower down. Their position varies more than that of the upper pair.",
+      "color": "#9a7fb5",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chief_cells",
+      "parent": "parathyroids",
+      "label": "Chief Cells",
+      "summary": "The main hormone-making cells of the parathyroid (schematic)",
+      "function": "They make parathyroid hormone. Drawn as beads far larger than real cells.",
+      "color": "#b89ad0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "oxyphil_cells",
+      "parent": "parathyroids",
+      "label": "Oxyphil Cells",
+      "summary": "Larger, paler cells of the parathyroid (schematic)",
+      "function": "Larger cells scattered among the chief cells; their role is not settled. Drawn as beads far larger than real cells.",
+      "color": "#d8a0c0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
     }
   ]
 }

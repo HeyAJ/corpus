@@ -37,6 +37,14 @@ import { capsule, ellipsoid, mergeParts, polygonise, smoothUnion, tubeAlong, typ
  * vessels lie inside the shell's cord tube (radius 6 mm): the vessels twist round each other
  * on a helix of 2.8 mm radius, and the vein is thicker than the two arteries, as it is.
  *
+ * FINER STRUCTURES (T2; src/data/anatomy/fetus.json). Four new level-1 parts that have a plausible
+ * place in the existing figure: the two kidneys, the two adrenals, the stomach and the vertebral
+ * column; and the four chambers of the heart as children of `heart`. The chambers are the same
+ * four lumps that make the heart, drawn a little smaller so they sit inside it, so they follow
+ * the beat (a child rides its parent's pose). Positions are written in fetal axes like the rest,
+ * chosen to sit behind the liver and beside the aorta and the vena cava without touching a
+ * stream, and are drawing proportions, not measurements.
+ *
  * NOT DRAWN. The heart valves, the vessels of the limbs, the hepatic and portal tree, the
  * pulmonary vessels beyond the first branches, the cord's Wharton's jelly (a sheath would
  * be a fifteenth part), the placenta. Sizes are chosen to read clearly, not measured. The
@@ -346,5 +354,37 @@ export const parts: PartBuilder = () => {
   out.push({ id: 'ductus_venosus', geometry: tube(p.ductusVenosus, 0.0026, 0.0026, 8, 16) });
   out.push({ id: 'foramen_ovale', geometry: tube(p.foramenOvale, 0.0028, 0.0028, 8, 10) });
   out.push({ id: 'ductus_arteriosus', geometry: tube(p.ductusArteriosus, 0.0028, 0.0028, 8, 12) });
+
+  // The four chambers, as children of the heart: the same lumps, drawn at 85 % so they sit inside it.
+  const chamber = (id: string, c: V3, r: V3): void => {
+    const l = lump(c[0], c[1], c[2], r[0] * 0.85, r[1] * 0.85, r[2] * 0.85);
+    out.push({ id, geometry: lumpsToGeometry([l], 0, 0.0016) });
+  };
+  chamber('fetal_right_atrium', [0.01, 0.056, 0.022], [0.009, 0.01, 0.009]);
+  chamber('fetal_left_atrium', [-0.002, 0.062, 0.01], [0.008, 0.008, 0.008]);
+  chamber('fetal_right_ventricle', [0.002, 0.044, 0.034], [0.01, 0.011, 0.007]);
+  chamber('fetal_left_ventricle', [-0.012, 0.04, 0.024], [0.01, 0.013, 0.009]);
+
+  // Kidneys and adrenals: behind the abdomen, either side of the aorta; the adrenal sits on the
+  // top of its kidney and is drawn large, as it is before birth.
+  const kid = [1, -1].map((s) => lump(s * 0.022, -0.014, -0.018, 0.0065, 0.013, 0.007));
+  out.push({ id: 'fetal_kidneys', geometry: lumpsToGeometry(kid, 0, 0.0016) });
+  const adr = [1, -1].map((s) => lump(s * 0.021, 0.002, -0.018, 0.0055, 0.004, 0.0035));
+  out.push({ id: 'fetal_adrenals', geometry: lumpsToGeometry(adr, 0, 0.0012) });
+
+  // Stomach: on the fetal left, under the left lobe of the liver.
+  out.push({ id: 'fetal_stomach', geometry: lumpsToGeometry([lump(-0.026, -0.012, 0.006, 0.01, 0.013, 0.008)], 0, 0.0018) });
+
+  // Vertebral column: a row of bodies along the back, behind the aorta, from the sacrum to the neck.
+  const bodies: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 17; i++) {
+    const y = -0.052 + i * 0.0095;
+    const c = f(0, y, -0.0125);
+    const g = new THREE.SphereGeometry(1, 8, 5);
+    g.scale(0.0045, 0.0036, 0.0036);
+    g.translate(c[0], c[1], c[2]);
+    bodies.push(g);
+  }
+  out.push({ id: 'spine', geometry: mergeParts(bodies) });
   return out;
 };

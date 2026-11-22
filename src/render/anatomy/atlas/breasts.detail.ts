@@ -16,8 +16,10 @@ import { breastPaths } from './breasts.parts';
  */
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-const GLASS = ['adipose_tissue', 'lactiferous_ducts', 'lymphatics', 'pectoral_fascia'];
-const OPACITY: Record<string, number> = { adipose_tissue: 0.2, pectoral_fascia: 0.25 };
+// The new retromammary sheet and the magnified lobule are glass too (T2): the first so the
+// fascia shows through it, the second so its duct and alveoli can be seen inside.
+const GLASS = ['adipose_tissue', 'lactiferous_ducts', 'lymphatics', 'pectoral_fascia', 'retromammary_space', 'breast_lobule'];
+const OPACITY: Record<string, number> = { adipose_tissue: 0.2, pectoral_fascia: 0.25, retromammary_space: 0.18, breast_lobule: 0.18 };
 const SIDES = [
   ['r', 1],
   ['l', -1],

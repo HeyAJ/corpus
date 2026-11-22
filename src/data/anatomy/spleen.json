@@ -20,8 +20,18 @@
       "color": "#c98a8f",
       "rest": 0.15,
       "drives": [
-        { "signal": "bleeding", "weight": 0.2, "note": "The spleen holds a reservoir of blood that is released when blood is lost.", "source": "GH14" },
-        { "signal": "sympathetic", "weight": 0.1, "note": "Sympathetic outflow squeezes blood out of the spleen's reservoir.", "source": "GH14" }
+        {
+          "signal": "bleeding",
+          "weight": 0.2,
+          "note": "The spleen holds a reservoir of blood that is released when blood is lost.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.1,
+          "note": "Sympathetic outflow squeezes blood out of the spleen's reservoir.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -33,7 +43,12 @@
       "color": "#e3c6a6",
       "rest": 0.15,
       "drives": [
-        { "signal": "sympathetic", "weight": 0.1, "note": "The supporting framework tightens a little when sympathetic outflow is raised.", "source": "GH14" }
+        {
+          "signal": "sympathetic",
+          "weight": 0.1,
+          "note": "The supporting framework tightens a little when sympathetic outflow is raised.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -45,8 +60,18 @@
       "color": "#a8323f",
       "rest": 0.25,
       "drives": [
-        { "signal": "haemolysis", "weight": 0.35, "note": "Red pulp macrophages remove damaged or broken red cells.", "source": "GH14" },
-        { "signal": "infection", "weight": 0.15, "note": "The red pulp also filters microbes and debris from the blood.", "source": "GH14" }
+        {
+          "signal": "haemolysis",
+          "weight": 0.35,
+          "note": "Red pulp macrophages remove damaged or broken red cells.",
+          "source": "GH14"
+        },
+        {
+          "signal": "infection",
+          "weight": 0.15,
+          "note": "The red pulp also filters microbes and debris from the blood.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -58,9 +83,24 @@
       "color": "#e8dfd0",
       "rest": 0.2,
       "drives": [
-        { "signal": "immune", "weight": 0.4, "note": "Lymphoid tissue is activated by an immune response.", "source": "GH14" },
-        { "signal": "infection", "weight": 0.3, "note": "Blood-borne pathogens are met by the white pulp.", "source": "GH14" },
-        { "signal": "inflammation", "weight": 0.1, "note": "Inflammation accompanies immune activation.", "source": "GH14" }
+        {
+          "signal": "immune",
+          "weight": 0.4,
+          "note": "Lymphoid tissue is activated by an immune response.",
+          "source": "GH14"
+        },
+        {
+          "signal": "infection",
+          "weight": 0.3,
+          "note": "Blood-borne pathogens are met by the white pulp.",
+          "source": "GH14"
+        },
+        {
+          "signal": "inflammation",
+          "weight": 0.1,
+          "note": "Inflammation accompanies immune activation.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -72,8 +112,18 @@
       "color": "#d99aa6",
       "rest": 0.2,
       "drives": [
-        { "signal": "infection", "weight": 0.35, "note": "Blood-borne microbes are sampled here first.", "source": "GH14" },
-        { "signal": "immune", "weight": 0.25, "note": "Its cells take part in the early immune response.", "source": "GH14" }
+        {
+          "signal": "infection",
+          "weight": 0.35,
+          "note": "Blood-borne microbes are sampled here first.",
+          "source": "GH14"
+        },
+        {
+          "signal": "immune",
+          "weight": 0.25,
+          "note": "Its cells take part in the early immune response.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -85,8 +135,18 @@
       "color": "#c8323a",
       "rest": 0.3,
       "drives": [
-        { "signal": "outputRise", "weight": 0.25, "note": "More blood flows through the organ when cardiac output is higher.", "source": "GH14" },
-        { "signal": "outputFall", "weight": -0.2, "note": "Less blood flows through it when output falls.", "source": "GH14" }
+        {
+          "signal": "outputRise",
+          "weight": 0.25,
+          "note": "More blood flows through the organ when cardiac output is higher.",
+          "source": "GH14"
+        },
+        {
+          "signal": "outputFall",
+          "weight": -0.2,
+          "note": "Less blood flows through it when output falls.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -98,8 +158,18 @@
       "color": "#6a4a7a",
       "rest": 0.3,
       "drives": [
-        { "signal": "outputRise", "weight": 0.25, "note": "More blood drains from the organ when cardiac output is higher.", "source": "GH14" },
-        { "signal": "outputFall", "weight": -0.2, "note": "Less blood drains from it when output falls.", "source": "GH14" }
+        {
+          "signal": "outputRise",
+          "weight": 0.25,
+          "note": "More blood drains from the organ when cardiac output is higher.",
+          "source": "GH14"
+        },
+        {
+          "signal": "outputFall",
+          "weight": -0.2,
+          "note": "Less blood drains from it when output falls.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -111,8 +181,121 @@
       "color": "#8a5a6a",
       "rest": 0.2,
       "drives": [
-        { "signal": "outputRise", "weight": 0.15, "note": "More blood passes in and out when output is higher.", "source": "GH14" }
+        {
+          "signal": "outputRise",
+          "weight": 0.15,
+          "note": "More blood passes in and out when output is higher.",
+          "source": "GH14"
+        }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gastrosplenic_ligament",
+      "label": "Gastrosplenic Ligament",
+      "summary": "Fold of peritoneum from the stomach to the hilum (schematic extent)",
+      "function": "It joins the stomach to the front of the hilum and carries the short gastric vessels. Drawn as a thin sheet; its extent here is a drawing choice.",
+      "color": "#d8c8b8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "splenorenal_ligament",
+      "label": "Splenorenal Ligament",
+      "summary": "Fold of peritoneum from the left kidney to the hilum (schematic extent)",
+      "function": "It joins the hilum to the region of the left kidney and carries the splenic vessels. Drawn as a thin sheet; its extent here is a drawing choice.",
+      "color": "#d8c8b8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "periarteriolar_lymphoid_sheath",
+      "parent": "white_pulp",
+      "label": "Periarteriolar Lymphoid Sheath",
+      "summary": "Lymphoid tissue wrapped round each central arteriole (schematic)",
+      "function": "A sleeve of T lymphocytes around the arteriole inside a white-pulp follicle.",
+      "color": "#e8dfd0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "germinal_centre",
+      "parent": "white_pulp",
+      "label": "Germinal Centre",
+      "summary": "A zone where B cells multiply in a follicle (schematic)",
+      "function": "Present when a follicle is responding to an antigen, where B cells multiply and improve their antibodies. It comes and goes; the drawing shows a few as a device.",
+      "color": "#f4efe6",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "central_arteriole",
+      "parent": "white_pulp",
+      "label": "Central Arteriole",
+      "summary": "The small artery running through a white-pulp follicle",
+      "function": "A branch of the splenic artery that runs through the middle of the lymphoid sheath, bringing blood to the white pulp.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "splenic_cords",
+      "parent": "red_pulp",
+      "label": "Splenic Cords (of Billroth)",
+      "summary": "The cellular meshwork between the sinuses (schematic)",
+      "function": "Tissue between the venous sinuses where blood slowly filters past macrophages and old or damaged red cells are held and removed.",
+      "color": "#a8323f",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "venous_sinuses",
+      "parent": "red_pulp",
+      "label": "Venous Sinuses",
+      "summary": "Wide, leaky vessels that drain the red pulp",
+      "function": "Blood from the cords passes through the sinus walls and drains toward the splenic vein. Drawn as a few tubes; real sinuses are far more numerous.",
+      "color": "#7a5a9a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "red_pulp_macrophages",
+      "parent": "red_pulp",
+      "label": "Red Pulp Macrophages",
+      "summary": "Cells that engulf old red cells and debris (schematic)",
+      "function": "They remove worn-out red cells and cell debris from the blood. Drawn as beads far larger than real cells.",
+      "color": "#c9a24a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "trabecular_arteries",
+      "parent": "splenic_artery",
+      "label": "Trabecular Arteries",
+      "summary": "Branches of the splenic artery inside the trabeculae",
+      "function": "After entering at the hilum the artery divides into branches that run in the supporting trabeculae.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "penicillar_arterioles",
+      "parent": "splenic_artery",
+      "label": "Penicillar Arterioles",
+      "summary": "Brush-like fine terminal arterioles opening into the red pulp (schematic)",
+      "function": "Small arterioles that leave the white pulp and split like the hairs of a brush, delivering blood to the red pulp.",
+      "color": "#d8404a",
+      "rest": 0.3,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]

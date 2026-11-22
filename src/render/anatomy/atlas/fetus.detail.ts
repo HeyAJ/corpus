@@ -83,6 +83,16 @@ const PART_LOOK: readonly (readonly [string, number | null, number | null])[] = 
   ['ductus_venosus', OXYGENATED, null],
   ['foramen_ovale', OXYGENATED, null],
   ['ductus_arteriosus', DEOXYGENATED, null],
+  // T2: the new solid organs keep their atlas colour and the same constant glow. The chambers are
+  // children of the heart, so they pulse with it; they are solid inside its glass.
+  ['fetal_kidneys', null, null],
+  ['fetal_adrenals', null, null],
+  ['fetal_stomach', null, null],
+  ['spine', null, null],
+  ['fetal_right_atrium', null, null],
+  ['fetal_left_atrium', null, null],
+  ['fetal_right_ventricle', null, null],
+  ['fetal_left_ventricle', null, null],
 ];
 
 const FLOW_IDS: readonly string[] = [

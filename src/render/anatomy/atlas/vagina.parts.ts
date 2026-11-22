@@ -180,18 +180,17 @@ export const parts: PartBuilder = () => {
   });
 
   // THE VULVA'S OTHER PARTS: rings, folds, pads, glands and the artery of the wall.
-  const ringTilted = (c: V3, ax: number, az: number, r: number): V3[] => {
+  const ringTilted = (c: V3, ax: number, az: number): V3[] => {
     // A ring in the plane of the vaginal opening: x across, and (0, 0.6, 0.8) up and forward.
     const pts: V3[] = [];
     for (let k = 0; k < 16; k++) {
       const a = (k / 16) * Math.PI * 2;
       pts.push([c[0] + ax * Math.cos(a), c[1] + 0.6 * az * Math.sin(a), c[2] + 0.8 * az * Math.sin(a)]);
     }
-    void r;
     return pts;
   };
-  out.push({ id: 'hymen', geometry: tubeAlong(ringTilted([0, -0.0715, 0.0355], 0.0066, 0.0046, 0), () => 0.0006, { tubular: 32, radial: 6, closed: true }) });
-  out.push({ id: 'vaginal_orifice', geometry: tubeAlong(ringTilted([0, -0.0748, 0.0372], 0.0072, 0.005, 0), () => 0.0004, { tubular: 32, radial: 5, closed: true }) });
+  out.push({ id: 'hymen', geometry: tubeAlong(ringTilted([0, -0.0715, 0.0355], 0.0066, 0.0046), () => 0.0006, { tubular: 32, radial: 6, closed: true }) });
+  out.push({ id: 'vaginal_orifice', geometry: tubeAlong(ringTilted([0, -0.0748, 0.0372], 0.0072, 0.005), () => 0.0004, { tubular: 32, radial: 5, closed: true }) });
   out.push({ id: 'external_urethral_orifice', geometry: scaledSphere([0, -0.0725, 0.0418], [0.0009, 0.0009, 0.0007], 8) });
   out.push({ id: 'labia_minora', geometry: mergeParts([1, -1].map((s) => scaledSphere([s * 0.0125, -0.0755, 0.0415], [0.001, 0.012, 0.0052], 14))) });
   out.push({ id: 'labia_majora', geometry: mergeParts([1, -1].map((s) => scaledSphere([s * 0.019, -0.0735, 0.0415], [0.0035, 0.016, 0.0065], 14))) });
