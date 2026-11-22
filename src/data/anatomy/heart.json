@@ -1,6 +1,6 @@
 {
   "atlas": "heart",
-  "about": "The interior of the heart: its four chambers, the septum, the four valves, the lumens of the great vessels, the coronary arteries and the conduction system, drawn inside the glass shell of the organ. Chamber size, valve state, blood colour and the beat-by-beat spread of the electrical impulse follow the simulation's own cardiac cycle. It leaves out the papillary muscles, chordae tendineae, trabeculae, coronary sinus and the fine structure of the valve cusps, and the shapes are adult-mean drawings, not anyone's scan. Activity is a display index of how hard the model's drives are pushing a structure; it is not a measurement and nothing here is clinical advice.",
+  "about": "The interior of the heart: its four chambers, the septa, the four valves, the lumens of the great vessels, the coronary arteries, the conduction system and the pericardium, drawn inside the glass shell of the organ. Chamber size, valve state, blood colour and the beat-by-beat spread of the electrical impulse follow the simulation's own cardiac cycle. Many parts hold finer structures of their own (papillary muscles and chordae tendineae in a ventricle, the cusps of a valve, the branches of a coronary artery, the layers of the pericardium): select a part, or zoom in on it, and they appear inside it; the Structures list nests them under their parent. The shapes are adult-mean drawings, not anyone's scan, and the cusps, cords and ridges are schematic: their number and layout are illustrative. Activity is a display index of how hard the model's drives are pushing a structure; a structure with no drive of its own shows its parent's. It is not a measurement and nothing here is clinical advice.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -239,6 +239,408 @@
         { "signal": "heartRate", "weight": 0.3, "note": "The network conducts once per beat, so it is used more at a faster rate.", "source": "GH14" },
         { "signal": "fibrillation", "weight": 0.3, "note": "Fibrillation makes the electrical activity chaotic and continuous.", "source": "GH14" }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interatrial_septum",
+      "label": "Interatrial Septum",
+      "summary": "Wall between the two atria",
+      "function": "The interatrial septum separates the right atrium from the left atrium, so that venous and oxygenated blood do not mix at atrial level. On its right-atrial face it carries a shallow oval depression, the fossa ovalis, which marks where the foramen ovale of the fetal heart closed. Open the septum to see it.",
+      "color": "#b5544f",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The septum moves with every atrial beat, so a faster rate means more work.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.25, "note": "With no organised beat it does no work.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pericardium",
+      "label": "Pericardium",
+      "summary": "The sac that holds the heart",
+      "function": "The pericardium is the double-walled sac in which the heart lies. A tough outer fibrous layer anchors it to its surroundings, and inside that a thin serous membrane folds back on itself: one layer lines the sac and the other covers the heart. A film of lubricating fluid between them lets the heart move with each beat with little friction. It is drawn here as a faint glass envelope; open it to see its layers.",
+      "color": "#e8dccf",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "papillary_muscles_lv",
+      "parent": "left_ventricle",
+      "label": "Papillary Muscles (left)",
+      "summary": "Muscular columns that anchor the mitral cords",
+      "function": "Two columns of muscle, the anterolateral and the posteromedial papillary muscles, rise from the inner wall of the left ventricle. They contract with the ventricle and keep the cords tight, which stops the mitral cusps being pushed back into the left atrium when the ventricle squeezes.",
+      "color": "#7a2030",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "Each beat tenses them, so a faster rate means more work.", "source": "GH14" },
+        { "signal": "inotropy", "weight": 0.3, "note": "Stronger contraction raises the load on the muscle.", "source": "GH14" },
+        { "signal": "pumpFailure", "weight": -0.3, "note": "Weaker contraction lowers the work done.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.25, "note": "No organised beat means no contraction.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chordae_tendineae_lv",
+      "parent": "left_ventricle",
+      "label": "Chordae Tendineae (left)",
+      "summary": "Fine cords from the papillary muscles to the mitral cusps",
+      "function": "The chordae tendineae are thin fibrous cords that run from the tips of the papillary muscles to the free edges of the mitral cusps. They hold the cusps shut against the pressure of systole, like the guy-ropes of a tent. They are passive tissue, so here they simply show the activity of the ventricle they belong to.",
+      "color": "#efe6d2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trabeculae_carneae_lv",
+      "parent": "left_ventricle",
+      "label": "Trabeculae Carneae (left)",
+      "summary": "Muscular ridges on the inner wall",
+      "function": "The inner surface of the left ventricle is not smooth: it is raised into ridges and bridges of muscle called trabeculae carneae. Some are fixed along their length, some are attached only at their ends, and the papillary muscles are the largest of the free-standing type. The wall near the outflow tract is smooth.",
+      "color": "#8c3340",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "papillary_muscles_rv",
+      "parent": "right_ventricle",
+      "label": "Papillary Muscles (right)",
+      "summary": "Muscular columns that anchor the tricuspid cords",
+      "function": "The right ventricle has an anterior, a posterior and a septal papillary muscle. As in the left ventricle they contract with the chamber and keep the cords tight so that the tricuspid cusps do not blow back into the right atrium in systole.",
+      "color": "#7a2030",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "Each beat tenses them, so a faster rate means more work.", "source": "GH14" },
+        { "signal": "inotropy", "weight": 0.3, "note": "Stronger contraction raises the load on the muscle.", "source": "GH14" },
+        { "signal": "pumpFailure", "weight": -0.3, "note": "Weaker contraction lowers the work done.", "source": "GH14" },
+        { "signal": "arrest", "weight": -0.25, "note": "No organised beat means no contraction.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chordae_tendineae_rv",
+      "parent": "right_ventricle",
+      "label": "Chordae Tendineae (right)",
+      "summary": "Fine cords from the papillary muscles to the tricuspid cusps",
+      "function": "Thin fibrous cords join the tips of the right papillary muscles to the edges of the three tricuspid cusps, and each muscle sends cords to more than one cusp. They are passive tissue, so here they show the activity of the right ventricle.",
+      "color": "#efe6d2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trabeculae_carneae_rv",
+      "parent": "right_ventricle",
+      "label": "Trabeculae Carneae (right)",
+      "summary": "Muscular ridges and the septomarginal band",
+      "function": "The inner wall of the right ventricle is more coarsely ridged than that of the left. One thick band, the septomarginal trabecula (the moderator band), crosses the cavity from the septum to the base of the anterior papillary muscle and carries part of the right bundle branch.",
+      "color": "#8c3340",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_mitral_cusp",
+      "parent": "mitral_valve",
+      "label": "Anterior Mitral Cusp",
+      "summary": "The larger cusp, next to the aortic outflow",
+      "function": "The anterior cusp of the mitral valve lies between the inflow and the outflow of the left ventricle, next to the aortic valve. It is the larger of the two cusps and, with the posterior cusp, closes the orifice in systole. Its edge is tethered by cords from both papillary muscles.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_mitral_cusp",
+      "parent": "mitral_valve",
+      "label": "Posterior Mitral Cusp",
+      "summary": "The cusp on the free wall side",
+      "function": "The posterior cusp of the mitral valve is attached along most of the circumference of the orifice, on the side of the free wall of the left ventricle. It meets the anterior cusp along a line of closure when the ventricle contracts.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_tricuspid_cusp",
+      "parent": "tricuspid_valve",
+      "label": "Anterior Tricuspid Cusp",
+      "summary": "The cusp facing the front of the ventricle",
+      "function": "The anterior cusp of the tricuspid valve is generally the largest of the three. It faces the front of the right ventricle, and its edge is held by cords from the anterior papillary muscle among others.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_tricuspid_cusp",
+      "parent": "tricuspid_valve",
+      "label": "Posterior Tricuspid Cusp",
+      "summary": "The cusp facing the back of the ventricle",
+      "function": "The posterior cusp of the tricuspid valve lies along the lower, back wall of the right ventricle. It closes the orifice together with the other two cusps in systole.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "septal_tricuspid_cusp",
+      "parent": "tricuspid_valve",
+      "label": "Septal Tricuspid Cusp",
+      "summary": "The cusp on the septum side",
+      "function": "The septal cusp of the tricuspid valve lies against the interventricular septum. It is held by cords, some of which come from the septal wall itself.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "right_aortic_cusp",
+      "parent": "aortic_valve",
+      "label": "Right Coronary Cusp",
+      "summary": "Aortic cusp over the right coronary artery",
+      "function": "The aortic valve has three semilunar cusps. The right coronary cusp lies in front, and the right coronary artery arises from the aortic sinus behind it. Each cusp is a pocket that fills with blood and seals the valve when the ventricle relaxes.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_aortic_cusp",
+      "parent": "aortic_valve",
+      "label": "Left Coronary Cusp",
+      "summary": "Aortic cusp over the left coronary artery",
+      "function": "The left coronary cusp lies to the left of the aortic valve, and the left main coronary artery arises from the aortic sinus behind it. Its pocket fills with blood and closes against the other two cusps in diastole.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "non_coronary_cusp",
+      "parent": "aortic_valve",
+      "label": "Non-coronary Cusp",
+      "summary": "Aortic cusp with no coronary artery behind it",
+      "function": "The non-coronary cusp lies at the back of the aortic valve, next to the interatrial septum. No coronary artery arises from the aortic sinus behind it.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_pulmonary_cusp",
+      "parent": "pulmonary_valve",
+      "label": "Anterior Pulmonary Cusp",
+      "summary": "Pulmonary cusp at the front",
+      "function": "The pulmonary valve has three semilunar cusps. The anterior cusp lies at the front of the valve. Like the aortic cusps it is a pocket that fills with blood and seals the valve when the right ventricle relaxes.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_pulmonary_cusp",
+      "parent": "pulmonary_valve",
+      "label": "Left Pulmonary Cusp",
+      "summary": "Pulmonary cusp on the left",
+      "function": "The left cusp of the pulmonary valve lies on the patient’s left. It closes against its two neighbours when the right ventricle relaxes.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "right_pulmonary_cusp",
+      "parent": "pulmonary_valve",
+      "label": "Right Pulmonary Cusp",
+      "summary": "Pulmonary cusp on the right",
+      "function": "The right cusp of the pulmonary valve lies on the patient’s right. It closes against its two neighbours when the right ventricle relaxes.",
+      "color": "#ece0c8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscular_septum",
+      "parent": "interventricular_septum",
+      "label": "Muscular Septum",
+      "summary": "The thick muscular part of the septum",
+      "function": "Most of the interventricular septum is muscle, and it bulges towards the right ventricle. It contracts with the left ventricle and carries the left and right bundle branches on its two faces.",
+      "color": "#a8604f",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "membranous_septum",
+      "parent": "interventricular_septum",
+      "label": "Membranous Septum",
+      "summary": "The small fibrous part under the aortic valve",
+      "function": "Near the top of the septum, just below the aortic valve, there is a small thin area of fibrous tissue instead of muscle: the membranous part of the interventricular septum. It is the usual site of ventricular septal defects.",
+      "color": "#e4d9c4",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fossa_ovalis",
+      "parent": "interatrial_septum",
+      "label": "Fossa Ovalis",
+      "summary": "Oval depression on the right side of the atrial septum",
+      "function": "The fossa ovalis is a shallow oval depression in the interatrial septum, seen from the right atrium. It marks where the foramen ovale was open in the fetus, letting blood pass from the right atrium to the left before birth. In many people a slit-like channel remains at its edge.",
+      "color": "#d9c6b8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_main_coronary",
+      "parent": "coronary_arteries",
+      "label": "Left Main Coronary Artery",
+      "summary": "Short trunk of the left coronary artery",
+      "function": "The left main coronary artery arises from the aorta above the left coronary cusp and runs a short way before dividing into the left anterior descending and the circumflex arteries.",
+      "color": "#d9584a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_anterior_descending",
+      "parent": "coronary_arteries",
+      "label": "Left Anterior Descending Artery",
+      "summary": "Runs down the front groove towards the apex",
+      "function": "The left anterior descending artery, also called the anterior interventricular branch, runs in the groove between the two ventricles on the front of the heart and down towards the apex. It gives branches to the front of the left ventricle and to the septum.",
+      "color": "#d9584a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "circumflex_artery",
+      "parent": "coronary_arteries",
+      "label": "Circumflex Artery",
+      "summary": "Curves round the left side of the heart",
+      "function": "The circumflex artery runs in the groove between the left atrium and the left ventricle, round the left border of the heart to its back. It supplies the left atrium and much of the side and back of the left ventricle.",
+      "color": "#d9584a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "right_coronary_artery",
+      "parent": "coronary_arteries",
+      "label": "Right Coronary Artery",
+      "summary": "Runs in the groove on the right side",
+      "function": "The right coronary artery arises from the aorta above the right coronary cusp and runs in the groove between the right atrium and right ventricle, round the right border to the back of the heart. It supplies the right atrium and ventricle, and commonly the sinoatrial and atrioventricular nodes.",
+      "color": "#d9584a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_descending_artery",
+      "parent": "coronary_arteries",
+      "label": "Posterior Descending Artery",
+      "summary": "Runs in the groove on the underside",
+      "function": "The posterior descending artery, or posterior interventricular branch, runs in the groove between the ventricles on the underside of the heart. In most people it comes from the right coronary artery, and it supplies the back part of the septum.",
+      "color": "#d9584a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coronary_sinus",
+      "parent": "coronary_arteries",
+      "label": "Coronary Sinus",
+      "summary": "Main vein that drains the heart muscle",
+      "function": "The coronary sinus is a wide vein that lies in the groove at the back of the heart between the left atrium and ventricle. It collects blood from the cardiac veins that drain the heart muscle and empties it into the right atrium. It carries deoxygenated blood and is drawn in the venous colour.",
+      "color": "#6a74b0",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.2, "note": "More work by the muscle means more blood passing out through its veins.", "source": "GH14" },
+        { "signal": "inotropy", "weight": 0.2, "note": "Stronger contraction raises the flow through the muscle.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bundle_of_his",
+      "parent": "his_purkinje",
+      "label": "Bundle of His",
+      "summary": "Carries the impulse from the AV node into the septum",
+      "function": "The bundle of His is the only normal electrical connection between the atria and the ventricles. It leaves the atrioventricular node, passes through the fibrous tissue between the chambers and runs along the septum before dividing into the right and left bundle branches.",
+      "color": "#f2e08a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_bundle_branch",
+      "parent": "his_purkinje",
+      "label": "Left Bundle Branch",
+      "summary": "Spreads the impulse over the left ventricle",
+      "function": "The left bundle branch runs down the left face of the septum and spreads into fascicles that reach the left ventricular wall and its papillary muscles.",
+      "color": "#f0d870",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "right_bundle_branch",
+      "parent": "his_purkinje",
+      "label": "Right Bundle Branch",
+      "summary": "Carries the impulse down the right side of the septum",
+      "function": "The right bundle branch runs down the right face of the septum, through the septomarginal band, and reaches the free wall of the right ventricle.",
+      "color": "#f0d870",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "purkinje_fibres",
+      "parent": "his_purkinje",
+      "label": "Purkinje Fibres",
+      "summary": "Fine fibres that carry the impulse through the ventricular wall",
+      "function": "The bundle branches end in a network of Purkinje fibres beneath the inner lining of the ventricles. They conduct quickly, so the ventricles contract almost together. The network is disorganised in fibrillation.",
+      "color": "#f6e9a6",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "heartRate", "weight": 0.3, "note": "The network conducts once per beat, so it is used more at a faster rate.", "source": "GH14" },
+        { "signal": "fibrillation", "weight": 0.3, "note": "Fibrillation makes the electrical activity chaotic and continuous.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fibrous_pericardium",
+      "parent": "pericardium",
+      "label": "Fibrous Pericardium",
+      "summary": "Tough outer layer of the sac",
+      "function": "The fibrous pericardium is the strong outer layer of the sac. It is attached to the diaphragm below and blends with the walls of the great vessels above, which anchors the heart in the chest and limits how far it can stretch.",
+      "color": "#cdbd9e",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parietal_pericardium",
+      "parent": "pericardium",
+      "label": "Parietal Serous Pericardium",
+      "summary": "Slippery membrane lining the inside of the sac",
+      "function": "The parietal layer of the serous pericardium is a thin, smooth membrane stuck to the inside of the fibrous layer. At the roots of the great vessels it turns back on itself to become the visceral layer.",
+      "color": "#ece3d6",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epicardium",
+      "parent": "pericardium",
+      "label": "Epicardium (Visceral Pericardium)",
+      "summary": "Thin membrane on the surface of the heart",
+      "function": "The visceral layer of the serous pericardium, also called the epicardium, covers the outer surface of the heart muscle and the roots of the great vessels. The space between it and the parietal layer, the pericardial cavity, holds a thin film of fluid that lets the two slide over each other.",
+      "color": "#e7b7a8",
+      "rest": 0.15,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]

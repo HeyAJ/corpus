@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { organDefs } from '../../render/organs/OrganSet';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
 import type { AnatomyFile, AnatomyPartDef } from '../../data/anatomy-types';
@@ -6,6 +6,7 @@ import type { BodySystem, OrganDef, OrganId } from '../../data/types';
 import { useStore, type CutAxis } from '../store';
 import styles from './anatomy.module.css';
 import { PanelHeader } from '../components/PanelHeader';
+import { activitySourceOf, ancestorIds, buildPartTree, countBeneath, type PartNode } from '../anatomyTree';
 
 /**
  * STRUCTURES PANEL — what is inside each organ, and how hard each part is working now.
@@ -15,6 +16,17 @@ import { PanelHeader } from '../components/PanelHeader';
  * where it is. With an organ selected it is that organ's atlas: every drawn part as a row
  * with a live activity meter, and a tap opens the row in place to say what the part does,
  * what drives it up or down, and where that is documented.
+ *
+ * FINER STRUCTURES. A part may have children (src/data/anatomy-types.ts, `parent`): the papillary
+ * muscles of a ventricle, the cusps of a valve. They are listed nested under their parent. A row
+ * that has children carries a disclosure button showing how many (it is a button of its own, so
+ * folding the list never selects anything); tapping the row itself selects the part, flies the
+ * camera to it (which is what makes its children appear in the 3D view) and unfolds its list.
+ * The part the body reports as picked unfolds all of its ancestors, so a structure tapped in 3D
+ * is never hidden inside a folded row. The list is plain nested lists: each row is one button
+ * with a 44 px target, the disclosure is another, and the whole is a `ul` per level with the
+ * level in `data-level`, which keeps it readable to a screen reader without the roving-focus
+ * contract an ARIA tree would demand.
  *
  * The numbers in the meters are the engine's ACTIVITY INDEX (0..1), not a measurement in
  * any unit. The panel says so by drawing them as bars with no scale marks and no units.
@@ -102,35 +114,70 @@ function MostActive({ organId, parts }: { organId: string; parts: AnatomyPartDef
   );
 }
 
-function PartRow({ organId, part, atlas, open }: { organId: string; part: AnatomyPartDef; atlas: AnatomyFile; open: boolean }) {
-  const setSelectedPart = useStore((s) => s.setSelectedPart);
+function PartRow({
+  organId,
+  node,
+  atlas,
+  selectedPart,
+  expanded,
+  toggleExpanded,
+  choose,
+}: {
+  organId: string;
+  node: PartNode;
+  atlas: AnatomyFile;
+  selectedPart: string | null;
+  expanded: ReadonlySet<string>;
+  toggleExpanded: (id: string) => void;
+  choose: (node: PartNode, open: boolean) => void;
+}) {
+  const part = node.part;
+  const open = selectedPart === part.id;
+  const kids = node.children;
+  const unfolded = kids.length > 0 && expanded.has(part.id);
+  const count = countBeneath(node);
 
   // The atlas entries this part leans on: its own source and one per drive, once each.
   const sourceKeys = useMemo(() => {
     const keys = [part.source, ...part.drives.map((d) => d.source)];
     return keys.filter((k, i) => keys.indexOf(k) === i && atlas.sources[k]);
   }, [part, atlas]);
+  // A part with no drive of its own shows its parent's activity, as the 3D view does.
+  const activityId = useMemo(() => activitySourceOf(atlas.parts, part.id), [atlas, part.id]);
 
   return (
-    <li className={styles.partItem} data-part={part.id} data-open={open}>
-      <button
-        className={styles.partRow}
-        aria-expanded={open}
-        onClick={() => setSelectedPart(open ? null : part.id)}
-      >
-        <span className={styles.swatch} style={{ background: part.color }} aria-hidden="true" />
-        <span className={styles.partText}>
-          <span className={styles.partTop}>
-            <span className={styles.partLabel}>{part.label}</span>
-            <PartMeter organId={organId} partId={part.id} label={part.label} />
+    <li className={styles.partItem} data-part={part.id} data-open={open} data-level={node.level}>
+      <div className={styles.rowLine}>
+        <button className={styles.partRow} aria-expanded={open} onClick={() => choose(node, open)}>
+          <span className={styles.swatch} style={{ background: part.color }} aria-hidden="true" />
+          <span className={styles.partText}>
+            <span className={styles.partTop}>
+              <span className={styles.partLabel}>{part.label}</span>
+              <PartMeter organId={organId} partId={activityId} label={part.label} />
+            </span>
+            <span className={styles.partSummary}>{part.summary}</span>
           </span>
-          <span className={styles.partSummary}>{part.summary}</span>
-        </span>
-      </button>
+        </button>
+        {kids.length > 0 && (
+          <button
+            className={styles.disclose}
+            aria-expanded={unfolded}
+            aria-controls={`kids-${organId}-${part.id}`}
+            aria-label={`${unfolded ? 'Hide' : 'Show'} ${count} finer ${count === 1 ? 'structure' : 'structures'} of ${part.label}`}
+            onClick={() => toggleExpanded(part.id)}
+            data-disclose={part.id}
+          >
+            <span className={styles.discloseCount}>{count}</span>
+            <span className={styles.chevron} data-open={unfolded} aria-hidden="true">
+              {'\u203A'}
+            </span>
+          </button>
+        )}
+      </div>
       {open && (
         <div className={styles.detail}>
           <p className={styles.prose}>{part.function}</p>
-          {part.drives.length > 0 && (
+          {part.drives.length > 0 ? (
             <>
               <h4 className={styles.subTitle}>Responds to</h4>
               <ul className={styles.drives}>
@@ -144,6 +191,13 @@ function PartRow({ organId, part, atlas, open }: { organId: string; part: Anatom
                 ))}
               </ul>
             </>
+          ) : (
+            activityId !== part.id && (
+              <p className={styles.prose}>
+                Nothing drives this structure on its own, so its activity meter follows{' '}
+                {atlas.parts.find((p) => p.id === activityId)?.label ?? 'its parent'}.
+              </p>
+            )
           )}
           {sourceKeys.length > 0 && (
             <>
@@ -160,6 +214,22 @@ function PartRow({ organId, part, atlas, open }: { organId: string; part: Anatom
             </>
           )}
         </div>
+      )}
+      {unfolded && (
+        <ul className={styles.children} id={`kids-${organId}-${part.id}`} aria-label={`Finer structures of ${part.label}`}>
+          {kids.map((k) => (
+            <PartRow
+              key={k.part.id}
+              organId={organId}
+              node={k}
+              atlas={atlas}
+              selectedPart={selectedPart}
+              expanded={expanded}
+              toggleExpanded={toggleExpanded}
+              choose={choose}
+            />
+          ))}
+        </ul>
       )}
     </li>
   );
@@ -265,20 +335,63 @@ function CutRow() {
 function OrganAtlas({ organ }: { organ: OrganDef }) {
   const selectedPart = useStore((s) => s.selectedPart);
   const reducedMotion = useStore((s) => s.reducedMotion);
+  const setSelectedPart = useStore((s) => s.setSelectedPart);
+  const requestFocusPart = useStore((s) => s.requestFocusPart);
   const atlas = atlasFor(organ);
   const [more, setMore] = useState(false);
   const listRef = useRef<HTMLUListElement | null>(null);
+  const roots = useMemo(() => (atlas ? buildPartTree(atlas.parts) : []), [atlas]);
+  // Rows that are unfolded. Chosen by hand or by selecting a part that has children.
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
 
-  // A new organ starts with its description folded again.
-  useEffect(() => setMore(false), [organ.id]);
+  // A new organ starts with its description folded again, and its list folded.
+  useEffect(() => {
+    setMore(false);
+    setExpanded(new Set());
+  }, [organ.id]);
+
+  // A part picked in the 3D view (or from search) must not be hidden inside a folded row, so
+  // its ancestors unfold. Only ever adds: a visitor's own folding is left alone.
+  useEffect(() => {
+    if (!selectedPart || !atlas) return;
+    const up = ancestorIds(atlas.parts, selectedPart);
+    if (up.length === 0) return;
+    setExpanded((prev) => (up.every((id) => prev.has(id)) ? prev : new Set([...prev, ...up])));
+  }, [selectedPart, atlas]);
 
   // When the part was picked by tapping the 3D body, its row may be below the fold of
   // the sheet; bring it into view. `nearest` leaves a row that is already visible alone.
+  // The row is looked up by its data attribute because it may be nested several lists deep.
   useEffect(() => {
     if (!selectedPart || !listRef.current) return;
-    const row = Array.from(listRef.current.children).find((el) => (el as HTMLElement).dataset.part === selectedPart);
+    const row = Array.from(listRef.current.querySelectorAll<HTMLElement>('[data-part]')).find((el) => el.dataset.part === selectedPart);
     row?.scrollIntoView({ block: 'nearest', behavior: reducedMotion ? 'auto' : 'smooth' });
-  }, [selectedPart, reducedMotion]);
+  }, [selectedPart, reducedMotion, expanded]);
+
+  const toggleExpanded = useCallback((id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  // Choosing a row selects it (or, if it is already selected, clears it). A row that has
+  // children or is itself a child also flies the camera to the part: that flight is what
+  // reveals the part's finer structures in the body, and it unfolds the row's own list.
+  const choose = useCallback(
+    (node: PartNode, open: boolean) => {
+      if (open) {
+        setSelectedPart(null);
+        return;
+      }
+      setSelectedPart(node.part.id);
+      if (node.children.length > 0 || node.level > 1) requestFocusPart(node.part.id);
+      if (node.children.length > 0) setExpanded((prev) => (prev.has(node.part.id) ? prev : new Set([...prev, node.part.id])));
+    },
+    [setSelectedPart, requestFocusPart],
+  );
 
   return (
     <>
@@ -295,8 +408,17 @@ function OrganAtlas({ organ }: { organ: OrganDef }) {
           <CutRow />
           <MostActive organId={organ.id} parts={atlas.parts} />
           <ul className={styles.parts} ref={listRef}>
-            {atlas.parts.map((p) => (
-              <PartRow key={p.id} organId={organ.id} part={p} atlas={atlas} open={selectedPart === p.id} />
+            {roots.map((n) => (
+              <PartRow
+                key={n.part.id}
+                organId={organ.id}
+                node={n}
+                atlas={atlas}
+                selectedPart={selectedPart}
+                expanded={expanded}
+                toggleExpanded={toggleExpanded}
+                choose={choose}
+              />
             ))}
           </ul>
         </>
@@ -313,7 +435,9 @@ export function AnatomyPanel() {
   const organ = useMemo(() => ORGANS.find((o) => o.id === selectedOrgan) ?? null, [selectedOrgan]);
 
   const setSelected = useStore((s) => s.setSelected);
-  const partCount = organ ? (atlasFor(organ)?.parts.length ?? 0) : 0;
+  const allParts = organ ? (atlasFor(organ)?.parts ?? []) : [];
+  const finerCount = allParts.filter((p) => p.parent).length;
+  const partCount = allParts.length - finerCount;
 
   if (!open) return null;
 
@@ -332,7 +456,11 @@ export function AnatomyPanel() {
             </button>
           ) : undefined
         }
-        meta={organ ? `${organ.displayName}${partCount > 0 ? ` \u00B7 ${partCount} parts` : ''}` : undefined}
+        meta={
+          organ
+            ? `${organ.displayName}${partCount > 0 ? ` \u00B7 ${partCount} parts` : ''}${finerCount > 0 ? ` \u00B7 ${finerCount} finer` : ''}`
+            : undefined
+        }
         onClose={() => {
           // Closing by hand while an organ is selected means "stop opening this for me":
           // the store reopens the panel on every organ tap unless told otherwise.

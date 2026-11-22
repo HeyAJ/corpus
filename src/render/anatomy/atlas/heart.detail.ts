@@ -122,6 +122,37 @@ const VESSEL_GLASS = 0.5;
 const CORONARY_GLASS = 0.8;
 const VESSELS = ['venae_cavae', 'pulmonary_trunk', 'pulmonary_veins', 'aorta'] as const;
 
+/**
+ * THE FINER STRUCTURES (level-2 parts, see ../detail/reveal.ts). A child rides its parent's pose
+ * on its own (OrganDetail), so the papillary muscles swell with the ventricle and the cusps fold
+ * with the valve; what each module still says is what is particular to the heart:
+ *   - the cusps fade and shrink with their valve (opacity is not inherited);
+ *   - the coronary arteries are the arterial colour and the coronary sinus, a vein, the venous one;
+ *   - the layers of the pericardium are drawn as glass, the faintest outermost, so a heart seen
+ *     through its sac is still a heart. These opacities are drawing choices.
+ * The three children of the conduction system flash with the impulse like their parent.
+ */
+const VALVE_CUSPS: Readonly<Record<string, readonly string[]>> = {
+  tricuspid_valve: ['anterior_tricuspid_cusp', 'posterior_tricuspid_cusp', 'septal_tricuspid_cusp'],
+  mitral_valve: ['anterior_mitral_cusp', 'posterior_mitral_cusp'],
+  pulmonary_valve: ['anterior_pulmonary_cusp', 'left_pulmonary_cusp', 'right_pulmonary_cusp'],
+  aortic_valve: ['right_aortic_cusp', 'left_aortic_cusp', 'non_coronary_cusp'],
+};
+const CORONARY_ARTERIES = [
+  'left_main_coronary',
+  'left_anterior_descending',
+  'circumflex_artery',
+  'right_coronary_artery',
+  'posterior_descending_artery',
+] as const;
+const PERICARDIUM_GLASS: Readonly<Record<string, number>> = {
+  pericardium: 0.05,
+  fibrous_pericardium: 0.12,
+  parietal_pericardium: 0.1,
+  epicardium: 0.16,
+};
+const CONDUCTION_CHILDREN = ['bundle_of_his', 'left_bundle_branch', 'right_bundle_branch', 'purkinje_fibres'] as const;
+
 export const detail: OrganDetailSpec = {
   flows: (): FlowSpec[] => {
     const flows: FlowSpec[] = [
@@ -185,6 +216,15 @@ export const detail: OrganDetailSpec = {
     const coronaries = ctx.part('coronary_arteries');
     coronaries?.setColor(scratchLeft);
     coronaries?.setOpacity(CORONARY_GLASS);
+    for (const id of CORONARY_ARTERIES) {
+      const a = ctx.part(id);
+      a?.setColor(scratchLeft);
+      a?.setOpacity(CORONARY_GLASS);
+    }
+    const sinus = ctx.part('coronary_sinus');
+    sinus?.setColor(scratchRight);
+    sinus?.setOpacity(VESSEL_GLASS);
+    for (const [id, opacity] of Object.entries(PERICARDIUM_GLASS)) ctx.part(id)?.setOpacity(opacity);
 
     /* ------------------------------------------------------------------ valves */
     const sys = smooth(SYSTOLE_ON, SYSTOLE_FULL, act);
@@ -197,6 +237,8 @@ export const detail: OrganDetailSpec = {
       // Open: faded and shrunk towards its ring. Closed: restored.
       v.setOpacity(1 - 0.88 * open);
       v.setScale(1 - 0.65 * open);
+      // The cusps ride the valve's scale (OrganDetail) but not its opacity.
+      for (const cusp of VALVE_CUSPS[id] ?? []) ctx.part(cusp)?.setOpacity(1 - 0.88 * open);
     };
     setValve('tricuspid_valve', avOpen);
     setValve('mitral_valve', avOpen);
@@ -283,6 +325,7 @@ export const detail: OrganDetailSpec = {
     const p = (tau - lead) / SWEEP_S;
     const sweeping = p >= 0 && p <= 1.25;
     if (his) his.setGlow(sweeping ? 1 : ctx.activity('his_purkinje'));
+    for (const id of CONDUCTION_CHILDREN) if (sweeping) ctx.part(id)?.setGlow(1);
     for (const id of impulse) {
       const f = ctx.flow(id);
       if (!f) continue;

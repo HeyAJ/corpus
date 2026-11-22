@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
 import {
+  boundsOf,
   capsule,
   ellipsoid,
   halfSpace,
@@ -8,7 +9,9 @@ import {
   mergeParts,
   offset,
   polygonise,
+  smoothSubtract,
   smoothUnion,
+  sphere,
   subtract,
   tubeAlong,
   union,
@@ -43,10 +46,15 @@ import {
  * blood passing through a real hole. The aortic and pulmonary valves use the same trick
  * between a ventricular outflow tract and the lumen of the great vessel above it.
  *
- * WHAT THIS IS NOT. There are no papillary muscles or chordae, no coronary sinus, no
- * foramen ovale remnant, no trabeculae, and the leaflets are flat wedges rather than
- * curved cusps: each would cost triangles and fill the glass with clutter that hides the
- * thing the viewer came to see, which is the blood moving. The coronary arteries and the
+ * WHAT THIS IS NOT. The first version of this file left out the papillary muscles, chordae,
+ * coronary sinus, fossa ovalis and trabeculae, on the reasoning that each would cost
+ * triangles and fill the glass with clutter that hides the thing the viewer came to see,
+ * which is the blood moving. Both halves of that were right and the conclusion was wrong:
+ * a student opening a ventricle should be able to find its papillary muscles. They are now
+ * LEVEL-2 PARTS (see "FINER STRUCTURES" below): they are built with the organ but shown only
+ * when their parent is selected or the camera is close to it (reveal.ts), so they cost the
+ * default view nothing. The leaflets of each valve are still flat wedges, and each cusp child
+ * is a flat wedge laid on its parent's disc, not a curved cusp. The coronary arteries and the
  * Purkinje strands are centrelines hand-placed on the shell (snapped to its surface by a
  * probe, .cache/probes/heart_snap.ts, and then pasted here as numbers, because snapping at
  * run time would mean building the shell a second time inside the worker, which costs a
@@ -344,6 +352,10 @@ const tube = (pts: readonly V3[], radius: number, tubular: number, radial = 6): 
 export const parts: PartBuilder = () => {
   const c = heartCavities();
   const out: { id: string; geometry: THREE.BufferGeometry }[] = [];
+  // Children are built here, with their organ, and revealed by the renderer: see below.
+  const finer = (): void => {
+    for (const x of finerStructures(c)) out.push(x);
+  };
 
   // Chambers. Cell sizes are about 1/35 of the part: the ventricles are ~70 mm long.
   out.push({
@@ -405,6 +417,7 @@ export const parts: PartBuilder = () => {
       fine(HEART_PATHS.lad, 0.0015, 0.0007, 40),
       fine(HEART_PATHS.circumflex, 0.0014, 0.0007, 32),
       fine(HEART_PATHS.rca, 0.0015, 0.0007, 40),
+      fine(HEART_CHILD_PATHS.pda, 0.0012, 0.0006, 30),
     ]),
   });
 
@@ -423,6 +436,12 @@ export const parts: PartBuilder = () => {
     geometry: mergeParts(HIS_STRANDS.map((p, i) => tubeAlong(p, () => (i === 0 ? 0.0011 : 0.0007), { tubular: Math.max(10, p.length * 6), radial: 5 }))),
   });
 
+  // The interatrial septum, and the pericardium: two level-1 parts that did not exist before
+  // their finer structures were added (a fossa ovalis needs a septum to be a depression in).
+  out.push({ id: 'interatrial_septum', geometry: interatrialSeptum() });
+  out.push({ id: 'pericardium', geometry: pericardialSurface(PERICARDIUM_SAC) });
+
+  finer();
   return out;
 };
 
@@ -462,3 +481,381 @@ export const heartCavityUnion = (): Sdf => {
   const c = heartCavities();
   return union(c.ra, c.rv, c.la, c.lv);
 };
+
+
+/* ===================================================================================== */
+/* FINER STRUCTURES: the level-2 parts (src/data/anatomy/heart.json, `parent`)             */
+/* ===================================================================================== */
+
+/**
+ * Two paths that are not in the shell's own vasculature because they are not vessels of the
+ * great-vessel overlay: the posterior descending artery and the coronary sinus. Both were
+ * placed by the same procedure as the other coronary centrelines (a hand-placed rough path,
+ * snapped to the shell by .cache/probes/heart_snap.ts and pulled inside it, 1.8 mm for the
+ * artery and 4.2 mm for the wider vein) and pasted here as numbers. The posterior descending
+ * artery starts at the end of the right coronary artery, where the groove it follows begins.
+ * Illustrative course; no vessel here is traced from an atlas.
+ */
+export const HEART_CHILD_PATHS = {
+  pda: [
+    [0.0292, -0.0085, -0.0248],
+    [0.0217, -0.0229, -0.0225],
+    [-0.013, -0.0278, -0.0101],
+    [-0.026, -0.0444, -0.0011],
+    [-0.0341, -0.0578, 0.0105],
+  ] as V3[],
+  coronarySinus: [
+    [-0.02, 0.011, -0.0307],
+    [-0.007, 0.0085, -0.0337],
+    [0.0032, 0.0056, -0.03],
+    [0.0264, -0.0029, -0.0196],
+    [0.0294, -0.0031, -0.0209],
+  ] as V3[],
+};
+
+/** A fixed pseudo-random sequence in 0..1: the golden-ratio walk, so no Math.random is needed. */
+function frac(x: number): number {
+  return x - Math.floor(x);
+}
+
+/** Two unit vectors perpendicular to `n` and to each other: a frame in the plane of a valve. */
+function planeBasis(n: V3): [V3, V3] {
+  const helper: V3 = Math.abs(n[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0];
+  const u = unit(cross(n, helper));
+  const w = unit(cross(n, u));
+  return [u, w];
+}
+
+/** A point on a circle in the plane of a valve, `radius` from its centre, at angle `theta`. */
+function ringPoint(v: ValvePlane, theta: number, radius: number, lift = 0): V3 {
+  const [u, w] = planeBasis(v.n);
+  const c = Math.cos(theta) * radius;
+  const s = Math.sin(theta) * radius;
+  return [
+    v.p[0] + u[0] * c + w[0] * s + v.n[0] * lift,
+    v.p[1] + u[1] * c + w[1] * s + v.n[1] * lift,
+    v.p[2] + u[2] * c + w[2] * s + v.n[2] * lift,
+  ];
+}
+
+/** A muscle column: a tapered capsule from a base on the wall to a rounded tip. */
+function column(base: V3, tip: V3, r0: number, r1: number): THREE.BufferGeometry {
+  const { min, max } = boundsOf([base, tip], r0 + 0.002);
+  return polygonise(capsule(base, tip, r0, r1), min, max, { cell: 0.0014 });
+}
+
+/** A thin cord from a papillary tip to a point on the valve ring, with a slight sag. */
+function cord(tip: V3, end: V3): THREE.BufferGeometry {
+  const mid = lerp3(tip, end, 0.5);
+  const sag: V3 = [mid[0], mid[1] - 0.0006, mid[2]];
+  return tubeAlong([tip, sag, end], () => 0.00032, { tubular: 6, radial: 4 });
+}
+
+/**
+ * The cords of one papillary muscle: a fan to the part of the valve ring nearest it. The
+ * angle of the muscle round the valve axis picks the middle of the fan, so a muscle on the
+ * lateral wall sends its cords to the lateral edge of the ring and not across the orifice.
+ */
+function cordFan(tip: V3, v: ValvePlane, spread: readonly number[]): THREE.BufferGeometry[] {
+  const [u, w] = planeBasis(v.n);
+  const rel: V3 = [tip[0] - v.p[0], tip[1] - v.p[1], tip[2] - v.p[2]];
+  const centre = Math.atan2(dot(rel, w), dot(rel, u));
+  return spread.map((a) => cord(tip, ringPoint(v, centre + a, v.r * 0.82, 0.0006)));
+}
+
+/** +1 or -1: which way round the left ventricular axis the anterior side lies (larger z). */
+function lvAnteriorSign(): number {
+  const d = unit([LV_B[0] - LV_A[0], LV_B[1] - LV_A[1], LV_B[2] - LV_A[2]]);
+  return Math.sign(cross(d, septalNormal(0.5))[2]) || 1;
+}
+
+/** The same for the right ventricular axis. */
+function rvAnteriorSign(): number {
+  const d = unit([RV_B[0] - RV_A[0], RV_B[1] - RV_A[1], RV_B[2] - RV_A[2]]);
+  return Math.sign(cross(d, septalNormal(0.5))[2]) || 1;
+}
+
+/** Where a papillary muscle's tip is: from its base on the wall, part of the way to the valve. */
+function papillaryTip(base: V3, v: ValvePlane, fraction: number): V3 {
+  return lerp3(base, v.p, fraction);
+}
+
+/** The two papillary muscles of the left ventricle: the anterolateral and the posteromedial. */
+const LV_PAP_BASES: V3[] = (() => {
+  const s = lvAnteriorSign();
+  return [lvWallPoint(0.52, Math.PI - s * 0.8, 0.0006), lvWallPoint(0.46, Math.PI + s * 0.75, 0.0006)];
+})();
+
+/** The three papillary muscles of the right ventricle: anterior, posterior and septal. */
+const RV_PAP_BASES: V3[] = (() => {
+  const s = rvAnteriorSign();
+  return [
+    rvFreeWallPoint(0.55, s * 0.9, 0.0006),
+    rvFreeWallPoint(0.45, -s * 0.9, 0.0006),
+    lvWallPoint(0.45, 0, SEPTUM - 0.0006),
+  ];
+})();
+
+/** Ridges on an inner wall: short, rounded bars lying along the wall's long axis. */
+function ridges(
+  count: number,
+  point: (t: number, phi: number) => V3,
+  tRange: readonly [number, number],
+  phiRange: readonly [number, number],
+): THREE.BufferGeometry {
+  const pieces: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < count; i++) {
+    const t0 = tRange[0] + (tRange[1] - tRange[0]) * frac(i * 0.618 + 0.13);
+    const phi = phiRange[0] + (phiRange[1] - phiRange[0]) * frac(i * 0.382 + 0.1);
+    const span = 0.07 + 0.05 * frac(i * 0.7 + 0.3);
+    const r = 0.001 + 0.0006 * frac(i * 0.45 + 0.2);
+    const pts: V3[] = [point(t0, phi), point(t0 + span / 2, phi + 0.05), point(Math.min(0.97, t0 + span), phi)];
+    pieces.push(tubeAlong(pts, (t) => r * Math.sqrt(Math.max(0.05, Math.sin(Math.PI * t))), { tubular: 8, radial: 5 }));
+  }
+  return mergeParts(pieces);
+}
+
+/**
+ * One cusp of a valve: a flat wedge of the valve's own disc, laid just downstream of the
+ * parent's disc (the parent's disc is 0.8 mm thick, a cusp is 0.6 mm and sits 0.7 mm clear
+ * of its centre line, so the two never share a surface and never flicker). The wedge angles
+ * are the same as valveGeometry's, so cusp `i` lies exactly over leaflet `i`. Returns the
+ * geometry and the centre of its bounding box, which the caller uses to name it.
+ */
+function cuspGeometry(v: ValvePlane, cusps: number, index: number): { geometry: THREE.BufferGeometry; centre: V3 } {
+  const gapAngle = 0.28;
+  const span = (Math.PI * 2) / cusps - gapAngle;
+  const start = (index * Math.PI * 2) / cusps + gapAngle / 2;
+  const g = new THREE.CylinderGeometry(v.r * 0.9, v.r * 0.9, 0.0006, 12, 1, false, start, span);
+  g.translate(0, 0.0007, 0);
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), new THREE.Vector3(v.n[0], v.n[1], v.n[2]));
+  g.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(v.p[0], v.p[1], v.p[2]), q, new THREE.Vector3(1, 1, 1)));
+  g.computeBoundingBox();
+  g.computeBoundingSphere();
+  const c = new THREE.Vector3();
+  g.boundingBox?.getCenter(c);
+  return { geometry: g, centre: [c.x, c.y, c.z] };
+}
+
+/** Name the cusps of a valve from where each one lies, with `names` chosen by `assign`. */
+function namedCusps(
+  v: ValvePlane,
+  count: number,
+  assign: (centres: V3[]) => number[],
+  names: readonly string[],
+): { id: string; geometry: THREE.BufferGeometry }[] {
+  const made = Array.from({ length: count }, (_, i) => cuspGeometry(v, count, i));
+  const order = assign(made.map((m) => m.centre));
+  return made.map((m, i) => ({ id: names[order[i]], geometry: m.geometry }));
+}
+
+/** Index of the largest (or smallest) value of `pick` among the candidates still free. */
+function extreme(centres: V3[], free: number[], pick: (c: V3) => number, largest: boolean): number {
+  let best = free[0];
+  for (const i of free) {
+    if (largest ? pick(centres[i]) > pick(centres[best]) : pick(centres[i]) < pick(centres[best])) best = i;
+  }
+  return best;
+}
+
+/** A flat lens (a squashed sphere) of half-axes rx, ry and half-thickness `half`, facing `normal`. */
+function lens(centre: V3, normal: V3, rx: number, ry: number, half: number): THREE.BufferGeometry {
+  const g = new THREE.SphereGeometry(1, 20, 12);
+  g.scale(rx, ry, half);
+  const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), new THREE.Vector3(normal[0], normal[1], normal[2]));
+  g.applyMatrix4(new THREE.Matrix4().compose(new THREE.Vector3(centre[0], centre[1], centre[2]), q, new THREE.Vector3(1, 1, 1)));
+  g.deleteAttribute('uv');
+  g.computeBoundingSphere();
+  g.computeBoundingBox();
+  return g;
+}
+
+/**
+ * The right atrium and left atrium lie about 22 mm apart in this drawing, edge to edge, so the
+ * wall between them is drawn as a thick lens spanning the gap, along the line from one centre
+ * to the other. `SEPTUM_AXIS` runs from the right atrium to the left, and `ATRIAL_SEPTUM` is the
+ * middle of the gap. The geometry is a drawing proportion, not a measurement of a septum.
+ */
+const ATRIAL_AXIS: V3 = unit([-0.042, 0.014, -0.028]);
+const ATRIAL_SEPTUM: V3 = [0.0092, 0.0289, -0.0139];
+
+function interatrialSeptum(): THREE.BufferGeometry {
+  return lens(ATRIAL_SEPTUM, ATRIAL_AXIS, 0.0115, 0.0085, 0.0105);
+}
+
+/** The oval depression on the right-atrial face of the septum: a pale lens laid on that face. */
+function fossaOvalis(): THREE.BufferGeometry {
+  const onRightFace = add(ATRIAL_SEPTUM, ATRIAL_AXIS, -0.0092);
+  return lens(onRightFace, ATRIAL_AXIS, 0.0046, 0.0034, 0.0016);
+}
+
+/* ------------------------------------------------------------------ pericardium */
+
+/**
+ * The outline the pericardium follows: the ventricles, both atria and both auricles, the same
+ * recipe as the shell in models.ts (heart()) without the interventricular groove and the
+ * vessel stubs. Each layer is this field pushed outward by its own distance, so the four
+ * surfaces are nested and never meet. The great vessels are not wrapped: the sac is drawn
+ * round the heart body only, an illustrative simplification.
+ */
+function heartBodyField(): Sdf {
+  const rv = capsule([0.012, 0.014, 0.014], [-0.03, -0.046, 0.022], 0.027, 0.011);
+  const lv = capsule([-0.008, 0.016, -0.008], [-0.044, -0.052, 0.012], 0.031, 0.013);
+  return smoothUnion(
+    0.007,
+    smoothUnion(0.01, rv, lv),
+    ellipsoid([0.03, 0.022, 0.0], [0.02, 0.027, 0.022]),
+    ellipsoid([-0.012, 0.036, -0.028], [0.026, 0.02, 0.017]),
+    ellipsoid([0.016, 0.042, 0.022], [0.012, 0.009, 0.009]),
+    ellipsoid([-0.038, 0.034, 0.0], [0.01, 0.008, 0.011]),
+  );
+}
+
+/** How far outside the heart's surface each layer of the pericardium is drawn, metres (display choice). */
+const PERICARDIUM_SAC = 0.0075;
+const PERICARDIUM_FIBROUS = 0.0058;
+const PERICARDIUM_PARIETAL = 0.004;
+const PERICARDIUM_EPICARDIUM = 0.0016;
+
+/** One layer of the pericardium: the body outline pushed out by `distance`. Coarse cells on purpose: the field is smooth. */
+function pericardialSurface(distance: number): THREE.BufferGeometry {
+  return polygonise(offset(heartBodyField(), distance), [-0.074, -0.078, -0.058], [0.068, 0.066, 0.062], { cell: 0.0075 });
+}
+
+/* ----------------------------------------------------------------- the children */
+
+/** Every level-2 part of the heart, as `{ id, geometry }` like the level-1 ones. */
+function finerStructures(c: HeartCavities): { id: string; geometry: THREE.BufferGeometry }[] {
+  const out: { id: string; geometry: THREE.BufferGeometry }[] = [];
+
+  /* Left ventricle. */
+  const lvTips = LV_PAP_BASES.map((b) => papillaryTip(b, MITRAL, 0.42));
+  out.push({
+    id: 'papillary_muscles_lv',
+    geometry: mergeParts(LV_PAP_BASES.map((b, i) => column(b, lvTips[i], 0.0042, 0.0022))),
+  });
+  out.push({
+    id: 'chordae_tendineae_lv',
+    geometry: mergeParts(lvTips.flatMap((tip) => cordFan(tip, MITRAL, [-0.75, -0.25, 0.25, 0.75]))),
+  });
+  out.push({
+    id: 'trabeculae_carneae_lv',
+    geometry: ridges(22, (t, phi) => lvWallPoint(t, phi, -0.0006), [0.4, 0.9], [0.8, Math.PI * 2 - 0.8]),
+  });
+
+  /* Right ventricle. */
+  const rvTips = RV_PAP_BASES.map((b, i) => papillaryTip(b, TRICUSPID, i === 2 ? 0.4 : 0.45));
+  out.push({
+    id: 'papillary_muscles_rv',
+    geometry: mergeParts(RV_PAP_BASES.map((b, i) => column(b, rvTips[i], i === 2 ? 0.0028 : 0.0038, 0.002))),
+  });
+  out.push({
+    id: 'chordae_tendineae_rv',
+    geometry: mergeParts(rvTips.flatMap((tip) => cordFan(tip, TRICUSPID, [-0.9, -0.3, 0.3, 0.9]))),
+  });
+  // The septomarginal trabecula crosses the cavity from the septum to the anterior papillary muscle.
+  const moderator = tubeAlong(
+    [lvWallPoint(0.58, 0, SEPTUM - 0.0006), lerp3(lvWallPoint(0.58, 0, SEPTUM - 0.0006), RV_PAP_BASES[0], 0.5), RV_PAP_BASES[0]],
+    () => 0.0016,
+    { tubular: 10, radial: 6 },
+  );
+  out.push({
+    id: 'trabeculae_carneae_rv',
+    geometry: mergeParts([ridges(14, (t, phi) => rvFreeWallPoint(t, phi, 0.0006), [0.3, 0.9], [-1.3, 1.3]), moderator]),
+  });
+
+  /* Valve cusps, named from where each wedge lies. */
+  out.push(
+    ...namedCusps(
+      MITRAL,
+      2,
+      (cs) => {
+        const anterior = extreme(cs, [0, 1], (p) => p[2], true);
+        return cs.map((_, i) => (i === anterior ? 0 : 1));
+      },
+      ['anterior_mitral_cusp', 'posterior_mitral_cusp'],
+    ),
+  );
+  out.push(
+    ...namedCusps(
+      TRICUSPID,
+      3,
+      (cs) => {
+        const free = [0, 1, 2];
+        const septal = extreme(cs, free, (p) => p[0], false);
+        const rest = free.filter((i) => i !== septal);
+        const anterior = extreme(cs, rest, (p) => p[2], true);
+        return cs.map((_, i) => (i === septal ? 2 : i === anterior ? 0 : 1));
+      },
+      ['anterior_tricuspid_cusp', 'posterior_tricuspid_cusp', 'septal_tricuspid_cusp'],
+    ),
+  );
+  out.push(
+    ...namedCusps(
+      AORTIC,
+      3,
+      (cs) => {
+        const free = [0, 1, 2];
+        const nonCoronary = extreme(cs, free, (p) => p[2], false);
+        const rest = free.filter((i) => i !== nonCoronary);
+        const left = extreme(cs, rest, (p) => p[0], false);
+        return cs.map((_, i) => (i === nonCoronary ? 2 : i === left ? 1 : 0));
+      },
+      ['right_aortic_cusp', 'left_aortic_cusp', 'non_coronary_cusp'],
+    ),
+  );
+  out.push(
+    ...namedCusps(
+      PULMONIC,
+      3,
+      (cs) => {
+        const free = [0, 1, 2];
+        const anterior = extreme(cs, free, (p) => p[2], true);
+        const rest = free.filter((i) => i !== anterior);
+        const left = extreme(cs, rest, (p) => p[0], false);
+        return cs.map((_, i) => (i === anterior ? 0 : i === left ? 1 : 2));
+      },
+      ['anterior_pulmonary_cusp', 'left_pulmonary_cusp', 'right_pulmonary_cusp'],
+    ),
+  );
+
+  /* Septa. The children are drawn 0.4 mm inside their parent's surface so the two never share one. */
+  const wall = subtract(offset(c.lvFull, SEPTUM), c.lvFull);
+  const septum = offset(intersect(intersect(wall, offset(c.rvFull, 0.0075)), downstream(TRICUSPID)), -0.0004);
+  const membranousCentre = lvWallPoint(0.06, 0, SEPTUM * 0.5);
+  const membranousZone = sphere(membranousCentre, 0.0062);
+  out.push({
+    id: 'muscular_septum',
+    geometry: polygonise(smoothSubtract(0.002, septum, membranousZone), [-0.05, -0.062, -0.016], [0.022, 0.032, 0.032], { cell: 0.0028 }),
+  });
+  out.push({
+    id: 'membranous_septum',
+    geometry: polygonise(intersect(septum, membranousZone), [membranousCentre[0] - 0.01, membranousCentre[1] - 0.01, membranousCentre[2] - 0.01], [membranousCentre[0] + 0.01, membranousCentre[1] + 0.01, membranousCentre[2] + 0.01], { cell: 0.0012 }),
+  });
+  out.push({ id: 'fossa_ovalis', geometry: fossaOvalis() });
+
+  /* Coronary vessels: the same centrelines as the parent, drawn thinner so they lie inside it. */
+  const taper = (r0: number, r1: number) => (t: number) => r0 + (r1 - r0) * t;
+  const artery = (pts: readonly V3[], r0: number, r1: number, tubular: number): THREE.BufferGeometry =>
+    tubeAlong(pts, taper(r0, r1), { tubular, radial: 6 });
+  out.push({ id: 'left_main_coronary', geometry: artery(HEART_PATHS.leftMain, 0.0013, 0.0012, 12) });
+  out.push({ id: 'left_anterior_descending', geometry: artery(HEART_PATHS.lad, 0.0011, 0.0005, 40) });
+  out.push({ id: 'circumflex_artery', geometry: artery(HEART_PATHS.circumflex, 0.001, 0.0005, 32) });
+  out.push({ id: 'right_coronary_artery', geometry: artery(HEART_PATHS.rca, 0.0011, 0.0005, 40) });
+  out.push({ id: 'posterior_descending_artery', geometry: artery(HEART_CHILD_PATHS.pda, 0.0009, 0.0004, 30) });
+  out.push({ id: 'coronary_sinus', geometry: artery(HEART_CHILD_PATHS.coronarySinus, 0.0034, 0.0042, 30) });
+
+  /* Conduction: the strands of the parent, drawn a little thicker in their own colours. */
+  const strands = (idx: readonly number[], r: number): THREE.BufferGeometry =>
+    mergeParts(idx.map((i) => tubeAlong(HIS_STRANDS[i], () => r, { tubular: Math.max(10, HIS_STRANDS[i].length * 6), radial: 5 })));
+  out.push({ id: 'bundle_of_his', geometry: strands([0], 0.0015) });
+  out.push({ id: 'left_bundle_branch', geometry: strands([1, 2, 3, 4], 0.001) });
+  out.push({ id: 'right_bundle_branch', geometry: strands([5, 6], 0.001) });
+  out.push({ id: 'purkinje_fibres', geometry: strands([7, 8], 0.0009) });
+
+  /* Pericardium: its three layers. */
+  out.push({ id: 'fibrous_pericardium', geometry: pericardialSurface(PERICARDIUM_FIBROUS) });
+  out.push({ id: 'parietal_pericardium', geometry: pericardialSurface(PERICARDIUM_PARIETAL) });
+  out.push({ id: 'epicardium', geometry: pericardialSurface(PERICARDIUM_EPICARDIUM) });
+  return out;
+}

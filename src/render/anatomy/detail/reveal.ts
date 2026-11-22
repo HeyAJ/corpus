@@ -12,9 +12,12 @@
  *       the child itself, or is a part somewhere beneath the child's parent (so picking one
  *       papillary muscle keeps its siblings in view instead of making them vanish).
  *   (b) PROXIMITY. The camera has come within REACH of the parent's centre: `REVEAL_RADII[level]`
- *       times the parent's bounding radius, but never less than `REVEAL_FLOOR_M`. The floor
- *       exists because the orbit rig will not come closer than 0.07 m to its target, and a valve
- *       (radius about 0.01 m) would otherwise need a distance it can never reach.
+ *       times the parent's bounding radius, but never less than `REVEAL_FLOOR_M` and never more
+ *       than `REVEAL_ORGAN_CAP` times the OPEN ORGAN's bounding radius. The floor exists because
+ *       a valve (radius about 0.01 m) would otherwise need a distance the orbit rig, which will
+ *       not come closer than 0.07 m to its target, can barely reach. The cap exists because the
+ *       pericardium is as big as the heart: six and a half of its radii is farther than the camera sits
+ *       when the heart is first opened, and its layers would have been on show from the start.
  *
  * A child at level 3 also needs its own parent to be revealed: a chord cannot appear on a
  * papillary muscle that is not there. Parts of level 1 are always shown (they are what the
@@ -27,18 +30,30 @@
 
 /**
  * Camera reach, in units of the parent's bounding radius, at which the children of a part at
- * level 1 (key 2 = its children's level) and of a part at level 2 (key 3) appear. The rig frames
- * a sphere at about four radii, so 5 means "a little before the part fills the view". A display
+ * level 1 (key 2 = its children's level) and of a part at level 2 (key 3) appear. MEASURED, not
+ * guessed: on a 1280 x 860 desktop the rig flies to a part at about nine of its radii (the left
+ * ventricle, radius 0.052 m, is framed from 0.483 m, with the 21 degree field of view the camera
+ * has), so 6.5 means "about a third closer than the part would be framed" and a visitor who zooms in by
+ * hand gets the finer structures a clear step before the part fills the view (8 let the right
+ * ventricle's children appear while the visitor was still being flown to the left one). A display
  * constant.
  */
-export const REVEAL_RADII: Readonly<Record<2 | 3, number>> = { 2: 5.0, 3: 4.5 };
+export const REVEAL_RADII: Readonly<Record<2 | 3, number>> = { 2: 6.5, 3: 6.5 };
 
 /**
- * The smallest reach, metres of scene, whatever the parent's size. The orbit rig's floor is
- * 0.07 m, so 0.1 m means "zoomed right in" for a part too small to be framed at five radii.
- * A display constant.
+ * The smallest reach, metres of scene, whatever the parent's size. A valve (radius about
+ * 0.01 m) is framed from about 0.1 m, and the orbit rig's floor is 0.07 m, so 0.13 m means
+ * "zoomed right in" for a part too small to be reached at eight radii. A display constant.
  */
-export const REVEAL_FLOOR_M = 0.1;
+export const REVEAL_FLOOR_M = 0.13;
+
+/**
+ * The largest reach, in units of the OPEN ORGAN's bounding radius (the heart's is 0.094 m and
+ * it is first framed from 0.74 m, about eight of those). 3.5 means the camera must have come
+ * more than half of the way in from the opening view before the finer structures of a part as big
+ * as the organ appear on their own. A display constant.
+ */
+export const REVEAL_ORGAN_CAP = 3.5;
 
 /** Seconds for a child to fade in, and out. Instant under reduced motion. Display constants. */
 export const REVEAL_FADE_IN_S = 0.35;
@@ -114,11 +129,13 @@ export function buildRevealTree(parts: readonly RevealNode[]): RevealTree {
 
 /**
  * The camera reach for the children of a parent: how close the camera must be to the parent's
- * centre. `childLevel` is the level of the CHILDREN (2 or 3).
+ * centre. `childLevel` is the level of the CHILDREN (2 or 3); `organRadius` is the open organ's
+ * bounding radius, for the cap (omit it for no cap). The floor wins over the cap.
  */
-export function revealReach(childLevel: number, parentRadius: number): number {
+export function revealReach(childLevel: number, parentRadius: number, organRadius = Infinity): number {
   const mult = childLevel >= 3 ? REVEAL_RADII[3] : REVEAL_RADII[2];
-  return Math.max(REVEAL_FLOOR_M, mult * Math.max(0, parentRadius));
+  const wanted = mult * Math.max(0, parentRadius);
+  return Math.max(REVEAL_FLOOR_M, Math.min(wanted, REVEAL_ORGAN_CAP * organRadius));
 }
 
 /**

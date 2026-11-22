@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ANATOMY, atlasOf } from '../../src/data/anatomy';
-import { ANATOMY_SIGNALS } from '../../src/data/anatomy-types';
+import { ANATOMY_SIGNALS, MAX_PART_DEPTH } from '../../src/data/anatomy-types';
 import organsFile from '../../src/data/organs.json';
 
 /**
@@ -42,6 +42,25 @@ describe('anatomy atlas files', () => {
           expect(p.id, `part id ${p.id}`).toMatch(PART_ID);
           expect(seen.has(p.id), `duplicate part id ${p.id}`).toBe(false);
           seen.add(p.id);
+        }
+      });
+
+      it('nests parts sensibly: the parent exists in this file, no cycle, depth within the limit', () => {
+        const byId = new Map(file.parts.map((p) => [p.id, p] as const));
+        for (const p of file.parts) {
+          if (p.parent === undefined) continue;
+          expect(byId.has(p.parent), `${p.id}: parent "${p.parent}" is not a part of ${key}`).toBe(true);
+          expect(p.parent, `${p.id} is its own parent`).not.toBe(p.id);
+          const seen = new Set<string>([p.id]);
+          let depth = 1;
+          let cursor: string | undefined = p.parent;
+          while (cursor !== undefined) {
+            expect(seen.has(cursor), `${p.id}: cycle through ${cursor}`).toBe(false);
+            seen.add(cursor);
+            depth++;
+            cursor = byId.get(cursor)?.parent;
+          }
+          expect(depth, `${p.id}: level ${depth}, the deepest allowed is ${MAX_PART_DEPTH}`).toBeLessThanOrEqual(MAX_PART_DEPTH);
         }
       });
 

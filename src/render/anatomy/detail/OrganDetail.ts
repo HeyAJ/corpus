@@ -17,6 +17,7 @@ import {
   buildRevealTree,
   revealReach,
   revealedSet,
+  selectionReveals,
   stepReveal,
   type RevealTree,
 } from './reveal';
@@ -57,8 +58,12 @@ import {
  * part's children show, the part itself is thinned to glass (PARENT_GLASS_DROP), otherwise a
  * solid septum or a picked ventricle would hide what is inside it. A child with no drives of its
  * own shows its parent's activity, worked out here from the data and never from the simulation.
- * Triangles: the heart's interior went from 24,276 to the figure in reveal.ts's notes, well under
- * the 2x at which a lazy build would be needed, so every child is built with its organ.
+ * A CHILD RIDES ITS PARENT. Unless an atlas module gives a child a pose of its own, it takes its
+ * parent's scale, pivot and offset each frame, so papillary muscles swell and shrink with the
+ * ventricle they hang in and the cusps of a valve fold with the valve, without the module
+ * having to name them. Triangles: the heart's interior went from 24,276 to 47,864 (just under
+ * 2x), the limit above which children would have to be built lazily, so every child is built
+ * with its organ; the next atlas to add many children should measure the same way.
  *
  * NOTHING HERE WRITES TO THE SIMULATION.
  *
@@ -228,6 +233,8 @@ class Interior {
   tree: RevealTree | null = null;
   /** Parts that have children, with the entries to ask about, in tree order. */
   readonly parents: PartEntry[] = [];
+  /** The children (level 2 and 3), parents before children: the order in which poses are inherited. */
+  readonly inherit: PartEntry[] = [];
   /** Scratch for the reveal rule, reused every frame. */
   readonly shown = new Set<string>();
 
@@ -483,7 +490,9 @@ export class OrganDetail {
     }
     for (const node of tree.order) {
       const entry = interior.parts.get(node.id);
-      if (entry && (tree.children.get(node.id)?.length ?? 0) > 0) interior.parents.push(entry);
+      if (!entry) continue;
+      if ((tree.children.get(node.id)?.length ?? 0) > 0) interior.parents.push(entry);
+      if (entry.level > 1) interior.inherit.push(entry);
     }
 
     if (flows.length > 0) {
@@ -602,6 +611,18 @@ export class OrganDetail {
       this.activeInterior = null;
     }
 
+    // A CHILD RIDES ITS PARENT unless the module posed it itself. Parents come before children,
+    // so a grandchild reads a parent whose own pose is already final.
+    for (const child of interior.inherit) {
+      const own = child.scale.x === 1 && child.scale.y === 1 && child.scale.z === 1 && !child.pivotGiven;
+      const parent = interior.parts.get(interior.tree?.ancestors.get(child.id)?.[0] ?? '');
+      if (!own || !parent) continue;
+      child.scale.copy(parent.scale);
+      child.pivot.copy(parent.pivotGiven ? parent.pivot : parent.center);
+      child.pivotGiven = true;
+      child.offset.add(parent.offset);
+    }
+
     // APPLY to the materials and meshes.
     const pick = this.highlighted;
     const blend = 1 - Math.exp(-dt / HIGHLIGHT_TAU_S);
@@ -610,7 +631,10 @@ export class OrganDetail {
       // eased reveal, and the part that holds children shows through them (see reveal.ts).
       const revealEase = p.reveal * p.reveal * (3 - 2 * p.reveal);
       const hlTarget = pick !== null && p.id === pick ? 1 : 0;
-      const dimTarget = pick !== null && p.id !== pick ? 1 : 0;
+      // The family of the picked part is never dimmed: its children (and a picked child's
+      // siblings) are what the visitor came to see, and are the very things revealed for it.
+      const family = pick !== null && p.level > 1 && !!interior.tree && selectionReveals(interior.tree, p.id, pick);
+      const dimTarget = pick !== null && p.id !== pick && !family ? 1 : 0;
       p.hl += (hlTarget - p.hl) * blend;
       p.dim += (dimTarget - p.dim) * blend;
       const u = p.material.uniforms;
@@ -665,9 +689,11 @@ export class OrganDetail {
     const near = (parentId: string, childLevel: number): boolean => {
       const parent = interior.parts.get(parentId);
       if (!parent || !Number.isFinite(cam.x)) return false;
-      const radius = this.sphereOf(interior, parent, this.sphereCentre);
+      // The part's size and place as DRAWN AT REST: a valve shrinks by two thirds as it opens, and
+      // a reach that followed that would flicker its cusps in and out with every beat.
+      const radius = this.sphereOf(interior, parent, this.sphereCentre, false);
       if (!(radius >= 0)) return false;
-      return this.sphereCentre.distanceTo(cam) < revealReach(childLevel, radius);
+      return this.sphereCentre.distanceTo(cam) < revealReach(childLevel, radius, interior.handle.boundingRadius);
     };
     revealedSet(tree, selected, near, interior.shown);
     for (const p of interior.partList) {
@@ -759,12 +785,17 @@ export class OrganDetail {
     return this.sphereOf(interior, p, out);
   }
 
-  private sphereOf(interior: Interior, p: PartEntry, out: THREE.Vector3): number {
+  private sphereOf(interior: Interior, p: PartEntry, out: THREE.Vector3, posed = true): number {
     const geometry = p.mesh.geometry;
     if (!geometry.boundingSphere) geometry.computeBoundingSphere();
     const sphere = geometry.boundingSphere;
     if (!sphere) return -1;
     interior.group.updateMatrix();
+    if (!posed) {
+      // As built: only the shell's own transform (its pulse and pose), not the part's.
+      out.copy(sphere.center).applyMatrix4(interior.group.matrix);
+      return sphere.radius * interior.group.scale.x;
+    }
     p.mesh.updateMatrix();
     out.copy(sphere.center).applyMatrix4(p.mesh.matrix).applyMatrix4(interior.group.matrix);
     return sphere.radius * Math.max(p.mesh.scale.x, p.mesh.scale.y, p.mesh.scale.z) * interior.group.scale.x;

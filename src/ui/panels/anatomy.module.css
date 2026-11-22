@@ -226,10 +226,69 @@
   background: var(--chip-bg-strong);
 }
 
+.rowLine {
+  display: flex;
+  align-items: stretch;
+}
+
+/* The disclosure is its own button, 44 px wide at least, so folding a list never selects the part. */
+.disclose {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 52px;
+  min-height: 44px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+}
+
+.discloseCount {
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  display: inline-block;
+  font-size: var(--text-xl);
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.chevron[data-open='true'] {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
+
+/* Finer structures: indented under their parent behind a hairline (non-text, so --ink-faint). */
+.children {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 8px 8px 14px;
+  padding: 0 0 0 8px;
+  border-left: 2px solid var(--ink-faint);
+}
+
 .partRow {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
   width: 100%;
   min-height: 44px;
   padding: 10px 12px;

@@ -1,6 +1,8 @@
 import organsFile from '../data/organs.json';
 import { ANATOMY, atlasOf } from '../data/anatomy';
 import type { OrganDef } from '../data/types';
+import type { AnatomyPartDef } from '../data/anatomy-types';
+import { ancestorIds } from './anatomyTree';
 
 /**
  * FIND AN ORGAN OR A STRUCTURE: the pure half of the panels menu's search box.
@@ -21,6 +23,11 @@ import type { OrganDef } from '../data/types';
  * that more than one organ reads appears ONCE PER SIDE, labelled "Renal Cortex, left kidney".
  * The lungs are two atlases (`lung_l`, `lung_r`), each already on one side, so their parts
  * are not suffixed.
+ *
+ * FINER STRUCTURES. A part with a `parent` (anatomy-types.ts) is searchable like any other and
+ * its subtitle names where it lies: "Papillary Muscles (left)" under "Left Ventricle, Heart".
+ * Choosing one opens the organ and flies to it; the renderer reveals it because it is then the
+ * part flown to (src/render/anatomy/detail/reveal.ts).
  *
  * RANKING (documented because it is the visible behaviour): case- and accent-insensitive;
  * a label that STARTS with the query beats a label with a WORD that starts with it, which
@@ -74,6 +81,18 @@ function sideQualifier(organ: OrganDef): string {
   return organ.displayName.toLowerCase();
 }
 
+/**
+ * The secondary line of a part's result. A level-1 part names its organ ("Heart"); a finer
+ * structure names what it belongs to, nearest parent first, then the organ: the papillary
+ * muscles of the left ventricle read "Left Ventricle, Heart". Children need no special
+ * handling to be FOUND (they are parts of the atlas like any other); this line is what
+ * tells two parts with the same kind of name apart.
+ */
+function partSub(parts: readonly AnatomyPartDef[], part: AnatomyPartDef, organ: OrganDef): string {
+  const names = ancestorIds(parts, part.id).map((id) => parts.find((p) => p.id === id)?.label ?? id);
+  return [...names, organ.displayName].join(', ');
+}
+
 export function buildCatalogue(body: BodyKind): SearchEntry[] {
   const organs = organsOf(body);
   // How many organs of THIS body read each atlas: more than one means a paired organ.
@@ -90,7 +109,7 @@ export function buildCatalogue(body: BodyKind): SearchEntry[] {
     const paired = (readers.get(atlasOf(o)) ?? 0) > 1;
     for (const p of atlas.parts) {
       const label = paired ? `${p.label}, ${sideQualifier(o)}` : p.label;
-      entries.push({ kind: 'part', organId: o.id, partId: p.id, label, sub: o.displayName, folded: fold(label) });
+      entries.push({ kind: 'part', organId: o.id, partId: p.id, label, sub: partSub(atlas.parts, p, o), folded: fold(label) });
     }
   }
   return entries;

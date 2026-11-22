@@ -97,3 +97,22 @@ describe('malformed share links', () => {
     expect(() => parseShareHash(null as unknown as string)).not.toThrow();
   });
 });
+
+describe('share links and finer structures', () => {
+  it('accepts a child part of the open organ and round-trips it', () => {
+    const state: ShareState = { sex: 'male', organ: 'heart', part: 'papillary_muscles_lv' };
+    expect(buildShareHash(state)).toBe('#v=1&sex=male&organ=heart&part=papillary_muscles_lv');
+    expect(parseShareHash(buildShareHash(state))).toEqual(state);
+  });
+
+  it('accepts a child of a level-2 and a level-1 part alike', () => {
+    expect(parseShareHash('#v=1&sex=male&organ=heart&part=fossa_ovalis')).toEqual({ sex: 'male', organ: 'heart', part: 'fossa_ovalis' });
+    expect(parseShareHash('#v=1&sex=male&organ=heart&part=left_ventricle')).toEqual({ sex: 'male', organ: 'heart', part: 'left_ventricle' });
+  });
+
+  it('drops a child of another organ and an unknown child', () => {
+    expect(parseShareHash('#v=1&sex=male&organ=kidney_l&part=papillary_muscles_lv')).toEqual({ sex: 'male', organ: 'kidney_l' });
+    expect(parseShareHash('#v=1&sex=male&organ=heart&part=papillary_muscles_xx')).toEqual({ sex: 'male', organ: 'heart' });
+  });
+});
+

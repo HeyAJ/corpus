@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildCatalogue, search, fold, MAX_RESULTS } from '../../src/ui/search';
+import { ANATOMY } from '../../src/data/anatomy';
+import { activitySourceOf, ancestorIds, buildPartTree, countBeneath } from '../../src/ui/anatomyTree';
 
 const male = buildCatalogue({ sex: 'male', pregnant: false });
 const female = buildCatalogue({ sex: 'female', pregnant: false });
@@ -56,3 +58,61 @@ describe('search catalogue and ranking', () => {
     expect(new Set(cortex.map((e) => e.organId)).size).toBe(2);
   });
 });
+
+describe('finer structures (parts with a parent)', () => {
+  it('finds a child like any other part and names its parent in the subtitle', () => {
+    const out = search(male, 'papillary');
+    const left = out.find((e) => e.partId === 'papillary_muscles_lv');
+    expect(left?.organId).toBe('heart');
+    expect(left?.sub).toBe('Left Ventricle, Heart');
+  });
+
+  it('names the organ alone for a level-1 part', () => {
+    const lv = search(male, 'left ventricle').find((e) => e.partId === 'left_ventricle');
+    expect(lv?.sub).toBe('Heart');
+  });
+
+  it('lists every part of the atlas, children included, exactly once', () => {
+    const heart = male.filter((e) => e.kind === 'part' && e.organId === 'heart');
+    expect(heart.length).toBe(ANATOMY.heart.parts.length);
+    expect(new Set(heart.map((e) => e.partId)).size).toBe(heart.length);
+  });
+});
+
+describe('the part tree the panel shows', () => {
+  const parts = ANATOMY.heart.parts;
+
+  it('nests each child under its parent and keeps file order', () => {
+    const roots = buildPartTree(parts);
+    const lv = roots.find((n) => n.part.id === 'left_ventricle');
+    expect(lv?.children.map((c) => c.part.id)).toEqual(['papillary_muscles_lv', 'chordae_tendineae_lv', 'trabeculae_carneae_lv']);
+    expect(lv?.children.every((c) => c.level === 2)).toBe(true);
+    expect(roots.every((n) => n.level === 1 && !n.part.parent)).toBe(true);
+  });
+
+  it('counts the whole tree once', () => {
+    const roots = buildPartTree(parts);
+    const total = roots.reduce((n, r) => n + 1 + countBeneath(r), 0);
+    expect(total).toBe(parts.length);
+  });
+
+  it('lists ancestors nearest first and shows a parent\u2019s activity for a child with no drives', () => {
+    expect(ancestorIds(parts, 'chordae_tendineae_lv')).toEqual(['left_ventricle']);
+    expect(activitySourceOf(parts, 'chordae_tendineae_lv')).toBe('left_ventricle');
+    expect(activitySourceOf(parts, 'papillary_muscles_lv')).toBe('papillary_muscles_lv');
+    expect(activitySourceOf(parts, 'left_ventricle')).toBe('left_ventricle');
+  });
+
+  it('does not crash on a missing parent or a cycle: those parts become level 1', () => {
+    const base = { label: '', summary: '', function: '', color: '#000000', rest: 0, drives: [], source: 's' };
+    const broken = [
+      { ...base, id: 'a', parent: 'nowhere' },
+      { ...base, id: 'b', parent: 'c' },
+      { ...base, id: 'c', parent: 'b' },
+      { ...base, id: 'd', parent: 'd' },
+    ];
+    expect(buildPartTree(broken).map((n) => n.part.id).sort()).toEqual(['a', 'b', 'c', 'd']);
+    expect(ancestorIds(broken, 'b').length).toBeLessThan(3);
+  });
+});
+
