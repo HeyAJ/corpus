@@ -13,6 +13,11 @@ import { patchForCut, setCut, sliceKeeps, type CutUniforms, type SlicePlane } fr
 import type { DetailContext, FlowSpec, OrganDetailSpec, PartHandle } from './types';
 import {
   PARENT_GLASS_DROP,
+  FOCUS_EASE_S,
+  FOCUS_FAINT_OPACITY,
+  FOCUS_PARENT_GLASS_DROP,
+  FOCUS_STREAM_FRACTION,
+  isCloseLook,
   REVEAL_PICKABLE,
   buildRevealTree,
   revealReach,
@@ -98,6 +103,8 @@ const PART_RENDER_ORDER = 31;
 const GLASS_BELOW = 0.98;
 const GLASS_RENDER_ORDER = 33;
 const FLOW_RENDER_ORDER = 36;
+/** A part drawn fainter than this is not there to be tapped (a display rule: invisible is not pickable). */
+const PICK_MIN_OPACITY = 0.05;
 const FADE_IN_S = 0.3;
 const FADE_OUT_S = 0.2;
 /** Parts other than the picked one are drawn at this fraction of their opacity. */
@@ -132,6 +139,8 @@ class PartEntry implements PartHandle {
   dim = 0;
   /** Whether the mesh is currently set up as glass (no depth write, drawn late). */
   glass = false;
+  /** The opacity the part is drawn at before the interior's fade; picking ignores ones below PICK_MIN. */
+  shownOpacity = 1;
   /** 1 for a level-1 part; for a child, the smoothed 0..1 fade of its reveal (see reveal.ts). */
   reveal = 1;
   /** The level in the part tree: 1 = no parent, 2 = a child, 3 = a grandchild. */
@@ -284,6 +293,8 @@ export class OrganDetail {
   /** The camera, in the BODY frame (the same frame `partSphere` reports), for the proximity rule. */
   private readonly cameraBody = new THREE.Vector3(Infinity, Infinity, Infinity);
   private readonly sphereCentre = new THREE.Vector3();
+  /** Smoothed 0..1 strength of the close-look rule (see reveal.ts), read by the Viewer for the vessel overlay. */
+  private closeLook = 0;
 
   // The frame context, one object reused for every call of every module.
   private previousSnap: SimSnapshot | null = null;
@@ -624,8 +635,19 @@ export class OrganDetail {
     }
 
     // APPLY to the materials and meshes.
-    const pick = this.highlighted;
+    // The selection the close-up rule looks at: a tap or list pick, else the part flown to.
+    const pick = this.highlighted ?? this.focused;
     const blend = 1 - Math.exp(-dt / HIGHLIGHT_TAU_S);
+    // CLOSE LOOK (reveal.ts): the part under study has finer structures, or is one. It eases in
+    // and out (instantly under reduced motion) and only for the interior being shown.
+    const closeTarget = animate && isCloseLook(interior.tree, pick) ? 1 : 0;
+    if (animate) {
+      this.closeLook = reducedMotion
+        ? closeTarget
+        : this.closeLook + (closeTarget - this.closeLook) * (1 - Math.exp(-dt / FOCUS_EASE_S));
+    }
+    const close = this.closeLook;
+    const ancestorsOfPick = pick !== null ? (interior.tree?.ancestors.get(pick) ?? []) : [];
     for (const p of interior.partList) {
       // A child that is not on show is not drawn at all; one fading in or out is scaled by an
       // eased reveal, and the part that holds children shows through them (see reveal.ts).
@@ -634,22 +656,29 @@ export class OrganDetail {
       // The family of the picked part is never dimmed: its children (and a picked child's
       // siblings) are what the visitor came to see, and are the very things revealed for it.
       const family = pick !== null && p.level > 1 && !!interior.tree && selectionReveals(interior.tree, p.id, pick);
+      // An ancestor of the picked part is its context (the ventricle round a papillary muscle)
+      // and keeps the gentle dimming; anything else unrelated goes faint in a close look.
       const dimTarget = pick !== null && p.id !== pick && !family ? 1 : 0;
+      const faint = dimTarget === 1 && !ancestorsOfPick.includes(p.id) ? close : 0;
+      const dimMul = (1 - (1 - DIMMED) * p.dim) * (1 - (1 - FOCUS_FAINT_OPACITY / DIMMED) * faint * p.dim);
       p.hl += (hlTarget - p.hl) * blend;
       p.dim += (dimTarget - p.dim) * blend;
       const u = p.material.uniforms;
       u.uGlow.value = p.glow;
       u.uHighlight.value = p.hl;
       // The picked part is never glass: picking a lobe from the list should show the lobe.
-      const own = (p.opacity + (1 - p.opacity) * p.hl) * (1 - PARENT_GLASS_DROP * p.childReveal);
-      const glass = own < GLASS_BELOW;
+      const drop = p.id === pick ? PARENT_GLASS_DROP + (FOCUS_PARENT_GLASS_DROP - PARENT_GLASS_DROP) * close : PARENT_GLASS_DROP;
+      const own = (p.opacity + (1 - p.opacity) * p.hl) * (1 - drop * p.childReveal);
+      // A dimmed part is glass too: a faint part that still wrote depth would hide what is behind.
+      const glass = own * dimMul < GLASS_BELOW;
       if (glass !== p.glass) {
         p.glass = glass;
         p.material.depthWrite = !glass;
         p.mesh.renderOrder = glass ? GLASS_RENDER_ORDER : PART_RENDER_ORDER;
       }
       u.uGlass.value = glass ? 1 : 0;
-      const opacity = own * fade * revealEase * (1 - (1 - DIMMED) * p.dim);
+      const opacity = own * fade * revealEase * dimMul;
+      p.shownOpacity = own * dimMul * revealEase;
       u.uOpacity.value = opacity;
       p.mesh.visible = p.visible && opacity > 0.003;
       p.applyTransform();
@@ -664,8 +693,10 @@ export class OrganDetail {
     }
 
     if (interior.flow) {
-      interior.flow.setFade(fade);
-      interior.flow.object.visible = fade > 0.003;
+      // Streams recede in a close look so the part and its children are not drawn over by blood.
+      const streams = fade * (1 - (1 - FOCUS_STREAM_FRACTION) * close);
+      interior.flow.setFade(streams);
+      interior.flow.object.visible = streams > 0.003;
       interior.flow.update(reducedMotion ? 0 : dt);
     }
   }
@@ -785,6 +816,47 @@ export class OrganDetail {
     return this.sphereOf(interior, p, out);
   }
 
+  /** 0..1: how strongly the close-look rule (reveal.ts) holds right now; 0 with nothing open. */
+  get closeLookAmount(): number {
+    return this.current ? this.closeLook : 0;
+  }
+
+  /**
+   * The bounding sphere of a part TOGETHER WITH everything beneath it (its revealed children and
+   * theirs), in the BODY frame: the framing of `Viewer.focusPart`. A valve alone is a few
+   * millimetres across, so framing only it put the camera where its cusps and chords, which
+   * reach past that sphere, were cut off. Returns the radius, -1 for an unknown part.
+   */
+  familySphere(partId: string, out: THREE.Vector3): number {
+    const interior = this.current;
+    const p = interior?.parts.get(partId);
+    if (!interior || !p) return -1;
+    let r = this.sphereOf(interior, p, out);
+    if (!(r >= 0)) return -1;
+    const stack = [...(interior.tree?.children.get(partId) ?? [])];
+    const c = new THREE.Vector3();
+    while (stack.length) {
+      const id = stack.pop() as string;
+      const child = interior.parts.get(id);
+      if (!child) continue;
+      stack.push(...(interior.tree?.children.get(id) ?? []));
+      const cr = this.sphereOf(interior, child, c);
+      if (!(cr >= 0)) continue;
+      // The smallest sphere holding both: centre moved along the line between them.
+      const d = out.distanceTo(c);
+      if (d + cr <= r) continue;
+      if (d + r <= cr) {
+        out.copy(c);
+        r = cr;
+        continue;
+      }
+      const nr = (d + r + cr) / 2;
+      out.lerp(c, (nr - r) / d);
+      r = nr;
+    }
+    return r;
+  }
+
   private sphereOf(interior: Interior, p: PartEntry, out: THREE.Vector3, posed = true): number {
     const geometry = p.mesh.geometry;
     if (!geometry.boundingSphere) geometry.computeBoundingSphere();
@@ -811,7 +883,8 @@ export class OrganDetail {
     // still be hit. A tap is rare; filtering here costs nothing that matters.
     // A child still fading in (or out) is not yet there to be tapped: only revealed ones count.
     const targets = interior.meshes.filter(
-      (m) => m.visible && (interior.parts.get(m.userData.partId as string)?.reveal ?? 1) >= REVEAL_PICKABLE,
+      (m) => m.visible && (interior.parts.get(m.userData.partId as string)?.reveal ?? 1) >= REVEAL_PICKABLE &&
+        (interior.parts.get(m.userData.partId as string)?.shownOpacity ?? 1) >= PICK_MIN_OPACITY,
     );
     if (targets.length === 0) return null;
     const allHits = raycaster.intersectObjects(targets, false);

@@ -93,6 +93,15 @@ export const DEFAULT_LIMITS: OrbitLimits = {
 const FOCUS_FILL = 0.68;
 
 /**
+ * The camera never frames a target nearer than this many of its radii, whatever the viewport
+ * says. The fill rule already lands at about 7.9 radii on the 21 degree lens, so this is a floor
+ * for odd viewports (a tall free area, a wide lens), not the usual answer: closer than about
+ * 4 radii a target no longer fits its free area and its children lie outside the frame. A
+ * DISPLAY constant.
+ */
+export const FOCUS_MIN_RADII = 4;
+
+/**
  * DISPLAY CONSTANTS for panning and double-tap zoom. None of them is a physiological
  * quantity; each is a feel choice.
  *
@@ -419,7 +428,8 @@ export class OrbitRig {
     const halfFov = (this.camera.fov * DEG) / 2;
     const H = this.viewH || 1;
     const freeMin = Math.max(1, Math.min(this.viewW - this.insetRight, H - this.insetBottom));
-    const d = (boundingRadius * H) / (Math.tan(halfFov) * FOCUS_FILL * freeMin);
+    const fill = (boundingRadius * H) / (Math.tan(halfFov) * FOCUS_FILL * freeMin);
+    const d = Math.max(fill, FOCUS_MIN_RADII * boundingRadius);
     return THREE.MathUtils.clamp(d, this.limits.minDistance, this.limits.maxDistance);
   }
 

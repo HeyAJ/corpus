@@ -109,6 +109,22 @@ interface Track {
   baseB: number;
 }
 
+/**
+ * The largest a stream particle is ever drawn, in drawing-buffer pixels, at any zoom. Before this
+ * cap a droplet was sized only in world metres, so a camera 0.08 m from a mitral valve turned a
+ * four-millimetre droplet into a red ring a hundred pixels across and the cusps vanished behind
+ * them. A DISPLAY constant, not a physical size.
+ */
+export const MAX_POINT_PX = 14;
+
+/**
+ * Within this distance of the camera (metres of scene) a particle fades out: fully gone at the
+ * END value, fully drawn at the START value. Display constants; they exist because a particle
+ * that passes a few centimetres from the lens is never a readable thing, only a smear.
+ */
+export const NEAR_FADE_END_M = 0.03;
+export const NEAR_FADE_START_M = 0.07;
+
 export class FlowField {
   readonly object: THREE.Points;
 
@@ -226,6 +242,7 @@ export class FlowField {
         attribute float aSize;
         uniform float uScale;
         varying vec3 vColor;
+        varying float vNear;
         void main() {
           vColor = aColor;
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
@@ -236,13 +253,19 @@ export class FlowField {
             gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
             return;
           }
-          gl_PointSize = max(2.0, aSize * uScale / -mv.z);
+          // Floored at 2 px so a distant stream does not vanish, CAPPED at MAX_POINT_PX so a
+          // droplet seen from a few centimetres away (a valve focused from 0.08 m) cannot grow
+          // into a ring that fills the frame, and faded out inside the near distance where the
+          // cap alone would still leave a screenful of overlapping discs.
+          gl_PointSize = clamp(aSize * uScale / -mv.z, 2.0, ${MAX_POINT_PX.toFixed(1)});
+          vNear = smoothstep(${NEAR_FADE_END_M.toFixed(3)}, ${NEAR_FADE_START_M.toFixed(3)}, -mv.z);
           gl_Position = projectionMatrix * mv;
         }
       `,
       fragmentShader: /* glsl */ `
         uniform float uOpacity;
         varying vec3 vColor;
+        varying float vNear;
         void main() {
           // Round and soft-edged: a square sprite reads as a rendering fault.
           vec2 d = gl_PointCoord - vec2(0.5);
@@ -252,7 +275,7 @@ export class FlowField {
           float edge = 1.0 - smoothstep(0.12, 0.25, r);
           float core = 1.0 - smoothstep(0.0, 0.06, r);
           vec3 colour = mix(vColor, vec3(1.0), core * 0.35);
-          gl_FragColor = vec4(colour, edge * uOpacity);
+          gl_FragColor = vec4(colour, edge * uOpacity * vNear);
         }
       `,
       blending: THREE.NormalBlending,

@@ -16,6 +16,7 @@ import { NervousSystem } from '../nervous/NervousSystem';
 import { HormoneTraffic, type HormoneLegendEntry } from '../endocrine/HormoneTraffic';
 import { BODY_MIRROR_X } from '../anatomy/layout';
 import { OrganDetail } from '../anatomy/detail/OrganDetail';
+import { FOCUS_OVERLAY_DIM } from '../anatomy/detail/reveal';
 import type { OrganId } from '../../data/types';
 import type { SimSnapshot } from '../../bridge/types';
 
@@ -53,6 +54,12 @@ const DOUBLE_TAP_MS = 350;
 const DOUBLE_TAP_SLOP = 0.06;
 /** Milliseconds of every camera flight; under reduced motion each flight is an instant cut. */
 const FLIGHT_MS = 600;
+
+/**
+ * The vessel overlay is thinned inside a sphere of this many times the open organ's bounding
+ * radius (a little over 1, so the organ's own surface is inside it). A DISPLAY constant.
+ */
+const FOCUS_DIM_RADIUS_FACTOR = 1.15;
 
 export interface ViewerCallbacks {
   onHover?: (id: OrganId | null) => void;
@@ -602,7 +609,8 @@ export class Viewer {
       this.rig.focus(this.toScene(h.centroid, this.focusPoint), h.boundingRadius, this.flightMs());
       return;
     }
-    const r = this.detail.partSphere(partId, this.partCentre);
+    // The part TOGETHER WITH its finer structures, so a valve is framed with its cusps and chords.
+    const r = this.detail.familySphere(partId, this.partCentre);
     if (!(r > 0)) return;
     // The part flown to counts as selected for the reveal rule, so its finer structures show.
     this.detail.setFocusedPart(partId);
@@ -901,6 +909,14 @@ export class Viewer {
     this.organs.reducedMotion = this.reducedMotion;
     this.organs.update(dtMs);
     this.vascular.update(dtMs / 1000);
+    // CLOSE LOOK: while a part with finer structures is under study, thin the vessel overlay
+    // inside the open organ (the heart forces it on) so it does not lie over those structures.
+    const openOrgan = this.selected ? this.organs.organs.get(this.selected) : undefined;
+    this.vascular.setFocusDim(
+      openOrgan ? openOrgan.centroid : this.partCentre,
+      openOrgan ? openOrgan.boundingRadius * FOCUS_DIM_RADIUS_FACTOR : 0,
+      openOrgan ? FOCUS_OVERLAY_DIM * this.detail.closeLookAmount : 0,
+    );
     this.nerves.update(dtMs / 1000);
     this.hormones.update(dtMs / 1000);
     this.outline.update(dtMs / 1000, now, this.reducedMotion);

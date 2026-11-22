@@ -31,6 +31,14 @@ const GLASS: readonly [string, number, number][] = [
   ['mucosa', 0.2, 0.2],
   ['muscularis', 0.2, 0.2],
   ['lumen', 0.4, 0.15],
+  // The layers of the wall enclose what lies inside them, so each is glass (the same rule as
+  // the segments above); the cords, rings and glands inside them stay solid.
+  ['epithelium', 0.3, 0.15],
+  ['lamina_propria', 0.22, 0.12],
+  ['submucosa', 0.18, 0.14],
+  ['striated_muscle_zone', 0.2, 0.18],
+  ['smooth_muscle_zone', 0.2, 0.18],
+  ['adventitia', 0.1, 0.06],
 ];
 
 const BOLUS_COLOUR = 0xe8c9a0;

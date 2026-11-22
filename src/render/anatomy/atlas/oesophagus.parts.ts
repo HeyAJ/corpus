@@ -1,8 +1,10 @@
 import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
 import { giSegment, warpGeometry } from '../layout';
+import { mulberry32 } from '../noise';
 import { mergeParts, tubeAlong } from '../sdf';
 import type { V3 } from '../sdf';
+import { aroundFrame, blob, frameAt, helixCord, lengthwiseCord, stick } from './gi_shared';
 
 /**
  * INTERIOR PARTS OF THE OESOPHAGUS.
@@ -24,11 +26,33 @@ import type { V3 } from '../sdf';
  * one spline, cut at fractions of its arc length (`CERVICAL_END`, `ABDOMINAL_START`), which
  * are drawing proportions chosen to look like the textbook picture, not measurements.
  *
+ * FINER STRUCTURES (added in the textbook-depth pass). The wall is now drawn layer by layer,
+ * from the lumen out, each as a child of the part that holds it: the epithelium, lamina propria
+ * and muscularis mucosae inside the mucosa; a submucosa (its own part) with its mucous glands and
+ * its submucosal (Meissner) plexus; the inner circular and outer longitudinal muscle, the
+ * striated upper and smooth lower zones and the myenteric (Auerbach) plexus inside the muscular
+ * coat; and an adventitia over everything. Four rings mark the narrowings (the cricopharyngeal,
+ * aortic arch, left main bronchus and diaphragmatic constrictions) and a zigzag ring marks the
+ * Z-line at the gastro-oesophageal junction. Radii are fixed fractions of the shell calibre, in
+ * the order the layers lie: lumen 0.3, epithelium 0.46, lamina propria 0.52, muscularis mucosae
+ * 0.555, mucosa 0.58, submucosa 0.66, inner circular 0.76, myenteric 0.79, longitudinal 0.835,
+ * wall segments 0.9, adventitia 0.96. Those fractions are drawing proportions that keep the
+ * layers apart so they can be told apart; they are NOT the real relative thicknesses.
+ *
+ * WHERE THE NARROWINGS SIT is a drawing proportion (`NARROWING_AT`, arc fractions of the
+ * path), chosen to put the aortic and bronchial rings in the chest and the diaphragmatic one
+ * near the hiatus; it was not measured from the body model and no distance is stated
+ * anywhere, because the textbook distances are not reproduced here. The cricopharyngeal ring
+ * is drawn a little below the upper sphincter, which is the same place in the body: the
+ * sphincter part is the muscle, the narrowing part is the lumen it closes.
+ *
  * WHAT IT DOES NOT DO. It does not model the real thickness of the wall layers (the muscle
  * coat is drawn as thin bands, not as a 3 mm shell). The striated-above, smooth-below
- * change in the muscle is described in the data file but the bands are drawn alike. The
+ * change is drawn as two sleeves with a gap between them where the textbook says the two
+ * types mix; the bands themselves are drawn alike. The
  * sphincters are rings, not the crural slings and oblique fibres Gray's describes, and the
- * plexus is a decorative braid, not a traced nerve map.
+ * plexuses are decorative braids, not a traced nerve map. The submucosal glands are drawn as
+ * a sparse scatter of enlarged flasks, many times life size.
  *
  * Built in unexploded body coordinates, then passed through `warpGeometry` exactly as the
  * shell is, so it follows the exploded stack.
@@ -147,6 +171,13 @@ function segment(u0: number, u1: number, frac: number, radial: number): THREE.Bu
   return tubeAlong(pts, (t) => frac * shellRadius(u0 + (u1 - u0) * t), { tubular: n, radial, tension: 0.5 });
 }
 
+/** Arc fractions of the four narrowings and the Z-line. Drawing proportions, not measurements (see header). */
+export const NARROWING_AT = { cricopharyngeal: 0.04, aortic_arch: 0.4, bronchial: 0.5, diaphragmatic: 0.9 } as const;
+export const Z_LINE_AT = 0.984;
+/** Where the striated coat ends and the smooth coat begins, as arc fractions: the middle is the mixed zone. */
+export const STRIATED_END = 0.36;
+export const SMOOTH_START = 0.62;
+
 export const parts: PartBuilder = () => {
   const curve = oesophagusCurve();
   const length = curve.getLength();
@@ -210,6 +241,72 @@ export const parts: PartBuilder = () => {
   const upper = sphincter(0.012, 0.0058, 0.001, [-0.0012, 0.0012]);
   const lower = sphincter(0.97, 0.0045, 0.0012, [-0.0016, 0.0, 0.0016]);
 
+  // ===================================================================================
+  // FINER STRUCTURES (children of the wall layers; see the header for the radius order).
+  // ===================================================================================
+  const rOf = (frac: number) => (u: number): number => frac * shellRadius(u);
+
+  // --- inside the mucosa: three nested layers, innermost first.
+  const epithelium = segment(0.02, 0.985, 0.46, 10);
+  const laminaPropria = segment(0.02, 0.985, 0.52, 10);
+  const mucosalMuscle: THREE.BufferGeometry[] = [];
+  for (let k = 0; k < 6; k++) mucosalMuscle.push(lengthwiseCord(curve, 0.03, 0.97, 60, (k * Math.PI) / 3, rOf(0.555), 0.00035));
+
+  // --- the submucosa and what lies in it.
+  const submucosa = segment(0.0, 1, 0.66, 12);
+  const glandRand = mulberry32(0x0e50);
+  const glands: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 30; i++) {
+    const u = 0.08 + 0.86 * glandRand();
+    const a = glandRand() * Math.PI * 2;
+    const f = frameAt(curve, u);
+    // The flask sits in the submucosa; a thin duct runs inward through the mucosa to the lumen.
+    const body = aroundFrame(f, a, 0.665 * shellRadius(u));
+    glands.push(blob(body, 0.0007, 6, 4));
+    glands.push(stick(body, aroundFrame(f, a, 0.5 * shellRadius(u)), 0.00018));
+  }
+  const meissner: THREE.BufferGeometry[] = [
+    helixCord(curve, 0.02, 0.98, 120, 9, 0, rOf(0.63), 0.00022),
+    helixCord(curve, 0.02, 0.98, 120, -9, Math.PI, rOf(0.63), 0.00022),
+  ];
+
+  // --- inside the muscular coat: the two layers, the two kinds of muscle and the plexus between.
+  const innerCircular: THREE.BufferGeometry[] = [];
+  const innerCount = Math.floor(length / 0.0055);
+  for (let i = 1; i < innerCount; i++) {
+    const u = i / innerCount;
+    if (u < 0.03 || u > 0.965) continue;
+    innerCircular.push(ringAcross(curve.getPointAt(u), curve.getTangentAt(u).normalize(), 0.76 * shellRadius(u), 0.00045, 3, 10));
+  }
+  const outerLong: THREE.BufferGeometry[] = [];
+  for (let k = 0; k < 6; k++) outerLong.push(lengthwiseCord(curve, 0.02, 0.975, 70, (k * Math.PI) / 3 + 0.2, rOf(0.835), 0.0006));
+  const striated = segment(0.02, STRIATED_END, 0.785, 10);
+  const smoothZone = segment(SMOOTH_START, 0.975, 0.785, 10);
+  const auerbach: THREE.BufferGeometry[] = [
+    helixCord(curve, 0.02, 0.98, 120, 11, Math.PI / 3, rOf(0.79), 0.00024),
+    helixCord(curve, 0.02, 0.98, 120, -11, (4 * Math.PI) / 3, rOf(0.79), 0.00024),
+  ];
+
+  // --- the adventitia: the loose outer sleeve that fastens the tube to its neighbours.
+  const adventitia = segment(0, 1, 0.96, 12);
+
+  // --- the narrowings: a thickened ring that protrudes into the lumen at four places.
+  const narrowing = (u: number): THREE.BufferGeometry =>
+    ringAcross(curve.getPointAt(u), curve.getTangentAt(u).normalize(), 0.7 * shellRadius(u), 0.0012, 6, 16);
+
+  // --- the Z-line: the ragged border where the squamous lining meets the stomach's lining,
+  // drawn as a closed zigzag round the mucosal surface.
+  const zf = frameAt(curve, Z_LINE_AT);
+  const zig: V3[] = [];
+  const teeth = 14;
+  for (let i = 0; i < teeth * 2; i++) {
+    const a = (i / (teeth * 2)) * Math.PI * 2;
+    const p = aroundFrame(zf, a, 0.6 * shellRadius(Z_LINE_AT));
+    const lift = (i % 2 === 0 ? 1 : -1) * 0.0012;
+    zig.push([p[0] + zf.t.x * lift, p[1] + zf.t.y * lift, p[2] + zf.t.z * lift]);
+  }
+  const zLine = tubeAlong(zig, () => 0.00032, { tubular: teeth * 6, radial: 3, closed: true, tension: 0.2 });
+
   const w = (g: THREE.BufferGeometry): THREE.BufferGeometry => warpGeometry(g);
   return [
     { id: 'upper_sphincter', geometry: w(upper) },
@@ -221,5 +318,23 @@ export const parts: PartBuilder = () => {
     { id: 'lumen', geometry: w(lumen) },
     { id: 'lower_sphincter', geometry: w(lower) },
     { id: 'vagal_plexus', geometry: w(mergeParts(plexus)) },
+    // --- finer structures
+    { id: 'epithelium', geometry: w(epithelium) },
+    { id: 'lamina_propria', geometry: w(laminaPropria) },
+    { id: 'muscularis_mucosae', geometry: w(mergeParts(mucosalMuscle)) },
+    { id: 'submucosa', geometry: w(submucosa) },
+    { id: 'submucosal_glands', geometry: w(mergeParts(glands)) },
+    { id: 'submucosal_plexus', geometry: w(mergeParts(meissner)) },
+    { id: 'inner_circular_muscle', geometry: w(mergeParts(innerCircular)) },
+    { id: 'outer_longitudinal_muscle', geometry: w(mergeParts(outerLong)) },
+    { id: 'striated_muscle_zone', geometry: w(striated) },
+    { id: 'smooth_muscle_zone', geometry: w(smoothZone) },
+    { id: 'myenteric_plexus', geometry: w(mergeParts(auerbach)) },
+    { id: 'adventitia', geometry: w(adventitia) },
+    { id: 'narrowing_cricopharyngeal', geometry: w(narrowing(NARROWING_AT.cricopharyngeal)) },
+    { id: 'narrowing_aortic_arch', geometry: w(narrowing(NARROWING_AT.aortic_arch)) },
+    { id: 'narrowing_bronchial', geometry: w(narrowing(NARROWING_AT.bronchial)) },
+    { id: 'narrowing_diaphragmatic', geometry: w(narrowing(NARROWING_AT.diaphragmatic)) },
+    { id: 'gastro_oesophageal_junction', geometry: w(zLine) },
   ];
 };

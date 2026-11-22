@@ -68,6 +68,41 @@ export const REVEAL_FADE_OUT_S = 0.25;
  */
 export const PARENT_GLASS_DROP = 0.55;
 
+/**
+ * CLOSE-UP LEGIBILITY. While the visitor is looking at a part that has finer structures (or at one
+ * of those structures), everything else is pushed back so the part and its family dominate. All
+ * display choices, none of them anatomical:
+ *
+ *   FOCUS_FAINT_OPACITY    a part that is neither the focus, nor its family, nor its ancestor is
+ *                          drawn at this fraction of its opacity (and as glass, so it does not
+ *                          write depth and hide what lies behind it). Without it the right
+ *                          ventricle stood in front of the left one's papillary muscles.
+ *   FOCUS_PARENT_GLASS_DROP the focused part itself thins by this much while its children show
+ *                          (PARENT_GLASS_DROP alone left a wall at 45 % over its own muscles).
+ *   FOCUS_STREAM_FRACTION  the organ's stream droplets are drawn at this fraction of their
+ *                          strength while a part is focused.
+ *   FOCUS_OVERLAY_DIM      how much of the vessel overlay (walls and particles) is removed
+ *                          inside the open organ while a part is focused; the vessels outside
+ *                          the organ are untouched.
+ *   FOCUS_EASE_S           the time constant of all of the above, so focus is a settle and not a
+ *                          pop; under reduced motion it is instant.
+ */
+export const FOCUS_FAINT_OPACITY = 0.12;
+export const FOCUS_PARENT_GLASS_DROP = 0.8;
+export const FOCUS_STREAM_FRACTION = 0.3;
+export const FOCUS_OVERLAY_DIM = 0.85;
+export const FOCUS_EASE_S = 0.15;
+
+/**
+ * Is a close look under way: the selected part has finer structures, or is one? A pick of a part
+ * with nothing beneath it (a kidney's cortex) keeps the old, gentler dimming, so only the parts
+ * whose children the reveal rule opens get the strong treatment.
+ */
+export function isCloseLook(tree: RevealTree | null, selected: string | null): boolean {
+  if (!tree || selected === null) return false;
+  return tree.children.has(selected) || (tree.depth.get(selected) ?? 1) > 1;
+}
+
 /** Reveals below this are treated as hidden for picking and labels (the child is only fading). */
 export const REVEAL_PICKABLE = 0.5;
 
