@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { SimSnapshot } from '../../bridge/types';
 import type { GeometryFactory } from '../anatomy/GeometryFactory';
+import { ANATOMY } from '../../data/anatomy';
 import { BODY_MIRROR_X } from '../anatomy/layout';
 import { SCAN_STOPS, thermalColor } from '../anatomy/detail/thermal';
 
@@ -91,7 +92,9 @@ export const SCAN_LEGEND: { label: string; t: number }[] = [
 
 /**
  * The regions drawn as translucent shells. These are the cortical lobes and the cerebellum:
- * the surface of the brain. Everything else in the atlas lies inside them.
+ * the surface of the brain. The meninges, ventricles and choroid plexus are ghosted too,
+ * because they are membranes and fluid spaces rather than tissue an activity scan maps, and
+ * a solid there would sit over the whole interior. Everything else in the atlas lies inside them.
  */
 const GHOST_IDS: ReadonlySet<string> = new Set([
   'prefrontal_cortex',
@@ -101,7 +104,37 @@ const GHOST_IDS: ReadonlySet<string> = new Set([
   'temporal_lobe',
   'occipital_lobe',
   'cerebellum',
+  'meninges',
+  'ventricles',
+  'choroid_plexus',
 ]);
+
+/**
+ * Level-1 parts the scan leaves out altogether. The dural venous sinuses, the arterial circle
+ * and the cranial nerves are vessels and nerves, and the central and lateral sulci are surface
+ * grooves; the scan maps grey-matter regions, so a solid for any of them would hide the
+ * interior it exists to show. None of them is tissue whose activity index the engine drives.
+ */
+const SKIPPED_IDS: ReadonlySet<string> = new Set([
+  'dural_venous_sinuses',
+  'cerebral_arterial_circle',
+  'cranial_nerves',
+  'central_sulcus',
+  'lateral_sulcus',
+]);
+
+/**
+ * The atlas parts that are scan regions: level 1 only, which is every part with no `parent`.
+ * Deeper parts (cortical layers, pituitary cell types, the cusps of a valve) are magnified
+ * schematics that sit beside their parent rather than at an anatomical position, so drawing
+ * them would stack a second, misplaced solid on top of the region they belong to. Exported so
+ * the readout that names the most active region reads the same set.
+ */
+export const BRAIN_SCAN_IDS: ReadonlySet<string> = new Set(
+  (ANATOMY.brain?.parts ?? [])
+    .filter((p) => p.parent === undefined && !SKIPPED_IDS.has(p.id))
+    .map((p) => p.id),
+);
 
 const VERTEX = /* glsl */ `
   varying vec3 vN;
@@ -388,6 +421,11 @@ export class BrainScan {
     this.partsLoaded = true;
     const box = new THREE.Box3();
     for (const p of list) {
+      if (!BRAIN_SCAN_IDS.has(p.id)) {
+        // Not a scan region: release its geometry rather than building a mesh for it.
+        p.geometry.dispose();
+        continue;
+      }
       p.geometry.computeBoundingBox();
       if (p.geometry.boundingBox) box.union(p.geometry.boundingBox);
       const ghost = GHOST_IDS.has(p.id);
