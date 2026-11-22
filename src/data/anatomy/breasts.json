@@ -115,6 +115,98 @@
         { "signal": "inflammation", "weight": 0.2, "note": "Inflammation draws nodes into activity.", "source": "GH14" }
       ],
       "source": "GRAYS42"
+    },
+    {
+      "id": "lactiferous_sinuses",
+      "label": "Lactiferous Sinuses",
+      "summary": "The widened ends of the ducts just behind the nipple",
+      "function": "Each lactiferous duct widens into a sinus beneath the areola, where milk collects before it reaches the nipple. They are drawn as small swellings on the ducts.",
+      "color": "#f4e2c4",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "oxytocin", "weight": 0.3, "note": "The let-down reflex moves milk towards the nipple.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "areolar_glands",
+      "label": "Areolar Glands (Montgomery)",
+      "summary": "The small glands in the areola that raise little bumps on the skin",
+      "function": "The areolar glands are large sebaceous glands in the areola. Their secretion lubricates the nipple and areola. They enlarge in pregnancy and are drawn as small bumps.",
+      "color": "#c08070",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.3, "note": "The glands enlarge in pregnancy.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "retromammary_space",
+      "label": "Retromammary Space",
+      "summary": "The loose layer behind the breast, in front of the pectoral fascia",
+      "function": "The retromammary space is a layer of loose fatty tissue between the breast and the fascia over the muscle, which lets the breast move a little on the chest wall. It is drawn as a thin glass sheet.",
+      "color": "#f0e8d0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "axillary_tail",
+      "label": "Axillary Tail",
+      "summary": "The extension of breast tissue towards the armpit",
+      "function": "The axillary tail (of Spence) is a tongue of glandular tissue that runs from the upper outer part of the breast towards the axilla, where the lymph nodes lie.",
+      "color": "#d98a8a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "breast_lobule",
+      "label": "Lobule",
+      "parent": "glandular_lobes",
+      "summary": "One small gland unit at the end of a lobe, with its own terminal duct",
+      "function": "A lobe ends in many lobules, each a cluster of tiny glands that make milk. One lobule is drawn here as a magnified glass sphere in each breast.",
+      "color": "#e8a0a0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "terminal_duct_lobular_unit",
+      "label": "Terminal Duct Lobular Unit",
+      "parent": "breast_lobule",
+      "summary": "The small duct and the lobule of glands that it serves",
+      "function": "The terminal duct lobular unit is the working unit of the breast: the last small duct and the group of alveoli that open into it. It is drawn as a small branching duct. In the textbook the alveoli are part of the unit; they are listed beside it here to keep the list shallow.",
+      "color": "#f0d0a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alveoli",
+      "label": "Alveoli",
+      "parent": "breast_lobule",
+      "summary": "The tiny sacs of milk-secreting cells",
+      "function": "The alveoli are small sacs lined by secretory cells that make milk under the influence of prolactin. They are drawn as tiny beads at the ends of the branching duct.",
+      "color": "#f2b8b0",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "prolactin", "weight": 0.3, "note": "Prolactin drives the secretory cells.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "myoepithelial_cells",
+      "label": "Myoepithelial Cells",
+      "parent": "breast_lobule",
+      "summary": "The contractile cells that surround each alveolus",
+      "function": "The myoepithelial cells lie round each alveolus and the small ducts, and oxytocin makes them contract and squeeze milk out. They are drawn as a fine basket round each alveolus.",
+      "color": "#c85a6a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "oxytocin", "weight": 0.3, "note": "Oxytocin makes the cells contract.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
     }
   ]
 }

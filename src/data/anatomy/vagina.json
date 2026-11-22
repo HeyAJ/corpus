@@ -156,6 +156,170 @@
         { "signal": "sexualArousal", "weight": 0.3, "note": "They secrete mucus under parasympathetic stimulation in arousal.", "source": "GH14" }
       ],
       "source": "GRAYS42"
+    },
+    {
+      "id": "hymen",
+      "label": "Hymen",
+      "summary": "The thin fold of mucous membrane at the entrance of the vagina",
+      "function": "The hymen is a membranous fold of varying form round or across the opening of the vagina. It is drawn as a simple ring.",
+      "color": "#e6a8a0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vaginal_orifice",
+      "label": "Vaginal Orifice",
+      "summary": "The opening of the vagina into the vestibule",
+      "function": "The vaginal orifice is the lower opening of the vagina, behind the opening of the urethra and between the labia minora. It is drawn as an outline ring.",
+      "color": "#c4607a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_urethral_orifice",
+      "label": "External Urethral Orifice",
+      "summary": "The opening of the urethra into the vestibule",
+      "function": "The external urethral orifice lies in the vestibule in front of the vaginal orifice and behind the clitoris. Urine leaves the body through it; it is not a part of the genital tract.",
+      "color": "#b0505a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "labia_minora",
+      "label": "Labia Minora",
+      "summary": "The two thin folds of skin that enclose the vestibule",
+      "function": "The labia minora lie between the labia majora and the vestibule and enclose the openings of the urethra and the vagina. They are rich in vessels and enlarge with arousal. They are drawn as glass folds.",
+      "color": "#e6a0a4",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.4, "note": "The folds fill with blood as arousal rises.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "labia_majora",
+      "label": "Labia Majora",
+      "summary": "The two large folds of skin and fat on either side of the vulva",
+      "function": "The labia majora are the outer boundary of the vulva and contain fat and the end of the round ligament. They are drawn as glass folds.",
+      "color": "#dca090",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.2, "note": "The labia swell a little with arousal.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mons_pubis",
+      "label": "Mons Pubis",
+      "summary": "The fatty pad over the pubic symphysis",
+      "function": "The mons pubis is a rounded cushion of fat under the skin in front of the pubic bones, continuous with the labia majora. It is drawn as a glass pad.",
+      "color": "#e0b0a0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "paraurethral_glands",
+      "label": "Paraurethral Glands (Skene)",
+      "summary": "Small glands that open beside the urethral orifice",
+      "function": "The paraurethral glands are small mucous glands whose ducts open on either side of the urethral orifice. They correspond to the prostate in the male.",
+      "color": "#e8c07a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "sexualArousal", "weight": 0.3, "note": "The glands secrete in arousal.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perineal_body",
+      "label": "Perineal Body",
+      "summary": "The fibromuscular mass between the vagina and the anal canal",
+      "function": "The perineal body is the central point of the perineum, where several muscles of the pelvic floor meet. It supports the lower vagina and is stretched in childbirth.",
+      "color": "#c9a58a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vaginal_artery",
+      "label": "Vaginal Artery",
+      "summary": "The artery that supplies the vagina",
+      "function": "The vaginal artery runs down the side of the vagina and supplies its wall, and it anastomoses with branches of the uterine artery. It is drawn in the arterial colour.",
+      "color": "#c8323a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "vasocongestion", "weight": 0.4, "note": "Flow to the wall rises with arousal.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vaginal_epithelium",
+      "label": "Stratified Squamous Epithelium",
+      "parent": "vaginal_wall",
+      "summary": "The innermost layer of the wall, a lining of flat cells in many layers",
+      "function": "The lining of the vagina is a non-keratinised stratified squamous epithelium that is thickened and rich in glycogen under oestrogen. It has no glands of its own.",
+      "color": "#f0b8b8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vaginal_lamina_propria",
+      "label": "Lamina Propria",
+      "parent": "vaginal_wall",
+      "summary": "The layer of loose connective tissue beneath the epithelium",
+      "function": "The lamina propria is a connective tissue rich in elastic fibres and in the blood vessels from which fluid passes through the epithelium. It is drawn as a glass layer.",
+      "color": "#e8a0a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vaginal_muscularis",
+      "label": "Muscularis",
+      "parent": "vaginal_wall",
+      "summary": "The smooth muscle layer of the wall",
+      "function": "The muscularis has an outer longitudinal and an inner circular layer of smooth muscle. It lets the vagina widen and return.",
+      "color": "#b05560",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vaginal_adventitia",
+      "label": "Adventitia",
+      "parent": "vaginal_wall",
+      "summary": "The outer coat of connective tissue",
+      "function": "The adventitia is a layer of dense connective tissue that blends with the tissue round the vagina and carries its vessels and nerves.",
+      "color": "#d8c0a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "clitoral_prepuce",
+      "label": "Prepuce of the Clitoris",
+      "parent": "clitoral_glans",
+      "summary": "The hood of skin over the glans",
+      "function": "The prepuce is formed by the upper ends of the labia minora, which unite above the glans and form a hood over it. It is drawn as a cap.",
+      "color": "#e6a0a4",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "clitoral_frenulum",
+      "label": "Frenulum of the Clitoris",
+      "parent": "clitoral_glans",
+      "summary": "The folds that run from the underside of the glans to the labia minora",
+      "function": "The frenulum is formed by the lower parts of the labia minora, which meet on the underside of the glans. It is drawn as a pair of fine folds.",
+      "color": "#d27d8c",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
     }
   ]
 }

@@ -137,6 +137,177 @@
       "rest": 0.1,
       "drives": [],
       "source": "GRAYS42"
+    },
+    {
+      "id": "suspensory_ligament",
+      "label": "Suspensory Ligament of the Ovary",
+      "summary": "The fold of peritoneum that carries the ovarian vessels up to the ovary",
+      "function": "The suspensory ligament runs from the upper pole of the ovary up and out over the pelvic brim and carries the ovarian artery, vein and nerves. It is drawn as one cord on each side.",
+      "color": "#d8cfc0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ovarian_ligament",
+      "label": "Ovarian Ligament",
+      "summary": "A fibrous cord from the lower pole of the ovary to the uterus",
+      "function": "The ovarian ligament joins the ovary to the side of the uterus just below the tube, within the broad ligament. It keeps the ovary near the uterus.",
+      "color": "#cdbfa8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mesovarium",
+      "label": "Mesovarium",
+      "summary": "The short fold of peritoneum that attaches the ovary to the back of the broad ligament",
+      "function": "The mesovarium is the fold through which the vessels reach the hilum of the ovary. The ovary is the only pelvic organ not covered by peritoneum. It is drawn as a thin sheet at the hilum border.",
+      "color": "#e3b8ae",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ovarian_hilum",
+      "label": "Hilum of the Ovary",
+      "summary": "The border of the ovary where the vessels enter and leave",
+      "function": "The hilum is the slit-like attached border of the ovary. Through it the ovarian artery, vein and nerves pass in and out of the medulla.",
+      "color": "#b98a8a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "surface_epithelium",
+      "label": "Surface Epithelium",
+      "summary": "The single layer of cells that covers the ovary",
+      "function": "The surface of the ovary is covered by a single layer of cuboidal cells, the germinal epithelium, which lies over the tunica albuginea. It is drawn as a thin glass skin.",
+      "color": "#efe0d0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "primary_follicles",
+      "label": "Primary Follicles",
+      "parent": "growing_follicles",
+      "summary": "The first growing stage of a follicle",
+      "function": "A primary follicle has an enlarging oocyte surrounded by a layer of cuboidal granulosa cells. It is drawn as a few beads, enlarged to be seen.",
+      "color": "#f6dcb0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "secondary_follicles",
+      "label": "Secondary (Antral) Follicles",
+      "parent": "growing_follicles",
+      "summary": "A growing follicle with several layers of granulosa cells and a fluid-filled space",
+      "function": "In a secondary follicle the granulosa cells have formed several layers, a theca has formed round them and pockets of fluid are merging into an antrum. Follicle-stimulating hormone drives this stage. It is drawn as a few larger beads.",
+      "color": "#f2c88a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "antrum",
+      "label": "Antrum",
+      "parent": "dominant_follicle",
+      "summary": "The fluid-filled cavity of the mature follicle",
+      "function": "The antrum holds follicular fluid and enlarges as the follicle grows towards ovulation. It is drawn as a glass sphere at the centre of the follicle.",
+      "color": "#f9f1d8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "granulosa_cells",
+      "label": "Granulosa Cells",
+      "parent": "dominant_follicle",
+      "summary": "The cells that line the wall of the follicle",
+      "function": "The granulosa cells form the wall inside the follicle. They make oestrogen from androgens made by the theca, and after ovulation they form the granulosa-lutein cells of the corpus luteum. They are drawn as a glass shell.",
+      "color": "#f2d890",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "theca_interna",
+      "label": "Theca Interna",
+      "parent": "dominant_follicle",
+      "summary": "The inner, vascular layer of the follicle wall",
+      "function": "The theca interna is a cellular, richly vascular layer round the granulosa. Under luteinising hormone it makes androgens, which the granulosa converts to oestrogen.",
+      "color": "#e6b078",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "theca_externa",
+      "label": "Theca Externa",
+      "parent": "dominant_follicle",
+      "summary": "The outer, fibrous layer of the follicle wall",
+      "function": "The theca externa is a capsule of connective tissue round the follicle, which merges with the stroma of the ovary.",
+      "color": "#d8c4a0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cumulus_oophorus",
+      "label": "Cumulus Oophorus",
+      "parent": "dominant_follicle",
+      "summary": "The mound of granulosa cells that carries the oocyte",
+      "function": "The cumulus oophorus is the heap of granulosa cells on the wall of the follicle in which the oocyte sits, projecting into the antrum. It goes with the oocyte at ovulation.",
+      "color": "#f6e4a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "zona_pellucida",
+      "label": "Zona Pellucida",
+      "parent": "oocyte",
+      "summary": "The clear glycoprotein coat round the oocyte",
+      "function": "The zona pellucida is a translucent layer between the oocyte and the cells around it. Sperm must bind to and pass through it at fertilisation. It is drawn as a glass shell.",
+      "color": "#fff2c8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corona_radiata",
+      "label": "Corona Radiata",
+      "parent": "oocyte",
+      "summary": "The ring of granulosa cells that stays attached to the oocyte",
+      "function": "The corona radiata is the innermost layer of the cumulus cells, which stays on the outside of the zona pellucida and goes with the oocyte at ovulation. It is drawn as a ring of beads.",
+      "color": "#f6dc98",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "granulosa_lutein_cells",
+      "label": "Granulosa-Lutein Cells",
+      "parent": "corpus_luteum",
+      "summary": "The large central cells of the corpus luteum, derived from the granulosa",
+      "function": "After ovulation the granulosa cells enlarge into granulosa-lutein cells, which make progesterone and oestrogen. They form most of the bulk of the corpus luteum. They are drawn as a glass core.",
+      "color": "#f0c030",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "theca_lutein_cells",
+      "label": "Theca-Lutein Cells",
+      "parent": "corpus_luteum",
+      "summary": "The smaller cells at the edge of the corpus luteum, derived from the theca interna",
+      "function": "The theca-lutein cells lie in the folds round the granulosa-lutein cells and make progesterone and androgens. They are drawn as a ring of beads at the edge.",
+      "color": "#d8941a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
     }
   ]
 }

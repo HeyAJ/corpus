@@ -355,7 +355,7 @@ function lobuleGeometry(): THREE.BufferGeometry {
  *     the vena cava, the porta hepatis) are thin SKINS of the shell: the shell's own field
  *     taken between two small depths and limited to a region by a sphere or capsule. A skin
  *     patch therefore always lies on the surface it names, whatever the shell does. Depths
- *     (0.6 to 2.2 mm) sit between the lobes' surfaces (3.5 mm in) and the shell, so a patch
+ *     (1.2 to 3.2 mm) sit between the lobes' surfaces (3.5 mm in) and the shell, so a patch
  *     neither touches a lobe nor leaves the liver. The positions of the regions are drawing
  *     choices placed from the anatomy texts' descriptions (GRAYS42), not measured.
  *   - THE FIBROUS (GLISSON) CAPSULE is one closed glass surface just under the shell.
@@ -469,7 +469,7 @@ function canaliculusPath(k: number): V3[] {
 }
 
 function bead(p: V3, r: number): THREE.BufferGeometry {
-  const s = new THREE.SphereGeometry(r, 8, 6);
+  const s = new THREE.SphereGeometry(r, 6, 4);
   s.translate(p[0], p[1], p[2]);
   s.deleteAttribute('uv');
   return s;
@@ -481,7 +481,7 @@ function lobuleFine(): { id: string; geometry: THREE.BufferGeometry }[] {
   const mid = h * 0.5;
   const out: { id: string; geometry: THREE.BufferGeometry }[] = [];
   const tube = (pts: V3[], r: number, radial = 6): THREE.BufferGeometry =>
-    tubeAlong(pts, () => r, { tubular: Math.max(2, pts.length * 4), radial });
+    tubeAlong(pts, () => r, { tubular: Math.max(2, pts.length * 3), radial });
 
   // Central vein: the lobule's draining vessel, a little wider than the parent's own tube.
   out.push({ id: 'central_vein', geometry: tube([lobulePoint(0, 0, 0.0003), lobulePoint(0, 0, h - 0.0002)], 0.0024, 12) });
@@ -501,7 +501,7 @@ function lobuleFine(): { id: string; geometry: THREE.BufferGeometry }[] {
     // Inward (depth) direction is -n; shifting a point by `d` along it moves it deeper.
     const deep = (p: V3, d: number): V3 => [p[0] - f.n[0] * d, p[1] - f.n[1] * d, p[2] - f.n[2] * d];
     const centre: V3 = [(c[0] + side[0] + alongEdge[0]) / 3, (c[1] + side[1] + alongEdge[1]) / 3, (c[2] + side[2] + alongEdge[2]) / 3];
-    sheath.push(tube([deep(centre, top), deep(centre, bottom)], 0.0026, 10));
+    sheath.push(tube([deep(centre, top), deep(centre, bottom)], 0.0026, 8));
     venule.push(tube([deep(c, top + 0.0004), deep(c, bottom - 0.0004)], 0.0011, 8));
     arteriole.push(tube([deep(side, top + 0.0004), deep(side, bottom - 0.0004)], 0.0006, 6));
     ductule.push(tube([deep(alongEdge, top + 0.0004), deep(alongEdge, bottom - 0.0004)], 0.0007, 6));
@@ -582,8 +582,8 @@ function finerParts(right: Sdf, left: Sdf): { id: string; geometry: THREE.Buffer
   const out: { id: string; geometry: THREE.BufferGeometry }[] = [];
 
   // Surface landmarks.
-  const patch = (id: string, region: Sdf, lo: V3, hi: V3, d0 = 0.0006, d1 = 0.0022): void => {
-    out.push({ id, geometry: polygonise(skin(region, d0, d1), lo, hi, { cell: 0.0012 }) });
+  const patch = (id: string, region: Sdf, lo: V3, hi: V3, d0 = 0.0012, d1 = 0.0032): void => {
+    out.push({ id, geometry: polygonise(skin(region, d0, d1), lo, hi, { cell: 0.0022 }) });
   };
   const bareCentre: V3 = [0.03, 0.026, -0.058];
   patch('bare_area', sphere(bareCentre, 0.024), [0.0, 0.0, -0.07], [0.06, 0.056, -0.03]);
@@ -602,22 +602,22 @@ function finerParts(right: Sdf, left: Sdf): { id: string; geometry: THREE.Buffer
   const clipped = (a: V3, b: V3, r: number): Sdf => intersect(capsule(a, b, r), offset(shell, -0.001));
   out.push({
     id: 'ligamentum_teres',
-    geometry: polygonise(clipped([-0.0215, -0.022, 0.034], [-0.0215, 0.002, 0.0405], 0.0013), [-0.03, -0.035, 0.02], [-0.012, 0.015, 0.05], { cell: 0.0007 }),
+    geometry: polygonise(clipped([-0.0212, -0.008, 0.03], [-0.0212, 0.012, 0.0345], 0.0012), [-0.03, -0.02, 0.02], [-0.012, 0.025, 0.045], { cell: 0.0008 }),
   });
   out.push({
     id: 'ligamentum_venosum',
-    geometry: polygonise(clipped([-0.012, -0.004, -0.016], [-0.0125, 0.028, -0.033], 0.0012), [-0.022, -0.012, -0.045], [0.0, 0.04, -0.005], { cell: 0.0007 }),
+    geometry: polygonise(clipped([-0.012, -0.004, -0.016], [-0.0125, 0.028, -0.033], 0.0012), [-0.022, -0.012, -0.045], [0.0, 0.04, -0.005], { cell: 0.001 }),
   });
 
   // The capsule round the whole organ: one closed surface.
-  out.push({ id: 'fibrous_capsule', geometry: polygonise(offset(shell, -0.0014), LIVER_LO, LIVER_HI, { cell: 0.0045 }) });
+  out.push({ id: 'fibrous_capsule', geometry: polygonise(offset(shell, -0.0014), LIVER_LO, LIVER_HI, { cell: 0.007 }) });
 
   // Couinaud segments, cut from the lobes' own fields a little inside them.
   const cut = 0.0004;
   const seg = (id: string, lobe: Sdf, ...planes: Sdf[]): void => {
     let f: Sdf = offset(lobe, -0.0012);
     for (const p of planes) f = intersect(f, p);
-    out.push({ id, geometry: polygonise(f, LIVER_LO, LIVER_HI, { cell: 0.005 }) });
+    out.push({ id, geometry: polygonise(f, LIVER_LO, LIVER_HI, { cell: 0.007 }) });
   };
   const yAbove = (y: number): Sdf => halfSpace([0, y + cut, 0], [0, 1, 0]);
   const yBelow = (y: number): Sdf => halfSpace([0, y - cut, 0], [0, -1, 0]);

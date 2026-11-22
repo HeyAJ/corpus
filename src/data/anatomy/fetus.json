@@ -151,6 +151,90 @@
       "rest": 0.35,
       "drives": [],
       "source": "GH14"
+    },
+    {
+      "id": "fetal_kidneys",
+      "label": "Kidneys",
+      "summary": "The two kidneys, behind the abdominal cavity",
+      "function": "The fetal kidneys make the urine that passes into the amniotic fluid, but the placenta, not the kidneys, clears the wastes of the fetus. They lie on either side of the aorta, below the adrenals.",
+      "color": "#a8624a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fetal_adrenals",
+      "label": "Adrenal Glands",
+      "summary": "The two adrenal glands, one above each kidney",
+      "function": "The fetal adrenals are large compared with the adult's. They make steroid hormones, among them cortisol, which helps ready the organs for life after birth.",
+      "color": "#d8b04a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fetal_stomach",
+      "label": "Stomach",
+      "summary": "The stomach, on the fetal left, below the diaphragm",
+      "function": "The fetal stomach holds swallowed amniotic fluid. It lies on the left side of the upper abdomen, beside the liver.",
+      "color": "#d89a8a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spine",
+      "label": "Vertebral Column",
+      "summary": "The column of vertebrae along the back",
+      "function": "The vertebral column holds the trunk up and encloses the spinal cord. It is drawn as a row of vertebral bodies along the back, behind the aorta.",
+      "color": "#e6dcc4",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fetal_right_atrium",
+      "label": "Right Atrium",
+      "parent": "heart",
+      "summary": "The chamber that receives the venae cavae",
+      "function": "The right atrium receives the blood of the superior and inferior venae cavae. Part of it passes through the foramen ovale to the left atrium.",
+      "color": "#b8545c",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fetal_left_atrium",
+      "label": "Left Atrium",
+      "parent": "heart",
+      "summary": "The chamber that receives blood through the foramen ovale",
+      "function": "In the fetus the left atrium receives most of its blood through the foramen ovale, since little returns from the unexpanded lungs.",
+      "color": "#c8646c",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fetal_right_ventricle",
+      "label": "Right Ventricle",
+      "parent": "heart",
+      "summary": "The chamber that pumps into the pulmonary trunk",
+      "function": "The fetal right ventricle sends blood into the pulmonary trunk, most of which passes through the ductus arteriosus to the aorta.",
+      "color": "#a8444c",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fetal_left_ventricle",
+      "label": "Left Ventricle",
+      "parent": "heart",
+      "summary": "The chamber that pumps into the aorta",
+      "function": "The left ventricle pumps blood into the aorta, which is the route by which the head and the heart receive the blood from the placenta first.",
+      "color": "#c05860",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
     }
   ]
 }
