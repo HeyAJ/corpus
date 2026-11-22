@@ -38,6 +38,12 @@ const GLASS: readonly [string, number, number][] = [
   ['rectum', 0.22, 0.2],
   ['mucosa', 0.2, 0.2],
   ['haustra', 0.3, 0.1],
+  // Finer structures that enclose or carry something are glass too.
+  ['hepatic_flexure', 0.12, 0.14],
+  ['splenic_flexure', 0.12, 0.14],
+  ['mesocolon', 0.14, 0.08],
+  ['anal_canal', 0.14, 0.12],
+  ['colonic_crypts', 0.25, 0.1],
 ];
 
 const CONTENT_COLOUR = 0x9c7a4a;

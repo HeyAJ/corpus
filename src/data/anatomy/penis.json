@@ -339,9 +339,9 @@
     {
       "id": "cavernous_spaces",
       "parent": "corpus_cavernosum_right",
-      "label": "Cavernous Spaces",
+      "label": "Cavernous Spaces (Right Corpus)",
       "summary": "The blood-filled spaces that make up the erectile tissue",
-      "function": "The cavernous spaces are the small chambers, lined by endothelium, that make up the erectile tissue. When the arteries open they fill with blood and the penis hardens. The same arrangement is drawn in both corpora.",
+      "function": "The cavernous spaces are the small chambers, lined by endothelium, that make up the erectile tissue. When the arteries open they fill with blood and the penis hardens.",
       "color": "#d86a78",
       "rest": 0.2,
       "drives": [
@@ -357,7 +357,7 @@
     {
       "id": "helicine_arteries",
       "parent": "corpus_cavernosum_right",
-      "label": "Helicine Arteries",
+      "label": "Helicine Arteries (Right Corpus)",
       "summary": "Coiled branches of the cavernosal artery that open into the spaces",
       "function": "The helicine arteries are coiled small arteries that open into the cavernous spaces. They straighten and widen when the muscle in their walls relaxes, and so let blood rush in.",
       "color": "#c8323a",
@@ -375,7 +375,61 @@
     {
       "id": "trabeculae",
       "parent": "corpus_cavernosum_right",
-      "label": "Trabeculae",
+      "label": "Trabeculae (Right Corpus)",
+      "summary": "The strands of smooth muscle and connective tissue between the spaces",
+      "function": "The trabeculae are strands of smooth muscle and fibrous tissue that form the walls between the cavernous spaces. When the muscle is relaxed the spaces open and fill.",
+      "color": "#e0b8a8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": -0.15,
+          "note": "The muscle relaxes as the spaces fill.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cavernous_spaces_left",
+      "parent": "corpus_cavernosum_left",
+      "label": "Cavernous Spaces (Left Corpus)",
+      "summary": "The blood-filled spaces that make up the erectile tissue",
+      "function": "The cavernous spaces are the small chambers, lined by endothelium, that make up the erectile tissue. When the arteries open they fill with blood and the penis hardens. The same arrangement is drawn in both corpora.",
+      "color": "#d86a78",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": 0.45,
+          "note": "Blood fills the spaces as the arteries open.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "helicine_arteries_left",
+      "parent": "corpus_cavernosum_left",
+      "label": "Helicine Arteries (Left Corpus)",
+      "summary": "Coiled branches of the cavernosal artery that open into the spaces",
+      "function": "The helicine arteries are coiled small arteries that open into the cavernous spaces. They straighten and widen when the muscle in their walls relaxes, and so let blood rush in.",
+      "color": "#c8323a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vasocongestion",
+          "weight": 0.45,
+          "note": "The muscle in their walls relaxes during arousal.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trabeculae_left",
+      "parent": "corpus_cavernosum_left",
+      "label": "Trabeculae (Left Corpus)",
       "summary": "The strands of smooth muscle and connective tissue between the spaces",
       "function": "The trabeculae are strands of smooth muscle and fibrous tissue that form the walls between the cavernous spaces. When the muscle is relaxed the spaces open and fill.",
       "color": "#e0b8a8",

@@ -35,6 +35,7 @@ function toBronchus(end: V3): V3[] {
 const tracker = breathTracker();
 // Reused every frame so the animation allocates nothing.
 const RISE: [number, number, number] = [0, 0, 0];
+const CILIA: [number, number, number] = [0, 0, 0];
 const FOLD_SCALE: [number, number, number] = [1, 1, 1];
 const FOLD_PIVOT: V3 = [0, 0.362, 0];
 const WARM = [0.85, 0.5, 0.23];
@@ -45,6 +46,31 @@ function warm(c: { r: number; g: number; b: number }, k: number): number {
   const b = Math.round((c.b + (WARM[2] - c.b) * k) * 255);
   return (r << 16) | (g << 8) | b;
 }
+
+/**
+ * Parts of the larynx that move with it in a swallow. The cartilages, folds and membranes are
+ * one assembly, so they are lifted by the same offset as the thyroid cartilage.
+ */
+const LARYNX_RIDERS = [
+  'epiglottis', 'arytenoid_cartilages', 'corniculate_cartilages', 'cuneiform_cartilages', 'vestibular_folds',
+  'laryngeal_ventricle', 'rima_glottidis', 'cricothyroid_ligament', 'thyrohyoid_membrane',
+];
+
+/** Opacity of each layer of the wall and of the hollow laryngeal spaces: drawing choices, not data. */
+const GLASS: [string, number][] = [
+  ['tracheal_wall', 0.1], ['tracheal_mucosa', 0.22], ['adventitia', 0.14], ['hyaline_cartilage', 0.5],
+  ['seromucous_glands', 0.6], ['laryngeal_ventricle', 0.35], ['rima_glottidis', 0.5], ['thyrohyoid_membrane', 0.5],
+  ['cricothyroid_ligament', 0.6],
+];
+
+/**
+ * DISPLAY CONSTANTS FOR THE CILIA. The beat is drawn as a small to-and-fro sweep of the whole
+ * tuft layer along the airway axis; it is a picture of a beating cilium, not a measured beat
+ * frequency or amplitude. It runs at rest and in apnoea alike (the mucociliary escalator does
+ * not depend on breathing) and stops under reduced motion.
+ */
+const CILIA_SWEEP_M = 0.00028;
+const CILIA_RAD_PER_S = 9;
 
 export const detail: OrganDetailSpec = {
   flows: () => [
@@ -77,6 +103,13 @@ export const detail: OrganDetailSpec = {
     RISE[1] = 0.004 * swallow;
     RISE[2] = 0.0008 * swallow;
     ctx.part('larynx')?.setOffset(RISE);
+    for (const id of LARYNX_RIDERS) ctx.part(id)?.setOffset(RISE);
+    for (const [id, o] of GLASS) ctx.part(id)?.setOpacity(o);
+    // The ciliated layer: the sweep is along the airway (y), toward the throat on the power stroke.
+    if (!ctx.reducedMotion) {
+      CILIA[1] = CILIA_SWEEP_M * Math.sin(ctx.time * CILIA_RAD_PER_S);
+      ctx.part('ciliated_epithelium')?.setOffset(CILIA);
+    }
     const folds = ctx.part('vocal_folds');
     if (folds) {
       folds.setOffset(RISE);

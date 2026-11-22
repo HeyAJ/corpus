@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
 import { capsule, ellipsoid, mergeParts, polygonise, tubeAlong, union, type V3 } from '../sdf';
 import { vasDeferensPath } from '../models';
+import { arcPoints, oval, ovals, perp } from './kidney.parts';
 
 /**
  * THE INSIDE OF THE TESTES.
@@ -34,8 +35,20 @@ import { vasDeferensPath } from '../models';
  * picture. The cord is only as wide as the shell's vas tube, so the artery and the veins
  * lie against the vas inside that tube.
  *
- * NOT DRAWN. The septa between the lobules, the layers of the tubule wall, the tunica
- * vaginalis, the cremaster and the cord's other contents, and the scrotum.
+ * FINER STRUCTURES (the second half of `parts`). The septa, tunica vaginalis with its two
+ * layers, tunica vasculosa, mediastinum, spermatic cord, cremaster, scrotum and dartos were
+ * left undrawn in the first version, as things that would hide the gland; they are now parts,
+ * the wraps drawn as nested glass ovals (the tunica vaginalis closes all round the testis here,
+ * although the real sac is bare at the back). The children of the seminiferous tubules are
+ * ONE magnified cross-section of a tubule laid in the middle lobule of each testis, about three
+ * times the radius of the coiled tubule: myoid cells on the outside, spermatogonia, the
+ * Sertoli cells and the rings of the blood-testis barrier, then the cells of spermatogenesis
+ * in order toward the lumen, and one spermatozoon on the axis. The cell counts are a handful
+ * where a real tubule has thousands, the order of the layers is the textbook one, and the
+ * sperm's tail is a fixed shape, not a swimming one.
+ *
+ * NOT DRAWN. The cord's other contents (lymphatics, nerves) and the layers of the tubule
+ * wall other than those named above.
  */
 
 const TR: V3 = [0.0125, 0.022, 0.015];
@@ -251,6 +264,7 @@ export function veinPath(s: number, k: number): V3[] {
 const tube = (pts: readonly V3[], r: number, tubular: number, radial: number): THREE.BufferGeometry => tubeAlong(pts, () => r, { tubular, radial });
 
 export const parts: PartBuilder = () => {
+  const extra: { id: string; geometry: THREE.BufferGeometry }[] = [];
   const tunica: THREE.BufferGeometry[] = [];
   const lobuleGeo: THREE.BufferGeometry[] = [];
   const tubules: THREE.BufferGeometry[] = [];
@@ -307,6 +321,139 @@ export const parts: PartBuilder = () => {
     for (let k = 0; k < 4; k++) plexus.push(tube(veinPath(s, k), 0.0003, 44, 4));
   }
 
+  /* ====================================================== FINER STRUCTURES ===== */
+  // Level-1 gaps and the children of the seminiferous tubules (src/data/anatomy/testes.json).
+  // Every count, radius and position below is a drawing choice, not anatomy's own figure.
+  const sacs: Record<'vaginalis' | 'visceral' | 'parietal', THREE.BufferGeometry[]> = { vaginalis: [], visceral: [], parietal: [] };
+  const vasculosa: THREE.BufferGeometry[] = [];
+  const mediastinum: THREE.BufferGeometry[] = [];
+  const septaGeo: { c: V3; r: V3; n: V3 }[] = [];
+  const cordGeo: THREE.BufferGeometry[] = [];
+  const cremaster: THREE.BufferGeometry[] = [];
+  const cells: Record<string, THREE.BufferGeometry[]> = {
+    sertoli_cells: [], blood_testis_barrier: [], myoid_cells: [], spermatogonia: [], primary_spermatocytes: [], secondary_spermatocytes: [], spermatids: [], spermatozoa: [], sperm_head: [], sperm_midpiece: [], sperm_tail: [],
+  };
+  const grown = (d: number): V3 => [TR[0] + d, TR[1] + d, TR[2] + d];
+  for (const s of [1, -1]) {
+    const c = centreOf(s);
+    const lo: V3 = [c[0] - 0.0185, c[1] - 0.0285, c[2] - 0.02];
+    const hi: V3 = [c[0] + 0.0185, c[1] + 0.0285, c[2] + 0.02];
+    // Tunica vaginalis: the sac, with its visceral layer just inside the shell and its parietal
+    // layer just outside it, as three nested glass ovals. The real sac does not close all round
+    // the testis (it is bare at the back, where the vessels enter); the drawing does close.
+    sacs.vaginalis.push(polygonise(ellipsoid(c, grown(0.001)), lo, hi, { cell: 0.0038 }));
+    sacs.visceral.push(polygonise(ellipsoid(c, grown(-0.0004)), lo, hi, { cell: 0.0038 }));
+    sacs.parietal.push(polygonise(ellipsoid(c, grown(0.0022)), lo, hi, { cell: 0.0038 }));
+
+    // Tunica vasculosa: fine vessels lying on the inner face of the capsule, as meridian arcs.
+    const face: V3 = [INNER[0] * 0.985, INNER[1] * 0.985, INNER[2] * 0.985];
+    for (let k = 0; k < 7; k++) {
+      const th = (k / 7) * Math.PI * 2;
+      const pts: V3[] = [];
+      for (let j = 0; j <= 8; j++) {
+        const phi = 0.45 + (2.25 * j) / 8;
+        pts.push([c[0] + face[0] * Math.sin(phi) * Math.cos(th), c[1] + face[1] * Math.cos(phi), c[2] + face[2] * Math.sin(phi) * Math.sin(th)]);
+      }
+      vasculosa.push(tube(pts, 0.00028, 10, 4));
+    }
+
+    // Mediastinum: a wedge of thick capsule along the back, round the rete.
+    mediastinum.push(tube([[c[0], c[1] - 0.0115, c[2] - 0.01], [c[0], c[1] + 0.0, c[2] - 0.0102], [c[0], c[1] + 0.0135, c[2] - 0.0098]], 0.0021, 10, 8));
+
+    // Septa: thin discs midway between neighbouring lobules, turned to the line joining them.
+    const lobs = lobulesOf(s);
+    for (let i = 0; i < NL - 1; i++) {
+      const m = along(lobs[i], 0.55);
+      const n2 = along(lobs[i + 1], 0.55);
+      const d: V3 = [n2[0] - m[0], n2[1] - m[1], n2[2] - m[2]];
+      septaGeo.push({ c: [(m[0] + n2[0]) / 2, (m[1] + n2[1]) / 2, (m[2] + n2[2]) / 2], r: [0.0042, 0.0042, 0.00022], n: norm(d) });
+    }
+
+    // Spermatic cord: a glass sleeve along the upper part of the vas path, just inside the
+    // shell's own tube; the cremaster is a few muscle loops round it.
+    const vas = vasDeferensPath(s).filter((q) => q[1] >= 0.03);
+    if (vas.length >= 2) cordGeo.push(tube(vas, 0.0017, 40, 8));
+    for (const y of [0.034, 0.04, 0.046, 0.052]) {
+      const q = cordAt(s, y);
+      const a = cordAt(s, y - 0.004);
+      const b = cordAt(s, y + 0.004);
+      cremaster.push(tube(arcPoints(q, [b[0] - a[0], b[1] - a[1], b[2] - a[2]], 0.0017, 0, Math.PI * 2 * 0.92, 10), 0.00028, 20, 4));
+    }
+
+    // A magnified cross-section of ONE seminiferous tubule, laid in the middle lobule: cell
+    // layers from the outer wall to the lumen. Drawn about three times the radius of the
+    // coiled tubules so the cells can be told apart; the cells are far fewer than in life.
+    const l = lobs[2];
+    const P = along(l, 0.72);
+    const d = l.dir;
+    const [e1, e2] = perp(d);
+    const R = 0.0018;
+    const at2 = (z: number, rho: number, ang: number): V3 => [P[0] + d[0] * z + (e1[0] * Math.cos(ang) + e2[0] * Math.sin(ang)) * rho, P[1] + d[1] * z + (e1[1] * Math.cos(ang) + e2[1] * Math.sin(ang)) * rho, P[2] + d[2] * z + (e1[2] * Math.cos(ang) + e2[2] * Math.sin(ang)) * rho];
+    const radial = (z: number, ang: number): V3 => norm([(e1[0] * Math.cos(ang) + e2[0] * Math.sin(ang)), (e1[1] * Math.cos(ang) + e2[1] * Math.sin(ang)), (e1[2] * Math.cos(ang) + e2[2] * Math.sin(ang)) + 0 * z]);
+    const layer = (name: string, n: number, rho: number, r: V3, stagger: number, flat = false): void => {
+      const items = [];
+      for (let k = 0; k < n; k++) {
+        const ang = (k / n) * Math.PI * 2 + stagger;
+        const z = ((k % 3) - 1) * 0.0014;
+        items.push({ c: at2(z, rho, ang), r, n: flat ? radial(z, ang) : undefined });
+      }
+      cells[name].push(ovals(items));
+    };
+    layer('myoid_cells', 14, R * 1.0, [0.0005, 0.0005, 0.00012], 0.2, true);
+    layer('spermatogonia', 10, R * 0.86, [0.0002, 0.0002, 0.0002], 0.4);
+    layer('primary_spermatocytes', 10, R * 0.62, [0.00028, 0.00028, 0.00028], 0.1);
+    layer('secondary_spermatocytes', 8, R * 0.5, [0.00018, 0.00018, 0.00018], 0.55);
+    layer('spermatids', 14, R * 0.38, [0.00013, 0.00013, 0.00013], 0.3);
+    // Sertoli cells: tall columns from the base of the wall toward the lumen.
+    const sertoli = [];
+    for (let k = 0; k < 16; k++) {
+      const ang = (k / 16) * Math.PI * 2 + 0.05;
+      const z = (k % 2 === 0 ? -1 : 1) * 0.0007;
+      sertoli.push({ c: at2(z, R * 0.62, ang), r: [0.00026, 0.00026, 0.0007] as V3, n: radial(z, ang) });
+    }
+    cells.sertoli_cells.push(ovals(sertoli));
+    // The blood-testis barrier: three rings between the outer and inner compartments.
+    for (const z of [-0.0016, 0, 0.0016]) {
+      const ring: V3[] = [];
+      for (let j = 0; j < 14; j++) ring.push(at2(z, R * 0.73, (j / 14) * Math.PI * 2));
+      cells.blood_testis_barrier.push(tube(ring, 0.0001, 16, 4));
+    }
+    // Spermatozoa in the lumen: a few small heads with short tails (many in life).
+    const heads = [];
+    for (let k = 0; k < 6; k++) {
+      const ang = (k / 6) * Math.PI * 2;
+      const z = ((k % 3) - 1) * 0.0012;
+      heads.push({ c: at2(z + 0.0004, R * 0.2, ang), r: [0.00012, 0.00008, 0.00008] as V3, n: d });
+      cells.spermatozoa.push(tube([at2(z, R * 0.2, ang), at2(z - 0.0005, R * 0.12, ang + 0.4), at2(z - 0.001, R * 0.2, ang + 0.1)], 0.00003, 6, 3));
+    }
+    cells.spermatozoa.push(ovals(heads));
+    // One spermatozoon, magnified, on the axis of the lumen: head with its acrosome cap,
+    // midpiece and a tail drawn as a fixed wave. Its proportions are for legibility.
+    const AX = (z: number, w = 0): V3 => at2(z, w, 0.7);
+    cells.sperm_head.push(oval(AX(0.0021), [0.00034, 0.00022, 0.0005], d), oval(AX(0.0025), [0.00036, 0.00024, 0.00017], d));
+    cells.sperm_midpiece.push(tube([AX(0.0015), AX(0.0012), AX(0.0009)], 0.00011, 8, 6));
+    const tail: V3[] = [];
+    for (let j = 0; j <= 14; j++) tail.push(AX(0.0009 - (0.0034 * j) / 14, 0.00012 * Math.sin(j * 0.9) * Math.min(1, j / 4)));
+    cells.sperm_tail.push(tube(tail, 0.00005, 28, 4));
+  }
+  // Scrotum and dartos: two glass sacs round both testes, the muscle layer just inside the skin.
+  const scrotumBox: [V3, V3] = [[-0.047, -0.037, -0.024], [0.047, 0.031, 0.024]];
+  const scrotal = (k: number): THREE.BufferGeometry => polygonise(ellipsoid([0, -0.0035, 0], [0.043 * k, 0.03 * k, 0.0195 * k]), scrotumBox[0], scrotumBox[1], { cell: 0.0048 });
+
+  extra.push(
+    { id: 'tunica_vaginalis', geometry: mergeParts(sacs.vaginalis) },
+    { id: 'visceral_layer', geometry: mergeParts(sacs.visceral) },
+    { id: 'parietal_layer', geometry: mergeParts(sacs.parietal) },
+    { id: 'tunica_vasculosa', geometry: mergeParts(vasculosa) },
+    { id: 'mediastinum_testis', geometry: mergeParts(mediastinum) },
+    { id: 'testicular_septa', geometry: ovals(septaGeo) },
+    { id: 'spermatic_cord', geometry: mergeParts(cordGeo) },
+    { id: 'cremaster_muscle', geometry: mergeParts(cremaster) },
+    { id: 'scrotum', geometry: scrotal(1) },
+    { id: 'dartos_muscle', geometry: scrotal(0.965) },
+  );
+  for (const [id, g] of Object.entries(cells)) extra.push({ id, geometry: mergeParts(g) });
+
   return [
     { id: 'tunica_albuginea', geometry: mergeParts(tunica) },
     { id: 'lobules', geometry: mergeParts(lobuleGeo) },
@@ -320,5 +467,6 @@ export const parts: PartBuilder = () => {
     { id: 'vas_deferens', geometry: mergeParts(vas) },
     { id: 'testicular_artery', geometry: mergeParts(artery) },
     { id: 'pampiniform_plexus', geometry: mergeParts(plexus) },
+    ...extra,
   ];
 };

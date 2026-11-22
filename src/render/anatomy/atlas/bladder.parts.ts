@@ -5,6 +5,7 @@ import {
   ellipsoid,
   halfSpace,
   intersect,
+  offset,
   mergeParts,
   polygonise,
   smoothUnion,
@@ -14,7 +15,8 @@ import {
   type Sdf,
   type V3,
 } from '../sdf';
-import { ridged } from '../noise';
+import { mulberry32, ridged } from '../noise';
+import { ovals } from './kidney.parts';
 
 /**
  * THE INSIDE OF THE BLADDER.
@@ -37,7 +39,12 @@ import { ridged } from '../noise';
  * direction; it is cut away over the trigone, which is smooth. The detail module fades the
  * folds as the bladder fills, because stretching flattens them.
  *
- * NOT DRAWN. The layers of the wall, the urothelium, the nerves, the prostate or the female
+ * FINER STRUCTURES (bottom of `parts`). The urothelium and its umbrella cells, interlacing
+ * muscle bundles, apex, fundus, neck and the urachal cord were left out of the first version
+ * as clutter; each is now a part, but as a drawing: the urothelium is the mucosa's own field
+ * grown a little, and the umbrella cells and strands are scattered by a seeded generator.
+ *
+ * NOT DRAWN. The separate layers of the wall, the nerves, the prostate or the female
  * urethral anatomy beyond its first part; the positions of the orifices are where the
  * ureters' own centrelines meet the inner wall, and the sizes are chosen to read clearly,
  * not measured.
@@ -182,5 +189,65 @@ export const parts: PartBuilder = () => {
     id: 'mucosa',
     geometry: polygonise(subtract(lining, trigonePrism(0.002)), [-0.034, -0.03, -0.034], [0.034, 0.03, 0.034], { cell: 0.0026 }),
   });
+  /* ====================================================== FINER STRUCTURES ===== */
+  // The apex, fundus (base), neck and urachal ligament are level-1; the urothelium with its
+  // umbrella cells hangs on the mucosa and the muscle bundles on the detrusor
+  // (src/data/anatomy/bladder.json, `parent`). All schematic, and none is a measurement.
+
+  // Apex: the forward tip, a short tapering tube along the apex capsule of the detrusor.
+  out.push({ id: 'bladder_apex', geometry: tubeAlong([[0, 0.025, 0.0225], [0, 0.0335, 0.0282]], (t) => 0.0028 - 0.0016 * t, { tubular: 8, radial: 10 }) });
+
+  // Fundus (base): the back-and-down cap of the body of the bladder, a solid lens cut from the
+  // wall's ellipsoid by a plane; as glass it reads as a region of the wall, which is what the
+  // fundus is. It is drawn 0.6 mm inside the shell so the two never share a surface.
+  const bn: V3 = [0, -0.5, -0.87];
+  const bl = Math.hypot(bn[0], bn[1], bn[2]);
+  const fundusF = intersect(ellipsoid([0, 0, 0], outerRadii(0.0006)), halfSpace([0, -0.5 * 0.0175 / bl, -0.87 * 0.0175 / bl], bn));
+  out.push({ id: 'bladder_fundus', geometry: polygonise(fundusF, [-0.036, -0.034, -0.036], [0.036, 0.012, 0.004], { cell: 0.0030 }) });
+
+  // Neck: a short flared collar round the start of the urethra, outside the sphincter ring.
+  out.push({ id: 'bladder_neck', geometry: tubeAlong([[0, -0.0292, NECK_Z], [0, -0.0345, NECK_Z], [0, -0.0405, NECK_Z]], (t) => 0.0056 - 0.0016 * t, { tubular: 10, radial: 12 }) });
+
+  // The remnant of the urachus: a thin cord leaving the apex toward the navel.
+  out.push({ id: 'median_umbilical_ligament', geometry: tubeAlong([[0, 0.034, 0.0285], [0, 0.05, 0.0395], [0, 0.068, 0.049]], () => 0.0007, { tubular: 16, radial: 6 }) });
+
+  // Urothelium: the surface of the folded lining, grown 0.7 mm so it wraps the mucosa part
+  // and reads as its skin. Same field and same cut as the mucosa, so the trigone stays bare.
+  const skin = subtract(offset(lining, 0.0007), trigonePrism(0.002));
+  out.push({ id: 'urothelium', geometry: polygonise(skin, [-0.034, -0.03, -0.034], [0.034, 0.03, 0.034], { cell: 0.0026 }) });
+
+  // Umbrella cells: wide flat ovals lying on the crests of that skin, turned to the wall's
+  // normal. They are magnified many times; their number and spacing are a drawing choice.
+  const rnd = mulberry32(0x0b1a);
+  const umbrella: { c: V3; r: V3; n: V3 }[] = [];
+  for (let tries = 0; tries < 400 && umbrella.length < 70; tries++) {
+    const phi = 0.3 + rnd() * 2.3;
+    const th = rnd() * Math.PI * 2;
+    const p0: V3 = [INNER[0] * Math.sin(phi) * Math.cos(th), INNER[1] * Math.cos(phi), INNER[2] * Math.sin(phi) * Math.sin(th)];
+    if (p0[1] < -0.014 || p0[1] > 0.026) continue; // not on the bare trigone, nor in the apex
+    const n = innerNormal(p0);
+    const h = 0.0018 + 0.0016 * ridged(p0[0], p0[1], p0[2], 230) + 0.0009;
+    umbrella.push({ c: [p0[0] - n[0] * h, p0[1] - n[1] * h, p0[2] - n[2] * h], r: [0.0011, 0.0011, 0.0004], n });
+  }
+  out.push({ id: 'umbrella_cells', geometry: ovals(umbrella) });
+
+  // Muscle bundles: strands that cross each other on the middle of the wall, some running
+  // from the apex toward the neck (twisting one way or the other) and some round the body. The
+  // wall's muscle is not in layers a student could peel; this is a handful of strands only.
+  const mid = outerRadii(WALL_OUT + WALL_THICK / 2);
+  const onWall = (phi: number, th: number): V3 => [mid[0] * Math.sin(phi) * Math.cos(th), mid[1] * Math.cos(phi), mid[2] * Math.sin(phi) * Math.sin(th)];
+  const strands: THREE.BufferGeometry[] = [];
+  for (let k = 0; k < 10; k++) {
+    const sign = k % 2 === 0 ? 1 : -1;
+    const pts: V3[] = [];
+    for (let j = 0; j <= 8; j++) pts.push(onWall(0.45 + (2.1 * j) / 8, (k / 10) * Math.PI * 2 + sign * 0.9 * Math.sin((j / 8) * Math.PI)));
+    strands.push(tubeAlong(pts, () => 0.0011, { tubular: 24, radial: 5 }));
+  }
+  for (const phi of [0.9, 1.3, 1.7, 2.1]) {
+    const ring: V3[] = [];
+    for (let j = 0; j < 12; j++) ring.push(onWall(phi, (j / 12) * Math.PI * 2));
+    strands.push(tubeAlong(ring, () => 0.001, { tubular: 28, radial: 5, closed: true }));
+  }
+  out.push({ id: 'muscle_bundles', geometry: mergeParts(strands) });
   return out;
 };

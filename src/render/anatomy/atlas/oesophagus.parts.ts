@@ -247,16 +247,16 @@ export const parts: PartBuilder = () => {
   const rOf = (frac: number) => (u: number): number => frac * shellRadius(u);
 
   // --- inside the mucosa: three nested layers, innermost first.
-  const epithelium = segment(0.02, 0.985, 0.46, 10);
-  const laminaPropria = segment(0.02, 0.985, 0.52, 10);
+  const epithelium = segment(0.02, 0.985, 0.46, 8);
+  const laminaPropria = segment(0.02, 0.985, 0.52, 8);
   const mucosalMuscle: THREE.BufferGeometry[] = [];
-  for (let k = 0; k < 6; k++) mucosalMuscle.push(lengthwiseCord(curve, 0.03, 0.97, 60, (k * Math.PI) / 3, rOf(0.555), 0.00035));
+  for (let k = 0; k < 4; k++) mucosalMuscle.push(lengthwiseCord(curve, 0.03, 0.97, 24, (k * Math.PI) / 2, rOf(0.555), 0.00035));
 
   // --- the submucosa and what lies in it.
-  const submucosa = segment(0.0, 1, 0.66, 12);
+  const submucosa = segment(0.0, 1, 0.66, 8);
   const glandRand = mulberry32(0x0e50);
   const glands: THREE.BufferGeometry[] = [];
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 20; i++) {
     const u = 0.08 + 0.86 * glandRand();
     const a = glandRand() * Math.PI * 2;
     const f = frameAt(curve, u);
@@ -266,29 +266,29 @@ export const parts: PartBuilder = () => {
     glands.push(stick(body, aroundFrame(f, a, 0.5 * shellRadius(u)), 0.00018));
   }
   const meissner: THREE.BufferGeometry[] = [
-    helixCord(curve, 0.02, 0.98, 120, 9, 0, rOf(0.63), 0.00022),
-    helixCord(curve, 0.02, 0.98, 120, -9, Math.PI, rOf(0.63), 0.00022),
+    helixCord(curve, 0.02, 0.98, 60, 9, 0, rOf(0.63), 0.00022),
+    helixCord(curve, 0.02, 0.98, 60, -9, Math.PI, rOf(0.63), 0.00022),
   ];
 
   // --- inside the muscular coat: the two layers, the two kinds of muscle and the plexus between.
   const innerCircular: THREE.BufferGeometry[] = [];
-  const innerCount = Math.floor(length / 0.0055);
+  const innerCount = Math.floor(length / 0.009);
   for (let i = 1; i < innerCount; i++) {
     const u = i / innerCount;
     if (u < 0.03 || u > 0.965) continue;
-    innerCircular.push(ringAcross(curve.getPointAt(u), curve.getTangentAt(u).normalize(), 0.76 * shellRadius(u), 0.00045, 3, 10));
+    innerCircular.push(ringAcross(curve.getPointAt(u), curve.getTangentAt(u).normalize(), 0.76 * shellRadius(u), 0.00045, 3, 8));
   }
   const outerLong: THREE.BufferGeometry[] = [];
-  for (let k = 0; k < 6; k++) outerLong.push(lengthwiseCord(curve, 0.02, 0.975, 70, (k * Math.PI) / 3 + 0.2, rOf(0.835), 0.0006));
+  for (let k = 0; k < 6; k++) outerLong.push(lengthwiseCord(curve, 0.02, 0.975, 30, (k * Math.PI) / 3 + 0.2, rOf(0.835), 0.0006));
   const striated = segment(0.02, STRIATED_END, 0.785, 10);
   const smoothZone = segment(SMOOTH_START, 0.975, 0.785, 10);
   const auerbach: THREE.BufferGeometry[] = [
-    helixCord(curve, 0.02, 0.98, 120, 11, Math.PI / 3, rOf(0.79), 0.00024),
-    helixCord(curve, 0.02, 0.98, 120, -11, (4 * Math.PI) / 3, rOf(0.79), 0.00024),
+    helixCord(curve, 0.02, 0.98, 60, 11, Math.PI / 3, rOf(0.79), 0.00024),
+    helixCord(curve, 0.02, 0.98, 60, -11, (4 * Math.PI) / 3, rOf(0.79), 0.00024),
   ];
 
   // --- the adventitia: the loose outer sleeve that fastens the tube to its neighbours.
-  const adventitia = segment(0, 1, 0.96, 12);
+  const adventitia = segment(0, 1, 0.96, 8);
 
   // --- the narrowings: a thickened ring that protrudes into the lumen at four places.
   const narrowing = (u: number): THREE.BufferGeometry =>

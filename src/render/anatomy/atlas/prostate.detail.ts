@@ -43,6 +43,11 @@ export const detail: OrganDetailSpec = {
     ctx.part('prostatic_urethra')?.setOpacity(0.4);
     ctx.part('ejaculatory_ducts')?.setOpacity(0.4);
     ctx.part('ampullae')?.setOpacity(0.4);
+    // Finer structures: the stroma slab and the gland's own sacs are glass or faint so the
+    // lobules and acini inside them can be seen; the ducts and bundles stay solid.
+    ctx.part('anterior_fibromuscular_stroma')?.setOpacity(0.22);
+    ctx.part('prostatic_glands')?.setOpacity(0.55);
+    ctx.part('prostatic_utricle')?.setOpacity(0.5);
     ctx.part('seminal_vesicles')?.setOpacity(0.2 + 0.25 * ctx.activity('seminal_vesicles'));
 
     const male = ctx.snapshot.body.sex === 'male';

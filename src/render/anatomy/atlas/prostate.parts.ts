@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
+import { mulberry32 } from '../noise';
+import { ovals } from './kidney.parts';
 import { capsule, chain, ellipsoid, halfSpace, intersect, mergeParts, polygonise, subtract, tubeAlong, union, type Sdf, type V3 } from '../sdf';
 
 /**
@@ -24,11 +26,16 @@ import { capsule, chain, ellipsoid, halfSpace, intersect, mergeParts, polygonise
  *
  * WHAT WAS DONE FOR THE EYE. The zone boundaries are smooth ovals chosen to give each zone
  * its usual place and relative size, not traced boundaries; the anterior fibromuscular
- * stroma is not drawn, so the front of the gland is left empty and the capsule alone marks
- * it. The urethra is drawn as a gently curved tube, and the vesicle's folding is shown as a
+ * stroma was once left undrawn (the front of the gland was empty and the capsule alone
+ * marked it) and is now a glass slab across the front. The urethra is drawn as a gently curved tube, and the vesicle's folding is shown as a
  * single coil, since the real tube is several times longer than the vesicle.
  *
- * NOT DRAWN. The gland's ducts and acini, the smooth muscle of the stroma, the nerves of the
+ * FINER STRUCTURES (bottom of `parts`). The anterior stroma, utricle, sinus, ducts, neurovascular
+ * bundles, bulbourethral glands and the glandular tissue are level-1; the acini and corpora
+ * amylacea are its children. Lobules, acini and amylacea are scattered by a seeded generator
+ * inside the peripheral zone; their number and size are illustrative.
+ *
+ * NOT DRAWN. The smooth muscle of the stroma, the nerves inside the
  * neurovascular bundles, the venous plexus around the capsule and the external sphincter.
  */
 
@@ -134,5 +141,66 @@ export const parts: PartBuilder = () => {
     id: 'ampullae',
     geometry: mergeParts([1, -1].map((s) => tubeAlong(ampullaPath(s), () => 0.0016, { tubular: 24, radial: 8 }))),
   });
+  /* ====================================================== FINER STRUCTURES ===== */
+  // Level-1 gaps and the glands' children (src/data/anatomy/prostate.json). Schematic.
+
+  // Anterior fibromuscular stroma: the gland-free band across the front, a glass slab of the
+  // gland's own oval in front of a plane, with the urethra's bore left open.
+  const front = subtract(intersect(ellipsoid([0, 0, 0], [G[0] * 0.97, G[1] * 0.97, G[2] * 0.97]), halfSpace([0, 0, 0.0072], [0, 0, 1])), bore);
+  out.push({ id: 'anterior_fibromuscular_stroma', geometry: polygonise(front, [-0.02, -0.0145, 0.0065], [0.02, 0.0145, 0.0135], { cell: 0.0013 }) });
+
+  // The utricle: a blind pouch running up and back from the colliculus between the two
+  // ejaculatory ducts.
+  out.push({ id: 'prostatic_utricle', geometry: tubeAlong([[0, -0.0013, 0.0016], [0, 0.0012, 0.0002], [0, 0.0038, -0.0021]], (t) => 0.0006 - 0.0002 * t, { tubular: 10, radial: 6 }) });
+
+  // Prostatic sinus: the groove either side of the colliculus, as a thin strand on the wall.
+  out.push({ id: 'prostatic_sinus', geometry: mergeParts([1, -1].map((s) => tubeAlong([[s * 0.0019, 0.0022, 0.0021], [s * 0.0021, -0.0015, 0.0023], [s * 0.0019, -0.0058, 0.0027]], () => 0.00042, { tubular: 14, radial: 5 }))) });
+
+  // Ducts: a few fine channels from the sinus out into the peripheral zone.
+  const ducts: THREE.BufferGeometry[] = [];
+  for (const s of [1, -1]) {
+    [0.0012, -0.0012, -0.0036, -0.006].forEach((y, k) => {
+      ducts.push(tubeAlong([[s * 0.0019, y, 0.0024], [s * (0.0045 + 0.0008 * k), y - 0.0012, -0.0006], [s * (0.0085 + 0.001 * k), y - 0.0024, -0.0042]], () => 0.00035, { tubular: 8, radial: 4 }));
+    });
+  }
+  out.push({ id: 'prostatic_ducts', geometry: mergeParts(ducts) });
+
+  // Neurovascular bundles: one tube each side, on the back-and-side of the capsule, 5 % outside it.
+  const bundle = (s: number): V3[] =>
+    [0.0105, 0.005, -0.0005, -0.006, -0.0105].map((y) => {
+      const r = Math.sqrt(Math.max(0, 1 - (y / G[1]) ** 2));
+      return [s * G[0] * r * 0.75 * 1.06, y, -G[2] * r * 0.66 * 1.06] as V3;
+    });
+  out.push({ id: 'neurovascular_bundles', geometry: mergeParts([1, -1].map((s) => tubeAlong(bundle(s), () => 0.0008, { tubular: 16, radial: 6 }))) });
+
+  // Bulbourethral glands: a small oval each side below the gland, a thin duct to the urethra.
+  const cowper: { c: V3; r: V3 }[] = [];
+  const cowperDucts: THREE.BufferGeometry[] = [];
+  for (const s of [1, -1]) {
+    cowper.push({ c: [s * 0.0085, -0.0245, -0.001], r: [0.0034, 0.003, 0.003] });
+    cowperDucts.push(tubeAlong([[s * 0.0075, -0.0235, -0.0005], [s * 0.0035, -0.0215, 0.0012], [0, -0.0195, 0.0025]], () => 0.00035, { tubular: 8, radial: 4 }));
+  }
+  out.push({ id: 'bulbourethral_glands', geometry: mergeParts([ovals(cowper), ...cowperDucts]) });
+
+  // Glandular tissue: lobules scattered through the peripheral zone by a seeded generator, each
+  // with a few acini (small spheres) round it. The count is a drawing choice.
+  const rnd = mulberry32(0x9057);
+  const lobules: V3[] = [];
+  for (let tries = 0; tries < 4000 && lobules.length < 30; tries++) {
+    const p: V3 = [(rnd() * 2 - 1) * G[0], (rnd() * 2 - 1) * G[1], -rnd() * G[2]];
+    if (peripheral(p[0], p[1], p[2]) > -0.0017) continue;
+    if (lobules.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]) < 0.0032)) continue;
+    lobules.push(p);
+  }
+  out.push({ id: 'prostatic_glands', geometry: ovals(lobules.map((c) => ({ c, r: [0.0012, 0.0012, 0.0012] as V3 }))) });
+  const acini: { c: V3; r: V3 }[] = [];
+  lobules.forEach((c, i) => {
+    for (let k = 0; k < 3; k++) {
+      const a = i * 1.7 + (k * Math.PI * 2) / 3;
+      acini.push({ c: [c[0] + 0.0011 * Math.cos(a), c[1] + 0.0011 * Math.sin(a), c[2] + 0.0005 * Math.cos(2 * a)], r: [0.0004, 0.0004, 0.0004] });
+    }
+  });
+  out.push({ id: 'secretory_acini', geometry: ovals(acini) });
+  out.push({ id: 'corpora_amylacea', geometry: ovals(lobules.slice(0, 9).map((c, i) => ({ c: [c[0], c[1], c[2] + 0.0002 * (i % 2)] as V3, r: [0.00045, 0.00045, 0.00045] as V3 }))) });
   return out;
 };

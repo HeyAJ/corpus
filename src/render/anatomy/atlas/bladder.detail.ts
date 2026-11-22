@@ -41,6 +41,12 @@ export const detail: OrganDetailSpec = {
     ctx.part('detrusor')?.setOpacity(0.2 + 0.2 * fill + 0.2 * ctx.activity('detrusor'));
     ctx.part('detrusor')?.setScale(ctx.reducedMotion ? 1 : 0.9 + 0.1 * fill);
     ctx.part('mucosa')?.setOpacity(0.12 + 0.4 * (1 - fill));
+    // Finer structures: the urothelium is the skin of the same folds, so it fades with them;
+    // the regions of the wall are faint glass; the cells and the muscle strands stay solid.
+    ctx.part('urothelium')?.setOpacity(0.1 + 0.3 * (1 - fill));
+    ctx.part('bladder_apex')?.setOpacity(0.3);
+    ctx.part('bladder_fundus')?.setOpacity(0.18);
+    ctx.part('bladder_neck')?.setOpacity(0.28);
 
     const urine = clamp(ctx.lerp((s) => s.renal.urineOutput_mL_per_min), 0, 2);
     const period = 16 - 4.5 * urine;

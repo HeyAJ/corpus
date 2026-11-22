@@ -130,6 +130,15 @@ const WHITE = new THREE.Color(0xffffff);
  * heart (the worst case) and are drawing choices.
  */
 const RECEDE_DENSITY = 0.22;
+
+/**
+ * CLOSE LOOK. While a part with finer structures is focused (a valve and its cusps, a ventricle
+ * and its papillary muscles) the receding neighbours are thinned further: their density is
+ * multiplied by `1 - CLOSE_LOOK_RECEDE_CUT * closeLook`. At 0.22 the lungs, great vessels and
+ * chest shells in front of a camera sitting 0.1 m from a mitral valve still laid a pink wash over
+ * its cusps. A DISPLAY factor, not a physical one.
+ */
+const CLOSE_LOOK_RECEDE_CUT = 0.75;
 const RECEDE_RIM = 0.4;
 /** Time constant of the recede, ms. */
 const RECEDE_TAU_MS = 160;
@@ -278,6 +287,11 @@ export class OrganSet {
   reducedMotion = false;
   /** 0..1, eased: 1 while some organ is selected. See RECEDE_DENSITY. */
   private focus = 0;
+  /**
+   * 0..1, already eased (instant under reduced motion) by the interior that owns the close-look
+   * rule, set each frame by the Viewer. See CLOSE_LOOK_RECEDE_CUT.
+   */
+  closeLook = 0;
   private disposed = false;
 
   constructor(private readonly factory: GeometryFactory = new GeometryFactory()) {
@@ -597,7 +611,7 @@ export class OrganSet {
       }
     }
     this.focus += ((anySelected ? 1 : 0) - this.focus) * (1 - Math.exp(-dtMs / RECEDE_TAU_MS));
-    const recedeDensity = 1 - (1 - RECEDE_DENSITY) * this.focus;
+    const recedeDensity = (1 - (1 - RECEDE_DENSITY) * this.focus) * (1 - CLOSE_LOOK_RECEDE_CUT * this.closeLook);
     const recedeRim = 1 - (1 - RECEDE_RIM) * this.focus;
 
     // The Activity mode cross-fades over the same time as the activity smoothing, so

@@ -197,7 +197,52 @@ const GLASS_LOBES = [
 const LOBE_OPACITY_QUIET = 0.08;
 const LOBE_OPACITY_GAIN = 0.4;
 
+/**
+ * WALLS AND LUMENS, DRAWN AS GLASS (added with the finer structures). A cavity, a membrane or a vessel
+ * that is drawn solid hides what lies inside or behind it, so these are panes: the ventricles (a
+ * cavity), the three meninges (membranes round everything), the venous sinuses and the arteries
+ * (lumens, so that the circle can be seen against the brainstem), and the three parts of the
+ * brainstem, which would otherwise hide every nucleus and the reticular formation inside them. The
+ * numbers are drawing choices, not physiology. The brainstem rises a little with its activity, like
+ * the cortical lobes above.
+ */
+const GLASS_FIXED: readonly (readonly [string, number])[] = [
+  ['ventricles', 0.3],
+  ['lateral_ventricles', 0.34],
+  ['third_ventricle', 0.34],
+  ['fourth_ventricle', 0.34],
+  ['cerebral_aqueduct', 0.34],
+  ['interventricular_foramina', 0.34],
+  ['meninges', 0.07],
+  ['dura_mater', 0.1],
+  ['arachnoid_mater', 0.08],
+  ['pia_mater', 0.12],
+  ['dural_venous_sinuses', 0.3],
+  ['superior_sagittal_sinus', 0.5],
+  ['inferior_sagittal_sinus', 0.5],
+  ['straight_sinus', 0.5],
+  ['transverse_sinuses', 0.5],
+  ['sigmoid_sinuses', 0.5],
+  ['cavernous_sinuses', 0.5],
+  ['cerebral_arterial_circle', 0.3],
+  ['internal_carotid_artery', 0.7],
+  ['vertebral_arteries', 0.7],
+  ['basilar_artery', 0.7],
+  ['anterior_cerebral_arteries', 0.7],
+  ['middle_cerebral_arteries', 0.7],
+  ['posterior_cerebral_arteries', 0.7],
+  ['communicating_arteries', 0.7],
+];
+const BRAINSTEM_GLASS = ['midbrain', 'pons', 'medulla'] as const;
+const BRAINSTEM_OPACITY_QUIET = 0.14;
+const BRAINSTEM_OPACITY_GAIN = 0.3;
+
 function animate(ctx: DetailContext): void {
+  for (let i = 0; i < GLASS_FIXED.length; i++) ctx.part(GLASS_FIXED[i][0])?.setOpacity(GLASS_FIXED[i][1]);
+  for (let i = 0; i < BRAINSTEM_GLASS.length; i++) {
+    const id = BRAINSTEM_GLASS[i];
+    ctx.part(id)?.setOpacity(BRAINSTEM_OPACITY_QUIET + BRAINSTEM_OPACITY_GAIN * clamp01(ctx.activity(id)));
+  }
   for (let i = 0; i < GLASS_LOBES.length; i++) {
     const id = GLASS_LOBES[i];
     ctx.part(id)?.setOpacity(LOBE_OPACITY_QUIET + LOBE_OPACITY_GAIN * clamp01(ctx.activity(id)));

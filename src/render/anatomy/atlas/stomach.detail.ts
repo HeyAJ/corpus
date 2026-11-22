@@ -121,6 +121,10 @@ export const detail: OrganDetailSpec = {
 
     // The wall is glass: the lumen, folds and streams must show through.
     for (let i = 0; i < WALL_IDS.length; i++) ctx.part(WALL_IDS[i])?.setOpacity(0.2 + 0.25 * ctx.activity(WALL_IDS[i]));
+    // Finer wall layers enclose what lies inside them, so they are glass too.
+    for (const id of ['serosa', 'muscularis_externa', 'submucosa', 'pyloric_canal', 'lesser_omentum', 'greater_omentum']) {
+      ctx.part(id)?.setOpacity(id.endsWith('omentum') ? 0.25 : 0.12 + 0.14 * ctx.activity(id));
+    }
     // Rugae flatten as the stomach fills.
     ctx.part('rugae')?.setOpacity(1 - 0.8 * clamp01(s.gi.gastricFillFraction));
 

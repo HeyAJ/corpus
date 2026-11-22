@@ -907,6 +907,7 @@ export class Viewer {
     }
 
     this.organs.reducedMotion = this.reducedMotion;
+    this.organs.closeLook = this.detail.closeLookAmount;
     this.organs.update(dtMs);
     this.vascular.update(dtMs / 1000);
     // CLOSE LOOK: while a part with finer structures is under study, thin the vessel overlay

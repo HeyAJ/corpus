@@ -24,8 +24,13 @@ import { URETER_LEFT, URETER_RIGHT } from '../models';
  * `warpPoints`. A part is therefore inside the shell by construction: the lumen is 1 mm
  * narrower than the shell tube, and the swellings and collars stay within it.
  *
- * NOT DRAWN. The three layers of the wall (mucosa, muscularis, adventitia) separately, the
- * ureteric peristaltic pacemaker cells, or the real calibre variations: the radii are
+ * FINER STRUCTURES. The four layers of the wall are children of the peristaltic wall (see
+ * `sleeve` in `parts`), and the pelviureteric junction and the pelvic-brim crossing are
+ * level-1 parts drawn at the same fractions as the collars, with the iliac vessel the ureter
+ * crosses in front of drawn as a short tube behind it.
+ *
+ * NOT DRAWN. The
+ * peristaltic pacemaker cells, or the real calibre variations: the radii are
  * drawing choices chosen to sit inside the shell, not measurements. The positions of the
  * collars along the length are schematic.
  */
@@ -36,6 +41,8 @@ const LUMEN_RADIUS = 0.0019;
 
 /** Fractions along each ureter for the three constrictions and the muscular swellings. */
 export const CONSTRICTIONS = [0.03, 0.55, 0.965];
+/** Where the ureter crosses the pelvic brim, as a fraction of its length: the second constriction. */
+const BRIM = CONSTRICTIONS[1];
 const SWELLINGS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.65, 0.75, 0.85];
 
 const curveOf = (pts: readonly V3[]): THREE.CatmullRomCurve3 =>
@@ -95,7 +102,34 @@ export const parts: PartBuilder = () => {
     junctions.push(warpGeometry(tubeAlong(sample(curve, 0.935, 1, 8), (t) => 0.0023 - 0.0009 * t, { tubular: 8, radial: 8 })));
   }
 
+  /* FINER STRUCTURES (src/data/anatomy/ureters.json, `parent`). */
+
+  // The wall's layers are four nested sleeves along the same centreline, each a little wider
+  // than the last, so that with the muscular coat as glass the layers read from the lumen
+  // outward: lining, loose connective tissue, muscle, outer coat. The outermost stays 0.4 mm
+  // inside the shell tube. A real wall's layers are not separable like this and the radii are
+  // drawing choices, not thicknesses.
+  const sleeve = (r: number): THREE.BufferGeometry => mergeParts([URETER_LEFT, URETER_RIGHT].map((pts) => warpGeometry(tubeAlong(pts, () => r, { tubular: 30, radial: 7 }))));
+  const flared: THREE.BufferGeometry[] = [];
+  const brim: THREE.BufferGeometry[] = [];
+  for (const pts of [URETER_LEFT, URETER_RIGHT]) {
+    const curve = curveOf(pts);
+    // The top of the ureter widens toward the pelvis: a funnel, the first narrow point.
+    flared.push(warpGeometry(tubeAlong(sample(curve, 0, 0.06, 8), (t) => 0.0023 - 0.0007 * Math.sin(Math.PI * Math.min(1, t * 1.4)) , { tubular: 8, radial: 8 })));
+    // The crossing of the pelvic brim: a collar, and the iliac vessel it passes in front of.
+    const mp = curve.getPointAt(BRIM);
+    const mid: V3 = [mp.x, mp.y, mp.z];
+    brim.push(warpGeometry(tubeAlong(sample(curve, BRIM - 0.035, BRIM + 0.035, 8), (t) => 0.0017 + 0.0006 * Math.sin(Math.PI * t), { tubular: 8, radial: 8 })));
+    brim.push(warpGeometry(tubeAlong([[mid[0] - 0.007, mid[1], mid[2] - 0.0036], [mid[0], mid[1], mid[2] - 0.0036], [mid[0] + 0.007, mid[1], mid[2] - 0.0036]], () => 0.0011, { tubular: 8, radial: 6 })));
+  }
+
   return [
+    { id: 'pelviureteric_junction', geometry: mergeParts(flared) },
+    { id: 'pelvic_brim_crossing', geometry: mergeParts(brim) },
+    { id: 'urothelium', geometry: sleeve(0.00197) },
+    { id: 'lamina_propria', geometry: sleeve(0.00212) },
+    { id: 'muscle_layers', geometry: sleeve(0.00226) },
+    { id: 'adventitia', geometry: sleeve(0.00236) },
     { id: 'left_ureter', geometry: lumens.left },
     { id: 'right_ureter', geometry: lumens.right },
     { id: 'peristaltic_wall', geometry: mergeParts(coat) },

@@ -20,6 +20,7 @@ import { NERVE_LIFT, phrenicRoute, sheetPath } from './diaphragm.parts';
  * nothing here needs to move it.
  */
 
+const OVERLAY: [string, number][] = [['sternal_part', 0.5], ['lumbar_part', 0.5], ['right_dome', 0.16], ['left_dome', 0.16]];
 const BRANCHES = ['anterior', 'lateral', 'posterior'];
 
 const pickPhase = (s: SimSnapshot): number => s.resp.cyclePhase;
@@ -53,7 +54,9 @@ export const detail: OrganDetailSpec = {
       }
     }
     const lift = 0.3 * Math.max(0, Math.min(1, ctx.lerp(pickInflation)));
-    for (const id of ['costal_muscle', 'right_crus', 'left_crus']) {
+    // The overlay parts are panes so the muscle and tendon under them still show (drawing choice).
+    for (const [id, o] of OVERLAY) ctx.part(id)?.setOpacity(o);
+    for (const id of ['costal_muscle', 'right_crus', 'left_crus', 'sternal_part', 'lumbar_part', 'right_dome', 'left_dome']) {
       ctx.part(id)?.setGlow(Math.min(1, ctx.activity(id) + lift));
     }
   },

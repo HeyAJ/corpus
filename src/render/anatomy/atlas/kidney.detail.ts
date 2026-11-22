@@ -54,6 +54,23 @@ const GLASS: Record<string, number> = {
   nephron: 0.55,
 };
 
+/**
+ * Finer structures that enclose something, drawn as glass at a fixed opacity (their activity
+ * does not thicken them, because a fat envelope or a fascia that brightened with filtration
+ * would read as a physiological signal it is not). Everything else added by the finer-structure
+ * pass is solid, so the cells and vessels inside the glass can be seen and tapped. The values
+ * are display choices.
+ */
+const GLASS_FIXED: Record<string, number> = {
+  renal_sinus: 0.1,
+  perirenal_fat: 0.1,
+  renal_fascia: 0.12,
+  bowmans_capsule: 0.3,
+  parietal_layer: 0.2,
+  visceral_layer: 0.3,
+  juxtaglomerular_apparatus: 0.4,
+};
+
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 
 export const detail: OrganDetailSpec = {
@@ -69,6 +86,7 @@ export const detail: OrganDetailSpec = {
 
   animate: (ctx: DetailContext) => {
     for (const id of Object.keys(GLASS)) ctx.part(id)?.setOpacity(GLASS[id] + 0.25 * ctx.activity(id));
+    for (const id of Object.keys(GLASS_FIXED)) ctx.part(id)?.setOpacity(GLASS_FIXED[id]);
 
     const blood = clamp(ctx.lerp((s) => s.renal.renalBloodFlow_mL_per_min) / BLOOD_REF, 0, 2.5);
     for (let i = 0; i < 3; i++) {

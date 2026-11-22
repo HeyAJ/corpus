@@ -97,6 +97,11 @@ export const detail: OrganDetailSpec = {
     fill(ctx.part('glans_penis'), blood, 0.4 * v, 0.1 + 0.6 * v, 0.25 + 0.15 * v);
 
     ctx.part('tunica_albuginea')?.setOpacity(0.2 + 0.15 * v);
+    // Finer structures: wraps are faint glass; the contents of the corpora stay solid and take
+    // the erection's colour through their own vasocongestion drive.
+    const WRAPS: Record<string, number> = { deep_fascia: 0.1, bulbospongiosus: 0.2, ischiocavernosus: 0.22, prepuce: 0.14 };
+    for (const id of Object.keys(WRAPS)) ctx.part(id)?.setOpacity(WRAPS[id]);
+    for (const id of ['cavernous_spaces', 'cavernous_spaces_left']) ctx.part(id)?.setGlow(0.1 + 0.7 * v);
     ctx.part('urethra')?.setOpacity(0.45);
   },
 };

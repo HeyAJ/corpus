@@ -79,6 +79,14 @@ export const detail: OrganDetailSpec = {
     ctx.part('testicular_artery')?.setOpacity(0.45);
     ctx.part('pampiniform_plexus')?.setOpacity(0.45);
 
+    // Finer structures. Wraps are faint nested glass; the cells inside the magnified tubule and
+    // the tubule's own coat stay solid except the barrier rings, which are drawn thin.
+    const WRAPS: Record<string, number> = {
+      tunica_vaginalis: 0.1, visceral_layer: 0.12, parietal_layer: 0.1, scrotum: 0.08, dartos_muscle: 0.1,
+      spermatic_cord: 0.2, mediastinum_testis: 0.3, testicular_septa: 0.35,
+    };
+    for (const id of Object.keys(WRAPS)) ctx.part(id)?.setOpacity(WRAPS[id]);
+
     // The interstitial cells glow with testosterone.
     const t = testosteroneActivity(ctx.snapshot);
     if (t >= 0) ctx.part('interstitial_cells')?.setGlow(clamp01(0.15 + 0.85 * t));

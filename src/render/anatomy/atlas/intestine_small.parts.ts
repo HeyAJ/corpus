@@ -4,6 +4,7 @@ import { giPath, giSegment } from '../layout';
 import { mulberry32 } from '../noise';
 import { mergeParts, polygonise, roundBox, tubeAlong } from '../sdf';
 import type { V3 } from '../sdf';
+import { blob, blobAlong, cone, frameAt, helixCord, ribbon } from './gi_shared';
 
 /**
  * INTERIOR PARTS OF THE SMALL INTESTINE.
@@ -31,8 +32,28 @@ import type { V3 } from '../sdf';
  * from `intestineSmall()` because models.ts does not export it. If that function changes,
  * change `baseRadius` to match. Body coordinates, not warped, as the shell is.
  *
- * WHAT IT DOES NOT DO. It does not draw the mesentery as a membrane (only its vessels), nor
- * the submucosal and myenteric plexuses, nor the crypts. The arcades are a fan from one
+ * FINER STRUCTURES (textbook-depth pass). The duodenum now holds its four parts (superior,
+ * descending, horizontal, ascending) as glass sleeves cut at drawing proportions of its arc
+ * (`DUODENAL_CUTS`, chosen to follow the C-shaped loop the authored centreline makes, not
+ * measured); the two papillae stand on the inner wall of the descending part; the duodenal
+ * (Brunner) glands are a scatter of enlarged flasks in the first part's submucosa. The
+ * duodenojejunal flexure is a short sleeve at the junction of duodenum and jejunum, with the
+ * suspensory muscle (Treitz) as a tapering cord running up from it. The mesentery is a glass
+ * fan from the bowel to the hub of the arcades. The wall is drawn in layers (fractions of the
+ * shell radius: regions 0.78, submucosal plexus 0.80, circular muscle 0.835, myenteric
+ * plexus 0.855, longitudinal muscle 0.88, wall 0.9, serosa 0.945). Those are drawing
+ * proportions to keep layers apart, NOT thicknesses.
+ *
+ * THE MAGNIFIED VILLUS AND CRYPT. The villi of the patch are too small to carry cells, so one
+ * enlarged villus and two enlarged crypts are drawn above the patch (`UNIT_*`), each many
+ * times the size of the villi beside it: enterocytes with a brush border, goblet cells,
+ * capillary loops, Paneth cells, and the three enteroendocrine kinds (I, S, K). Counts and
+ * positions of cells are schematic; the textbook says which cells a villus and crypt hold,
+ * not how many, and which kind lies exactly where varies. They are children of the mucosa
+ * part and appear only when it is focused or zoomed to.
+ *
+ * WHAT IT DOES NOT DO. It does not draw the mesentery as a real membrane with fat (a flat fan
+ * only). The arcades are a fan from one
  * point, not a traced vascular atlas. The bowel's real length is not reproduced: the model's
  * coils are the model's coils.
  */
@@ -178,6 +199,15 @@ export function lacteal0(): V3 {
   return [S.centre[0], S.centre[1] + S.half[1] + S.villusHeight * 0.6, S.centre[2]];
 }
 
+/** Where the four duodenal parts are cut, as fractions of the duodenum's arc: a drawing choice following its C-loop. */
+export const DUODENAL_CUTS = [0, 0.22, 0.62, 0.86, 1] as const;
+/** Position of the enlarged villus and crypts above the patch, in body coordinates: a display placement. */
+const UNIT_Y0 = -0.01;
+const UNIT_Z = 0.006;
+const VILLUS_X = -0.0565;
+const CRYPT_X = -0.0465;
+const VILLUS_H = 0.0085;
+
 const Z_AXIS = new THREE.Vector3(0, 0, 1);
 
 function ringAcross(centre: THREE.Vector3, tangent: THREE.Vector3, major: number, minor: number, radial: number, tubular: number): THREE.BufferGeometry {
@@ -315,6 +345,113 @@ export const parts: PartBuilder = () => {
   }
   lacteals.push(tubeAlong(lymphTrunk(), () => 0.0011, { tubular: 28, radial: 5 }));
 
+  // ===================================================================================
+  // FINER STRUCTURES
+  // ===================================================================================
+  const rOf = (frac: number) => (u: number): number => frac * baseRadius(u);
+  const duoU = (f: number): number => f * b0;
+  const duodenalPart = (k: number): THREE.BufferGeometry => bowelTube(duoU(DUODENAL_CUTS[k]), duoU(DUODENAL_CUTS[k + 1]), 0.82, 7);
+  // The inner wall of the C-loop: from a point on the loop toward the centroid of the duodenum.
+  const duoPts = giSegment('duodenum');
+  const loopCentre = new THREE.Vector3();
+  for (const q of duoPts) loopCentre.add(new THREE.Vector3(q[0], q[1], q[2]));
+  loopCentre.multiplyScalar(1 / duoPts.length);
+  const papilla = (f: number, size: number): THREE.BufferGeometry => {
+    const u = duoU(f);
+    const fr = frameAt(curve, u);
+    const inner = loopCentre.clone().sub(fr.p);
+    inner.addScaledVector(fr.t, -inner.dot(fr.t)).normalize();
+    const R = baseRadius(u);
+    const a: V3 = [fr.p.x + inner.x * 0.8 * R, fr.p.y + inner.y * 0.8 * R, fr.p.z + inner.z * 0.8 * R];
+    const b: V3 = [fr.p.x + inner.x * 0.5 * R, fr.p.y + inner.y * 0.5 * R, fr.p.z + inner.z * 0.5 * R];
+    return cone(a, b, size, 6);
+  };
+  const brunner: THREE.BufferGeometry[] = [];
+  const bRand = mulberry32(0xb2c4);
+  for (let i = 0; i < 26; i++) {
+    const u = duoU(0.02 + 0.5 * bRand());
+    const fr = frameAt(curve, u);
+    const a = bRand() * Math.PI * 2;
+    const R = baseRadius(u);
+    const c = (r: number): V3 => [fr.p.x + (fr.n.x * Math.cos(a) + fr.b.x * Math.sin(a)) * r * R, fr.p.y + (fr.n.y * Math.cos(a) + fr.b.y * Math.sin(a)) * r * R, fr.p.z + (fr.n.z * Math.cos(a) + fr.b.z * Math.sin(a)) * r * R];
+    brunner.push(blob(c(0.76), 0.0006, 6, 4));
+    brunner.push(stick(c(0.76), c(0.56), 0.00015));
+  }
+  const flexure = bowelTube(b0 - 0.012, b0 + 0.012, 0.86, 8);
+  const dj = bowelCurve().getPointAt(b0);
+  const treitz = tubeAlong(
+    [[dj.x, dj.y + 0.002, dj.z - 0.001], [dj.x + 0.003, dj.y + 0.016, dj.z - 0.005], [dj.x + 0.007, dj.y + 0.032, dj.z - 0.008]],
+    (t) => 0.0016 - 0.0011 * t,
+    { tubular: 10, radial: 5 },
+  );
+  const mesentery = ribbon(lay.ends, lay.ends.map((): V3 => lay.hub));
+  const serosa = tubeAlong(wallPts, (t) => 0.945 * baseRadius(t), { tubular: wallPts.length, radial: 8, tension: 0.5 });
+  const submucosalPlexus = mergeParts([helixCord(curve, 0.002, 0.998, 160, 40, 0, rOf(0.8), 0.00028)]);
+  const myenteric = mergeParts([helixCord(curve, 0.002, 0.998, 160, -40, Math.PI, rOf(0.855), 0.00028)]);
+  const circularMuscle: THREE.BufferGeometry[] = [];
+  const nRings = Math.floor(length / 0.015);
+  for (let i = 1; i < nRings; i++) {
+    const u = i / nRings;
+    circularMuscle.push(ringAcross(curve.getPointAt(u), curve.getTangentAt(u).normalize(), 0.835 * baseRadius(u), 0.0005, 3, 8));
+  }
+  const longitudinalMuscle = mergeParts([0, 1, 2].map((k) => helixCord(curve, 0.002, 0.998, 110, 0, (k * Math.PI * 2) / 3, rOf(0.88), 0.0004)));
+
+  // --- the enlarged villus, crypts and their cells (see the header). Local helpers: a point on the
+  // villus surface at height t (0..1) and angle a, and its outward direction.
+  const villusR = (t: number): number => 0.0016 * (1 - 0.35 * t);
+  const onVillus = (t: number, a: number, off: number): V3 => [VILLUS_X + Math.cos(a) * (villusR(t) + off), UNIT_Y0 + t * VILLUS_H, UNIT_Z + Math.sin(a) * (villusR(t) + off)];
+  const outAt = (a: number): V3 => [Math.cos(a), 0.15, Math.sin(a)];
+  const villusBody = tubeAlong([[VILLUS_X, UNIT_Y0, UNIT_Z], [VILLUS_X, UNIT_Y0 + VILLUS_H * 0.5, UNIT_Z], [VILLUS_X, UNIT_Y0 + VILLUS_H, UNIT_Z]], (t) => villusR(t) * 0.9, { tubular: 12, radial: 8 });
+  const enterocytes: THREE.BufferGeometry[] = [];
+  for (let row = 0; row < 5; row++) {
+    for (let k = 0; k < 7; k++) {
+      const t = 0.12 + row * 0.17;
+      const a = (k / 7) * Math.PI * 2 + (row % 2) * 0.45;
+      const c = onVillus(t, a, 0.0003);
+      enterocytes.push(blobAlong(c, outAt(a), 0.0007, 0.0004, 6, 4));
+      // The brush border: two short bristles on the cell's free face.
+      const o = outAt(a);
+      const l = Math.hypot(o[0], o[1], o[2]);
+      const tip: V3 = [c[0] + (o[0] / l) * 0.0013, c[1] + (o[1] / l) * 0.0013, c[2] + (o[2] / l) * 0.0013];
+      enterocytes.push(stick([c[0] + (o[0] / l) * 0.0006, c[1] + (o[1] / l) * 0.0006, c[2] + (o[2] / l) * 0.0006], tip, 0.00012));
+    }
+  }
+  const goblet: THREE.BufferGeometry[] = [];
+  for (let k = 0; k < 7; k++) {
+    const t = 0.2 + 0.1 * ((k * 5) % 7) + 0.04 * (k % 2);
+    const a = (k / 7) * Math.PI * 2 + 0.22 + 0.5 * (k % 2);
+    const c = onVillus(Math.min(0.9, t), a, 0.0006);
+    goblet.push(blobAlong(c, outAt(a), 0.0008, 0.0006, 6, 4));
+    goblet.push(cone(onVillus(Math.min(0.9, t), a, 0.0), onVillus(Math.min(0.9, t), a, 0.0005), 0.0003, 4));
+  }
+  const capillaries: THREE.BufferGeometry[] = [];
+  for (let k = 0; k < 3; k++) {
+    const a = (k / 3) * Math.PI * 2 + 0.4;
+    const ox = Math.cos(a) * 0.0006;
+    const oz = Math.sin(a) * 0.0006;
+    capillaries.push(tubeAlong([[VILLUS_X + ox, UNIT_Y0 + 0.0003, UNIT_Z + oz], [VILLUS_X + ox * 1.1, UNIT_Y0 + VILLUS_H * 0.6, UNIT_Z + oz * 1.1], [VILLUS_X + ox * 0.3, UNIT_Y0 + VILLUS_H * 0.85, UNIT_Z + oz * 0.3], [VILLUS_X - ox * 0.6, UNIT_Y0 + VILLUS_H * 0.6, UNIT_Z - oz * 0.6], [VILLUS_X - ox * 0.7, UNIT_Y0 + 0.0003, UNIT_Z - oz * 0.7]], () => 0.00016, { tubular: 18, radial: 3 }));
+  }
+  const crypts: THREE.BufferGeometry[] = [];
+  const paneth: THREE.BufferGeometry[] = [];
+  for (const dz of [-0.0022, 0.0022]) {
+    const z = UNIT_Z + dz;
+    crypts.push(tubeAlong([[CRYPT_X, UNIT_Y0 + 0.0008, z], [CRYPT_X, UNIT_Y0 - 0.0025, z], [CRYPT_X, UNIT_Y0 - 0.005, z]], (t) => 0.0011 - 0.0003 * t, { tubular: 12, radial: 7 }));
+    for (let k = 0; k < 3; k++) {
+      const a = (k / 3) * Math.PI * 2 + 0.5;
+      const c: V3 = [CRYPT_X + Math.cos(a) * 0.0011, UNIT_Y0 - 0.0042 + 0.0004 * k, z + Math.sin(a) * 0.0011];
+      paneth.push(blob(c, 0.0006, 6, 4));
+      paneth.push(blob([c[0] + Math.cos(a) * 0.0004, c[1] + 0.0003, c[2] + Math.sin(a) * 0.0004], 0.00022, 4, 3));
+    }
+  }
+  // Enteroendocrine cells: bottle-shaped, a rounded body and a stem reaching the lumen. The three
+  // kinds sit at different heights only so they can be told apart; the textbook gives no layout.
+  const bottle = (t: number, a: number): THREE.BufferGeometry =>
+    mergeParts([blobAlong(onVillus(t, a, 0.0002), outAt(a), 0.0008, 0.00045, 6, 4), cone(onVillus(t, a, 0.0004), onVillus(t, a, 0.0014), 0.00022, 4)]);
+  const iCells = mergeParts([0, 1, 2].map((k) => bottle(0.45, (k * Math.PI * 2) / 3 + 0.1)));
+  const sCells = mergeParts([0, 1, 2].map((k) => bottle(0.3, (k * Math.PI * 2) / 3 + 0.6)));
+  const kCells = mergeParts([0, 1, 2].map((k) => bottle(0.6, (k * Math.PI * 2) / 3 + 1.1)));
+  const eeAll = mergeParts([0, 1, 2].map((k) => bottle(0.75, (k * Math.PI * 2) / 3 + 1.6)));
+
   return [
     { id: 'duodenum', geometry: duodenum },
     { id: 'jejunum', geometry: jejunum },
@@ -327,5 +464,31 @@ export const parts: PartBuilder = () => {
     { id: 'peyers_patches', geometry: mergeParts(patches) },
     { id: 'ileocaecal_junction', geometry: valve },
     { id: 'mesenteric_vessels', geometry: mergeParts(vessels) },
+    // --- finer structures
+    { id: 'duodenal_superior_part', geometry: duodenalPart(0) },
+    { id: 'duodenal_descending_part', geometry: duodenalPart(1) },
+    { id: 'duodenal_horizontal_part', geometry: duodenalPart(2) },
+    { id: 'duodenal_ascending_part', geometry: duodenalPart(3) },
+    { id: 'major_duodenal_papilla', geometry: papilla(0.42, 0.0013) },
+    { id: 'minor_duodenal_papilla', geometry: papilla(0.32, 0.0008) },
+    { id: 'duodenal_glands', geometry: mergeParts(brunner) },
+    { id: 'duodenojejunal_flexure', geometry: flexure },
+    { id: 'suspensory_muscle', geometry: treitz },
+    { id: 'mesentery', geometry: mesentery },
+    { id: 'submucosal_plexus', geometry: submucosalPlexus },
+    { id: 'myenteric_plexus', geometry: myenteric },
+    { id: 'serosa', geometry: serosa },
+    { id: 'circular_muscle', geometry: mergeParts(circularMuscle) },
+    { id: 'longitudinal_muscle', geometry: longitudinalMuscle },
+    { id: 'villus_enlarged', geometry: villusBody },
+    { id: 'enterocytes', geometry: mergeParts(enterocytes) },
+    { id: 'goblet_cells', geometry: mergeParts(goblet) },
+    { id: 'villus_capillaries', geometry: mergeParts(capillaries) },
+    { id: 'intestinal_crypts', geometry: mergeParts(crypts) },
+    { id: 'paneth_cells', geometry: mergeParts(paneth) },
+    { id: 'enteroendocrine_cells', geometry: eeAll },
+    { id: 'i_cells', geometry: iCells },
+    { id: 's_cells', geometry: sCells },
+    { id: 'k_cells', geometry: kCells },
   ];
 };

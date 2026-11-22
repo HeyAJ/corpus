@@ -1,6 +1,6 @@
 {
   "atlas": "intestine_small",
-  "about": "The inside of the small intestine, drawn as anatomy: its three regions (duodenum, jejunum and ileum) inside a muscular wall, the circular folds, the string of chyme in the lumen, the Peyer's patches of the ileum, the ileocaecal junction, and the mesenteric arteries and veins. One short stretch of jejunal mucosa is drawn opened out and ENLARGED, with its villi, capillary loops and central lacteals, because the real villi are far too small to see at the scale of the bowel. It leaves out the mesentery as a membrane, the crypts, the enteric nerve plexuses, the brush border and every secretory and enzymatic detail. Chyme moves along the lumen with the model's peristalsis, absorbed nutrients leave the mucosa towards the portal vein at the rate the engine reports for glucose absorption, and lymph appears in the lacteals when fat is in the upper gut. Activity bars are display indices, not measurements.",
+  "about": "The inside of the small intestine, drawn as anatomy: its three regions (duodenum, jejunum and ileum) inside a muscular wall, the circular folds, the string of chyme in the lumen, the Peyer's patches of the ileum, the ileocaecal junction, and the mesenteric arteries and veins. One short stretch of jejunal mucosa is drawn opened out and ENLARGED, with its villi, capillary loops and central lacteals, because the real villi are far too small to see at the scale of the bowel. It leaves out the mesentery as a membrane, the crypts, the enteric nerve plexuses, the brush border and every secretory and enzymatic detail. Chyme moves along the lumen with the model's peristalsis, absorbed nutrients leave the mucosa towards the portal vein at the rate the engine reports for glucose absorption, and lymph appears in the lacteals when fat is in the upper gut. Activity bars are display indices, not measurements. The four parts of the duodenum, its papillae, the wall layers, the plexuses and the cells of one enlarged villus and crypt are drawn as finer structures; the villus and crypt are enlarged many times and cell counts are schematic.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -20,10 +20,30 @@
       "color": "#d9a05b",
       "rest": 0.25,
       "drives": [
-        { "signal": "digestion", "weight": 0.45, "note": "Food in the stomach and upper bowel means chyme is arriving here to be mixed with bile and pancreatic juice.", "source": "GH14" },
-        { "signal": "fatLoad", "weight": 0.2, "note": "Fat in the duodenum is the stimulus for bile release and for slowing gastric emptying.", "source": "GH14" },
-        { "signal": "parasympathetic", "weight": 0.15, "note": "Vagal outflow raises secretion and motility in the upper gut.", "source": "GH14" },
-        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.", "source": "GH14" }
+        {
+          "signal": "digestion",
+          "weight": 0.45,
+          "note": "Food in the stomach and upper bowel means chyme is arriving here to be mixed with bile and pancreatic juice.",
+          "source": "GH14"
+        },
+        {
+          "signal": "fatLoad",
+          "weight": 0.2,
+          "note": "Fat in the duodenum is the stimulus for bile release and for slowing gastric emptying.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.15,
+          "note": "Vagal outflow raises secretion and motility in the upper gut.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.2,
+          "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -35,10 +55,30 @@
       "color": "#e0b27a",
       "rest": 0.25,
       "drives": [
-        { "signal": "absorption", "weight": 0.4, "note": "The jejunum is the principal absorbing region, so it follows the absorption signal.", "source": "GH14" },
-        { "signal": "digestion", "weight": 0.25, "note": "Digestion in the upper gut sends chyme on into the jejunum.", "source": "GH14" },
-        { "signal": "intestinalTransit", "weight": 0.2, "note": "Contents in the small bowel mean the region is working.", "source": "GH14" },
-        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.", "source": "GH14" }
+        {
+          "signal": "absorption",
+          "weight": 0.4,
+          "note": "The jejunum is the principal absorbing region, so it follows the absorption signal.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Digestion in the upper gut sends chyme on into the jejunum.",
+          "source": "GH14"
+        },
+        {
+          "signal": "intestinalTransit",
+          "weight": 0.2,
+          "note": "Contents in the small bowel mean the region is working.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.2,
+          "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -50,10 +90,30 @@
       "color": "#c98f6a",
       "rest": 0.2,
       "drives": [
-        { "signal": "intestinalTransit", "weight": 0.3, "note": "Chyme that has passed the jejunum arrives here.", "source": "GH14" },
-        { "signal": "absorption", "weight": 0.2, "note": "The ileum absorbs the remainder of the nutrient load.", "source": "GH14" },
-        { "signal": "motilityRise", "weight": 0.3, "note": "Raised gut motility drives chyme through the ileum faster.", "source": "GH14" },
-        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.", "source": "GH14" }
+        {
+          "signal": "intestinalTransit",
+          "weight": 0.3,
+          "note": "Chyme that has passed the jejunum arrives here.",
+          "source": "GH14"
+        },
+        {
+          "signal": "absorption",
+          "weight": 0.2,
+          "note": "The ileum absorbs the remainder of the nutrient load.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.3,
+          "note": "Raised gut motility drives chyme through the ileum faster.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.2,
+          "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale (as muscular_wall), not a measured effect size.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -65,10 +125,30 @@
       "color": "#b5655a",
       "rest": 0.25,
       "drives": [
-        { "signal": "motilityRise", "weight": 0.4, "note": "Drugs or states that raise gut motility act on this muscle.", "source": "GH14" },
-        { "signal": "motilityFall", "weight": -0.3, "note": "Reduced motility, for example from opioids, quietens the muscle.", "source": "GH14" },
-        { "signal": "parasympathetic", "weight": 0.3, "note": "Vagal outflow excites intestinal smooth muscle.", "source": "GH14" },
-        { "signal": "sympathetic", "weight": -0.2, "note": "Sympathetic outflow inhibits intestinal motility.", "source": "GH14" }
+        {
+          "signal": "motilityRise",
+          "weight": 0.4,
+          "note": "Drugs or states that raise gut motility act on this muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.3,
+          "note": "Reduced motility, for example from opioids, quietens the muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal outflow excites intestinal smooth muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.2,
+          "note": "Sympathetic outflow inhibits intestinal motility.",
+          "source": "GH14"
+        }
       ],
       "source": "GH14"
     },
@@ -80,9 +160,24 @@
       "color": "#c9a24a",
       "rest": 0.15,
       "drives": [
-        { "signal": "intestinalTransit", "weight": 0.6, "note": "More material in the small bowel means more chyme to show.", "source": "GH14" },
-        { "signal": "digestion", "weight": 0.2, "note": "Digestion in the upper gut is what supplies chyme.", "source": "GH14" },
-        { "signal": "motilityRise", "weight": 0.2, "note": "Faster motility carries chyme through more quickly.", "source": "GH14" }
+        {
+          "signal": "intestinalTransit",
+          "weight": 0.6,
+          "note": "More material in the small bowel means more chyme to show.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Digestion in the upper gut is what supplies chyme.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.2,
+          "note": "Faster motility carries chyme through more quickly.",
+          "source": "GH14"
+        }
       ],
       "source": "GH14"
     },
@@ -94,8 +189,18 @@
       "color": "#e8c9a0",
       "rest": 0.2,
       "drives": [
-        { "signal": "absorption", "weight": 0.4, "note": "The folds carry the absorbing surface, so they follow the absorption signal.", "source": "GH14" },
-        { "signal": "digestion", "weight": 0.2, "note": "Digestion in the upper gut is what gives them something to absorb.", "source": "GH14" }
+        {
+          "signal": "absorption",
+          "weight": 0.4,
+          "note": "The folds carry the absorbing surface, so they follow the absorption signal.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Digestion in the upper gut is what gives them something to absorb.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -107,8 +212,18 @@
       "color": "#e6a0a0",
       "rest": 0.2,
       "drives": [
-        { "signal": "absorption", "weight": 0.6, "note": "Nutrients crossing the mucosa into the portal blood are what the absorption signal counts.", "source": "GH14" },
-        { "signal": "digestion", "weight": 0.2, "note": "Digestion supplies the nutrients to absorb.", "source": "GH14" }
+        {
+          "signal": "absorption",
+          "weight": 0.6,
+          "note": "Nutrients crossing the mucosa into the portal blood are what the absorption signal counts.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Digestion supplies the nutrients to absorb.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -120,8 +235,18 @@
       "color": "#f1ead0",
       "rest": 0.1,
       "drives": [
-        { "signal": "fatLoad", "weight": 0.7, "note": "Fat arriving in the gut is what the lacteals carry away.", "source": "GH14" },
-        { "signal": "digestion", "weight": 0.1, "note": "A meal in the upper gut precedes fat absorption.", "source": "GH14" }
+        {
+          "signal": "fatLoad",
+          "weight": 0.7,
+          "note": "Fat arriving in the gut is what the lacteals carry away.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.1,
+          "note": "A meal in the upper gut precedes fat absorption.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -133,8 +258,18 @@
       "color": "#7aa6d6",
       "rest": 0.2,
       "drives": [
-        { "signal": "immune", "weight": 0.3, "note": "Immune activation raises lymphoid tissue activity.", "source": "GH14" },
-        { "signal": "infection", "weight": 0.3, "note": "A pathogen burden engages gut-associated lymphoid tissue.", "source": "GH14" }
+        {
+          "signal": "immune",
+          "weight": 0.3,
+          "note": "Immune activation raises lymphoid tissue activity.",
+          "source": "GH14"
+        },
+        {
+          "signal": "infection",
+          "weight": 0.3,
+          "note": "A pathogen burden engages gut-associated lymphoid tissue.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -146,8 +281,18 @@
       "color": "#a8566b",
       "rest": 0.2,
       "drives": [
-        { "signal": "intestinalTransit", "weight": 0.3, "note": "Chyme reaching the end of the ileum is passed through this valve.", "source": "GH14" },
-        { "signal": "motilityRise", "weight": 0.3, "note": "Faster motility passes chyme through more often.", "source": "GH14" }
+        {
+          "signal": "intestinalTransit",
+          "weight": 0.3,
+          "note": "Chyme reaching the end of the ileum is passed through this valve.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.3,
+          "note": "Faster motility passes chyme through more often.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     },
@@ -159,9 +304,511 @@
       "color": "#b03a48",
       "rest": 0.25,
       "drives": [
-        { "signal": "digestion", "weight": 0.35, "note": "Gut blood flow rises while food is being digested.", "source": "GH14" },
-        { "signal": "absorption", "weight": 0.3, "note": "Absorbed nutrients leave the gut in the mesenteric veins.", "source": "GH14" },
-        { "signal": "sympathetic", "weight": -0.15, "note": "Sympathetic outflow constricts the splanchnic vessels.", "source": "GH14" }
+        {
+          "signal": "digestion",
+          "weight": 0.35,
+          "note": "Gut blood flow rises while food is being digested.",
+          "source": "GH14"
+        },
+        {
+          "signal": "absorption",
+          "weight": 0.3,
+          "note": "Absorbed nutrients leave the gut in the mesenteric veins.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.15,
+          "note": "Sympathetic outflow constricts the splanchnic vessels.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "duodenal_superior_part",
+      "label": "Superior Part of the Duodenum",
+      "parent": "duodenum",
+      "summary": "The first part of the duodenum, leaving the stomach",
+      "function": "The superior part is the short first stretch of the duodenum, which receives chyme from the pylorus. It is where the duodenal glands are most numerous.",
+      "color": "#e0a040",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.4,
+          "note": "Chyme arriving from the stomach is mixed here with bile and pancreatic juice.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "duodenal_descending_part",
+      "label": "Descending Part of the Duodenum",
+      "parent": "duodenum",
+      "summary": "The second part, running down and receiving bile and pancreatic juice",
+      "function": "The descending part runs down on the right side of the loop. The bile duct and pancreatic duct open into it at the major duodenal papilla.",
+      "color": "#d9953a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.4,
+          "note": "Chyme arriving from the stomach is mixed here with bile and pancreatic juice.",
+          "source": "GH14"
+        },
+        {
+          "signal": "fatLoad",
+          "weight": 0.2,
+          "note": "Fat in the duodenum stimulates bile release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "duodenal_horizontal_part",
+      "label": "Horizontal Part of the Duodenum",
+      "parent": "duodenum",
+      "summary": "The third part, crossing the midline",
+      "function": "The horizontal part crosses from right to left, passing below the head of the pancreas and in front of the large vessels behind it.",
+      "color": "#cf8a34",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.4,
+          "note": "Chyme arriving from the stomach is mixed here with bile and pancreatic juice.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "duodenal_ascending_part",
+      "label": "Ascending Part of the Duodenum",
+      "parent": "duodenum",
+      "summary": "The fourth part, rising to the duodenojejunal flexure",
+      "function": "The ascending part climbs on the left of the midline and ends at the duodenojejunal flexure, where the duodenum becomes the jejunum.",
+      "color": "#c4802e",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.4,
+          "note": "Chyme arriving from the stomach is mixed here with bile and pancreatic juice.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "major_duodenal_papilla",
+      "label": "Major Duodenal Papilla",
+      "parent": "duodenal_descending_part",
+      "summary": "The raised opening where the bile and main pancreatic ducts enter",
+      "function": "The major duodenal papilla is a small elevation on the inner wall of the descending duodenum. Bile and pancreatic juice pour through it onto the chyme.",
+      "color": "#a8465c",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.4,
+          "note": "Fat in the duodenum is the stimulus for bile release.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Digestion in the upper gut calls for bile and pancreatic juice.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "minor_duodenal_papilla",
+      "label": "Minor Duodenal Papilla",
+      "parent": "duodenal_descending_part",
+      "summary": "A smaller opening above the major papilla, for the accessory pancreatic duct",
+      "function": "The minor duodenal papilla lies above the major one and is the opening of the accessory pancreatic duct when that duct is present.",
+      "color": "#b85a70",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Digestion in the upper gut calls for pancreatic juice.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "duodenal_glands",
+      "label": "Duodenal (Brunner) Glands",
+      "parent": "duodenum",
+      "summary": "Mucus-secreting glands in the submucosa of the duodenum",
+      "function": "Brunner glands release an alkaline mucus that protects the duodenal wall from the acid arriving from the stomach. They are drawn as enlarged flasks, in a sparse scatter.",
+      "color": "#f0d890",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.3,
+          "note": "Acid chyme arriving from the stomach stimulates them.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.2,
+          "note": "Vagal outflow stimulates their secretion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "duodenojejunal_flexure",
+      "label": "Duodenojejunal Flexure",
+      "summary": "The sharp bend where the duodenum becomes the jejunum",
+      "function": "The duodenojejunal flexure marks the end of the duodenum. It is held in place by the suspensory muscle of the duodenum.",
+      "color": "#d9953a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "intestinalTransit",
+          "weight": 0.2,
+          "note": "Chyme leaving the duodenum passes round it.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "suspensory_muscle",
+      "label": "Suspensory Muscle of the Duodenum (Treitz)",
+      "summary": "A band of fibromuscular tissue that suspends the duodenojejunal flexure from above",
+      "function": "The suspensory muscle is a thin band running from the duodenojejunal flexure up toward the region of the coeliac artery. It fixes the flexure and is a landmark that divides the duodenum from the jejunum.",
+      "color": "#c47a6a",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mesentery",
+      "label": "Mesentery",
+      "summary": "The fold of peritoneum that suspends the jejunum and ileum and carries their vessels",
+      "function": "The mesentery is a double layer of peritoneum that attaches the small bowel to the back wall of the abdomen. It carries the arteries, veins, nerves and lymphatics to and from the bowel. It is drawn as a flat fan, not the real fatty fold.",
+      "color": "#f0e0a0",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.15,
+          "note": "Blood flow through it rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "submucosal_plexus",
+      "label": "Submucosal (Meissner) Plexus",
+      "summary": "The nerve network in the submucosa of the small intestine",
+      "function": "The submucosal plexus is part of the enteric nervous system. It controls local secretion and blood flow in the mucosa. The braid drawn here is schematic.",
+      "color": "#e8d060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal fibres connect with the enteric neurons of the plexus.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "A meal engages the secretory reflexes of the plexus.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "myenteric_plexus",
+      "label": "Myenteric (Auerbach) Plexus",
+      "summary": "The nerve network between the two muscle layers",
+      "function": "The myenteric plexus coordinates the contraction of the muscle coat and so controls the movement of chyme along the bowel. The braid drawn here is schematic.",
+      "color": "#e8d060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal fibres connect with the enteric neurons of the plexus.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.2,
+          "note": "Raised motility engages the enteric nervous system.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serosa",
+      "label": "Serosa",
+      "summary": "The smooth outer covering of the small intestine, a layer of peritoneum",
+      "function": "The serosa is the visceral peritoneum covering the bowel. It is slippery, so the coils can slide over one another as they move.",
+      "color": "#f0e4d0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "circular_muscle",
+      "label": "Circular Muscle Layer",
+      "parent": "muscular_wall",
+      "summary": "The inner muscle layer, with fibres running round the bowel",
+      "function": "The circular fibres narrow the lumen when they contract. Local rings of contraction, segmentation, mix the chyme and bring it against the lining.",
+      "color": "#b5555a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "motilityRise",
+          "weight": 0.4,
+          "note": "Drugs or states that raise gut motility act on this muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.3,
+          "note": "Reduced motility quietens the muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal outflow excites intestinal smooth muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.2,
+          "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "longitudinal_muscle",
+      "label": "Longitudinal Muscle Layer",
+      "parent": "muscular_wall",
+      "summary": "The outer muscle layer, with fibres running along the bowel",
+      "function": "The longitudinal fibres shorten a length of bowel when they contract. Together with the circular layer they produce the peristaltic wave that moves chyme onward.",
+      "color": "#9c4a52",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "motilityRise",
+          "weight": 0.4,
+          "note": "Drugs or states that raise gut motility act on this muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.3,
+          "note": "Reduced motility quietens the muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal outflow excites intestinal smooth muscle.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.2,
+          "note": "Sympathetic outflow inhibits small-bowel motility, so this part is drawn BELOW its resting level under sympathetic drive. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "villus_enlarged",
+      "label": "Villus (enlarged)",
+      "parent": "mucosa_villi",
+      "summary": "One finger-like villus drawn many times larger than those in the patch below",
+      "function": "A villus is a fold of the lining that increases the surface for absorption. This one is drawn enlarged above the patch so its cells can be seen. Its cells and capillaries are shown as children of the mucosa.",
+      "color": "#e8c070",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "enterocytes",
+      "label": "Enterocytes (Brush Border)",
+      "parent": "mucosa_villi",
+      "summary": "The absorbing cells of the lining, with a brush border of microvilli",
+      "function": "Enterocytes are the most numerous cells of the lining. Their free surface is covered by microvilli, the brush border, which increases the area for absorbing nutrients and holds enzymes that finish digestion.",
+      "color": "#e8a860",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "absorption",
+          "weight": 0.5,
+          "note": "Nutrients crossing the lining are absorbed by these cells.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "goblet_cells",
+      "label": "Goblet Cells",
+      "parent": "mucosa_villi",
+      "summary": "Mucus-secreting cells scattered among the absorbing cells",
+      "function": "Goblet cells release mucus onto the surface of the lining, which lubricates the passage of chyme and protects the lining.",
+      "color": "#6aa8d8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "A meal in the gut stimulates mucus release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "villus_capillaries",
+      "label": "Villus Capillaries",
+      "parent": "mucosa_villi",
+      "summary": "Capillary loops in each villus that carry absorbed nutrients away",
+      "function": "Each villus holds a network of capillaries just under its surface. They take up most absorbed nutrients and carry them toward the liver in the portal vein.",
+      "color": "#c0392b",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "absorption",
+          "weight": 0.4,
+          "note": "Absorbed nutrients leave the gut in these capillaries.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Gut blood flow rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intestinal_crypts",
+      "label": "Intestinal Crypts (of Lieberkühn)",
+      "parent": "mucosa_villi",
+      "summary": "Tubular pits between the villi where the lining renews itself",
+      "function": "The crypts are simple tubular glands that open between the villi. Stem cells at their base renew the lining, and the cells move up toward the villus tips as they mature.",
+      "color": "#d8a050",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "paneth_cells",
+      "label": "Paneth Cells",
+      "parent": "mucosa_villi",
+      "summary": "Granule-filled cells at the base of the crypts",
+      "function": "Paneth cells sit at the base of the crypts and release antimicrobial substances that help keep the bacteria of the lumen away from the stem cells.",
+      "color": "#d85a8a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "infection",
+          "weight": 0.15,
+          "note": "A pathogen burden engages the gut's defences.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "enteroendocrine_cells",
+      "label": "Enteroendocrine Cells",
+      "parent": "mucosa_villi",
+      "summary": "Scattered cells of the lining that release gut hormones",
+      "function": "Enteroendocrine cells sense the contents of the lumen and release hormones into the blood that control digestion. Several kinds exist; the I, S and K cells are shown.",
+      "color": "#b06ad8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Food in the gut is what they sense.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "i_cells",
+      "label": "I Cells (CCK)",
+      "parent": "enteroendocrine_cells",
+      "summary": "Enteroendocrine cells that release cholecystokinin",
+      "function": "I cells release cholecystokinin in response to fat and protein in the duodenum. It makes the gallbladder contract and the pancreas release enzymes.",
+      "color": "#8a5ad8",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "fatLoad",
+          "weight": 0.5,
+          "note": "Fat in the duodenum is the stimulus for CCK release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "s_cells",
+      "label": "S Cells (Secretin)",
+      "parent": "enteroendocrine_cells",
+      "summary": "Enteroendocrine cells that release secretin",
+      "function": "S cells release secretin when acid enters the duodenum. It makes the pancreas and bile ducts release a bicarbonate-rich fluid that neutralises the acid.",
+      "color": "#5a8ad8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "k_cells",
+      "label": "K Cells (GIP)",
+      "parent": "enteroendocrine_cells",
+      "summary": "Enteroendocrine cells that release glucose-dependent insulinotropic peptide",
+      "function": "K cells release GIP in response to glucose and fat in the upper bowel. It helps the pancreas release insulin in proportion to the meal.",
+      "color": "#d85ab0",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "absorption",
+          "weight": 0.4,
+          "note": "Absorbed glucose is a stimulus for GIP release.",
+          "source": "GH14"
+        },
+        {
+          "signal": "fatLoad",
+          "weight": 0.2,
+          "note": "Fat is also a stimulus.",
+          "source": "GH14"
+        }
       ],
       "source": "GRAYS42"
     }

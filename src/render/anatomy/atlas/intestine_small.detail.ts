@@ -39,6 +39,16 @@ const GLASS: readonly [string, number, number][] = [
   ['mucosa_villi', 0.3, 0.2],
   ['lacteals', 0.4, 0.1],
   ['mesenteric_vessels', 0.4, 0.1],
+  // Finer structures that enclose or carry something are glass too.
+  ['duodenal_superior_part', 0.12, 0.14],
+  ['duodenal_descending_part', 0.12, 0.14],
+  ['duodenal_horizontal_part', 0.12, 0.14],
+  ['duodenal_ascending_part', 0.12, 0.14],
+  ['duodenojejunal_flexure', 0.14, 0.12],
+  ['mesentery', 0.14, 0.08],
+  ['serosa', 0.08, 0.06],
+  ['villus_enlarged', 0.22, 0.12],
+  ['intestinal_crypts', 0.25, 0.1],
 ];
 
 const CHYME_COLOUR = 0xb99a52;

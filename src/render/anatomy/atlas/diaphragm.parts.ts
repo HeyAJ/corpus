@@ -60,6 +60,8 @@ function at(x: number, z: number, lift: number): V3 {
  */
 function patch(
   t0: number, t1: number, fIn: (t: number) => number, fOut: (t: number) => number, nt: number, nf: number,
+  /** Slab centre above the sheet and half its thickness: the level-1 parts that overlay the muscle sit just above it so no two surfaces coincide. */
+  centre = 0, half = HALF,
 ): THREE.BufferGeometry {
   const pos: number[] = [];
   const idx: number[] = [];
@@ -76,8 +78,8 @@ function patch(
     }
     return base;
   };
-  const top = grid(HALF);
-  const bot = grid(-HALF);
+  const top = grid(centre + half);
+  const bot = grid(centre - half);
   const quad = (base: number, flip: boolean): void => {
     for (let j = 0; j < nf; j++) {
       for (let i = 0; i < nt; i++) {
@@ -198,6 +200,26 @@ function phrenicNerves(): THREE.BufferGeometry {
   return mergeParts(list);
 }
 
+/** A tendinous arch laid on the sheet along the (x, z) points given. */
+function arch(xz: [number, number][]): THREE.BufferGeometry {
+  return tubeAlong(sheetPath(xz, 0.0012), () => 0.0012, { tubular: 14, radial: 4 });
+}
+
+/**
+ * THE TWO DOMES, THE STERNAL AND LUMBAR PARTS: slabs just above the existing muscle and tendon
+ * (a millimetre or two), so they read as regions of the same sheet. Where the parts begin and
+ * end is a drawing choice: the sternal part is a narrow wedge at the front rim, the lumbar part a
+ * wide wedge at the back, and each dome is one half of the sheet, split down the midline.
+ * The arcuate ligaments are schematic arches whose ends are placed by eye along the back rim.
+ */
+const DEG = Math.PI / 180;
+const stern = (): THREE.BufferGeometry =>
+  patch(76 * DEG, 104 * DEG, (t) => tendonFraction(t) + 0.012, () => RIM, 4, 5, 0.0014, 0.0005);
+const lumbar = (): THREE.BufferGeometry =>
+  patch(232 * DEG, 308 * DEG, (t) => tendonFraction(t) + 0.012, () => RIM, 10, 5, 0.0014, 0.0005);
+const dome = (right: boolean): THREE.BufferGeometry =>
+  patch(right ? -84 * DEG : 96 * DEG, right ? 84 * DEG : 264 * DEG, () => 0.04, () => 0.86, 20, 6, 0.0022, 0.0005);
+
 export const parts: PartBuilder = () => [
   { id: 'central_tendon', geometry: centralTendon() },
   { id: 'costal_muscle', geometry: costalMuscle() },
@@ -210,4 +232,11 @@ export const parts: PartBuilder = () => [
   // The aorta passes behind the diaphragm, between the crura, in the midline.
   { id: 'aortic_hiatus', geometry: opening(0, -0.066, 0.0085, 0.0013) },
   { id: 'phrenic_nerves', geometry: phrenicNerves() },
+  { id: 'sternal_part', geometry: stern() },
+  { id: 'lumbar_part', geometry: lumbar() },
+  { id: 'median_arcuate_ligament', geometry: arch([[-0.011, -0.056], [0, -0.0575], [0.011, -0.056]]) },
+  { id: 'medial_arcuate_ligament', geometry: mergeParts([1, -1].map((s) => arch([[s * 0.022, -0.06], [s * 0.034, -0.056], [s * 0.046, -0.05]]))) },
+  { id: 'lateral_arcuate_ligament', geometry: mergeParts([1, -1].map((s) => arch([[s * 0.046, -0.05], [s * 0.058, -0.045], [s * 0.068, -0.038]]))) },
+  { id: 'right_dome', geometry: dome(true) },
+  { id: 'left_dome', geometry: dome(false) },
 ];

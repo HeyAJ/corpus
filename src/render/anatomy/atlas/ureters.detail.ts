@@ -21,6 +21,13 @@ import { ureterRoute } from './ureters.parts';
  * closed and opens to full size as a bolus reaches it. Under `reducedMotion` it stays full
  * size and the boluses still run, since they are the content, not decoration.
  *
+ * THE MUSCLE LAYERS BRIGHTEN WITH THE WAVE. The one visible sign of peristalsis the wall can
+ * give without being rebuilt every frame is its glow: while a bolus is on its way (the same
+ * window the particles use) the muscle layers glow, and between boluses they fall back to a
+ * dim rest. The glow level is a display choice. The sleeves are not squeezed in step with
+ * the bolus because a part can only be scaled as a whole, which would swell the whole ureter
+ * and not a travelling band.
+ *
  * GLASS. The lumens and the muscular coat enclose the stream, so they are drawn as glass
  * every frame; the narrow-point collars and the junction stay solid.
  */
@@ -53,6 +60,7 @@ export const detail: OrganDetailSpec = {
     const travel = length / SPEED;
     const period = Math.max(travel * (1 + BOLUS) + 0.5, 16 - 4.5 * urine);
     let open = 0;
+    let wave = 0;
     for (let i = 0; i < 2; i++) {
       const f = ctx.flow(`bolus_${SIDES[i]}`);
       if (!f) continue;
@@ -64,7 +72,15 @@ export const detail: OrganDetailSpec = {
       f.setDensity(Math.min(1, urine));
       if (on) f.setWindow(Math.max(0, front - BOLUS), Math.min(1, front));
       if (on && front > 0.9) open = Math.max(open, 1);
+      if (on) wave = 1;
     }
+    // The wall's finer layers: glass sleeves round the lumen; the muscle brightens with the wave.
+    ctx.part('urothelium')?.setOpacity(0.3);
+    ctx.part('lamina_propria')?.setOpacity(0.22);
+    ctx.part('muscle_layers')?.setOpacity(0.26);
+    ctx.part('adventitia')?.setOpacity(0.16);
+    ctx.part('muscle_layers')?.setGlow(ctx.reducedMotion ? 0.3 : 0.12 + 0.6 * wave);
+    ctx.part('pelviureteric_junction')?.setOpacity(0.45);
     ctx.part('vesicoureteric_junctions')?.setScale(ctx.reducedMotion ? 1 : 0.75 + 0.25 * open);
   },
 };
