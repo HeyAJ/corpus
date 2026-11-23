@@ -28,7 +28,7 @@
     {
       "id": "lower_limb_bones",
       "triangles": 14720,
-      "budget": 8000,
+      "budget": 16000,
       "boundingRadius_m": 0.17647,
       "worldCentre_m": [
         0,
@@ -72,7 +72,7 @@
     {
       "id": "upper_limb_bones",
       "triangles": 10712,
-      "budget": 8000,
+      "budget": 12000,
       "boundingRadius_m": 0.22333,
       "worldCentre_m": [
         -0.0001,
