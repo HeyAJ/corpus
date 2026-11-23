@@ -242,10 +242,10 @@ function OrganList() {
   const pregnant = useStore((s) => s.snapshot?.reproductive?.pregnancy?.pregnant ?? false);
 
   const groups = useMemo(() => {
-    // Layer organs (the bones) are not listed until the layers control can build them; see
-    // OrganSet.wants. Their group, `skeletal`, is already in SYSTEM_ORDER and appears on its own
-    // once they are.
-    const visible = ORGANS.filter((o) => !o.layer && (!o.sex || !sex || o.sex === sex) && (!o.pregnancyOnly || pregnant));
+    // Layer organs (the bones) are listed like any other: choosing one selects it and OrganSet
+    // builds and draws it on demand, with its layer off. Their group, `skeletal`, is in
+    // SYSTEM_ORDER.
+    const visible = ORGANS.filter((o) => (!o.sex || !sex || o.sex === sex) && (!o.pregnancyOnly || pregnant));
     return SYSTEM_ORDER.map((g) => ({ ...g, organs: visible.filter((o) => o.system === g.id) })).filter((g) => g.organs.length > 0);
   }, [sex, pregnant]);
 

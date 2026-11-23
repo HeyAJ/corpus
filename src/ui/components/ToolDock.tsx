@@ -6,6 +6,7 @@ import { useStore, type ToolMode } from '../store';
 import { SearchBox } from './SearchBox';
 import { buildShareHash, LINK_COPIED_TOAST, LAYER_NAMES, type LayerName } from '../shareLink';
 import { ActivityLegend } from './ActivityLegend';
+import { BloodDrop } from './layerGlyphs';
 import styles from './dock.module.css';
 import { useVitalsAudio } from '../audio/useVitalsAudio';
 
@@ -44,80 +45,7 @@ function DockButton({ label, active, onClick, children }: DockButtonProps) {
 const S = 20;
 
 /**
- * THE VESSELS SWITCH, in the bottom-left corner of the stage, above the dock.
- *
- * Its own labelled control rather than an unlabelled chip in the dock. The anatomy
- * opens WITHOUT the vessels (user choice, 2026-09-26: the organs first, the vascular
- * tree on request), and a round drop icon among four tools did not say "vessels" to
- * anyone. A word and an on/off state does.
- */
-export function VesselToggle() {
-  const userOn = useStore((s) => s.vascularVisible);
-  const toggle = useStore((s) => s.toggleVascular);
-  // The Viewer forces the overlay on while the heart is open (Viewer.applyVascularVisibility),
-  // so the switch must read ON then, with the reason, rather than claim "off" over a
-  // screen full of vessels. Pressing it still flips the user's own state underneath.
-  const withHeart = useStore((s) => s.selectedOrgan === 'heart') && !userOn;
-  const on = userOn || withHeart;
-  return (
-    <button
-      className={`${styles.vessels} ${on ? styles.vesselsOn : ''}`}
-      onClick={toggle}
-      aria-pressed={on}
-      aria-label={withHeart ? 'Blood vessels shown while the heart is open' : on ? 'Hide blood vessels' : 'Show blood vessels'}
-      title={withHeart ? 'Shown while the heart is open' : on ? 'Hide blood vessels' : 'Show blood vessels'}
-    >
-      <BloodDrop filled={on} />
-      <span>Vessels</span>
-      <span className={styles.vesselsState}>{withHeart ? 'on, with heart' : on ? 'on' : 'off'}</span>
-    </button>
-  );
-}
-
-/**
- * THE NERVES AND HORMONES SWITCHES. The same component and style as Vessels, stacked
- * above it in the bottom-left corner (slot 1 and slot 2 in the CSS, a 48 px pitch: 44 px
- * touch height plus a 4 px gap). Each overlay is
- * off at start and costs nothing per frame while off.
- */
-export function NervesToggle() {
-  const on = useStore((s) => s.nervesVisible);
-  const toggle = useStore((s) => s.toggleNerves);
-  return (
-    <button
-      className={`${styles.vessels} ${styles.slot1} ${on ? styles.vesselsOn : ''}`}
-      onClick={toggle}
-      aria-pressed={on}
-      aria-label={on ? 'Hide nervous system' : 'Show nervous system'}
-      title={on ? 'Hide nervous system' : 'Show nervous system'}
-    >
-      <NerveGlyph on={on} />
-      <span>Nerves</span>
-      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
-    </button>
-  );
-}
-
-export function HormonesToggle() {
-  const on = useStore((s) => s.hormonesVisible);
-  const toggle = useStore((s) => s.toggleHormones);
-  return (
-    <button
-      className={`${styles.vessels} ${styles.slot2} ${on ? styles.vesselsOn : ''}`}
-      onClick={toggle}
-      aria-pressed={on}
-      aria-label={on ? 'Hide hormone traffic' : 'Show hormone traffic'}
-      title={on ? 'Hide hormone traffic' : 'Show hormone traffic'}
-    >
-      <HormoneGlyph on={on} />
-      <span>Hormones</span>
-      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
-    </button>
-  );
-}
-
-/**
- * THE HORMONE LEGEND. Shown whenever the Hormones switch is on, above the three switches.
+ * THE HORMONE LEGEND. Shown whenever the Hormones layer is on, above the Layers chip.
  * It lists every hormone present in the snapshot right now (the overlay's own legend()), so
  * the list follows the body: a woman's shows oestradiol, a man's testosterone. A colour dot
  * says which colour on the body is which; the mark says whether the level is above (up
@@ -155,29 +83,6 @@ export function HormoneLegend({ viewerRef, ready }: { viewerRef: React.MutableRe
 }
 
 /**
- * THE ACTIVITY SWITCH, fourth in the stack (slot 3). It recolours every unselected organ
- * by how far it is above its own rest (Viewer.setActivityVisible), from the one amber ramp
- * the legend below also draws. Off at start; the legend appears with it.
- */
-export function ActivityToggle() {
-  const on = useStore((s) => s.activityVisible);
-  const toggle = useStore((s) => s.toggleActivity);
-  return (
-    <button
-      className={`${styles.vessels} ${styles.slot3} ${on ? styles.vesselsOn : ''}`}
-      onClick={toggle}
-      aria-pressed={on}
-      aria-label="Show organ activity"
-      title={on ? 'Hide organ activity' : 'Show organ activity'}
-    >
-      <ActivityGlyph on={on} />
-      <span>Activity</span>
-      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
-    </button>
-  );
-}
-
-/**
  * The legends column: the Hormones legend and the Activity legend, stacked so that both
  * switches on at once cannot make them collide (see .legends in dock.module.css).
  */
@@ -187,52 +92,6 @@ export function LegendStack({ viewerRef, ready }: { viewerRef: React.MutableRefO
       <HormoneLegend viewerRef={viewerRef} ready={ready} />
       <ActivityLegend />
     </div>
-  );
-}
-
-function ActivityGlyph({ on }: { on: boolean }) {
-  // Amber, the hue of the ramp itself (activityRamp.ts), so the switch and what it paints agree.
-  const c = '#c0731a';
-  return (
-    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 12h4l2-5 4 10 2-5h6" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="12" cy="12" r="9" fill={on ? c : 'none'} fillOpacity={on ? 0.18 : 0} stroke={c} strokeWidth="1.4" />
-    </svg>
-  );
-}
-
-function NerveGlyph({ on }: { on: boolean }) {
-  const c = '#d08a1c';
-  return (
-    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 3v7m0 0-6 5m6-5 6 5m-6-5v11" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="12" cy="10" r="2.2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
-    </svg>
-  );
-}
-
-function HormoneGlyph({ on }: { on: boolean }) {
-  const c = '#7a4fb0';
-  return (
-    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="8" cy="9" r="3.2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
-      <circle cx="16.5" cy="7" r="2" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
-      <circle cx="15" cy="16.5" r="2.6" fill={on ? c : 'none'} stroke={c} strokeWidth="1.6" />
-    </svg>
-  );
-}
-
-function BloodDrop({ filled }: { filled: boolean }) {
-  return (
-    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M12 2.5c3.6 4.4 6.5 8 6.5 11.4A6.5 6.5 0 0 1 12 20.4a6.5 6.5 0 0 1-6.5-6.5C5.5 10.5 8.4 6.9 12 2.5Z"
-        fill={filled ? '#d63a2f' : 'none'}
-        stroke="#d63a2f"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
 
@@ -279,6 +138,7 @@ function currentShareHash(): string {
   const s = useStore.getState();
   const repro = s.snapshot?.reproductive;
   const layersOn: Record<LayerName, boolean> = {
+    bones: s.bonesVisible,
     vessels: s.vascularVisible,
     nerves: s.nervesVisible,
     hormones: s.hormonesVisible,

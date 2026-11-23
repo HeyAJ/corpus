@@ -173,75 +173,10 @@ a.item {
   color: inherit;
 }
 
-/* ------------------------------------------------------------ vessels switch */
-
-/*
- * Bottom-left corner of the stage, just above the dock. The body is centred, so this
- * corner is empty at every width; the bottom offset is the MEASURED bar height, the
- * same number the drawer and sheet use, so the switch can never sit under the dock.
- */
-.vessels {
-  position: absolute;
-  left: var(--inset-hud);
-  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + var(--switch-slot, 0px));
-  z-index: 14;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  /* 44 px touch target; the Nerves, Hormones and Activity switches stack above on a 48 px pitch. */
-  min-height: 44px;
-  padding: 4px 12px 4px 9px;
-  border: none;
-  border-radius: var(--radius-pill);
-  background: var(--chip-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--ink);
-  cursor: pointer;
-  transition: background 140ms ease;
-}
-
-.slot1 {
-  --switch-slot: 48px;
-}
-
-.slot2 {
-  --switch-slot: 96px;
-}
-
-.slot3 {
-  --switch-slot: 144px;
-}
-
-.vessels:hover {
-  background: var(--chip-bg-strong);
-}
-
-.vesselsOn {
-  background: var(--chip-bg-strong);
-  box-shadow: inset 0 0 0 1.5px rgba(214, 58, 47, 0.45);
-}
-
-.vesselsState {
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  /* Was --ink-faint, about 2:1 on the chip: the on/off word of a switch was unreadable. */
-  color: var(--ink-dim);
-}
-
-.vesselsOn .vesselsState {
-  color: var(--ink-alarm);
-}
-
 /* ------------------------------------------------------------ hormone legend */
 
 /*
- * THE LEGENDS COLUMN. Above the four switches (4 x 44 px plus three 4 px gaps, plus 8 px of
- * air), left-aligned with them. It holds the Hormones legend and the Activity legend one
+ * THE LEGENDS COLUMN. Above the Layers chip (44 px plus 8 px of air), left-aligned with it. It holds the Hormones legend and the Activity legend one
  * above the other, so with both switches on they cannot collide (each used to position
  * itself, and a second legend would have landed on the first). The Activity legend sits
  * nearest the switches; the hormone list is the part that shrinks and scrolls inside
@@ -251,13 +186,13 @@ a.item {
 .legends {
   position: absolute;
   left: var(--inset-hud);
-  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + 192px);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + 52px);
   z-index: 14;
   display: flex;
   flex-direction: column;
   gap: 8px;
   /* 200 px is the room kept for the HUD's first rows (a display choice). */
-  max-height: calc(100% - var(--corpus-bar-actual, var(--corpus-bar-h)) - 200px - 192px);
+  max-height: calc(100% - var(--corpus-bar-actual, var(--corpus-bar-h)) - 200px - 52px);
   pointer-events: none;
 }
 
@@ -334,21 +269,19 @@ a.item {
  * touched: its sheet is a right-hand column and the corner stays free.
  */
 @media (max-width: 720px) {
-  :global([data-card='open']) .vessels,
   :global([data-card='open']) .legends {
     display: none;
   }
 }
 
 /*
- * THE PANELS MENU HIDES THE CORNER SWITCHES AND THE LEGEND, AT EVERY WIDTH. The launcher
- * opens upward from the dock over the bottom-left corner, so the Vessels, Nerves, Hormones
- * and Activity switches were painted through the "Receptors" and "Laboratory" rows (the checker
- * printed "Vessels" x "Receptors"). The menu is modal (its scrim takes every tap), so the
- * switches were unreachable anyway; they return the moment it closes.
+ * THE PANELS MENU HIDES THE LEGEND, AT EVERY WIDTH. The launcher opens upward from the dock
+ * over the bottom-left corner, so the legends were painted through its rows. It returns the
+ * moment the menu closes. The Layers popover also hides it while open (data-layers), so the
+ * popover never lies over text it would cover.
  */
-:global([data-menu='open']) .vessels,
-:global([data-menu='open']) .legends {
+:global([data-menu='open']) .legends,
+:global([data-layers='open']) .legends {
   display: none;
 }
 

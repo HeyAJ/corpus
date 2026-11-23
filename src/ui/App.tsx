@@ -6,7 +6,8 @@ import type { OrganId } from '../data/types';
 import { ANATOMY, atlasOf } from '../data/anatomy';
 import type { WaveformChannel } from '../bridge/types';
 import { useStore } from './store';
-import { ToolDock, VesselToggle, NervesToggle, HormonesToggle, ActivityToggle, LegendStack } from './components/ToolDock';
+import { ToolDock, LegendStack } from './components/ToolDock';
+import { LayersControl } from './components/LayersControl';
 import { CoachMark } from './components/CoachMark';
 import { ResetViewButton } from './components/ResetViewButton';
 import { buildCatalogue } from './search';
@@ -90,6 +91,7 @@ function applyShareLink(): () => void {
         nervesVisible: parsed.layers.includes('nerves'),
         hormonesVisible: parsed.layers.includes('hormones'),
         activityVisible: parsed.layers.includes('activity'),
+        bonesVisible: parsed.layers.includes('bones'),
       });
     }
     if (parsed.organ) {
@@ -153,6 +155,8 @@ export function App() {
   const nervesVisible = useStore((s) => s.nervesVisible);
   const hormonesVisible = useStore((s) => s.hormonesVisible);
   const activityVisible = useStore((s) => s.activityVisible);
+  const bonesVisible = useStore((s) => s.bonesVisible);
+  const layersOpen = useStore((s) => s.layersOpen);
   const pushLog = useStore((s) => s.pushLog);
   // Why the 3D view is not showing, if it is not: it could not start, or it lost its context.
   const [glProblem, setGlProblem] = useState<null | 'unavailable' | 'lost'>(null);
@@ -461,6 +465,10 @@ export function App() {
   useEffect(() => {
     viewerRef.current?.setActivityVisible(activityVisible);
   }, [activityVisible]);
+  /* ---- the skeleton layer: built on first need, then shown and hidden (Viewer.setLayerVisible) ---- */
+  useEffect(() => {
+    viewerRef.current?.setLayerVisible('bones', bonesVisible);
+  }, [bonesVisible]);
 
   /* ---------------------------------------------------------------- input */
 
@@ -507,7 +515,7 @@ export function App() {
 
   return (
     <div className={styles.root} data-sheet={anyPanelOpen ? 'open' : 'closed'} data-card={sheetOpen ? 'open' : 'closed'}
-      data-menu={menuOpen ? 'open' : 'closed'} data-drawer-open={drawerOpen ? 'open' : 'closed'}>
+      data-menu={menuOpen ? 'open' : 'closed'} data-layers={layersOpen ? 'open' : 'closed'} data-drawer-open={drawerOpen ? 'open' : 'closed'}>
       {/*
         THE STAGE. The body and everything that must sit OVER the body: its own HUD,
         the screen-space labels, the condition tags, the speed control, the engine's
@@ -535,10 +543,7 @@ export function App() {
         <Hud ready={ready} client={client} folded={sheetOpen} />
         <Conditions />
         <TimeScaleControl />
-        <VesselToggle />
-        <NervesToggle />
-        <HormonesToggle />
-        <ActivityToggle />
+        <LayersControl />
         <LegendStack viewerRef={viewerRef} ready={ready} />
         <CoachMark covered={sheetOpen || menuOpen} />
         <ResetViewButton viewerRef={viewerRef} covered={sheetOpen || menuOpen} />

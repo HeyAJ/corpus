@@ -73,11 +73,11 @@ export function fold(text: string): string {
 
 /** The organs this body has, in organs.json order. */
 export function organsOf(body: BodyKind): OrganDef[] {
-  // Layer organs (the bones) are left out of the catalogue until the layers control exists:
-  // OrganSet does not build them, so choosing one would select an organ with no geometry to
-  // frame and no interior to open. Agent ls's layers work puts them back, found only while
-  // their layer is on or by name.
-  return ORGANS.filter((o) => !o.layer && (!o.sex || o.sex === body.sex) && (!o.pregnancyOnly || body.pregnant));
+  // Layer organs (the bones) ARE in the catalogue, whether or not their layer is on: choosing
+  // one selects it, and OrganSet builds and draws a selected layer organ on demand (layers.ts),
+  // hiding it again on deselection without touching the layer switch. So "Rib Cage" or "Skull"
+  // is found by name with Bones off.
+  return ORGANS.filter((o) => (!o.sex || o.sex === body.sex) && (!o.pregnancyOnly || body.pregnant));
 }
 
 /** The qualifier a shared-atlas part gets: "Left Kidney" becomes "left kidney". */

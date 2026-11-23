@@ -1,7 +1,7 @@
 /*
  * THE FIRST-VISIT HINT PILL (CoachMark.tsx). It sits on the row just above the bottom bar,
- * centred on a wide screen and, on a phone, to the right of the corner switches, so it
- * covers no control: not the four switches (bottom-left, up to about 140 px wide), not the
+ * centred on a wide screen and, on a phone, to the right of the Layers chip, so it
+ * covers no control: not the Layers chip (bottom-left, about 120 px wide), not the
  * dock under it, not the HUD at the top-left or the speed and condition tags at the top
  * right. An earlier placement over the lower body landed under the legends column when a
  * switch was on. Every offset is a display choice. It sits under the sheets and the panels
