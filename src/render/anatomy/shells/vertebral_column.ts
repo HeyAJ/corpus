@@ -44,6 +44,12 @@ import { thoracicLevel } from './thoracic_cage';
  * oesophagus, sampled from their shells) down to a body 4 mm deep, and the remaining overlap is
  * printed by the probe. The fix is to move the cord path or the oesophagus, which other files own.
  *
+ * IMPORT ORDER, FOR THE RECORD. The stub of this file read `SPINAL_CORD_PATH` inside its function
+ * and said that was to dodge an import cycle with models.ts. That cycle no longer exists: the
+ * path lives in paths.ts, which imports nothing, so it is imported at module level here and
+ * models.ts and this file both depend on it and not on each other. (This file does import
+ * shells/thoracic_cage.ts for the rib levels; that file imports neither models.ts nor this one.)
+ *
  * Exported for the atlas; sizes are drawing choices, not measurements.
  */
 
