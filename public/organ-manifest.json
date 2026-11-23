@@ -1,7 +1,7 @@
 {
   "generatedBy": "tools/placeholder-organs.ts",
   "note": "Bounding spheres and centroids of the authored organ shells, in the BODY frame (+x = the patient's right; the renderer mirrors x). Anything that replaces a shell must match these within a few millimetres, or the camera focus animation and the sim-driven pulse scaling will be framed on the wrong point.",
-  "totalTriangles": 222940,
+  "totalTriangles": 228024,
   "organs": [
     {
       "id": "brain",
@@ -224,6 +224,17 @@
       ]
     },
     {
+      "id": "ears",
+      "triangles": 4888,
+      "budget": 8000,
+      "boundingRadius_m": 0.07514,
+      "worldCentre_m": [
+        0,
+        0.4434,
+        -0.0141
+      ]
+    },
+    {
       "id": "bladder",
       "triangles": 4808,
       "budget": 8000,
@@ -334,6 +345,17 @@
       ]
     },
     {
+      "id": "nasal_cavity",
+      "triangles": 2096,
+      "budget": 8000,
+      "boundingRadius_m": 0.04509,
+      "worldCentre_m": [
+        0,
+        0.4182,
+        0.052
+      ]
+    },
+    {
       "id": "ureters",
       "triangles": 1792,
       "budget": 8000,
@@ -353,6 +375,17 @@
         0,
         0.0357,
         -0.006
+      ]
+    },
+    {
+      "id": "mouth",
+      "triangles": 1480,
+      "budget": 8000,
+      "boundingRadius_m": 0.03009,
+      "worldCentre_m": [
+        0,
+        0.38,
+        0.0445
       ]
     },
     {
@@ -378,17 +411,6 @@
       ]
     },
     {
-      "id": "ears",
-      "triangles": 1220,
-      "budget": 8000,
-      "boundingRadius_m": 0.07746,
-      "worldCentre_m": [
-        0,
-        0.443,
-        -0.0126
-      ]
-    },
-    {
       "id": "skull",
       "triangles": 1144,
       "budget": 8000,
@@ -397,28 +419,6 @@
         0,
         0.454,
         -0.004
-      ]
-    },
-    {
-      "id": "nasal_cavity",
-      "triangles": 1116,
-      "budget": 8000,
-      "boundingRadius_m": 0.03943,
-      "worldCentre_m": [
-        0,
-        0.4114,
-        0.0503
-      ]
-    },
-    {
-      "id": "mouth",
-      "triangles": 1056,
-      "budget": 8000,
-      "boundingRadius_m": 0.03068,
-      "worldCentre_m": [
-        0,
-        0.38,
-        0.0446
       ]
     },
     {
@@ -445,13 +445,13 @@
     },
     {
       "id": "salivary_glands",
-      "triangles": 896,
+      "triangles": 908,
       "budget": 8000,
-      "boundingRadius_m": 0.07847,
+      "boundingRadius_m": 0.07577,
       "worldCentre_m": [
         0,
         0.3918,
-        0.0314
+        0.0233
       ]
     },
     {

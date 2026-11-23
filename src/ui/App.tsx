@@ -545,8 +545,8 @@ export function App() {
         <TimeScaleControl />
         <LayersControl />
         <LegendStack viewerRef={viewerRef} ready={ready} />
-        <CoachMark covered={sheetOpen || menuOpen} />
-        <ResetViewButton viewerRef={viewerRef} covered={sheetOpen || menuOpen} />
+        <CoachMark covered={sheetOpen || menuOpen || layersOpen} />
+        <ResetViewButton viewerRef={viewerRef} covered={sheetOpen || menuOpen || layersOpen} />
         <NoticeToasts />
         <BrainScanInset viewerRef={viewerRef} ready={ready} />
 

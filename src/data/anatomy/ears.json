@@ -1,6 +1,6 @@
 {
   "atlas": "ears",
-  "about": "Both ears drawn as one organ, as the eyes are: the external ear canal, the middle ear with its three small bones, the cochlea that senses sound and the vestibular apparatus that senses head position. Hearing and balance are not simulated, so the only drive is the vertigo signal on the balance organ. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "about": "Both ears drawn as one organ, as the eyes are: the external ear canal, the eardrum, the middle ear with its three small bones and two muscles, the cochlea that senses sound, the vestibule and three semicircular canals that sense head position, and the nerves and ducts that serve them. The outer ear (the pinna) is not drawn, so that the glass head is not distorted. Hearing and balance are not simulated: nothing here moves, and the only drive is the existing vertigo signal on the vestibular apparatus. The hair-cell and crystal clusters are enlarged schematics, and every size and position is a drawing choice, not a measurement of any ear.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -23,6 +23,82 @@
       "source": "GRAYS42"
     },
     {
+      "id": "cartilaginous_meatus",
+      "parent": "external_canal",
+      "label": "Cartilaginous Part of the Meatus",
+      "summary": "Outer part of the canal, supported by cartilage",
+      "function": "The outer part of the canal is held open by cartilage and lined with skin that bears hairs and wax glands.",
+      "color": "#9fb0e8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bony_meatus",
+      "parent": "external_canal",
+      "label": "Bony Part of the Meatus",
+      "summary": "Inner part of the canal, in the temporal bone",
+      "function": "The inner part of the canal runs through the temporal bone and is lined with thin skin that continues over the eardrum.",
+      "color": "#c8c0a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ceruminous_glands",
+      "parent": "external_canal",
+      "label": "Ceruminous Glands",
+      "summary": "Wax glands in the skin of the outer canal",
+      "function": "These modified sweat glands lie in the skin of the cartilaginous part. Their secretion mixes with oil to form ear wax.",
+      "color": "#d8c05a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tympanic_membrane",
+      "label": "Tympanic Membrane",
+      "summary": "The eardrum, closing the inner end of the canal",
+      "function": "The eardrum is a thin membrane that vibrates when sound reaches it. It passes the vibration on to the malleus. It is set at a slant across the end of the canal.",
+      "color": "#e8c8c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pars_tensa",
+      "parent": "tympanic_membrane",
+      "label": "Pars Tensa",
+      "summary": "The large, taut part of the eardrum",
+      "function": "The pars tensa forms most of the eardrum and is held tight by a thickened rim. Most of the vibration is taken up here.",
+      "color": "#f0d8d0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pars_flaccida",
+      "parent": "tympanic_membrane",
+      "label": "Pars Flaccida",
+      "summary": "Small slack part above the taut part",
+      "function": "The pars flaccida is a small, looser area at the top of the eardrum.",
+      "color": "#d8a8a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "umbo",
+      "parent": "tympanic_membrane",
+      "label": "Umbo",
+      "summary": "Centre of the eardrum, where the malleus is attached",
+      "function": "The umbo is the deepest point of the eardrum, pulled inward by the tip of the handle of the malleus.",
+      "color": "#b88880",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "middle_ear",
       "label": "Middle Ear",
       "summary": "Air-filled space with the three ear bones",
@@ -33,11 +109,152 @@
       "source": "GRAYS42"
     },
     {
-      "id": "cochlea",
-      "label": "Cochlea",
-      "summary": "Snail-shaped organ of hearing",
-      "function": "The cochlea is a fluid-filled coil lined with hair cells that turn the movement of sound into nerve signals. Different parts of its length respond to different pitches. Hearing is not simulated.",
-      "color": "#6a7fc4",
+      "id": "tympanic_cavity",
+      "label": "Tympanic Cavity",
+      "summary": "Air-filled chamber behind the eardrum",
+      "function": "The tympanic cavity holds the three ear bones and two small muscles. It is lined with mucous membrane and is joined to the throat by the auditory tube.",
+      "color": "#a8b8ea",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epitympanic_recess",
+      "label": "Epitympanic Recess",
+      "summary": "Space above the eardrum holding the heads of the bones",
+      "function": "The recess is the upper part of the tympanic cavity. It holds the head of the malleus and the body of the incus and opens backward into the mastoid antrum.",
+      "color": "#a0b0e4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "malleus",
+      "label": "Malleus",
+      "summary": "The hammer, attached to the eardrum",
+      "function": "The malleus has a handle fixed to the eardrum and a head that joins the incus. It carries the eardrum vibration to the next bone.",
+      "color": "#e8e0c8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "incus",
+      "label": "Incus",
+      "summary": "The anvil, between the malleus and stapes",
+      "function": "The incus joins the malleus to the stapes. Its long process ends in a small knob that meets the stapes.",
+      "color": "#ddd4b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "stapes",
+      "label": "Stapes",
+      "summary": "The stirrup, fitting into the oval window",
+      "function": "The stapes is the smallest bone of the body. Its footplate sits in the oval window and passes the vibration into the fluid of the inner ear.",
+      "color": "#d0c8ac",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tensor_tympani",
+      "label": "Tensor Tympani",
+      "summary": "Muscle that tightens the eardrum",
+      "function": "The tensor tympani lies above the auditory tube and its tendon turns to attach to the malleus. When it contracts it pulls the eardrum inward and stiffens it.",
+      "color": "#c86a6a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "stapedius",
+      "label": "Stapedius",
+      "summary": "Muscle attached to the stapes",
+      "function": "The stapedius arises in a small bony projection on the back wall of the cavity and its tendon attaches to the stapes. It damps movement of that bone.",
+      "color": "#b85858",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chorda_tympani",
+      "label": "Chorda Tympani",
+      "summary": "Branch of the facial nerve crossing the cavity",
+      "function": "The chorda tympani is a small nerve branch that crosses the tympanic cavity between the malleus and incus, under the lining. It carries taste fibres from the front of the tongue.",
+      "color": "#e8cc58",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oval_window",
+      "label": "Oval Window",
+      "summary": "Opening where the stapes meets the inner ear",
+      "function": "The oval window is an opening in the inner wall of the cavity. The footplate of the stapes is held in it and moves the fluid of the vestibule.",
+      "color": "#b8a8d8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "round_window",
+      "label": "Round Window",
+      "summary": "Membrane-closed opening below the oval window",
+      "function": "The round window is closed by a thin membrane. It lets the fluid of the cochlea move in response to the stapes.",
+      "color": "#b8a8d8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pharyngotympanic_tube",
+      "label": "Pharyngotympanic (Auditory) Tube",
+      "summary": "Passage from the middle ear to the throat",
+      "function": "The tube joins the tympanic cavity to the nasopharynx. It lets the air pressure on the two sides of the eardrum be equalised.",
+      "color": "#8fa8e0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mastoid_antrum",
+      "label": "Mastoid Antrum",
+      "summary": "Air space behind the epitympanic recess",
+      "function": "The antrum is a space in the mastoid part of the temporal bone, joined to the epitympanic recess. The mastoid air cells open into it.",
+      "color": "#98a8e0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mastoid_air_cells",
+      "label": "Mastoid Air Cells",
+      "summary": "Honeycomb of air spaces in the mastoid bone",
+      "function": "The air cells are many small air-filled spaces in the mastoid process. They open into the antrum. The drawing is schematic.",
+      "color": "#a8b8e8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "facial_nerve_canal",
+      "label": "Facial Nerve Canal",
+      "summary": "Bony channel carrying the facial nerve",
+      "function": "The facial nerve runs through a bony canal in the temporal bone. The canal passes above the oval window, bends and then descends in the back wall of the cavity.",
+      "color": "#d8d0b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "facial_nerve",
+      "parent": "facial_nerve_canal",
+      "label": "Facial Nerve",
+      "summary": "The nerve of the face, in its canal",
+      "function": "The facial nerve runs through the canal to the muscles of the face. Branches given off on the way include the nerve to the stapedius and the chorda tympani.",
+      "color": "#e8cc58",
       "rest": 0.3,
       "drives": [],
       "source": "GRAYS42"
@@ -57,6 +274,394 @@
           "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibule",
+      "label": "Vestibule",
+      "summary": "Central chamber of the balance organ",
+      "function": "The vestibule is the central part of the bony inner ear. It contains the utricle and the saccule, and the oval window opens into it.",
+      "color": "#7a8fd4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "utricle",
+      "parent": "vestibule",
+      "label": "Utricle",
+      "summary": "Sac that senses tilt and sideways acceleration",
+      "function": "The utricle is the larger of the two sacs of the vestibule and opens into the semicircular canals. Its sensory patch lies roughly flat.",
+      "color": "#8a9fe0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "saccule",
+      "parent": "vestibule",
+      "label": "Saccule",
+      "summary": "Sac that senses tilt and up-down acceleration",
+      "function": "The saccule is the smaller sac of the vestibule and is joined to the cochlea. Its sensory patch lies roughly upright.",
+      "color": "#8a9fe0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "maculae",
+      "parent": "vestibule",
+      "label": "Maculae",
+      "summary": "Sensory patches of the utricle and saccule",
+      "function": "Each macula is a small patch of hair cells under a layer of gel. It reports the direction of gravity and of straight-line acceleration.",
+      "color": "#6a7fc4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibular_hair_cells",
+      "parent": "maculae",
+      "label": "Vestibular Hair Cells",
+      "summary": "Sensory cells with hair-like bundles",
+      "function": "The bundles of these cells project into the gel above them. Bending of a bundle changes the nerve signal. This is an enlarged schematic cluster, not a count.",
+      "color": "#e8a0a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "otolithic_membrane",
+      "parent": "maculae",
+      "label": "Otolithic Membrane",
+      "summary": "Gel layer over the maculae",
+      "function": "The membrane is a gel that rests on the hair bundles. Its weight lags behind when the head moves, which bends the bundles.",
+      "color": "#d8e8f0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "otoconia",
+      "parent": "maculae",
+      "label": "Otoconia",
+      "summary": "Tiny crystals in the gel",
+      "function": "The otoconia are small calcium crystals embedded in the top of the gel. They make it heavier than the fluid around it. This is an enlarged schematic scatter, not a count.",
+      "color": "#f4f4f4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_semicircular_canal",
+      "label": "Anterior Semicircular Canal",
+      "summary": "Upright loop that senses nodding-type turning",
+      "function": "The anterior canal is one of three canals set at right angles to each other. Each senses turning of the head in its own plane.",
+      "color": "#6a7fc4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_semicircular_canal",
+      "label": "Posterior Semicircular Canal",
+      "summary": "Upright loop at the back",
+      "function": "The posterior canal is the second upright loop. It lies at right angles to the anterior canal.",
+      "color": "#6a7fc4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_semicircular_canal",
+      "label": "Lateral Semicircular Canal",
+      "summary": "Near-horizontal loop",
+      "function": "The lateral canal lies close to the horizontal plane and senses turning of the head about a vertical axis. It is drawn here without its slight natural tilt.",
+      "color": "#6a7fc4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_ampulla",
+      "parent": "anterior_semicircular_canal",
+      "label": "Ampulla of the Anterior Canal",
+      "summary": "Dilated end holding the sensory organ",
+      "function": "The ampulla is a widening at one end of a canal. It holds the crista.",
+      "color": "#7a8fd4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_ampulla",
+      "parent": "posterior_semicircular_canal",
+      "label": "Ampulla of the Posterior Canal",
+      "summary": "Dilated end holding the sensory organ",
+      "function": "The ampulla is a widening at one end of a canal. It holds the crista.",
+      "color": "#7a8fd4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_ampulla",
+      "parent": "lateral_semicircular_canal",
+      "label": "Ampulla of the Lateral Canal",
+      "summary": "Dilated end holding the sensory organ",
+      "function": "The ampulla is a widening at one end of a canal. It holds the crista.",
+      "color": "#7a8fd4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_crista",
+      "parent": "anterior_ampulla",
+      "label": "Crista Ampullaris of the Anterior Canal",
+      "summary": "Ridge of hair cells in the ampulla",
+      "function": "The crista is a ridge of sensory hair cells across the floor of the ampulla.",
+      "color": "#e8a0a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_crista",
+      "parent": "posterior_ampulla",
+      "label": "Crista Ampullaris of the Posterior Canal",
+      "summary": "Ridge of hair cells in the ampulla",
+      "function": "The crista is a ridge of sensory hair cells across the floor of the ampulla.",
+      "color": "#e8a0a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_crista",
+      "parent": "lateral_ampulla",
+      "label": "Crista Ampullaris of the Lateral Canal",
+      "summary": "Ridge of hair cells in the ampulla",
+      "function": "The crista is a ridge of sensory hair cells across the floor of the ampulla.",
+      "color": "#e8a0a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_cupula",
+      "parent": "anterior_ampulla",
+      "label": "Cupula of the Anterior Canal",
+      "summary": "Gel dome over the crista",
+      "function": "The cupula is a gel that covers the hair bundles and is pushed by the fluid of the canal when the head turns.",
+      "color": "#d8e8f0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_cupula",
+      "parent": "posterior_ampulla",
+      "label": "Cupula of the Posterior Canal",
+      "summary": "Gel dome over the crista",
+      "function": "The cupula is a gel that covers the hair bundles and is pushed by the fluid of the canal when the head turns.",
+      "color": "#d8e8f0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_cupula",
+      "parent": "lateral_ampulla",
+      "label": "Cupula of the Lateral Canal",
+      "summary": "Gel dome over the crista",
+      "function": "The cupula is a gel that covers the hair bundles and is pushed by the fluid of the canal when the head turns.",
+      "color": "#d8e8f0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cochlea",
+      "label": "Cochlea",
+      "summary": "Snail-shaped organ of hearing",
+      "function": "The cochlea is a fluid-filled coil lined with hair cells that turn the movement of sound into nerve signals. Different parts of its length respond to different pitches. Hearing is not simulated.",
+      "color": "#6a7fc4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scala_vestibuli",
+      "parent": "cochlea",
+      "label": "Scala Vestibuli",
+      "summary": "Upper fluid channel of the cochlea",
+      "function": "The scala vestibuli starts at the oval window and runs up the coil. It joins the scala tympani at the tip.",
+      "color": "#8fb0e8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cochlear_duct",
+      "parent": "cochlea",
+      "label": "Cochlear Duct (Scala Media)",
+      "summary": "Middle channel holding the sense organ",
+      "function": "The cochlear duct lies between the other two channels and contains the spiral organ. It is filled with endolymph.",
+      "color": "#6a98e0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scala_tympani",
+      "parent": "cochlea",
+      "label": "Scala Tympani",
+      "summary": "Lower fluid channel of the cochlea",
+      "function": "The scala tympani runs back down the coil and ends at the round window.",
+      "color": "#8fb0e8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibular_membrane",
+      "parent": "cochlear_duct",
+      "label": "Vestibular Membrane (Reissner)",
+      "summary": "Thin roof of the cochlear duct",
+      "function": "Reissner membrane separates the cochlear duct from the scala vestibuli.",
+      "color": "#dfe8f4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "basilar_membrane",
+      "parent": "cochlear_duct",
+      "label": "Basilar Membrane",
+      "summary": "Floor of the cochlear duct",
+      "function": "The basilar membrane carries the spiral organ. Different parts of its length respond best to different pitches. It is drawn still because hearing is not simulated.",
+      "color": "#c8d8ec",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "stria_vascularis",
+      "parent": "cochlear_duct",
+      "label": "Stria Vascularis",
+      "summary": "Vascular strip on the outer wall of the duct",
+      "function": "The stria vascularis lines the outer wall of the duct. It makes the endolymph.",
+      "color": "#d86a6a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spiral_organ",
+      "parent": "cochlea",
+      "label": "Spiral Organ (Corti)",
+      "summary": "Sense organ of hearing on the basilar membrane",
+      "function": "The spiral organ is a ridge of hair cells and supporting cells on the basilar membrane. It turns movement of the membrane into nerve signals.",
+      "color": "#e8b8c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inner_hair_cells",
+      "parent": "spiral_organ",
+      "label": "Inner Hair Cells",
+      "summary": "Single row of hair cells nearer the core",
+      "function": "The inner hair cells are the main sensory cells that signal sound to the cochlear nerve. This is an enlarged schematic run, not a count.",
+      "color": "#e87878",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "outer_hair_cells",
+      "parent": "spiral_organ",
+      "label": "Outer Hair Cells",
+      "summary": "Rows of hair cells further out",
+      "function": "The outer hair cells lie in several rows. They change the response of the membrane. This is an enlarged schematic run, not a count.",
+      "color": "#c85858",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tectorial_membrane",
+      "parent": "spiral_organ",
+      "label": "Tectorial Membrane",
+      "summary": "Gel flap over the hair cells",
+      "function": "The tectorial membrane lies over the hair cells. Their bundles are bent as the basilar membrane moves relative to it.",
+      "color": "#e0ecf4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spiral_ganglion",
+      "parent": "cochlea",
+      "label": "Spiral Ganglion",
+      "summary": "Nerve cell bodies in the core of the cochlea",
+      "function": "The spiral ganglion holds the cell bodies of the cochlear nerve. It winds round the core, and its fibres run to the hair cells.",
+      "color": "#e8cc58",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibulocochlear_nerve",
+      "label": "Vestibulocochlear Nerve (VIII)",
+      "summary": "Nerve of hearing and balance",
+      "function": "This nerve runs through the internal acoustic meatus and has two divisions. The brain atlas draws its entry into the brainstem.",
+      "color": "#e8cc58",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cochlear_nerve",
+      "parent": "vestibulocochlear_nerve",
+      "label": "Cochlear Division",
+      "summary": "Branch carrying hearing",
+      "function": "The cochlear division takes signals from the spiral ganglion to the brain.",
+      "color": "#f0d870",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vestibular_nerve",
+      "parent": "vestibulocochlear_nerve",
+      "label": "Vestibular Division",
+      "summary": "Branch carrying balance",
+      "function": "The vestibular division takes signals from the maculae and cristae to the brain.",
+      "color": "#d8b840",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_acoustic_meatus",
+      "label": "Internal Acoustic Meatus",
+      "summary": "Bony passage for the nerves of the inner ear",
+      "function": "The meatus is a short canal in the temporal bone. The facial nerve and the vestibulocochlear nerve pass through it.",
+      "color": "#d8d0b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "endolymphatic_duct_and_sac",
+      "label": "Endolymphatic Duct and Sac",
+      "summary": "Small duct and sac of the inner ear",
+      "function": "The duct leaves the vestibule and ends in a sac on the back of the temporal bone. It is part of the system that holds endolymph.",
+      "color": "#98a8e0",
+      "rest": 0.3,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]

@@ -3,7 +3,7 @@ import { tubeAlong, type V3 } from '../sdf';
 import { warpGeometry } from '../layout';
 
 /**
- * PHARYNX, STUB SHELL. An AXIAL organ.
+ * PHARYNX, SHELL. An AXIAL organ.
  *
  * Authored in unexploded body coordinates and bent by `warpGeometry`, exactly like the
  * oesophagus it continues into, so the join stays seamless after the exploded stack has
@@ -18,8 +18,10 @@ import { warpGeometry } from '../layout';
  * ahead of the spinal cord (z -0.026 at the top) and behind the larynx (z +0.004), so
  * z drifts from -0.014 to -0.008.
  *
- * It is a plain tube in this stub: no anterior openings into the nose, mouth and larynx
- * yet. The content agent adds those and the three named parts.
+ * It is a plain tube: the silhouette only. The openings into the nose, mouth and larynx,
+ * the three levels, the muscles and the tonsils are drawn by the interior
+ * (atlas/pharynx.parts.ts), which re-derives this centreline and radius profile so the two
+ * cannot drift apart. The shell is deliberately unchanged so the glass head still fits.
  */
 const PATH: V3[] = [
   [0.002, 0.37, -0.014],
