@@ -18,6 +18,15 @@ import { ellipsoid, polygonise, smoothUnion } from '../sdf';
  * midline) and a median column fills the gap: the septum and the bone and cartilage that
  * carry it, which is how a nose looks in profile.
  *
+ * THE OLFACTORY CLEFT. The brain atlas draws the olfactory bulbs just under the frontal lobes, at
+ * scene y about 0.4705 (local y 0.0585 here), x 0.008 to 0.014 and z 0.062 to 0.075. Anatomically a bulb
+ * rests ON the cribriform plate, so the roof of the cavity is carried up from the chamber as a
+ * narrow cleft to that height, passing between the medial walls of the two orbits (the globes'
+ * medial edges are at x 0.021 and the cleft's widest point is 0.0168, so they do not meet) and
+ * behind the lacrimal sacs (z 0.0634 at most; the cleft starts at 0.0645). The frontal sinus
+ * moved up and out to lie above the orbit. The cleft is much taller than a real one; the height
+ * is set by where the bulb is drawn.
+ *
  * The silhouette is: the two chambers, the median column, a flared vestibule a side (the
  * nostril), the maxillary sinus a side (the largest, below the orbit), the frontal sinus a
  * side (above the nasal root, between the globes), a block of ethmoidal cells between the
@@ -30,8 +39,9 @@ export function nasalCavity(): THREE.BufferGeometry {
     chamber(s),
     ellipsoid([s * 0.0085, -0.012, 0.03], [0.007, 0.008, 0.006]), // vestibule, the flare of the nostril
     ellipsoid([s * 0.028, -0.012, -0.002], [0.0115, 0.0115, 0.0145]), // maxillary sinus
-    ellipsoid([s * 0.0105, 0.03, 0.0105], [0.0068, 0.006, 0.0072]), // frontal sinus
-    ellipsoid([s * 0.0185, 0.0165, 0.0035], [0.0050, 0.0085, 0.0115]), // ethmoidal cells
+    ellipsoid([s * 0.0205, 0.0535, 0.005], [0.0075, 0.0065, 0.008]), // frontal sinus, above the orbit's medial part
+    ellipsoid([s * 0.011, 0.0385, 0.0205], [0.0058, 0.027, 0.0095]), // olfactory cleft, up to the underside of the olfactory bulb
+    ellipsoid([s * 0.0165, 0.0135, 0.0035], [0.0045, 0.008, 0.0115]), // ethmoidal cells, kept medial to the globe
     ellipsoid([s * 0.0055, 0.0115, -0.0225], [0.0058, 0.0058, 0.0075]), // sphenoidal sinus
   ];
   const field = smoothUnion(
@@ -40,5 +50,5 @@ export function nasalCavity(): THREE.BufferGeometry {
     ...side(1),
     ...side(-1),
   );
-  return polygonise(field, [-0.045, -0.026, -0.04], [0.045, 0.04, 0.042], { cell: 0.0045 });
+  return polygonise(field, [-0.045, -0.026, -0.04], [0.045, 0.075, 0.042], { cell: 0.0045 });
 }

@@ -311,7 +311,7 @@
       "parent": "olfactory_epithelium",
       "label": "Olfactory Nerve Fila",
       "summary": "Bundles of receptor axons that pass through the roof",
-      "function": "The axons of the receptor neurons gather into small bundles and pass through the holes of the cribriform plate to the olfactory bulb of the brain. The bulb itself is drawn with the brain, and its position there does not line up exactly with the nose in this model.",
+      "function": "The axons of the receptor neurons gather into small bundles and pass through the holes of the cribriform plate to the olfactory bulb of the brain. The bulb itself is drawn with the brain and rests on the plate. In this model the nasal roof is carried up to the bulb as a tall narrow cleft, much taller than a real one.",
       "color": "#e8cc58",
       "rest": 0.3,
       "drives": [],

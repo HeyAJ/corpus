@@ -345,7 +345,9 @@ export const parts: PartBuilder = () => {
       line([punctumDown, [cx - s * 0.0145, -0.0012, 0.0034], [sacC[0], -0.0012, sacC[2]]], 0.00022, 6, 4),
     );
     sac.push(bean(sacC, 0.0016, 0.0042, 0.0016, 8, 6));
-    duct.push(line([[sacC[0], -0.0042, sacC[2]], [cx - s * 0.0182, -0.011, 0.0008], [cx - s * 0.0172, -0.0195, -0.0004]], 0.0007, 8, 6));
+    // The duct runs down to the opening in the front of the inferior meatus that the nasal atlas
+    // draws at nasal-frame (0.014, -0.0125, 0.0085), i.e. eye-frame (0.014, -0.0465, -0.0015).
+    duct.push(line([[sacC[0], -0.0042, sacC[2]], [cx - s * 0.0182, -0.011, 0.0008], [s * 0.0134, -0.026, 0.0], [s * 0.0138, -0.038, -0.0008], [s * 0.014, -0.0465, -0.0015]], 0.0007, 14, 6));
 
     // THE MUSCLES. Origins on a ring round the nerve at the apex of the socket; recti run
     // forward over the globe to insert in front of its equator.

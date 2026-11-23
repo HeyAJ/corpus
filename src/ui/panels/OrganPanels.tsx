@@ -496,7 +496,7 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
           { label: 'Osm', value: s.fluids.osmolality_mOsm_per_kg, digits: 0, unit: 'mOsm/kg' },
           { label: 'Nausea', value: pct(s.mind.nausea), digits: 0, unit: '%' },
         ],
-        caption: 'Chewing, taste, speech and saliva are not simulated. Plasma osmolality is shown because it is what thirst would follow.',
+        caption: 'Chewing, taste, speech and saliva volume are not simulated. The swallow is drawn as a gesture when the engine signals swallowing. Plasma osmolality is shown because it is what thirst would follow.',
       };
     case 'salivary_glands':
       return {
@@ -504,7 +504,7 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
           { label: 'Para', value: pct(nerves.parasympathetic), digits: 0, unit: '%' },
           { label: 'Symp', value: pct(nerves.sympathetic), digits: 0, unit: '%' },
         ],
-        caption: 'Saliva flow is not simulated. The glands are shown against autonomic outflow above rest.',
+        caption: 'Saliva flow is not simulated. The glands are shown against autonomic outflow above rest, and the droplets in the ducts move faster as parasympathetic drive rises (a display, not a flow rate).',
       };
     case 'pharynx':
       return {
@@ -512,7 +512,7 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
           { label: 'RR', value: s.resp.rate_per_min, digits: 0, unit: '/min' },
           { label: 'Nausea', value: pct(s.mind.nausea), digits: 0, unit: '%' },
         ],
-        caption: 'Air and food share this passage. Swallowing as a movement is not simulated; breathing rate and nausea are the live readings.',
+        caption: 'Air and food share this passage. The swallow is drawn as a squeezing wave when the engine signals swallowing; its timing is a display choice. Breathing rate and nausea are the live readings.',
       };
     case 'nasal_cavity':
       return {
@@ -520,12 +520,12 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
           { label: 'RR', value: s.resp.rate_per_min, digits: 0, unit: '/min' },
           { label: 'FiO2', value: pct(s.environment.fio2), digits: 0, unit: '%' },
         ],
-        caption: 'Smell and the resistance of the nasal airway are not simulated.',
+        caption: 'Smell and the resistance of the nasal airway are not simulated. Air moves with each breath; the cilia sweep at a fixed display pace.',
       };
     case 'ears':
       return {
         chips: [],
-        caption: 'Hearing and balance are not simulated, so no ear reading is shown.',
+        caption: 'Hearing and balance are not simulated, so no ear reading is shown. The vestibular apparatus lights only while vertigo is active in the engine.',
       };
     case 'skull':
     case 'vertebral_column':

@@ -82,29 +82,38 @@ const INF_CONCHA = { c: [0.0108, -0.0085, 0.0015] as V3, r: [0.0036, 0.0028, 0.0
  * through can be SEEN. The holes are on a 1.2 mm by 1.6 mm pitch so that the fila of the
  * olfactory cluster (below) go through real holes.
  */
-const SIEVE_Y = 0.0196;
+/**
+ * THE ROOF IS RAISED. The bulb in the brain atlas lies at scene y 0.4705 and z 0.062 to 0.075, so
+ * the plate, the epithelium and the fila sit under it: local y 0.0575 (OY above the old roof),
+ * x about 0.011 (OX) and z about 0.020 (OZ). The three offsets are named so the cluster below and
+ * the lattice keep the same relation to each other as before.
+ */
+const OX = 0.0065;
+const OY = 0.0379;
+const OZ = 0.0155;
+const SIEVE_Y = 0.0196 + OY;
 const SIEVE_BAR = 0.00015;
 function cribriform(): G {
   const bars: G[] = [];
-  const xs = [0.0024, 0.0036, 0.0048, 0.006, 0.0072, 0.0084];
+  const xs = [0.0024, 0.0036, 0.0048, 0.006, 0.0072, 0.0084].map((x) => x + OX);
   const zs: number[] = [];
-  for (let z = -0.0062; z <= 0.0131; z += 0.0016) zs.push(z);
+  for (let z = 0.0141; z <= 0.0270; z += 0.0016) zs.push(z);
   for (const s of [1, -1]) {
     for (const x of xs) bars.push(box([s * x, SIEVE_Y, (zs[0] + zs[zs.length - 1]) / 2], [SIEVE_BAR, 0.00035, (zs[zs.length - 1] - zs[0]) / 2]));
     for (const z of zs) bars.push(box([s * (xs[0] + xs[xs.length - 1]) / 2, SIEVE_Y, z], [(xs[xs.length - 1] - xs[0]) / 2, 0.00035, SIEVE_BAR]));
   }
   // The crista galli, the bony blade that rises from the midline between the two sieves.
-  bars.push(box([0, SIEVE_Y + 0.0013, 0.0035], [0.0007, 0.0016, 0.0035]));
+  bars.push(box([0, SIEVE_Y + 0.0013, 0.0205], [0.0007, 0.0016, 0.0035]));
   return mergeParts(bars);
 }
 
 /* ------------------------------------------- magnified schematic cell clusters */
 
 /** Olfactory epithelium cluster: sites on a grid, right side, between the airway face and the roof. */
-const OLF_X = [0.003, 0.0042, 0.0054];
-const OLF_Z = [0.001, 0.0026, 0.0042, 0.0058];
-const OLF_AIR = 0.017; // the surface facing the air
-const OLF_BASE = 0.0189; // the base, next to the lamina propria
+const OLF_X = [0.003, 0.0042, 0.0054].map((x) => x + OX);
+const OLF_Z = [0.001, 0.0026, 0.0042, 0.0058].map((z) => z + OZ);
+const OLF_AIR = 0.017 + OY; // the surface facing the air
+const OLF_BASE = 0.0189 + OY; // the base, next to the lamina propria
 function olfactorySites(parity: number): V3[] {
   const out: V3[] = [];
   OLF_X.forEach((x, i) => OLF_Z.forEach((z, j) => { if ((i + j) % 2 === parity) out.push([x, 0, z]); }));
@@ -193,10 +202,10 @@ export const parts: PartBuilder = () => {
   );
 
   /* ---- sinuses ---------------------------------------------------------------- */
-  out.push(P('frontal_sinuses', both((s) => [plate(m(s, [0.0105, 0.03, 0.0105]), [0.0058, 0.005, 0.0062])])));
+  out.push(P('frontal_sinuses', both((s) => [plate(m(s, [0.0205, 0.0535, 0.005]), [0.0065, 0.0055, 0.007])])));
   {
     const cells: G[] = [];
-    const sites: V3[] = [[0.0172, 0.0235, 0.0], [0.0194, 0.0205, 0.0075], [0.0165, 0.017, 0.0105], [0.0195, 0.0145, 0.0], [0.0167, 0.0115, 0.0075], [0.0198, 0.011, -0.0045], [0.0168, 0.0205, -0.0045], [0.0196, 0.0175, -0.005]];
+    const sites: V3[] = [[0.0148, 0.0185, 0.0], [0.0178, 0.0165, 0.0075], [0.015, 0.015, 0.0105], [0.0182, 0.012, 0.0], [0.015, 0.01, 0.0075], [0.0185, 0.0075, -0.0045], [0.015, 0.017, -0.005], [0.0183, 0.0105, -0.006]];
     for (const s of [1, -1]) for (const p of sites) cells.push(bead(m(s, p), 0.0017, 8, 6));
     out.push(P('ethmoidal_cells', mergeParts(cells)));
   }
@@ -252,9 +261,9 @@ export const parts: PartBuilder = () => {
 
   /* ---- olfactory epithelium and its finer structures ------------------------- */
   out.push(
-    P('olfactory_region', both((s) => [plate(m(s, [0.0045, 0.0185, 0.0045]), [0.0036, 0.0016, 0.0118])])),
+    P('olfactory_region', both((s) => [plate(m(s, [0.011, 0.0405, 0.0205]), [0.005, 0.0215, 0.009])])),
   );
-  out.push(P('olfactory_epithelium', both((s) => [plate(m(s, [0.0045, 0.018, 0.0045]), [0.003, 0.001, 0.01])])));
+  out.push(P('olfactory_epithelium', both((s) => [plate(m(s, [0.011, 0.018 + OY, 0.02]), [0.0028, 0.001, 0.006])])));
   {
     const sust = olfactorySites(0).map((p) => stick([p[0], OLF_AIR + 0.0002, p[2]], [p[0], OLF_BASE, p[2]], 0.0004, 5));
     out.push(P('sustentacular_cells', mergeParts(sust)));
@@ -272,7 +281,7 @@ export const parts: PartBuilder = () => {
     out.push(P('basal_cells', mergeParts(basal)));
     // Olfactory (Bowman) glands lie in the lamina propria, above the epithelium, with a duct to the surface.
     const glands: G[] = [];
-    const gs: [number, number][] = [[0.0036, 0.0018], [0.0048, 0.0034], [0.0036, 0.005], [0.0048, 0.0064]];
+    const gs: [number, number][] = [[0.0036 + OX, 0.0018 + OZ], [0.0048 + OX, 0.0034 + OZ], [0.0036 + OX, 0.005 + OZ], [0.0048 + OX, 0.0064 + OZ]];
     for (const [x, z] of gs) {
       glands.push(bead([x, OLF_BASE + 0.0006, z], 0.0004, 7, 5));
       glands.push(stick([x, OLF_BASE + 0.0003, z], [x, OLF_AIR + 0.0001, z], 0.00009, 3));
@@ -281,7 +290,7 @@ export const parts: PartBuilder = () => {
     // Nerve fila: the axons gather, pass up through the sieve and leave toward the bulb.
     const fila: G[] = [];
     for (const p of olfactorySites(1)) {
-      fila.push(cord([[p[0], SIEVE_Y - 0.0004, p[2]], [p[0], SIEVE_Y + 0.0012, p[2]], [p[0] * 0.8 + 0.0008, 0.0245, p[2] * 0.85 + 0.002], [0.0042, 0.0275, 0.004]], 0.00016, 8, 4));
+      fila.push(cord([[p[0], SIEVE_Y - 0.0004, p[2]], [p[0], SIEVE_Y + 0.0005, p[2]], [p[0], SIEVE_Y + 0.001, p[2]]], 0.00016, 6, 4));
     }
     out.push(P('olfactory_nerve_fila', mergeParts(fila)));
   }

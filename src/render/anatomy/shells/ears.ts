@@ -24,10 +24,9 @@ import { mergeParts, tubeAlong, type V3 } from '../sdf';
  * three-quarter turns), drawn as a tapering helix.
  *
  * THE PHARYNGOTYMPANIC TUBE runs from the front wall of the tympanic cavity forward, medially
- * and down to the nasopharynx. Its end (X 0.012, y -0.011, z 0.006 here, which is scene
- * x 0.012, y 0.435, z -0.006) is aligned with the lateral wall of the pharynx stub, whose
- * centreline rises through x 0 to 0.002, z -0.01 to -0.008 with a radius that grows to about
- * 0.012 at the top; agent hn1 draws the tubal opening there.
+ * and down to the nasopharynx. Its end (X 0.0082, y -0.011, z 0.0129 here, which is scene
+ * x 0.0082, y 0.435, z 0.0009) meets the tubal opening agent hn1 drew on the lateral wall of the
+ * reshaped pharynx.
  */
 
 export const at = (s: number, p: V3): V3 => [s * p[0], p[1], p[2]];
@@ -63,9 +62,9 @@ export const SACCULE_C: V3 = [0.0372, -0.0016, -0.0008];
 export const TUBE: readonly V3[] = [
   [0.043, -0.0035, 0.006],
   [0.036, -0.005, 0.0085],
-  [0.027, -0.0075, 0.008],
-  [0.019, -0.0095, 0.0072],
-  [0.012, -0.011, 0.0062],
+  [0.027, -0.0075, 0.01],
+  [0.0165, -0.0095, 0.012],
+  [0.0082, -0.011, 0.0129],
 ];
 /** Internal acoustic meatus, medial (brain) end first. */
 export const IAM: readonly V3[] = [

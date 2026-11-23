@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { PartBuilder, PartGeometry } from '../parts';
-import { warpPoint } from '../layout';
+import { warpGeometry, warpPoint } from '../layout';
+import { BODY_Y0, BODY_Y1, ellipticalTube, ringAt } from '../shells/pharynx';
 import { mergeParts, tubeAlong, type V3 } from '../sdf';
 import { mulberry32 } from '../noise';
 import { beads, cord, ribbon as sheet } from './gland_shared';
@@ -17,7 +18,7 @@ import { blob } from './gi_shared';
  * ring and a tonsil would each come out four times too tall. Instead the shell's own
  * CENTRELINE is warped once (`CENTRE`, sampled by arc length exactly as the shell's rings
  * are) and every structure is placed on that line in SCENE metres with the shell's own
- * radius profile (`radiusAt`). The levels (laryngo-, oro-, nasopharynx) are cut at scene
+ * radii (`rxAt`, `dzAt`). The levels (laryngo-, oro-, nasopharynx) are cut at scene
  * heights, which is where the mouth and the nose are, not at body heights.
  *
  * WHAT IS AND IS NOT ANATOMY. The textbook order is followed (constrictors overlapping from
@@ -33,24 +34,27 @@ import { blob } from './gi_shared';
  * draws the openings on the pharynx's own front wall.
  */
 
-const PATH: V3[] = [
-  [0.002, 0.37, -0.014],
-  [0.002, 0.381, -0.012],
-  [0.001, 0.392, -0.01],
-  [0, 0.4, -0.008],
-];
-const CURVE = new THREE.CatmullRomCurve3(PATH.map((p) => new THREE.Vector3(p[0], p[1], p[2])), false, 'catmullrom', 0.5);
 const SAMPLES = 160;
-/** The shell's centreline after the axial warp, by arc length. */
+/** The shell's rings (shells/pharynx.ts `ringAt`), after the axial warp, by body height: centre, half-width, half-depth. */
 const CENTRE: V3[] = [];
+const RX: number[] = [];
+const DZ: number[] = [];
 for (let i = 0; i <= SAMPLES; i++) {
-  const p = CURVE.getPointAt(i / SAMPLES);
-  CENTRE.push(warpPoint([p.x, p.y, p.z]));
+  const r = ringAt(BODY_Y0 + ((BODY_Y1 - BODY_Y0) * i) / SAMPLES);
+  CENTRE.push(warpPoint([r.cx, r.y, r.cz]));
+  RX.push(r.rx);
+  DZ.push(r.dz);
 }
-/** The shell's radius profile (shells/pharynx.ts). */
-const radiusAt = (t: number): number => 0.0075 + 0.0045 * Math.sin(Math.min(1, t * 1.6) * Math.PI * 0.5);
+function sampleAt(arr: readonly number[], t: number): number {
+  const f = Math.max(0, Math.min(1, t)) * SAMPLES;
+  const i = Math.min(SAMPLES - 1, Math.floor(f));
+  return arr[i] + (f - i) * (arr[i + 1] - arr[i]);
+}
+/** Half-width and half-depth of the shell at fraction t. */
+const rxAt = (t: number): number => sampleAt(RX, t);
+const dzAt = (t: number): number => sampleAt(DZ, t);
 
-/** Centre of the lumen at arc fraction t. */
+/** Centre of the lumen at fraction t (uniform in body height). */
 function cs(t: number): V3 {
   const f = Math.max(0, Math.min(1, t)) * SAMPLES;
   const i = Math.min(SAMPLES - 1, Math.floor(f));
@@ -59,7 +63,7 @@ function cs(t: number): V3 {
   const b = CENTRE[i + 1];
   return [a[0] + u * (b[0] - a[0]), a[1] + u * (b[1] - a[1]), a[2] + u * (b[2] - a[2])];
 }
-/** Arc fraction at scene height y (the centreline rises monotonically). */
+/** Fraction at scene height y (the centreline rises monotonically). */
 export function tOfY(y: number): number {
   let lo = 0;
   let hi = 1;
@@ -70,24 +74,27 @@ export function tOfY(y: number): number {
   }
   return (lo + hi) / 2;
 }
+/** The body height that the axial warp sends to scene height y. */
+function bodyY(y: number): number {
+  return BODY_Y0 + (BODY_Y1 - BODY_Y0) * tOfY(y);
+}
 /** The centre of the lumen at a scene height. */
 export function centreAt(y: number): V3 {
   return cs(tOfY(y));
 }
-/** A point at scene height y on the wall at angle `theta` (0 behind, +90 degrees the patient's right, 180 in front), at `k` of the radius. */
+/** A point at scene height y on the wall at angle `theta` (0 behind, +90 degrees the patient's right, 180 in front), at `k` of the size. */
 function wall(y: number, thetaDeg: number, k: number): V3 {
   const t = tOfY(y);
   const c = cs(t);
-  const r = radiusAt(t) * k;
   const th = (thetaDeg * Math.PI) / 180;
-  return [c[0] + r * Math.sin(th), c[1], c[2] - r * Math.cos(th)];
+  return [c[0] + rxAt(t) * k * Math.sin(th), c[1], c[2] - dzAt(t) * k * Math.cos(th)];
 }
-/** A point on the front wall at height y and sideways offset x, at `k` of the radius. */
+/** A point on the front wall at height y and sideways offset x, at `k` of the size. */
 function front(y: number, x: number, k: number): V3 {
   const t = tOfY(y);
   const c = cs(t);
-  const r = radiusAt(t) * k;
-  return [c[0] + x, y, c[2] + Math.sqrt(Math.max(0, r * r - x * x))];
+  const e = Math.max(0, 1 - (x / (rxAt(t) * k)) ** 2);
+  return [c[0] + x, y, c[2] + dzAt(t) * k * Math.sqrt(e)];
 }
 
 /** Scene heights of the level boundaries and of the named landmarks (display choices against the mouth shell). */
@@ -112,14 +119,9 @@ export function constrictorPivot(id: ConstrictorId): V3 {
 
 const merge = (g: THREE.BufferGeometry[]): THREE.BufferGeometry => mergeParts(g);
 
-/** A tube round the centreline between two heights, at a fraction of the wall radius: a level of the pharynx as glass. */
+/** A level of the pharynx as a see-through elliptical tube between two scene heights, at a fraction of the wall's size. */
 function segment(y0: number, y1: number, k: number): THREE.BufferGeometry {
-  const t0 = tOfY(y0);
-  const t1 = tOfY(y1);
-  const pts: V3[] = [];
-  const n = 8;
-  for (let i = 0; i <= n; i++) pts.push(cs(t0 + ((t1 - t0) * i) / n));
-  return tubeAlong(pts, (u) => radiusAt(t0 + (t1 - t0) * u) * k, { tubular: 18, radial: 14 });
+  return warpGeometry(ellipticalTube(bodyY(y0), bodyY(y1), k, 24, 16));
 }
 /** A curved muscle sheet wrapping the back and sides of the wall, from `-span` to `+span` degrees about the back. */
 function constrictor(id: ConstrictorId, span = 118): THREE.BufferGeometry {
@@ -168,7 +170,32 @@ function sideOval(c: V3, major: number, minor: number, sy: number): THREE.Buffer
  * opening itself. Both sides are symmetric, so the sign of x does not matter.
  */
 const TUBE_END: V3 = [0.012, 0.435, -0.006];
-const tubeEnd = (s: number): V3 => [s * TUBE_END[0], TUBE_END[1], TUBE_END[2]];
+/**
+ * The wall point nearest the ears' tube end. The pharynx's back wall now lies in front of the
+ * vertebral bodies (shells/pharynx.ts), which is about 4 mm further forward than the tube end
+ * hn2 aligned to when the pharynx was still the old circle, so the end can no longer lie ON
+ * the wall; the opening is drawn at the nearest wall point and `TUBE_GAP_M` records how far
+ * short of the ears' tube end that leaves it.
+ */
+function nearestOnWall(s: number): { p: V3; gap: number } {
+  const target: V3 = [s * TUBE_END[0], TUBE_END[1], TUBE_END[2]];
+  let best: V3 = wall(TUBE_END[1], s * 90, 1);
+  let gap = Infinity;
+  for (let th = 40; th <= 180; th += 0.5) {
+    const p = wall(TUBE_END[1], s * th, 1);
+    const d = Math.hypot(p[0] - target[0], p[1] - target[1], p[2] - target[2]);
+    if (d < gap) {
+      gap = d;
+      best = p;
+    }
+  }
+  return { p: best, gap };
+}
+const tubeEnd = (s: number): V3 => nearestOnWall(s).p;
+/** Where the right-hand opening is drawn (printed by the probe so the ears' tube end can be moved to it). */
+export const TUBE_OPENING_RIGHT: V3 = nearestOnWall(1).p;
+/** Distance from the drawn opening to the ears' tube end, metres (printed by the probe). */
+export const TUBE_GAP_M = Math.max(nearestOnWall(1).gap, nearestOnWall(-1).gap);
 function tubeOpenings(): THREE.BufferGeometry {
   return merge([1, -1].map((s) => sideOval(tubeEnd(s), 0.002, 0.0006, 1.6)));
 }
@@ -188,7 +215,7 @@ function tubalTonsils(): THREE.BufferGeometry {
 function pharyngealTonsil(): THREE.BufferGeometry {
   const t = tOfY(0.442);
   const c = cs(t);
-  const z = c[2] - radiusAt(t) * 0.86;
+  const z = c[2] - dzAt(t) * 0.86;
   return merge([-2, -1, 0, 1, 2].map((k) => blob([c[0] + k * 0.0025, 0.442, z], [0.0011, 0.006, 0.002], 8, 6)));
 }
 function palatineTonsils(): THREE.BufferGeometry {

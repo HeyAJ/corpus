@@ -25,6 +25,14 @@ import { blob, blobAlong, cone, stick } from './gi_shared';
  * diagrams floating in the free space above the tongue: they are not at true size or at a
  * true place, and their summaries say so.
  *
+ * THE BACK OF THE MOUTH. The first drawing ended at z -0.021 and left 2 cm of nothing between
+ * it and the pharynx. The shell now carries the cavity back through a doorway (the isthmus of
+ * the fauces, shells/mouth.ts) to z -0.030, which is where the pharynx's front wall is, and
+ * everything behind the terminal sulcus was moved back to fill it: the root of the tongue forms
+ * the doorway's floor and the throat's front wall, the soft palate runs back to its roof, and
+ * the palatoglossal folds are its side walls. The oral two-thirds and the pharyngeal third of
+ * the tongue are therefore drawn in about that proportion, with the terminal sulcus between.
+ *
  * HISTORY. Everything here replaces a four-primitive stub (a lip blob, a palate blob, a
  * tongue blob and one rod for all the teeth). The first draft of the arch put the molars'
  * roots outside the shell at the corners of the mouth; the arch is now laid out as a U with
@@ -151,8 +159,8 @@ function teeth(kinds: readonly Kind[], grow = 1): THREE.BufferGeometry {
 
 const TONGUE: Sdf = smoothUnion(
   0.003,
-  ellipsoid([0, -0.002, 0.005], [0.0125, 0.0043, 0.0105]), // the oral part
-  ellipsoid([0, -0.0035, -0.0125], [0.011, 0.006, 0.0085]), // the pharyngeal part, lower and further back
+  ellipsoid([0, -0.002, 0.003], [0.0125, 0.0043, 0.0125]), // the oral part
+  ellipsoid([0, -0.002, -0.019], [0.0105, 0.005, 0.01]), // the pharyngeal part: its root forms the front wall of the throat
 );
 
 /** Height of the tongue's upper surface at (x, z), or NaN where there is no tongue. */
@@ -194,8 +202,8 @@ const vault = (x: number, z: number): number => {
 };
 /** Droop of the soft palate below the vault, s = 0 at its joint with the hard palate and 1 at its free edge. */
 const SOFT_Z0 = -0.0035;
-const SOFT_Z1 = -0.015;
-const droop = (s: number): number => 0.0035 * s ** 1.5;
+const SOFT_Z1 = -0.0255;
+const droop = (s: number): number => 0.003 * s ** 1.5;
 
 function hardPalate(): THREE.BufferGeometry {
   const rows: V3[][] = [];
@@ -213,14 +221,14 @@ function hardPalate(): THREE.BufferGeometry {
 }
 function softPalate(): THREE.BufferGeometry {
   const rows: V3[][] = [];
-  for (let i = 0; i <= 8; i++) {
-    const s = i / 8;
+  for (let i = 0; i <= 10; i++) {
+    const s = i / 10;
     const z = SOFT_Z0 + (SOFT_Z1 - SOFT_Z0) * s;
-    const w = 0.015 - 0.004 * s;
+    const w = 0.015 - 0.0065 * s;
     const r: V3[] = [];
     for (let j = 0; j <= 12; j++) {
       const x = -w + (2 * w * j) / 12;
-      r.push([x, vault(x * (0.015 / w), z) - droop(s), z]);
+      r.push([x, vault(x * (0.015 / w), SOFT_Z0) - droop(s), z]);
     }
     rows.push(r);
   }
@@ -251,7 +259,7 @@ function filiform(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
   for (let i = 0; i < 170; i++) {
     const x = (rnd() * 2 - 1) * 0.0112;
-    const z = -0.0035 + rnd() * 0.0185;
+    const z = -0.009 + rnd() * 0.024;
     const y = topY(x, z);
     if (!Number.isFinite(y)) continue;
     parts.push(cone([x, y - 0.0001, z], [x, y + 0.0007, z], 0.00022, 3));
@@ -263,7 +271,7 @@ function fungiform(): THREE.BufferGeometry {
   const c: V3[] = [];
   for (let i = 0; i < 400 && c.length < 30; i++) {
     const x = (rnd() * 2 - 1) * 0.0112;
-    const z = -0.003 + rnd() * 0.0185;
+    const z = -0.008 + rnd() * 0.0235;
     // The tip and the margins carry most of them.
     if (!(z > 0.008 || Math.abs(x) > 0.0075)) continue;
     const y = topY(x, z);
@@ -271,10 +279,12 @@ function fungiform(): THREE.BufferGeometry {
   }
   return beads(c, 0.00042, 6, 4);
 }
+/** Apex of the terminal sulcus, where the oral two-thirds ends. */
+const SULCUS_Z = -0.0095;
 const VALLATE: V3[] = [];
 for (const side of [1, -1]) {
   for (const ax of [0.003, 0.0058, 0.0082]) {
-    const z = -0.0045 + (ax / 0.0085) * 0.0045 + 0.0014;
+    const z = SULCUS_Z + (ax / 0.0085) * 0.0045 + 0.0014;
     VALLATE.push(onTop(side * ax, z));
   }
 }
@@ -300,7 +310,7 @@ function foliate(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
   for (const side of [1, -1]) {
     for (let k = 0; k < 4; k++) {
-      const z = -0.0105 + 0.0009 * k;
+      const z = -0.0195 + 0.0011 * k;
       const pts: V3[] = [];
       for (const y of [0.0, -0.0015, -0.003]) {
         const x = sideX(y, z);
@@ -311,13 +321,13 @@ function foliate(): THREE.BufferGeometry {
   }
   return merge(parts);
 }
-const sulcusPts = (side: number): V3[] => [[0, -0.0046], [0.0045, -0.0025], [0.0085, 0]].map(([x, z]) => onTop(side * x, z, 0.0001));
+const sulcusPts = (side: number): V3[] => [[0, SULCUS_Z - 0.0001], [0.0045, SULCUS_Z + 0.002], [0.0085, SULCUS_Z + 0.0045]].map(([x, z]) => onTop(side * x, z, 0.0001));
 function terminalSulcus(): THREE.BufferGeometry {
   return merge([1, -1].map((s) => cord(sulcusPts(s), 0.0003, 8, 4)));
 }
 function medianSulcus(): THREE.BufferGeometry {
   const pts: V3[] = [];
-  for (let i = 0; i <= 8; i++) pts.push(onTop(0, -0.0035 + (0.0183 * i) / 8, 0.0001));
+  for (let i = 0; i <= 8; i++) pts.push(onTop(0, -0.0085 + (0.0233 * i) / 8, 0.0001));
   return cord(pts, 0.00022, 16, 4);
 }
 function frenulum(): THREE.BufferGeometry {
@@ -336,43 +346,45 @@ function intrinsic(): THREE.BufferGeometry {
   for (const x of [-0.005, 0, 0.005]) {
     const up: V3[] = [];
     for (let i = 0; i <= 6; i++) {
-      const z = 0.014 - (0.0175 * i) / 6;
+      const z = 0.014 - (0.0215 * i) / 6;
       up.push([x, topY(x, z) - 0.001, z]);
     }
     parts.push(cord(up, 0.00028, 12, 4));
   }
-  for (const x of [-0.003, 0.003]) parts.push(cord([[x, -0.0052, 0.014], [x, -0.0052, 0.006], [x, -0.0054, -0.003]], 0.00028, 10, 4));
+  for (const x of [-0.003, 0.003]) parts.push(cord([[x, -0.0052, 0.014], [x, -0.0052, 0.006], [x, -0.0054, -0.0075]], 0.00028, 10, 4));
   // Transverse: sheets of fibres from the midline septum to the sides.
-  for (const z of [0.011, 0.007, 0.003, -0.001]) parts.push(cord([[-0.0095, -0.0012, z], [0, -0.0004, z], [0.0095, -0.0012, z]], 0.00026, 10, 4));
+  for (const z of [0.011, 0.007, 0.003, -0.001, -0.007, -0.013]) parts.push(cord([[-0.0095, -0.0012, z], [0, -0.0004, z], [0.0095, -0.0012, z]], 0.00026, 10, 4));
   // Vertical: from the upper to the lower surface at the sides.
   for (const x of [-0.0075, 0.0075]) for (const z of [0.01, 0.006, 0.002]) parts.push(line([x, 0.0005, z], [x, -0.0045, z], 0.00026));
   return merge(parts);
 }
 
 const R = (v: readonly number[], side: number): V3 => [side * v[0], v[1], v[2]];
+/** The palatoglossal fold, front pillar of the isthmus: the doorway's side wall, from the soft palate down to the tongue. */
+const ARCH_FOLD: V3[] = [[0.0082, 0.0058, -0.025], [0.0088, 0.0018, -0.0235], [0.0092, -0.0022, -0.0215]];
 function genioglossus(): THREE.BufferGeometry {
   const origin: V3 = [0, -0.0062, 0.015];
-  const ends: V3[] = [[0, 0.001, 0.012], [0, 0.0015, 0.005], [0, 0.001, -0.002], [0, -0.001, -0.01], [0, -0.006, -0.0165]];
+  const ends: V3[] = [[0, 0.001, 0.012], [0, 0.0015, 0.005], [0, 0.001, -0.002], [0, -0.0005, -0.012], [0, -0.0045, -0.0255]];
   return merge([-1, 1].flatMap((k) => ends.map((e) => line([k * 0.0009, origin[1], origin[2]], [k * 0.0009, e[1], e[2]], 0.0004))));
 }
 function hyoglossus(): THREE.BufferGeometry {
-  const hyoid: V3 = [0.0045, -0.0085, -0.016];
-  const ends: V3[] = [[0.0105, -0.003, -0.003], [0.0108, -0.003, 0.002], [0.01, -0.002, -0.009]];
+  const hyoid: V3 = [0.0045, -0.0065, -0.022];
+  const ends: V3[] = [[0.01, -0.003, -0.011], [0.0105, -0.003, -0.002], [0.0098, -0.0035, -0.019]];
   return merge([1, -1].flatMap((s) => ends.map((e) => line(R(hyoid, s), R(e, s), 0.0004))));
 }
 function styloglossus(): THREE.BufferGeometry {
-  const path: V3[] = [[0.0145, 0.0005, -0.0215], [0.0125, -0.0015, -0.01], [0.0112, -0.002, 0], [0.0095, -0.0035, 0.0095]];
+  const path: V3[] = [[0.0108, 0.002, -0.0245], [0.0118, -0.001, -0.016], [0.0114, -0.002, -0.005], [0.0095, -0.0035, 0.0095]];
   return merge([1, -1].map((s) => cord(path.map((p) => R(p, s)), 0.0004, 12, 4)));
 }
 function palatoglossus(): THREE.BufferGeometry {
-  const path: V3[] = [[0.014, 0.0058, -0.01], [0.0115, 0.001, -0.007], [0.0108, -0.002, -0.0045]];
+  const path: V3[] = [[0.0092, 0.0056, -0.0252], [0.0099, 0.0016, -0.0236], [0.0102, -0.0022, -0.0216]];
   return merge([1, -1].map((s) => cord(path.map((p) => R(p, s)), 0.0004, 8, 4)));
 }
 const NERVE: Record<string, V3[]> = {
-  hypoglossal: [[0.009, -0.0075, -0.017], [0.0085, -0.0065, -0.009], [0.005, -0.0056, 0.003], [0.003, -0.005, 0.01]],
-  lingual: [[0.0135, -0.004, -0.02], [0.0105, -0.005, -0.005], [0.0075, -0.0035, 0.006], [0.0035, -0.003, 0.013]],
-  chorda: [[0.015, 0.0005, -0.0205], [0.0125, -0.003, -0.012], [0.0105, -0.005, -0.006]],
-  glosso: [[0.0135, -0.001, -0.022], [0.01, 0.0005, -0.016], [0.006, 0.001, -0.0075]],
+  hypoglossal: [[0.0075, -0.005, -0.025], [0.0085, -0.0062, -0.017], [0.005, -0.0056, 0.003], [0.003, -0.005, 0.01]],
+  lingual: [[0.0082, -0.004, -0.025], [0.0108, -0.005, -0.009], [0.0075, -0.0035, 0.006], [0.0035, -0.003, 0.013]],
+  chorda: [[0.0083, 0.001, -0.025], [0.011, -0.003, -0.015], [0.0105, -0.005, -0.009]],
+  glosso: [[0.0083, 0, -0.027], [0.0095, 0.0005, -0.019], [0.006, 0.001, -0.0085]],
 };
 const nerve = (k: string): THREE.BufferGeometry => merge([1, -1].map((s) => cord(NERVE[k].map((p) => R(p, s)), 0.00032, 14, 4)));
 
@@ -449,8 +461,8 @@ export const parts: PartBuilder = () => {
   add('incisive_papilla', blob([0, vault(0, 0.0152) - 0.0005, 0.0152], [0.0007, 0.0006, 0.0009], 8, 5));
   add('median_palatine_raphe', cord([-0.003, 0.005, 0.0148].map((z): V3 => [0, vault(0, z) - 0.0004, z]), 0.0003, 10, 4));
   add('soft_palate', softPalate());
-  add('uvula', cone([0, 0.0076, -0.015], [0, 0.002, -0.0152], 0.0018, 8));
-  add('palatoglossal_arch', merge([1, -1].map((s) => cord([[0.014, 0.0058, -0.01], [0.0128, 0.0012, -0.0075], [0.0113, -0.0018, -0.0052]].map((p) => R(p, s)), 0.0012, 10, 5))));
+  add('uvula', cone([0, vault(0, SOFT_Z0) - 0.0033, -0.0255], [0, 0.0034, -0.0257], 0.0018, 8));
+  add('palatoglossal_arch', merge([1, -1].map((s) => cord(ARCH_FOLD.map((p) => R(p, s)), 0.0012, 10, 5))));
 
   add('oral_cavity_proper', blob([0, 0.002, 0.003], [0.015, 0.008, 0.015], 14, 10));
   add('floor_of_mouth', floorSheet(-0.005, 0.015, 0, 0.0008, 0));
@@ -463,11 +475,11 @@ export const parts: PartBuilder = () => {
   add('sublingual_caruncles', beads([[0.002, -0.008, 0.01], [-0.002, -0.008, 0.01]], 0.0007, 8, 5));
 
   // Tongue.
-  add('tongue', polygonise(TONGUE, [-0.0145, -0.0105, -0.0225], [0.0145, 0.0045, 0.017], { cell: 0.0007, maxCells: 90000 }));
-  add('oral_part', blob([0, -0.002, 0.005], [0.013, 0.0048, 0.0109], 14, 9));
-  add('pharyngeal_part', blob([0, -0.0035, -0.0125], [0.0114, 0.0064, 0.0089], 14, 9));
+  add('tongue', polygonise(TONGUE, [-0.0145, -0.0105, -0.0315], [0.0145, 0.0045, 0.017], { cell: 0.0007, maxCells: 110000 }));
+  add('oral_part', blob([0, -0.002, 0.003], [0.013, 0.0048, 0.0129], 14, 9));
+  add('pharyngeal_part', blob([0, -0.002, -0.019], [0.0111, 0.0054, 0.0105], 14, 9));
   add('terminal_sulcus', terminalSulcus());
-  add('foramen_caecum', bead(onTop(0, -0.0046, -0.0001), 0.0004, 8, 5));
+  add('foramen_caecum', bead(onTop(0, SULCUS_Z - 0.0001, -0.0001), 0.0004, 8, 5));
   add('median_sulcus', medianSulcus());
   add('lingual_frenulum', frenulum());
   add('filiform_papillae', filiform());
