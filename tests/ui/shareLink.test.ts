@@ -6,13 +6,13 @@ const FULL: ShareState = {
   weeks: 28,
   organ: 'uterus',
   part: 'placenta',
-  layers: ['vessels', 'nerves', 'hormones', 'activity'],
+  layers: ['bones', 'vessels', 'nerves', 'hormones', 'activity'],
   cut: { axis: 'front', depth: 0.5 },
 };
 
 describe('share link build and parse', () => {
   it('builds the documented format', () => {
-    expect(buildShareHash(FULL)).toBe('#v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=vessels,nerves,hormones,activity&cut=front:0.5');
+    expect(buildShareHash(FULL)).toBe('#v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=bones,vessels,nerves,hormones,activity&cut=front:0.5');
   });
 
   it('round-trips a full state', () => {
@@ -22,6 +22,13 @@ describe('share link build and parse', () => {
   it('round-trips a male body with an organ, a part and a cut', () => {
     const s: ShareState = { sex: 'male', organ: 'kidney_l', part: 'renal_medulla', cut: { axis: 'side', depth: 0.25 } };
     expect(parseShareHash(buildShareHash(s))).toEqual(s);
+  });
+
+  it('restores the bones layer from layers=bones, and opens a skeleton organ with its layer off', () => {
+    expect(parseShareHash('#v=1&layers=bones')).toEqual({ layers: ['bones'] });
+    expect(buildShareHash({ layers: ['bones'] })).toBe('#v=1&layers=bones');
+    // A skeleton organ is a catalogue organ (it is built on demand), so a link may open it.
+    expect(parseShareHash('#v=1&organ=thoracic_cage')).toEqual({ organ: 'thoracic_cage' });
   });
 
   it('leaves weeks out of a male body and an empty layer list out of the hash', () => {

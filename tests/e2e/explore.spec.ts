@@ -44,11 +44,12 @@ test('a share link restores the body and the view, and a malformed one is ignore
 
   const structures = page.getByRole('region', { name: 'Structures' });
   await expect(structures).toContainText(/Uterus/i, { timeout: 30_000 });
-  // On a phone the corner switches are deliberately absent while a bottom sheet is open (they
-  // would sit under it), so close the Structures sheet first, as a visitor would to reach them.
-  // The Vessels switch announces its state through aria-pressed; its name flips with it.
+  // On a phone the Layers chip is deliberately absent while a bottom sheet is open (it would sit
+  // under it), so close the Structures sheet first, as a visitor would to reach it. The Vessels row
+  // of the Layers popover announces its state through aria-pressed; its name flips with it.
   await structures.getByRole('button', { name: 'Close Structures' }).click();
   await expect(structures).toHaveCount(0);
+  await page.getByRole('button', { name: /^Layers/ }).click();
   await expect(page.getByRole('button', { name: 'Hide blood vessels' })).toHaveAttribute('aria-pressed', 'true');
 
   await page.getByRole('button', { name: 'Panels', exact: true }).click();
@@ -64,6 +65,7 @@ test('a share link restores the body and the view, and a malformed one is ignore
   await acceptWelcome(page);
   await settle(page);
   await expect(page.getByRole('region', { name: 'Structures' })).toHaveCount(0);
+  await page.getByRole('button', { name: /^Layers/ }).click();
   await expect(page.getByRole('button', { name: 'Show blood vessels' })).toHaveAttribute('aria-pressed', 'false');
 
   expect(problems.list).toEqual([]);

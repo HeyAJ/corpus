@@ -1,6 +1,6 @@
 {
   "atlas": "salivary_glands",
-  "about": "The three pairs of large salivary glands drawn as one organ: the parotid in front of the ear, the submandibular under the jaw and the sublingual in the floor of the mouth. Saliva is not simulated, so the only drive is the direction textbooks give: parasympathetic outflow raises secretion. The weight is a display scale and the index is not a flow rate. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "about": "The three pairs of large salivary glands (parotid, submandibular, sublingual) with their ducts, the many minor glands of the mouth lining, the facial nerve plexus inside the parotid, the parasympathetic supply, and one magnified diagram of a salivary acinus with its duct system. Saliva volume is not simulated, so the only drives are the directions textbooks give: parasympathetic outflow raises secretion and sympathetic outflow raises it slightly, as a thick saliva. The weights are a display scale and the index is not a flow rate. Duct courses, lobule counts and the acinus are schematic; the acinus is magnified and placed in the middle of the organ, not at true size or position.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -30,6 +30,45 @@
       "source": "GRAYS42"
     },
     {
+      "id": "parotid_superficial_part",
+      "parent": "parotid_glands",
+      "label": "Superficial Part of the Parotid",
+      "summary": "The part lateral to the facial nerve plexus",
+      "function": "It forms most of the gland that can be felt in front of the ear.",
+      "color": "#d9a441",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parotid_deep_part",
+      "parent": "parotid_glands",
+      "label": "Deep Part of the Parotid",
+      "summary": "The part medial to the facial nerve plexus",
+      "function": "It lies deep to the nerve plexus, against the structures beside the throat.",
+      "color": "#c88f30",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parotid_duct",
+      "label": "Parotid Duct (Stensen)",
+      "summary": "The duct that carries saliva from the parotid into the mouth",
+      "function": "It runs forward across the cheek and pierces the cheek muscle to open opposite the upper second molar.",
+      "color": "#e8c878",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.25,
+          "note": "Parasympathetic stimulation produces a copious watery saliva.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
       "id": "submandibular_glands",
       "label": "Submandibular Glands",
       "summary": "Pair under the body of the jaw",
@@ -41,6 +80,23 @@
           "signal": "parasympathetic",
           "weight": 0.3,
           "note": "Parasympathetic nerves stimulate the salivary glands to secrete.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "submandibular_duct",
+      "label": "Submandibular Duct (Wharton)",
+      "summary": "The duct that carries saliva from the submandibular gland to the floor of the mouth",
+      "function": "It runs forward above the mylohyoid and opens on the sublingual caruncle beside the frenulum.",
+      "color": "#e8c878",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.25,
+          "note": "Parasympathetic stimulation produces a copious watery saliva.",
           "source": "GH14"
         }
       ],
@@ -61,6 +117,276 @@
           "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sublingual_ducts",
+      "label": "Sublingual Ducts",
+      "summary": "The many small ducts of the sublingual gland",
+      "function": "They open along the sublingual fold, and some join the submandibular duct.",
+      "color": "#ecd496",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.25,
+          "note": "Parasympathetic stimulation produces a copious watery saliva.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "minor_salivary_glands",
+      "label": "Minor Salivary Glands",
+      "summary": "Hundreds of tiny glands in the lining of the mouth",
+      "function": "They lie in the lips, cheeks, palate and tongue and keep the mouth moist between meals. Their counts here are schematic.",
+      "color": "#e6b858",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.2,
+          "note": "Parasympathetic stimulation produces a copious watery saliva.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "labial_glands",
+      "parent": "minor_salivary_glands",
+      "label": "Labial Glands",
+      "summary": "Small glands in the lips",
+      "function": "They open onto the inner surface of the lips.",
+      "color": "#e6b858",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "buccal_glands",
+      "parent": "minor_salivary_glands",
+      "label": "Buccal Glands",
+      "summary": "Small glands in the cheeks",
+      "function": "They open onto the inside of the cheek.",
+      "color": "#dcae50",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatine_glands",
+      "parent": "minor_salivary_glands",
+      "label": "Palatine Glands",
+      "summary": "Mucous glands in the palate",
+      "function": "They lie in the palate and make a mucous saliva.",
+      "color": "#d4a548",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lingual_glands",
+      "parent": "minor_salivary_glands",
+      "label": "Lingual Glands",
+      "summary": "Glands in the tongue",
+      "function": "Some open into the trenches of the vallate papillae and wash the taste buds.",
+      "color": "#ecc468",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intraparotid_facial_plexus",
+      "label": "Intraparotid Facial Plexus",
+      "summary": "The branches of the facial nerve inside the parotid gland",
+      "function": "The facial nerve passes through the gland and divides into branches that supply the muscles of facial expression. It does not supply the gland itself.",
+      "color": "#e8d27a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporofacial_division",
+      "parent": "intraparotid_facial_plexus",
+      "label": "Temporofacial Division",
+      "summary": "The upper division of the facial nerve",
+      "function": "It gives branches that run upward and forward over the face.",
+      "color": "#e8d27a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cervicofacial_division",
+      "parent": "intraparotid_facial_plexus",
+      "label": "Cervicofacial Division",
+      "summary": "The lower division of the facial nerve",
+      "function": "It gives branches that run forward and down over the face and neck.",
+      "color": "#d8c060",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parasympathetic_supply",
+      "label": "Parasympathetic Supply",
+      "summary": "The nerve pathways that drive secretion",
+      "function": "Fibres synapse in two ganglia: the otic ganglion for the parotid, and the submandibular ganglion for the submandibular and sublingual glands.",
+      "color": "#7fb8d8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.4,
+          "note": "These are the parasympathetic pathways that stimulate the glands.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "otic_ganglion",
+      "parent": "parasympathetic_supply",
+      "label": "Otic Ganglion",
+      "summary": "The relay for the parotid gland",
+      "function": "Fibres from the glossopharyngeal nerve relay here and reach the parotid through a branch of the mandibular nerve.",
+      "color": "#7fb8d8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "submandibular_ganglion",
+      "parent": "parasympathetic_supply",
+      "label": "Submandibular Ganglion",
+      "summary": "The relay for the submandibular and sublingual glands",
+      "function": "It hangs from the lingual nerve and receives fibres that come from the facial nerve through the chorda tympani.",
+      "color": "#6aa8c8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "salivary_acinus",
+      "label": "Salivary Acinus (enlarged schematic)",
+      "summary": "A terminal secretory unit and its ducts, drawn magnified",
+      "function": "This is a microscopic structure drawn as a magnified diagram in the middle of the organ, not at true size or position. Saliva is made in the acini and modified as it passes along the ducts.",
+      "color": "#d9a441",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Parasympathetic stimulation produces a copious watery saliva.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.08,
+          "note": "Sympathetic stimulation produces only a small amount of thick saliva.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serous_acinar_cells",
+      "parent": "salivary_acinus",
+      "label": "Serous Acinar Cells",
+      "summary": "Cells that make a watery, enzyme-rich secretion",
+      "function": "They form round acini and are the main cell of the parotid.",
+      "color": "#c47a5a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Parasympathetic stimulation produces a copious watery saliva.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mucous_acinar_cells",
+      "parent": "salivary_acinus",
+      "label": "Mucous Acinar Cells",
+      "summary": "Cells that make a thick, mucus-rich secretion",
+      "function": "They are common in the sublingual gland and lubricate the mouth.",
+      "color": "#e8d8a8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Parasympathetic stimulation produces a copious watery saliva.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serous_demilunes",
+      "parent": "salivary_acinus",
+      "label": "Serous Demilunes",
+      "summary": "Crescents of serous cells capping a mucous acinus",
+      "function": "They add a watery secretion to a mucous acinus.",
+      "color": "#b8604a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "myoepithelial_cells",
+      "parent": "salivary_acinus",
+      "label": "Myoepithelial Cells",
+      "summary": "Contractile cells that embrace the acinus",
+      "function": "They squeeze the acinus and the duct to expel the saliva.",
+      "color": "#7a6a9a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.25,
+          "note": "Parasympathetic stimulation makes the gland secrete and the cells squeeze saliva out.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intercalated_duct",
+      "parent": "salivary_acinus",
+      "label": "Intercalated Duct",
+      "summary": "The first and narrowest duct from the acinus",
+      "function": "It carries the secretion from the acinus to the striated duct.",
+      "color": "#a8d0e0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "striated_duct",
+      "parent": "salivary_acinus",
+      "label": "Striated Duct",
+      "summary": "The duct whose cells alter the saliva",
+      "function": "Its cells adjust the salts in the saliva as it passes. Their folded bases give the striated look.",
+      "color": "#88b8d0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "excretory_duct",
+      "parent": "salivary_acinus",
+      "label": "Excretory Duct",
+      "summary": "The large duct that leaves the gland",
+      "function": "It joins others and carries the saliva to the mouth.",
+      "color": "#6aa0c0",
+      "rest": 0.3,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]
