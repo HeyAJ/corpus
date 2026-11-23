@@ -99,6 +99,10 @@ const CAGE_BF: readonly (readonly [number, number])[] = [
   [0.32, 0.05], [0.3, 0.052], [0.28, 0.056], [0.24, 0.082], [0.2, 0.1], [0.16, 0.104], [0.12, 0.104], [0.08, 0.1], [0.04, 0.092], [0.0, 0.085],
 ];
 
+/** Half-width and back half-depth of the cage's cross-section at height y: the scapula hugs this surface. */
+export const cageHalfWidth = (y: number): number => table(CAGE_A, y);
+export const cageBackDepth = (y: number): number => table(CAGE_BP, y);
+
 interface RibSpec {
   /** Level of the head (the vertebral body it meets). */
   yh: number;

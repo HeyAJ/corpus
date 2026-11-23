@@ -26,6 +26,17 @@
       ]
     },
     {
+      "id": "lower_limb_bones",
+      "triangles": 14720,
+      "budget": 8000,
+      "boundingRadius_m": 0.17647,
+      "worldCentre_m": [
+        0,
+        -0.2147,
+        -0.0053
+      ]
+    },
+    {
       "id": "heart",
       "triangles": 14260,
       "budget": 16000,
@@ -56,6 +67,17 @@
         -0.0783,
         0.2103,
         0
+      ]
+    },
+    {
+      "id": "upper_limb_bones",
+      "triangles": 10712,
+      "budget": 8000,
+      "boundingRadius_m": 0.22333,
+      "worldCentre_m": [
+        -0.0001,
+        0.2109,
+        -0.0283
       ]
     },
     {
@@ -114,6 +136,17 @@
       ]
     },
     {
+      "id": "skull",
+      "triangles": 7264,
+      "budget": 8000,
+      "boundingRadius_m": 0.11534,
+      "worldCentre_m": [
+        0,
+        0.4501,
+        -0.002
+      ]
+    },
+    {
       "id": "uterus",
       "triangles": 7096,
       "budget": 16000,
@@ -133,6 +166,17 @@
         0,
         0.184,
         0.0811
+      ]
+    },
+    {
+      "id": "vertebral_column",
+      "triangles": 6924,
+      "budget": 8000,
+      "boundingRadius_m": 0.31668,
+      "worldCentre_m": [
+        0,
+        0.0743,
+        -0.0556
       ]
     },
     {
@@ -408,50 +452,6 @@
         0,
         0.0357,
         -0.006
-      ]
-    },
-    {
-      "id": "lower_limb_bones",
-      "triangles": 1456,
-      "budget": 8000,
-      "boundingRadius_m": 0.16926,
-      "worldCentre_m": [
-        0,
-        -0.2359,
-        -0.0019
-      ]
-    },
-    {
-      "id": "skull",
-      "triangles": 1144,
-      "budget": 8000,
-      "boundingRadius_m": 0.11462,
-      "worldCentre_m": [
-        0,
-        0.454,
-        -0.004
-      ]
-    },
-    {
-      "id": "vertebral_column",
-      "triangles": 960,
-      "budget": 8000,
-      "boundingRadius_m": 0.32687,
-      "worldCentre_m": [
-        0,
-        0.0805,
-        -0.0439
-      ]
-    },
-    {
-      "id": "upper_limb_bones",
-      "triangles": 912,
-      "budget": 8000,
-      "boundingRadius_m": 0.19172,
-      "worldCentre_m": [
-        0,
-        0.1985,
-        0.0007
       ]
     },
     {

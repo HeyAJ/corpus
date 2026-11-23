@@ -1,6 +1,6 @@
 {
   "atlas": "thoracic_cage",
-  "about": "The rib cage as an anatomy textbook draws it: the sternum in front, the twelve pairs of ribs and the costal cartilages that join most of them to it. It surrounds the lungs and the heart. Bone is not simulated as tissue, so no part has a live drive; how far the cage moves in breathing is not modelled. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "about": "The rib cage as an anatomy textbook draws it: the sternum in front, the twelve pairs of ribs behind and around, and the costal cartilages that join most of them to the sternum. It surrounds the lungs and the heart. Select a part, or zoom in on it, to see the finer structures it holds; the Structures list nests them under their parent. The shapes are an adult-mean drawing and not anyone's scan; the typical rib is drawn thicker than a real rib so its features can be told apart, and the joints, the spaces between the ribs and the red marrow are schematic markers. Bone is shown as ivory and cartilage as blue-grey. The cage rises a little on each breath in the open view, by a display amplitude and not a measured movement. Bone is not simulated as tissue: calcium handling and bone remodelling are not modelled, and the only live part is the red bone marrow, which follows erythropoietin.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -23,11 +23,154 @@
       "source": "GRAYS42"
     },
     {
+      "id": "manubrium",
+      "parent": "sternum",
+      "label": "Manubrium",
+      "summary": "The upper part of the sternum",
+      "function": "The manubrium carries the notches where the clavicles and the first costal cartilages join. It meets the body of the sternum at the sternal angle.",
+      "color": "#dccfa8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sternal_body",
+      "parent": "sternum",
+      "label": "Body of the Sternum",
+      "summary": "The long middle part of the sternum",
+      "function": "The body is the longest segment and has the cartilages of the second to seventh ribs meeting its edges. It lies in front of the heart.",
+      "color": "#cfc29b",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "xiphoid_process",
+      "parent": "sternum",
+      "label": "Xiphoid Process",
+      "summary": "The small pointed lower end of the sternum",
+      "function": "The xiphoid process is the lowest and smallest segment of the sternum. It is cartilage in youth and bony in the adult, and it gives attachment to part of the diaphragm and the abdominal wall.",
+      "color": "#e2d6b0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "jugular_notch",
+      "parent": "sternum",
+      "label": "Jugular Notch",
+      "summary": "The dip in the top edge of the manubrium",
+      "function": "The jugular notch is the hollow between the two clavicular notches, which can be felt at the root of the neck.",
+      "color": "#efe5c3",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sternal_angle",
+      "parent": "sternum",
+      "label": "Sternal Angle",
+      "summary": "The ridge where the manubrium meets the body",
+      "function": "The sternal angle is a transverse ridge at the joint between the manubrium and the body. The second costal cartilage joins the sternum here, which is why it is used to count the ribs.",
+      "color": "#efe5c3",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "clavicular_notches",
+      "parent": "sternum",
+      "label": "Clavicular Notches",
+      "summary": "The two hollows at the top corners of the manubrium",
+      "function": "Each clavicular notch receives the inner end of a clavicle, forming the sternoclavicular joint.",
+      "color": "#efe5c3",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "true_ribs",
       "label": "True Ribs",
       "summary": "Ribs 1 to 7, joined to the sternum",
       "function": "Each true rib reaches the sternum through its own costal cartilage. Together they form the firm upper part of the cage.",
       "color": "#cabd96",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "typical_rib",
+      "parent": "true_ribs",
+      "label": "Typical Rib (enlarged, illustrative)",
+      "summary": "One rib drawn thicker so its parts can be told apart",
+      "function": "The third to ninth ribs share one pattern: a head, a neck, a tubercle, an angle and a shaft. This one is the right sixth rib, drawn thicker than a real rib; it is an illustration of the pattern.",
+      "color": "#d6c9a1",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rib_head",
+      "parent": "typical_rib",
+      "label": "Head of the Rib",
+      "summary": "The rounded end that meets the vertebral column",
+      "function": "The head of a typical rib makes a joint with the sides of two neighbouring vertebral bodies and with the disc between them.",
+      "color": "#e2d6ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rib_neck",
+      "parent": "typical_rib",
+      "label": "Neck of the Rib",
+      "summary": "The narrow part just outside the head",
+      "function": "The neck joins the head to the tubercle and the shaft. It lies in front of the transverse process of its vertebra.",
+      "color": "#c9bc95",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rib_tubercle",
+      "parent": "typical_rib",
+      "label": "Tubercle of the Rib",
+      "summary": "A small knob where the neck meets the shaft",
+      "function": "The tubercle makes a joint with the transverse process of the vertebra of the same number, which holds the back of the rib to the spine.",
+      "color": "#efe5c3",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rib_angle",
+      "parent": "typical_rib",
+      "label": "Angle of the Rib",
+      "summary": "The place where the rib turns forward",
+      "function": "The angle is where the shaft bends and turns towards the front of the chest. It is the weakest and most strongly curved part of the rib.",
+      "color": "#d6c9a1",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rib_shaft",
+      "parent": "typical_rib",
+      "label": "Shaft of the Rib",
+      "summary": "The long curved flat body of the rib",
+      "function": "The shaft is thin and flat and curves round the chest to the costal cartilage. Its curve and the slope of the rib are what let the chest expand when the ribs are lifted.",
+      "color": "#cfc29b",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "costal_groove",
+      "parent": "typical_rib",
+      "label": "Costal Groove",
+      "summary": "The groove along the lower inner edge of the shaft",
+      "function": "The costal groove shelters the intercostal vein, artery and nerve, which run along the lower border of each rib.",
+      "color": "#efe5c3",
       "rest": 0.3,
       "drives": [],
       "source": "GRAYS42"
@@ -43,6 +186,28 @@
       "source": "GRAYS42"
     },
     {
+      "id": "false_ribs",
+      "parent": "false_and_floating_ribs",
+      "label": "False Ribs",
+      "summary": "Ribs 8 to 10, joined to the cartilage above",
+      "function": "Each false rib is joined to the cartilage of the rib above it, so that these ribs reach the sternum only by a shared path. Their joined cartilages make the costal margin.",
+      "color": "#d3c69f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "floating_ribs",
+      "parent": "false_and_floating_ribs",
+      "label": "Floating Ribs",
+      "summary": "Ribs 11 and 12, free at the front",
+      "function": "The floating ribs end in the muscle of the abdominal wall and do not join any cartilage in front. They give some protection to the kidneys behind.",
+      "color": "#e2d6ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "costal_cartilages",
       "label": "Costal Cartilages",
       "summary": "Bars of cartilage between the ribs and the sternum",
@@ -51,6 +216,73 @@
       "rest": 0.3,
       "drives": [],
       "source": "GRAYS42"
+    },
+    {
+      "id": "costal_margin",
+      "label": "Costal Margin",
+      "summary": "The lower edge of the chest wall at the front",
+      "function": "The costal margin is the arch made by the lower edges of the cartilages of the seventh to tenth ribs, running down and out from the xiphoid process.",
+      "color": "#8fb3b0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intercostal_spaces",
+      "label": "Intercostal Spaces",
+      "summary": "The gaps between neighbouring ribs",
+      "function": "Each space is filled by the intercostal muscles and their membranes, which carry the vessels and nerves of the chest wall. They are drawn here as thin panes, standing in for the tissue they hold.",
+      "color": "#c8c2b6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sternocostal_joints",
+      "label": "Sternocostal Joints",
+      "summary": "Where the costal cartilages meet the sternum",
+      "function": "The first cartilage is fused to the sternum, and the second to seventh make small synovial joints with it. They are drawn as markers on the junctions.",
+      "color": "#8fb3c4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "costovertebral_joints",
+      "label": "Costovertebral Joints",
+      "summary": "Where the heads of the ribs meet the vertebral bodies",
+      "function": "Each rib head is held to the side of its vertebra by a small joint and its ligaments. The rib turns about this joint as it is lifted and lowered. They are drawn as markers.",
+      "color": "#8fb3c4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "costotransverse_joints",
+      "label": "Costotransverse Joints",
+      "summary": "Where the rib tubercles meet the transverse processes",
+      "function": "The tubercle of each of the upper ten ribs makes a small joint with the transverse process of its vertebra. They are drawn as markers.",
+      "color": "#8fb3c4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "red_bone_marrow",
+      "label": "Red Bone Marrow (sternum and ribs)",
+      "summary": "Blood-forming marrow inside the sternum and the ribs",
+      "function": "Guyton and Hall list the ribs and the sternum among the membranous bones that make red blood cells in the adult. Erythropoietin from the kidney drives this production; the text does not say what the other bones hold.",
+      "color": "#b8434c",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "epo",
+          "weight": 0.6,
+          "note": "Erythropoietin raises red-cell production in red marrow; the cited text names this bone among the sites of adult red-cell production.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
     }
   ]
 }

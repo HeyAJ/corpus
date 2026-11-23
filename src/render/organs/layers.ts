@@ -80,6 +80,13 @@ export function layerBuildNeeded(
  * Skeleton content agents: these two are the knobs to revisit once real bones (whole vertebrae,
  * ribs with their cartilages) replace the stub shells, since real geometry has many more walls
  * along a ray than a stub has.
+ *
+ * RETUNED once the real skeleton existed (0.42 to 0.62). With the rib cage, the shoulder and
+ * arm bones and the hip and thigh bones drawn properly, the ribs are thin tubes and the limb bones
+ * are single shafts, so at 0.42 the whole skeleton read as faint ivory lines behind the organs and
+ * the pelvis and arms were barely visible. 0.62 keeps the lungs, heart, liver and bowel legible
+ * through the rib cage (checked in the front and side views of the body with Bones on) while
+ * the skeleton can be read at a glance.
  */
 /** Ivory, the colour bone transmits light as (sRGB hex). A display choice. */
 export const BONE_TINT = 0xe9dcb4;
@@ -88,7 +95,7 @@ export const BONE_TINT = 0xe9dcb4;
  * Multiplier on a bone shell's absorption density, applied on top of the organ's own dormant
  * density (STATE_STYLE) and its `shellDensity`. A display choice; see the comment above.
  */
-export const BONE_DENSITY = 0.42;
+export const BONE_DENSITY = 0.62;
 
 /**
  * How far a bone's activity-mode colour may leave the ivory: 0 keeps bone ivory in Activity mode

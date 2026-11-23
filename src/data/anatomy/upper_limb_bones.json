@@ -1,6 +1,6 @@
 {
   "atlas": "upper_limb_bones",
-  "about": "The bones of the shoulder girdle and upper arm as an anatomy textbook draws them: the clavicle, the scapula and the humerus on each side. They follow the brachial vessels to the point where the glass arm fades. Bone is not simulated as tissue, so no part has a live drive. This is a first-pass schematic: the parts are named and listed, and their drawing is still to come.",
+  "about": "The bones of the shoulder and upper arm as an anatomy textbook draws them, on both sides: the collar bones, the shoulder blades, the upper arm bones, and the joints between them. The humerus is drawn along the glass arm and ends where the glass arm fades, a little above the elbow's own joint. Select a part, or zoom in on it, to see the finer structures it holds; the Structures list nests them under their parent. The shapes are an adult-mean drawing and not anyone's scan: the shoulder blade is a smooth curved plate that lies close behind the ribs, its hollows (the fossae) are shown as patches, and the joint capsule, the lining, the labrum and the cartilage are thin schematic shapes. Bone is not simulated as tissue: calcium handling and bone remodelling are not modelled. The only live part is the red bone marrow of the proximal humerus, which follows erythropoietin.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -15,9 +15,42 @@
     {
       "id": "clavicles",
       "label": "Clavicles",
-      "summary": "Collarbones, joining the sternum to the shoulder",
-      "function": "Each clavicle is a long slender bone that braces the shoulder away from the chest and passes force from the arm to the trunk.",
-      "color": "#c9be9a",
+      "summary": "Collar bones, braced between the sternum and the shoulder",
+      "function": "Each clavicle holds the shoulder out from the chest wall and passes force from the arm to the trunk. It meets the sternum at one end and the acromion of the scapula at the other.",
+      "color": "#cfc49f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sternal_end",
+      "parent": "clavicles",
+      "label": "Sternal End",
+      "summary": "The inner end of the clavicle",
+      "function": "The sternal end is the enlarged inner end of the clavicle. It makes the sternoclavicular joint with the manubrium of the sternum and the first costal cartilage.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "acromial_end",
+      "parent": "clavicles",
+      "label": "Acromial End",
+      "summary": "The outer, flattened end of the clavicle",
+      "function": "The acromial end is flat and makes the acromioclavicular joint with the acromion of the scapula.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "clavicle_shaft",
+      "parent": "clavicles",
+      "label": "Shaft of the Clavicle",
+      "summary": "The long curved middle of the clavicle",
+      "function": "The shaft is curved like a shallow S, bowed forward in its inner part and backward in its outer part.",
+      "color": "#c3b890",
       "rest": 0.3,
       "drives": [],
       "source": "GRAYS42"
@@ -33,6 +66,116 @@
       "source": "GRAYS42"
     },
     {
+      "id": "scapular_spine",
+      "parent": "scapulae",
+      "label": "Spine of the Scapula",
+      "summary": "The bony ridge across the back of the blade",
+      "function": "The spine rises from the back of the scapula and runs out to the shoulder, where it ends in the acromion. It divides the back of the blade into the supraspinous and infraspinous fossae.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "acromion",
+      "parent": "scapulae",
+      "label": "Acromion",
+      "summary": "The flattened outer end of the spine, at the point of the shoulder",
+      "function": "The acromion arches over the shoulder joint and makes a joint with the clavicle. It gives attachment to the deltoid and trapezius muscles.",
+      "color": "#e6dbb6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coracoid_process",
+      "parent": "scapulae",
+      "label": "Coracoid Process",
+      "summary": "A hooked projection that points forward",
+      "function": "The coracoid process rises from the upper edge of the scapula near the socket and curves forward. Several muscles and ligaments of the shoulder attach to it.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glenoid_cavity",
+      "parent": "scapulae",
+      "label": "Glenoid Cavity",
+      "summary": "The shallow socket of the shoulder joint",
+      "function": "The glenoid cavity is a shallow pear-shaped hollow at the outer corner of the scapula. It receives the head of the humerus.",
+      "color": "#ece2bf",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "supraspinous_fossa",
+      "parent": "scapulae",
+      "label": "Supraspinous Fossa",
+      "summary": "The hollow of the blade above the spine",
+      "function": "The supraspinous fossa is the part of the back of the scapula above its spine, and holds the supraspinatus muscle. It is drawn as a patch on the blade.",
+      "color": "#b9ad87",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "infraspinous_fossa",
+      "parent": "scapulae",
+      "label": "Infraspinous Fossa",
+      "summary": "The hollow of the blade below the spine",
+      "function": "The infraspinous fossa is the large part of the back of the scapula below its spine, and holds the infraspinatus muscle. It is drawn as a patch on the blade.",
+      "color": "#b9ad87",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "subscapular_fossa",
+      "parent": "scapulae",
+      "label": "Subscapular Fossa",
+      "summary": "The hollow on the front of the blade, against the ribs",
+      "function": "The subscapular fossa is the broad shallow hollow on the rib side of the scapula, and holds the subscapularis muscle. It is drawn as a patch on the blade.",
+      "color": "#b9ad87",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "medial_border",
+      "parent": "scapulae",
+      "label": "Medial Border",
+      "summary": "The edge of the blade nearest the spine",
+      "function": "The medial border is the long edge of the scapula that runs beside the vertebral column from the upper to the lower angle.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_border",
+      "parent": "scapulae",
+      "label": "Lateral Border",
+      "summary": "The edge of the blade nearest the arm",
+      "function": "The lateral border is the thick edge of the scapula that runs from the socket of the shoulder down to the lower angle.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_angle",
+      "parent": "scapulae",
+      "label": "Inferior Angle",
+      "summary": "The lowest point of the blade",
+      "function": "The inferior angle is where the medial and lateral borders meet. It moves round the chest wall when the arm is raised.",
+      "color": "#ece2bf",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "humeri",
       "label": "Humeri",
       "summary": "Upper arm bones",
@@ -41,6 +184,185 @@
       "rest": 0.3,
       "drives": [],
       "source": "GRAYS42"
+    },
+    {
+      "id": "humeral_head",
+      "parent": "humeri",
+      "label": "Head of the Humerus",
+      "summary": "The rounded upper end that fits the socket",
+      "function": "The head of the humerus is smooth and rounded and faces the glenoid cavity. It is covered with articular cartilage.",
+      "color": "#e6dbb6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anatomical_neck",
+      "parent": "humeri",
+      "label": "Anatomical Neck",
+      "summary": "The groove round the base of the head",
+      "function": "The anatomical neck is the narrow ring where the head meets the rest of the upper end. The capsule of the shoulder joint attaches along it. It is drawn as a ring on the bone.",
+      "color": "#d3c8a4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "surgical_neck",
+      "parent": "humeri",
+      "label": "Surgical Neck",
+      "summary": "The narrowing just below the tubercles",
+      "function": "The surgical neck is the part of the shaft just below the head and the tubercles. It is named because it is a common place to break the bone. It is drawn as a ring on the bone.",
+      "color": "#d3c8a4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "greater_tubercle",
+      "parent": "humeri",
+      "label": "Greater Tubercle",
+      "summary": "The large bump on the outer side of the upper end",
+      "function": "The greater tubercle gives attachment to the supraspinatus, infraspinatus and teres minor muscles, and forms the rounded outline of the shoulder.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lesser_tubercle",
+      "parent": "humeri",
+      "label": "Lesser Tubercle",
+      "summary": "The smaller bump on the front of the upper end",
+      "function": "The lesser tubercle gives attachment to the subscapularis muscle.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intertubercular_sulcus",
+      "parent": "humeri",
+      "label": "Intertubercular Sulcus",
+      "summary": "The groove between the two tubercles",
+      "function": "The intertubercular sulcus runs down the front of the upper end of the humerus and holds the tendon of the long head of the biceps. It is drawn as a line along the groove.",
+      "color": "#b9ad87",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deltoid_tuberosity",
+      "parent": "humeri",
+      "label": "Deltoid Tuberosity",
+      "summary": "The rough patch on the outer side of the shaft",
+      "function": "The deltoid tuberosity is where the deltoid muscle attaches to the middle of the shaft.",
+      "color": "#ded3ae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "humeral_shaft",
+      "parent": "humeri",
+      "label": "Shaft of the Humerus",
+      "summary": "The long body of the bone",
+      "function": "The shaft is the long, nearly cylindrical middle of the humerus, and it is drawn to the elbow end where the glass arm fades.",
+      "color": "#c3b890",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sternoclavicular_joints",
+      "label": "Sternoclavicular Joints",
+      "summary": "Where the clavicles meet the sternum",
+      "function": "Each sternoclavicular joint joins the inner end of a clavicle to the manubrium and the first costal cartilage, and has a disc of fibrocartilage inside. It is the only bony link between the arm and the trunk. It is drawn as a marker.",
+      "color": "#8fb3c4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "acromioclavicular_joints",
+      "label": "Acromioclavicular Joints",
+      "summary": "Where the clavicles meet the shoulder blades",
+      "function": "Each acromioclavicular joint joins the outer end of a clavicle to the acromion, at the top of the shoulder. It is drawn as a marker.",
+      "color": "#8fb3c4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glenohumeral_joints",
+      "label": "Glenohumeral Joints",
+      "summary": "The shoulder joints, ball and socket",
+      "function": "Each glenohumeral joint is the ball of the humeral head in the socket of the glenoid cavity. It moves more freely than any other joint of the body. It is drawn as a disc in the plane of the socket.",
+      "color": "#8fb3c4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glenoid_labrum",
+      "parent": "glenohumeral_joints",
+      "label": "Glenoid Labrum",
+      "summary": "A rim of fibrocartilage round the socket",
+      "function": "The glenoid labrum is a ring of fibrocartilage round the edge of the glenoid cavity that deepens the socket. It is drawn as a ring.",
+      "color": "#a9c4c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "joint_capsule",
+      "parent": "glenohumeral_joints",
+      "label": "Joint Capsule",
+      "summary": "The fibrous sleeve round the shoulder joint",
+      "function": "The capsule runs from the rim of the glenoid to the anatomical neck of the humerus and holds the joint together. It is loose, which allows free movement. It is drawn as a faint glass sleeve.",
+      "color": "#cfd8d0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "synovial_membrane",
+      "parent": "glenohumeral_joints",
+      "label": "Synovial Membrane",
+      "summary": "The lining of the joint capsule",
+      "function": "The synovial membrane lines the inside of the capsule and makes the synovial fluid that lubricates the joint. It is drawn as a faint glass sleeve inside the capsule.",
+      "color": "#e2d4c4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glenohumeral_articular_cartilage",
+      "parent": "glenohumeral_joints",
+      "label": "Articular Cartilage (shoulder)",
+      "summary": "The smooth cartilage that covers the two joint surfaces",
+      "function": "Articular cartilage covers the head of the humerus and lines the glenoid cavity, so that the two surfaces glide on each other with little friction. It is drawn as thin caps.",
+      "color": "#bcd8d4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "red_bone_marrow",
+      "label": "Red Bone Marrow (proximal humerus)",
+      "summary": "Blood-forming marrow in the upper end of the humerus",
+      "function": "Guyton and Hall say that in most long bones the marrow turns to fat after about the age of twenty, but that the upper ends of the humerus and the tibia remain a source of red blood cells. Erythropoietin from the kidney drives this production.",
+      "color": "#b8434c",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "epo",
+          "weight": 0.6,
+          "note": "Erythropoietin raises red-cell production in red marrow; the cited text names this bone among the sites of adult red-cell production.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
     }
   ]
 }
