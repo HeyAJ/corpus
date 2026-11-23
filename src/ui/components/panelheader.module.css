@@ -14,8 +14,7 @@
 }
 
 .title {
-  flex: 1 1 auto;
-  min-width: 0;
+  flex: 1 0 auto;
   margin: 0;
   font-size: var(--text-xl);
   font-weight: 700;
@@ -47,7 +46,10 @@
    chip was `flex: none` and the title had only what was left. Now the chip may shrink,
    is capped at 60 % of the row, and ellipsises; its full text is in the `title` attribute
    (PanelHeader.tsx) so a visitor can still read all of it on hover or long-press. The
-   title keeps its place in the row: it is never the one that is truncated. */
+   title keeps its place in the row: it is never the one that is truncated. The title also
+   must not shrink below its own text width: with `flex: 1 1 auto` and `min-width: 0` it
+   did, and "Structures" ran under a long chip on the nasal cavity (24 parts, 14 finer) at
+   390 px, so the title now grows and never shrinks (`flex: 1 0 auto`). */
 .meta {
   min-width: 0;
   flex: 0 1 auto;

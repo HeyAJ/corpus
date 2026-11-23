@@ -160,19 +160,30 @@ function sideOval(c: V3, major: number, minor: number, sy: number): THREE.Buffer
   return g;
 }
 
-const Y_TUBE = 0.418;
-const TUBE_SIDE = 90;
+/**
+ * WHERE THE AUDITORY TUBES MEET THE PHARYNX. The ears shell (shells/ears.ts, written by agent
+ * hn2) ends each pharyngotympanic tube at scene (+-0.012, 0.435, -0.006); its header says the
+ * tubal opening is drawn here. So the opening's centre is that exact point, not a point
+ * worked out from this shell's wall, and the tube meets the nasopharynx with no gap at the
+ * opening itself. Both sides are symmetric, so the sign of x does not matter.
+ */
+const TUBE_END: V3 = [0.012, 0.435, -0.006];
+const tubeEnd = (s: number): V3 => [s * TUBE_END[0], TUBE_END[1], TUBE_END[2]];
 function tubeOpenings(): THREE.BufferGeometry {
-  return merge([1, -1].map((s) => sideOval(wall(Y_TUBE, s * TUBE_SIDE, 0.955), 0.002, 0.0006, 1.6)));
+  return merge([1, -1].map((s) => sideOval(tubeEnd(s), 0.002, 0.0006, 1.6)));
 }
+/** The cushion of tubal cartilage: above and behind the opening, and a hair inside the wall. */
 function torus(): THREE.BufferGeometry {
   return merge([1, -1].map((s) => {
-    const c = wall(Y_TUBE + 0.0045, s * (TUBE_SIDE + 10), 0.93);
-    return blob(c, [0.001, 0.0022, 0.0016], 8, 6);
+    const e = tubeEnd(s);
+    return blob([e[0] - s * 0.0006, e[1] + 0.0045, e[2] - 0.0025], [0.001, 0.0022, 0.0016], 8, 6);
   }));
 }
 function tubalTonsils(): THREE.BufferGeometry {
-  return merge([1, -1].map((s) => blob(wall(Y_TUBE - 0.0005, s * (TUBE_SIDE + 28), 0.9), [0.0012, 0.003, 0.0018], 8, 6)));
+  return merge([1, -1].map((s) => {
+    const e = tubeEnd(s);
+    return blob([e[0] - s * 0.0010, e[1] - 0.0005, e[2] - 0.0045], [0.0012, 0.003, 0.0018], 8, 6);
+  }));
 }
 function pharyngealTonsil(): THREE.BufferGeometry {
   const t = tOfY(0.442);
@@ -228,7 +239,7 @@ export const parts: PartBuilder = () => {
   add('cricopharyngeus', ringAround(Y_BOTTOM + 0.0012, 0.96, 0.0012));
 
   const stylo = runDown([[0.436, 112], [0.42, 100], [0.404, 88], [0.392, 80]], 0.94, 0.0007);
-  const salpingo = runDown([[0.418, 95], [0.406, 88], [0.395, 80]], 0.94, 0.0006);
+  const salpingo = runDown([[0.433, 92], [0.412, 88], [0.395, 80]], 0.94, 0.0006);
   const palato = runDown([[0.396, 75], [0.386, 85], [0.376, 95]], 0.94, 0.0007);
   add('pharyngeal_longitudinal_muscles', merge([stylo.clone(), salpingo.clone(), palato.clone()]));
   add('stylopharyngeus', stylo);
