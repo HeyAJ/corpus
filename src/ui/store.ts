@@ -122,6 +122,8 @@ interface UiState {
    */
   bonesVisible: boolean;
   toggleBones: () => void;
+  musclesVisible: boolean;
+  toggleMuscles: () => void;
   /**
    * The Layers popover (ToolDock.tsx). It is NOT a panel and takes no part in `openOnly`: it is a
    * small anchored menu that closes on an outside tap, Escape, or the opening of any panel.
@@ -363,6 +365,8 @@ export const useStore = create<UiState>((set, get) => ({
   toggleReproductionPanel: () => set((s) => openOnly(s, 'reproductionPanelOpen')),
   bonesVisible: false,
   toggleBones: () => set((s) => ({ bonesVisible: !s.bonesVisible })),
+  musclesVisible: false,
+  toggleMuscles: () => set((s) => ({ musclesVisible: !s.musclesVisible })),
   layersOpen: false,
   setLayersOpen: (open) => set({ layersOpen: open }),
   nervesVisible: false,

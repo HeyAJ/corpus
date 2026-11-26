@@ -50,6 +50,7 @@ const SYSTEM_ORDER: { id: BodySystem; label: string }[] = [
   { id: 'lymphatic', label: 'Lymphatic' },
   { id: 'reproductive', label: 'Reproductive' },
   { id: 'skeletal', label: 'Skeleton' },
+  { id: 'muscular', label: 'Muscles' },
 ];
 
 /** A part must beat its own resting value by this much to be called "most active". */

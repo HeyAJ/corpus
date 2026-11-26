@@ -4,6 +4,8 @@ import {
   BONE_TINT,
   LAYER_IDS,
   LAYER_LOOK,
+  MUSCLE_DENSITY,
+  MUSCLE_TINT,
   layerBuildNeeded,
   layerOrganVisible,
   noLayers,
@@ -64,5 +66,31 @@ describe('bone look', () => {
     const b = BONE_TINT & 255;
     expect(r).toBeGreaterThan(b);
     expect(g).toBeGreaterThan(b);
+  });
+});
+
+describe('muscle look', () => {
+  it('is a layer of its own, gated exactly like the bones', () => {
+    expect(LAYER_IDS).toContain('muscles');
+    expect(noLayers().muscles).toBe(false);
+    const on = { ...noLayers(), muscles: true };
+    expect(layerOrganVisible('muscles', noLayers(), false)).toBe(false);
+    expect(layerOrganVisible('muscles', noLayers(), true)).toBe(true);
+    expect(layerOrganVisible('muscles', on, false)).toBe(true);
+    // Switching muscles on must not draw the skeleton, and the reverse.
+    expect(layerOrganVisible('bones', on, false)).toBe(false);
+    expect(layerBuildNeeded('muscles', on, false, false, false)).toBe(true);
+    expect(layerBuildNeeded('muscles', on, false, true, false)).toBe(false);
+  });
+
+  it('is red, and no denser than bone, so organs stay legible through the trunk wall', () => {
+    expect(LAYER_LOOK.muscles.tint).toBe(MUSCLE_TINT);
+    expect(MUSCLE_DENSITY).toBeGreaterThan(0);
+    expect(MUSCLE_DENSITY).toBeLessThanOrEqual(BONE_DENSITY);
+    const r = (MUSCLE_TINT >> 16) & 255;
+    const g = (MUSCLE_TINT >> 8) & 255;
+    const b = MUSCLE_TINT & 255;
+    expect(r).toBeGreaterThan(g);
+    expect(r).toBeGreaterThan(b);
   });
 });

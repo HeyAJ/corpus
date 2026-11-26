@@ -2,8 +2,8 @@
  * LAYER ORGANS: the pure rules, and the bone look. No three.js import, so a test can read them.
  *
  * WHAT A LAYER ORGAN IS. Most organs belong to the body: they are built at boot, drawn and
- * picked always. A LAYER organ (`OrganDef.layer`, today only `'bones'`; `'muscles'` and
- * `'lymph'` will follow) belongs to an optional overlay a visitor switches on. Five skeleton
+ * picked always. A LAYER organ (`OrganDef.layer`, today `'bones'` and `'muscles'`; `'lymph'`
+ * will follow) belongs to an optional overlay a visitor switches on. Five skeleton
  * organs carry several hundred thousand triangles between them once their anatomy is real, and a
  * visitor who never opens the skeleton must not pay for it, so such an organ is
  *
@@ -20,18 +20,18 @@
  * tests/render/layers.test.ts pins them.
  */
 
-/** The layers an organ can belong to. Extend with `'muscles'` and `'lymph'` as they arrive. */
-export type LayerId = 'bones';
+/** The layers an organ can belong to. Extend with `'lymph'` when it arrives. */
+export type LayerId = 'bones' | 'muscles';
 
 /** Every layer name the renderer knows, in the order the Layers control lists them. */
-export const LAYER_IDS: readonly LayerId[] = ['bones'];
+export const LAYER_IDS: readonly LayerId[] = ['bones', 'muscles'];
 
 /** Which layers are switched on. */
 export type LayerFlags = Record<LayerId, boolean>;
 
 /** All layers off: the default view. */
 export function noLayers(): LayerFlags {
-  return { bones: false };
+  return { bones: false, muscles: false };
 }
 
 /**
@@ -105,10 +105,47 @@ export const BONE_DENSITY = 0.62;
  */
 export const BONE_ACTIVITY_COLOUR_MIX = 0.35;
 
+/*
+ * THE MUSCLE LOOK. Like the bone look, every number is a DISPLAY choice and not a measurement of
+ * muscle. Muscle is drawn in the same multiply-blend bucket as every organ shell (ADR-002), so it
+ * is order-independent against the organs, bones, vessels and nerves by the same argument.
+ *
+ *   - TINT: a muscle red, deeper and browner than the pink every soft organ is mixed toward, so a
+ *     muscle is not read as a blood-filled organ and not as bone. It is the colour the muscle
+ *     transmits light as, not the colour of the surface.
+ *   - DENSITY: lower than a soft organ's and a little lower than bone's. The muscles are the
+ *     OUTERMOST soft layer: the chest wall, the abdominal wall and the back muscles each lie
+ *     across the whole front or back of the trunk, so a ray that reaches the heart, lungs, liver
+ *     or bowel crosses a muscle sheet first. At the soft-organ density, and at the bone density,
+ *     a sheet in front of the viscera turned the trunk into one red mass in which no organ could
+ *     be told apart (the same failure the bone-density comment above records for the ribs).
+ *     0.5 is the PROVISIONAL value chosen for the stub shells, which are single slabs; it has not
+ *     yet been checked against real, many-layered muscle geometry.
+ *
+ * Muscle content agents: this is the knob to revisit once real muscles replace the stub slabs,
+ * exactly as the bone comment says for the skeleton. Retune it by looking at the front and side
+ * views of the trunk with Muscles on, not by calculation.
+ */
+/** The red muscle transmits light as (sRGB hex). A display choice. */
+export const MUSCLE_TINT = 0xb5524a;
+
+/** Multiplier on a muscle shell's absorption density. A display choice; see the comment above. */
+export const MUSCLE_DENSITY = 0.5;
+
 /**
- * The look of each layer, gathered so OrganSet reads one table and the muscles and the lymph
- * layers add a row instead of a branch. Bones only today.
+ * How far a muscle's activity-mode colour may leave its red: 0 keeps muscle red in Activity mode,
+ * 1 gives it the ramp colour like any organ. Muscle is the one layer whose parts DO have live
+ * engine signals (exertion, shivering, paralysis, rigidity), so it follows the ramp more than
+ * bone does, but not fully, so a resting body of muscle is still recognisably muscle. A display
+ * choice.
+ */
+export const MUSCLE_ACTIVITY_COLOUR_MIX = 0.55;
+
+/**
+ * The look of each layer, gathered so OrganSet reads one table and the lymph layer adds a row
+ * instead of a branch. Bones and muscles today.
  */
 export const LAYER_LOOK: Record<LayerId, { tint: number; density: number; activityColourMix: number }> = {
   bones: { tint: BONE_TINT, density: BONE_DENSITY, activityColourMix: BONE_ACTIVITY_COLOUR_MIX },
+  muscles: { tint: MUSCLE_TINT, density: MUSCLE_DENSITY, activityColourMix: MUSCLE_ACTIVITY_COLOUR_MIX },
 };

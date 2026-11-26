@@ -536,6 +536,27 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
         chips: [hormoneChip(s, 'epo', 'EPO', 1), { label: 'Hct', value: pct(s.chem.haematocrit), digits: 0, unit: '%' }],
         caption: 'Bone itself, calcium and bone remodelling are not simulated. Red cells are made in the marrow in response to EPO, so those two readings are shown.',
       };
+    case 'head_neck_muscles':
+    case 'chest_wall_muscles':
+    case 'abdominal_wall_muscles':
+    case 'back_muscles':
+    case 'shoulder_arm_muscles':
+    case 'hip_thigh_muscles':
+    case 'pelvic_floor_muscles':
+      // ONE honest set of readings for every muscle group, because the engine has no per-muscle
+      // state: only whole-body skeletal muscle tone, the exertion the body is performing, and the
+      // somatic motor outflow (which the engine raises for voluntary effort, shivering and a
+      // seizure alike, so it is the only place shivering shows). A group-specific reading
+      // would be invented. The words line says when a seizure is under way.
+      return {
+        chips: [
+          { label: 'Tone', value: s.mind.muscleTone, digits: 2 },
+          { label: 'Exertion', value: pct(s.behaviour.exertion), digits: 0, unit: '%' },
+          { label: 'Motor', value: pct(nerves.motor), digits: 0, unit: '%' },
+        ],
+        words: s.mind.seizing ? ['Seizing'] : undefined,
+        caption: 'Tone: -1 flaccid, 0 normal, +1 rigid, for the whole body. Motor outflow is above rest and includes effort, shivering and a seizure. Muscle force, fatigue and the metabolism of each muscle are not simulated, so no reading is shown for them.',
+      };
     case 'spinal_cord':
       return {
         chips: [
@@ -781,6 +802,7 @@ export const PANELS = {
   fetal: OrganTelemetryPanel,
   headneck: OrganTelemetryPanel,
   skeletal: OrganTelemetryPanel,
+  muscular: OrganTelemetryPanel,
 } as const;
 
 export function ConditionStack({ conditions }: { conditions: SimSnapshot['conditions'] }) {
