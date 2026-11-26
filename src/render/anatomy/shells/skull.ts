@@ -41,12 +41,19 @@ import {
  * the table (the generator is described in the atlas file's header) and re-run that probe.
  *
  * KNOWN CONFLICT IN THE NEIGHBOURING SHELLS, NOT FIXED HERE. The brain shell reaches 4.7 mm
- * into the upper part of each eyeball and the ears atlas puts the inner ear inside the
- * brain's temporal lobe (the brain's lowest surface there is 41 mm below its origin, the
- * cochlea is 36 to 43). A true skull has bone between them (the orbital roof, the petrous
- * ridge). Here the cavity is cut to the brain, so the bone wall hugs the brain and the globe
- * and the inner ear poke through it by those few millimetres. The external canal is therefore
- * a dimple ending 1 mm short of the cranial cavity rather than a tube to the drum.
+ * into the upper part of each eyeball. A true skull has bone between them (the orbital roof).
+ * Here the cavity is cut to the brain, so the bone wall hugs the brain and the globe and the
+ * eye pokes through it by those few millimetres. (The ears used to be the second case: they
+ * were drawn at the eyes' height, inside the brain. They now lie 23 mm lower, in the petrous
+ * and tympanic bone below the cavity, so the external canal is a dimple that runs in to the
+ * drum end of the ears' canal.)
+ *
+ * THE TEMPORAL BONE AT THE EAR. At the height of the ears (scene y 0.424) the skull's outer
+ * surface used to be only 52 mm from the midline, 22 mm short of the ears' canal opening
+ * (74.5 mm), because the vault is an ellipsoid that has already narrowed to the base there.
+ * A temporal-bone mass (`TEMPORAL_EAR_MASS`, the bone round the canal: tympanic ring and the
+ * lateral end of the petrous part) fills that gap so the canal has bone to open in. Its size is
+ * a drawing choice that reaches the canal's lateral end.
  *
  * Exported for the atlas (atlas/skull.parts.ts), which cuts this one bone field into the
  * individual bones: shapes, not geometry, are shared, so each caller polygonises at its own
@@ -109,9 +116,17 @@ export const SKULL_LANDMARKS = {
   foramenMagnum: [0, -0.1, -0.03] as V3,
   /** The pituitary's own bounding box centre, brain atlas: x 0, y -0.030..-0.014, z 0.005..0.014. */
   sella: [0, -0.0262, 0.0095] as V3,
-  /** Right-hand external acoustic meatus: lateral opening and inner end (ears atlas puts the meatus at y -0.035, z -0.011). */
-  meatusOuter: [0.082, -0.035, -0.011] as V3,
-  meatusInner: [0.0725, -0.035, -0.011] as V3,
+  /**
+   * Right-hand external acoustic meatus: lateral opening and inner end, ON THE EARS' OWN CANAL
+   * AXIS (shells/ears.ts CANAL plus the organ's scene position (0, 0.423, -0.012), less this
+   * frame's 0.48): the canal runs from scene (0.0745, 0.424, -0.0125) to its drum end
+   * (0.0485, 0.421, -0.0105). It used to be at y -0.035, z -0.011, which was the eyes' height
+   * where the ears had been drawn; the ears were moved down to the Frankfort plane (porion level
+   * with the orbitale) and the dimple moved with them. Now it is a real bony canal that runs in
+   * to the drum, because the cranial cavity is 14 mm above it, not 1 mm.
+   */
+  meatusOuter: [0.0795, -0.056, -0.0127] as V3,
+  meatusInner: [0.0505, -0.0585, -0.0106] as V3,
   /** The jaw joint (right side): condyle head, and the fossa on the temporal bone above it. */
   condyle: [0.0605, -0.0585, -0.0155] as V3,
   fossa: [0.0605, -0.0505, -0.0125] as V3,
@@ -119,6 +134,9 @@ export const SKULL_LANDMARKS = {
   mandibleRidgeY: -0.1065,
   maxillaRidgeY: -0.0925,
 };
+
+/** The temporal bone round the ears' canal, right side (x mirrored): centre and radii, a drawing choice reaching the canal's lateral end. */
+const TEMPORAL_EAR_MASS = { c: [0.0585, -0.0555, -0.0125] as V3, r: [0.0152, 0.0125, 0.0165] as V3 };
 
 /** A superellipsoid: exponent 2 is an ellipsoid, larger is boxier. Approximate distance (scaled by the smallest radius). */
 function superEllipsoid(c: V3, r: V3, p: number): Sdf {
@@ -261,6 +279,7 @@ export function outerEnvelope(): Sdf {
     mirroredX(ellipsoid([gx + 0.016, gy - 0.014, 0.055], [0.012, 0.0125, 0.0135])), // zygomatic body (cheekbone)
     mirroredX(capsule([0.0585, -0.045, 0.043], [0.0665, -0.0425, 0.01], 0.0042)), // zygomatic arch, front
     mirroredX(capsule([0.0665, -0.0425, 0.01], [0.0645, -0.0405, -0.012], 0.0042)), // zygomatic arch, back
+    mirroredX(ellipsoid(TEMPORAL_EAR_MASS.c, TEMPORAL_EAR_MASS.r)), // the bone round the ear canal (tympanic ring, lateral petrous)
     mirroredX(ellipsoid([0.06, -0.058, -0.03], [0.0095, 0.0145, 0.011])), // mastoid process
     mirroredX(capsule([0.049, -0.06, -0.0125], [0.044, -0.084, 0.001], 0.0023)), // styloid process
     mirroredX(capsule([0.0165, -0.06, 0.022], [0.0185, -0.0865, 0.029], 0.0042)), // pterygoid process

@@ -4,11 +4,23 @@ import { mergeParts, tubeAlong, type V3 } from '../sdf';
 /**
  * EARS, SHELL AND SHARED LAYOUT. Both ears in one organ, the pattern the eyes use.
  *
- * Frame: origin at organs.json [0, 0.386, -0.012]. The height is the eyes' own (0.386, then
- * lifted 0.06 with the cranial group): the brief is "temporal region at about eye level".
- * In z it is 7.2 cm behind the globes (z 0.06), the order of the distance from pupil to ear
- * canal in an adult head. Every position below is written for the RIGHT ear (+x) with X the
- * distance from the midline; `at(s, ...)` puts it on side s.
+ * Frame: origin at organs.json [0, 0.363, -0.012]; the cranial group's 0.06 lift makes that
+ * scene y 0.423. WHERE IT LIES, AND WHY IT WAS MOVED DOWN 23 mm (agent ea). The scaffold put
+ * the ears at the EYES' height (0.386, scene 0.446), which is the height of the globes, not of
+ * the ears. At that height the whole inner ear was inside the brain shell (cochlea 4.8 mm deep,
+ * canals 10.8 to 14.5 mm, vestibular apparatus 19.4 mm, the shell as a whole 15.2 mm): the
+ * brain's floor under the temporal lobe is scene y 0.436 to 0.439 at x 0.04, so an organ that
+ * must lie in the petrous temporal bone BELOW the brain has to be drawn below that. Two
+ * landmarks from Gray's fix the height: the Frankfort horizontal plane (the porion, the top of
+ * the external acoustic meatus, level with the orbitale, the lowest point of the infraorbital
+ * margin; the skull shell's orbitale is scene y 0.4274, so the canal's lateral opening, axis
+ * 0.424 plus the 3.1 mm canal radius, tops out at 0.4271), and the pharyngotympanic tube,
+ * which runs from the front of the tympanic cavity forward, medially and DOWN to the
+ * nasopharynx, whose opening lies level with the back end of the inferior nasal concha (scene
+ * y 0.4035, read from the nasal atlas). Every position below is written for the RIGHT ear (+x)
+ * with X the distance from the midline; `at(s, ...)` puts it on side s. In z it is 7.2 cm
+ * behind the globes (z 0.06), the order of the distance from pupil to ear canal in an adult
+ * head.
  *
  * NO AURICLE. The outer ear (the pinna) is left out on purpose. The glass body outline
  * (`src/render/body/outlineModel.ts`) is fitted to the organ shells, so a flap standing out
@@ -24,9 +36,10 @@ import { mergeParts, tubeAlong, type V3 } from '../sdf';
  * three-quarter turns), drawn as a tapering helix.
  *
  * THE PHARYNGOTYMPANIC TUBE runs from the front wall of the tympanic cavity forward, medially
- * and down to the nasopharynx. Its end (X 0.0082, y -0.011, z 0.0129 here, which is scene
- * x 0.0082, y 0.435, z 0.0009) meets the tubal opening agent hn1 drew on the lateral wall of the
- * reshaped pharynx.
+ * and down to the nasopharynx. Its end (X 0.0126, y -0.0195, z 0.0166 here, which is scene
+ * x 0.0126, y 0.4035, z 0.0046) is the point on the pharynx's side wall at the height of the
+ * inferior concha's back end; atlas/pharynx.parts.ts reads this very end (TUBE below plus the
+ * organ's position) and draws the tubal opening there, so the two cannot drift apart again.
  */
 
 export const at = (s: number, p: V3): V3 => [s * p[0], p[1], p[2]];
@@ -61,10 +74,10 @@ export const SACCULE_C: V3 = [0.0372, -0.0016, -0.0008];
 /** Pharyngotympanic tube, tympanic end first. */
 export const TUBE: readonly V3[] = [
   [0.043, -0.0035, 0.006],
-  [0.036, -0.005, 0.0085],
-  [0.027, -0.0075, 0.01],
-  [0.0165, -0.0095, 0.012],
-  [0.0082, -0.011, 0.0129],
+  [0.036, -0.007, 0.0085],
+  [0.027, -0.0105, 0.011],
+  [0.0185, -0.015, 0.014],
+  [0.0126, -0.0195, 0.0166],
 ];
 /** Internal acoustic meatus, medial (brain) end first. */
 export const IAM: readonly V3[] = [

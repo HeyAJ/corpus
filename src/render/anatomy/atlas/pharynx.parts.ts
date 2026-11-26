@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { PartBuilder, PartGeometry } from '../parts';
-import { warpGeometry, warpPoint } from '../layout';
+import { organDef, organPosition, warpGeometry, warpPoint } from '../layout';
+import { TUBE } from '../shells/ears';
 import { BODY_Y0, BODY_Y1, ellipticalTube, ringAt } from '../shells/pharynx';
 import { mergeParts, tubeAlong, type V3 } from '../sdf';
 import { mulberry32 } from '../noise';
@@ -163,19 +164,25 @@ function sideOval(c: V3, major: number, minor: number, sy: number): THREE.Buffer
 }
 
 /**
- * WHERE THE AUDITORY TUBES MEET THE PHARYNX. The ears shell (shells/ears.ts, written by agent
- * hn2) ends each pharyngotympanic tube at scene (+-0.012, 0.435, -0.006); its header says the
- * tubal opening is drawn here. So the opening's centre is that exact point, not a point
- * worked out from this shell's wall, and the tube meets the nasopharynx with no gap at the
- * opening itself. Both sides are symmetric, so the sign of x does not matter.
+ * WHERE THE AUDITORY TUBES MEET THE PHARYNX. The tube end is READ from the ears (the last point
+ * of `TUBE` in shells/ears.ts, written in the ears' frame, plus the ears organ's scene
+ * position), not typed in a second time: an earlier copy of the point here, (0.012, 0.435,
+ * -0.006), went stale the moment the ears moved, and `TUBE_GAP_M` kept reporting a gap to a
+ * point nobody drew any more. Anatomically (Gray's) the pharyngeal opening of the tube lies in
+ * the side wall of the nasopharynx level with the back end of the inferior nasal concha, which
+ * the nasal atlas puts at scene y 0.4035, and the tube reaches it from the middle ear going
+ * forward, medially and DOWN. The ears' tube end sits at that height on this shell's side wall.
  */
-const TUBE_END: V3 = [0.012, 0.435, -0.006];
+const EARS_AT = organPosition(organDef('ears'));
+const TUBE_END: V3 = [
+  Math.abs(TUBE[TUBE.length - 1][0]) + EARS_AT.x,
+  TUBE[TUBE.length - 1][1] + EARS_AT.y,
+  TUBE[TUBE.length - 1][2] + EARS_AT.z,
+];
 /**
- * The wall point nearest the ears' tube end. The pharynx's back wall now lies in front of the
- * vertebral bodies (shells/pharynx.ts), which is about 4 mm further forward than the tube end
- * hn2 aligned to when the pharynx was still the old circle, so the end can no longer lie ON
- * the wall; the opening is drawn at the nearest wall point and `TUBE_GAP_M` records how far
- * short of the ears' tube end that leaves it.
+ * The wall point nearest the ears' tube end. If the ears' end does not lie exactly on this
+ * shell's wall the opening is drawn at the nearest wall point, and `TUBE_GAP_M` records how far
+ * short of the ears' REAL tube end that leaves it (the printout the probe reads).
  */
 function nearestOnWall(s: number): { p: V3; gap: number } {
   const target: V3 = [s * TUBE_END[0], TUBE_END[1], TUBE_END[2]];
