@@ -1214,3 +1214,148 @@ forbid ingestion into AI systems without permission. Its licence is non-commerci
 without a source is worse than a drawing proportion plainly called one). Leaving the cell-level
 parts out (the depth is the point). Calling the schematics anatomy (a visitor could read a bead
 scatter as a count of cells).
+
+## ADR-048 — Layer organs, and one Layers control
+
+Ten organs were to be added, five of them the skeleton (about 46,800 triangles of shells alone, and
+far more in their interiors). The default load was already close to its triangle budget (218,172
+of 240,000 before this round), and most visitors never look at a bone. The four overlay switches
+in the bottom-left corner were also already reaching mid-abdomen over the body at 390 px, and a
+fifth would have covered more of it.
+
+**The decision.** An organ may carry `layer: 'bones'` in `organs.json`. The rule, in the pure
+`src/render/organs/layers.ts` (`layerOrganVisible`, `layerBuildNeeded`): a layer organ is drawn
+and picked while its layer is on OR it is itself the selected organ; it is built lazily the first
+time it is needed and cached; selecting one never changes the layer flag, so deselecting hides it
+again; and if the selected organ is not yet built, its camera flight and interior wait for the
+geometry (`openPending`). Layer organs do not count against the default `TOTAL_BUDGET` 240,000;
+bones have their own `LAYER_BUDGET` 60,000 and per-organ entries (lower limb 16,000, upper limb
+12,000), all load and performance choices. They are excluded from the glass body-outline fit,
+because that outline is built in a worker from the default organs and must not change when a
+visitor switches Bones on; a bone that would otherwise poke through the glass is held in by a
+landmark sample (`organSamples.ts`). One **Layers** control (a chip with a count of layers on)
+replaces the four corner switches and adds Bones: an anchored popover with rows Bones, Vessels,
+Nerves, Hormones, Activity, each with a one-line description, closing on an outside press, Escape
+or a panel opening. It is deliberately outside `openOnly` (a layer is not a panel, and a visitor
+must be able to leave Vessels on while a sheet is open). Each row keeps its old accessible name
+and `aria-pressed`. The popover is 320 px wide (display).
+
+**What went wrong on the way.** The first bone density, `BONE_DENSITY` 0.42, left the organs
+behind the ribs hard to read; it is now 0.62, checked against front and profile renders.
+
+**Rejected.** Building the skeleton at start like every other organ (it would have spent the load
+budget on something most visitors do not open). A fifth corner switch (it covered the body). A
+Layers sheet that joins the one-panel rule (turning a layer on would close the panel the visitor
+was reading). Fitting the glass outline to the bones once built (the silhouette would change under
+the visitor's hand, and the fit would wait on a lazy build).
+
+## ADR-049 — Head-and-neck organs are ordinary organs, and say what they do not simulate
+
+Mouth, salivary glands, pharynx, nasal cavity and ears had no organ. Giving them organs makes the
+swallow, the breath, saliva and vertigo something to look at; it also invites the reading that
+taste, hearing and balance are simulated.
+
+**The decision.** They are ordinary default-load organs with the textbook-depth standard of
+ADR-047 (parts of 14, 10, 16, 24 and 26 at level 1, with 55, 17, 16, 14 and 35 children). What is
+driven is stated, and nothing else is: the swallow gesture plays once on the rising edge of the
+engine's `swallowing` signal (a display gesture; its timing is not simulated); vomiting drives
+only the soft palate (Guyton: it lifts to close the posterior nares); saliva droplets follow
+parasympathetic drive, with a small sympathetic weight of 0.08 (Guyton: a small, thick
+secretion); nasal and pharynx airflow follow the breath; and the vestibular apparatus follows
+`vertigo`, the engine's pathology state. **Why vertigo is the right drive:** vertigo is the
+vestibular system reporting a movement that is not happening (GH14), so the part that reports
+movement is the part that lights, at a weight (0.4) that is a display choice. Mucus flow and the
+cilia sweep run at a fixed display rhythm, since clearance is not simulated. Hearing, balance,
+taste, smell and chewing are stated as not simulated in `docs/MODEL_LIMITATIONS.md` section 20.
+Magnified schematics (taste bud, tooth section, acinus, tonsil section, hair cells, otoconia) are
+drawn as enlarged samples, never as counts. The ears have no auricle: it would have pulled the
+glass head outward, because the glass is fitted to organ shells.
+
+**What went wrong.** The pharynx panel first said the swallow is not simulated while the organ
+drew one; the copy now says the swallow is a display gesture on the engine's signal. The pharynx
+spans the cranial band, so it carries an `axialWarp` like the oesophagus; its first anchor at the
+oesophagus join pinned it while the vertebral stub intruded 4.5 to 17 mm.
+
+**Rejected.** A drive on the ears from heart rate or posture (nothing cited ties them). A
+sympathetic drive on the nasal mucosa (no citation was found). Leaving the organs as labels on
+the head (nothing for a swallow or a vertigo state to act on).
+
+## ADR-050 — The skeleton is five regional organs, stacked, warped and contained
+
+**The decision.** The skeleton is five layer organs (ADR-048), not one: skull (65 parts), vertebral
+column (64), rib cage (25), shoulder and arm bones (32), hip and thigh bones (66). The ribs and the
+spine need the same exploded view as the viscera, each region wants its own camera framing and
+Structures tree, and one organ of about 250 parts would have been neither pickable nor
+budgetable (each region has its own triangle entry). The vertebral column is an exploded stack:
+each of the 24 vertebrae is a rigid piece, tilted to the cord tangent (capped at slope 0.5,
+`MAX_TILT_SLOPE`, because a 45 degree tilt put C2 back in the pharynx) and shifted by the warp
+offset at its centre, with discs opening the gaps; the sacrum follows the continuous warp.
+**Containment rules**, each measured: the brain lies inside the cranial cavity (worst 0.5 mm), the
+eyes inside the orbit cones (worst 1 mm), the cord inside the canal at every level, the lungs and
+heart inside the rib cage (closest right lung 7.7 mm, heart 13.7 mm), the scapula standing off
+the ribs (`SCAPULA_STANDOFF` 0.0135), and every bone inside the glass outline (worst bone vertex
+2.4 to 10.8 mm inside across both sexes, after the landmark samples of ADR-048). **Red marrow**
+is the only live part: `epo` drives it (weight 0.6, rest 0.25) at the sites Guyton and Hall name,
+the membranous bones (vertebrae, sternum, ribs, ilia) and the proximal humeri, the exception to
+long-bone marrow turning fatty after about 20; this body ends at the knee, so the tibiae are not
+drawn. The skull has no marrow part (the texts do not name it; that is silence, not a claim).
+Calcium handling and remodelling are not simulated. Rib movement with `resp.inflation`, the skull
+wall (`SKULL_WALL` 0.0065), the bone tissue in the right femur (magnified, cortex thicker than
+real) and the enlarged vertebra are display choices.
+
+**Rejected.** One skeleton organ (above). Marrow in every long bone (against GH14 for an adult).
+A calcium or remodelling model (no sourced magnitudes in this project). Fitting bones loosely
+inside the glass without measuring (the occiput stood 9.9 mm outside the glass until it got a
+landmark sample).
+
+## ADR-051 — The neck is reconciled by moving the cervical cord back
+
+Bones exposed what the soft organs had hidden: the model's neck was too shallow front to back.
+`SPINAL_CORD_PATH` ran the cervical cord at z -0.026 to -0.05 against an oesophagus back wall at
+-0.029, leaving no room for vertebral bodies, and C1 to C7 overlapped the oesophagus and pharynx
+by 5 to 14.7 mm (worst C3).
+
+**The decision.** Move the cervical cord path back about 3.5 cm (the points now run from z -0.0255
+at y 0.39 to -0.0655 at y 0.29, unchanged from y 0.22 down), and let every dependant follow. The
+path moved to `src/render/anatomy/paths.ts` (it had to leave `models.ts` to break an import cycle
+with the vertebral column; `models.ts` re-exports it). The 4 mm clamp on the vertebral body depth
+was removed. `bodyFrontAt(y)` gives the front of the bodies; the **pharynx is re-anchored** to it
+(its back wall `RETRO_GAP` 4 mm in front, blending above y 0.384 to a skull-base anchor so it does
+not ride back with the spine); the oesophagus's extra top point was dropped (it put oesophagus
+vertices inside the trachea) and the pharynx takes over above y 0.352. The three **cervical
+sympathetic ganglia**, which had been placed at a fixed offset behind the cord (cordZ + 0.036,
+0.032, 0.028) and so followed it back into the pharynx, are anchored to the bone instead,
+`bodyFrontAt(y) - 0.004`, now 8.0 mm behind the pharynx. Measured after: oesophagus clearance 2.6
+mm at C2 rising to 11.2 mm at T3, pharynx 2.2 to 5.2 mm at C1 to C3, cord within the canal at every
+level, no trachea or oesophagus vertex inside the other.
+
+**Rejected.** Moving the anterior neck forward (the trachea, thyroid, oesophagus and the glass
+all hang from it, so every one of them would have to move and be re-checked). Accepting the
+overlap (bone through the airway is not a limitation to put in a limitations file; it reads as a
+bug). Shrinking the vertebral bodies (that hides the fault, and the cord would still pass through
+the oesophagus wall).
+
+**What it cost.** The upper-neck cord path is now steep, because the brain atlas's brainstem sits
+far forward (medulla axis 13.8 degrees from vertical, the next cord segments 52.4 and 42.0), and
+the pharynx is squeezed to about 4 mm front to back at C2. Both are limitations in section 20.
+
+## ADR-052 — The ears are placed by Gray's landmarks
+
+The scaffold put the ears at the eyes' height (scene y 0.446) while the brain floor beside them
+is at 0.436 to 0.439, so the inner ear sat 4.8 to 19.4 mm inside the brain shell.
+
+**The decision.** Place them by the landmarks of Gray's Anatomy: on the Frankfort horizontal the
+top of the external acoustic meatus (porion) is level with the lowest point of the infraorbital
+margin (orbitale), and the pharyngotympanic tube runs anteromedially and downward. The ears
+organ moved 24 mm down (y 0.386 to 0.362); the tube descends monotonically 15 mm; the lateral
+canal and the endolymphatic duct and sac moved forward and down to clear the cerebellar floor;
+the skull's meatus is a bony canal on the canal axis with a temporal-bone mass round it
+(`TEMPORAL_EAR_MASS`, a drawing choice; the skull surface had stopped 22 mm short of the canal).
+Measured: the inner ear is outside the brain shell (worst +1.25 mm, the vestibular apparatus),
+porion within 1.3 mm of orbitale, the tube opening level with the posterior end of the inferior
+concha.
+
+**Rejected.** Pushing the brain shell up (it is the reference for the cranial cavity and the
+skull). Shrinking the inner ear to fit (the vestibular envelope was reduced only where the
+landmarks called for it). Leaving the overlap as a limitation (the cause was a placement error,
+not a modelling limit).

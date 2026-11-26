@@ -895,3 +895,75 @@ pads extend slightly beyond the shell. The hymen is a simple ring. Fetal organ p
 drawing proportions. The uterus draws only the first stretch of the umbilical cord, which is not
 aligned with the fetus atlas's own cord end. Breast TDLU, alveoli and myoepithelial cells are
 flattened to siblings by the depth cap.
+
+---
+
+## 20. Head, neck and skeleton (2026-11-26)
+
+These are limits of the ten organs added in the 2026-11-23 to 2026-11-26 round: mouth, salivary
+glands, pharynx, nasal cavity and sinuses, ears, skull, vertebral column, rib cage, shoulder and
+arm bones, hip and thigh bones (ADR-048 to ADR-052). None of them changes a number the
+simulation computes. Where something is a schematic, a display motion or a magnified
+illustration it is said to be one, and none of it is a measurement.
+
+**Schematic and magnified.**
+
+- Taste bud, tooth section, salivary acinus, tonsil section, the olfactory and respiratory
+  epithelium, hair cells and otoconia, the enlarged typical vertebra (2x life size, beside the
+  column) and the bone tissue in the right femur (osteon, canals, lamellae, cells, trabeculae;
+  the cortex drawn thicker than real) are magnified examples or enlarged samples, not counts and
+  not a map. Several float in free space and are not at true size or place.
+- Teeth are drawn at about two-thirds width, and the teeth children are the same teeth at 1.06x,
+  overlapping their parent. Arch shape, papillae, gland lobules, minor glands, the cribriform
+  foramina lattice and the cochlea's turns (drawn at Gray's 2.75; the data text states no number)
+  are layout choices.
+- The skull's bones are territories of one hollow bone field and its sutures are ribbons on the
+  outer surface; wall thickness (`SKULL_WALL` 0.0065), the temporal-bone mass round the ear canal
+  and the hyoid are drawing choices. The typical rib is a right rib 6 drawn 1.8x thicker.
+- The ear has no auricle: it would have pulled the glass head outward, since the glass is fitted
+  to organ shells.
+
+**Display motions, not physiology.** The swallow gesture (palate and tongue rise, a constriction
+wave down the pharynx) is drawn on the engine's `swallowing` signal; its timing and extent are
+display values. Saliva droplet rate, mucus flow, the cilia sweep, and the rise and forward travel
+of the ribs, cartilages and sternum with the breath are display amplitudes, frozen under reduced
+motion. The airflow in the nose and pharynx follows the breath but is not a flow calculation.
+
+**Not simulated.** Hearing, balance (other than the vertigo drive below), taste, smell, chewing,
+saliva volume, mucociliary clearance, calcium handling and bone remodelling. Only a few things
+are live: the vestibular apparatus follows `vertigo`, the pathology state that drives nausea;
+saliva follows parasympathetic drive; red marrow follows EPO. The skull has no marrow part, which
+is not a claim that it has none: Guyton and Hall do not name it. The mucosa of the nose has no
+sympathetic drive because no citation was found. The bone panels show EPO and haematocrit and
+nothing about bone itself.
+
+**Alignment limits, measured and not fixed.**
+
+- The olfactory cleft is drawn far taller than a real one. The brain atlas's olfactory bulbs sit
+  about 1 cm higher than a real skull places them, so the cribriform plate was raised to touch
+  them. Plate and bulbs meet as in life; the excess height is a drawing choice.
+- The skull's bony cribriform plate top (0.4637) sits 5.4 mm below the nasal sieve (0.469 to
+  0.472), because the cranial floor is tied to the brain shell. Olfactory-region vertices still
+  inside solid bone: 22 of 234 (84 before the correction).
+- The brain shell enters the eyeballs by 4.7 mm at its measured worst; the eye shell vertices lie
+  5.8 mm inside the brain shell (sclera 4.1, retina 3.0).
+- The internal acoustic meatus ends in the temporal bone and not at the brainstem. The inner ear,
+  though outside the brain shell, is only just so (worst +1.25 mm).
+- The conus tapers from body y 0.045, inside T12; Gray's puts the conus at L1 to L2.
+- The sacroiliac auricular surfaces overlap with a 7.7 mm centre offset in z, and the y alignment
+  is rough (auricular patch y -0.127 against sacral alae -0.140 to -0.109). The pelvic bones are
+  shifted rigidly while the sacrum follows the continuous warp.
+- The pharynx is squeezed to about 4 mm front to back at C2. The upper-neck cord path is steep
+  (first cord segment 22.4 degrees from vertical against the medulla's 13.8; the next segments
+  52.4 and 42.0) because the brain atlas's brainstem sits far forward.
+- The femoral neck is steep and short, because the glass thigh is narrow. The humerus and femur end at the
+  glass arm and leg fade (about body y 0.129 and -0.312), and this body ends at the knee.
+- The mandible's condyle and fossa landmarks sit at the ear canal's depth, so the canal passes
+  through the condyle and ramus, and the parotid was left at the old ear height about 24 mm above
+  the ear. This was open when these notes were written and was being fixed separately; check the
+  code before relying on it.
+
+**Budget headroom.** The default load is at 233,256 of its 240,000-triangle budget, about 6,700
+triangles of headroom, and the bones layer at 46,812 of 60,000. Both budgets are load and
+performance choices; the next organ added to the default body will need one of them raised or
+something else made smaller.
