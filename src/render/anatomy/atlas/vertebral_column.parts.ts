@@ -3,6 +3,7 @@ import type { PartBuilder, PartGeometry } from '../parts';
 import { warpOffsetY } from '../layout';
 import {
   COCCYX_BOTTOM,
+  SACRAL_SHIFT,
   COLUMN_LEVELS,
   SACRUM_BOTTOM,
   SACRUM_TOP,
@@ -248,7 +249,7 @@ export const parts: PartBuilder = () => {
     hr.translate(0, hy + shift, axisZ(hy) - 0.0105);
     push('sacral_hiatus', hr);
 
-    const cox = fieldMesh(coccyxField(), { min: [-0.015, COCCYX_BOTTOM - 0.004, -0.07], max: [0.015, SACRUM_BOTTOM + 0.002, 0.0] }, 0.0034, new THREE.Matrix4().makeTranslation(0, warpOffsetY(SACRUM_BOTTOM - 0.01), 0));
+    const cox = fieldMesh(coccyxField(), { min: [-0.015, COCCYX_BOTTOM - 0.004, -0.07], max: [0.015, SACRUM_BOTTOM + 0.002, 0.0] }, 0.0034, new THREE.Matrix4().makeTranslation(0, SACRAL_SHIFT, 0));
     push('coccyx', merge([cox], [0, COCCYX_BOTTOM, 0]));
   }
 
@@ -304,7 +305,7 @@ export const parts: PartBuilder = () => {
     push('cervical_lordosis', guide(cerv));
     push('thoracic_kyphosis', guide(thor));
     push('lumbar_lordosis', guide(lumb));
-    const sk = [SACRUM_TOP - 0.004, (SACRUM_TOP + SACRUM_BOTTOM) / 2, SACRUM_BOTTOM, COCCYX_BOTTOM + 0.006].map((y): V3 => [0, y + warpOffsetY(y), axisZ(y) + 0.0275 - 0.006 * ((SACRUM_TOP - y) / 0.12)]);
+    const sk = [SACRUM_TOP - 0.004, (SACRUM_TOP + SACRUM_BOTTOM) / 2, SACRUM_BOTTOM, COCCYX_BOTTOM + 0.006].map((y): V3 => [0, y + SACRAL_SHIFT, axisZ(y) + 0.0275 - 0.006 * ((SACRUM_TOP - y) / 0.12)]);
     push('sacral_kyphosis', rod(sk, 0.0016, 12, 6));
 
     // Longitudinal ligaments: bands down the front of the bodies and down the back of them (the front of the canal).

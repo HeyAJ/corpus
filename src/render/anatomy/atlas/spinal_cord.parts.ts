@@ -67,7 +67,14 @@ const CUT_LUMBAR = 0.11;
 /** The tip of the conus: the L1-L2 intervertebral disc, from paths.ts so the shell and the parts cannot disagree. */
 const CONUS_Y = CONUS_TIP_Y;
 const TOP_Y = 0.39;
-const BOTTOM_Y = -0.1;
+/**
+ * The lower end of the dural sac, body y: the lower border of the second sacral segment. Gray's ends
+ * the dural sac at about S2; it used to end at y -0.1, which is the upper part of S1 (the sacrum's
+ * five segments are equal slices of SACRUM_TOP to SACRUM_BOTTOM in `sacrumField`, so S2 ends two
+ * fifths of the way down). The path of the cord stops at -0.1, so below it `centreAt` follows the
+ * column's own axis (see there).
+ */
+const BOTTOM_Y = SACRUM_TOP - (2 * (SACRUM_TOP - SACRUM_BOTTOM)) / 5;
 
 /** The centreline, sampled densely once, so a height can be turned into a point. */
 const CURVE = new THREE.CatmullRomCurve3(
@@ -84,7 +91,9 @@ export function centreAt(y: number, out: THREE.Vector3 = new THREE.Vector3()): T
   let lo = 0;
   let hi = SAMPLES.length - 1;
   if (y >= SAMPLES[0].y) return out.copy(SAMPLES[0]);
-  if (y <= SAMPLES[hi].y) return out.copy(SAMPLES[hi]);
+  // Below the end of the cord's own path (y -0.1) the sac and the filum follow the sacral canal,
+  // whose axis is the column's `axisZ`; it equals the path's last point at -0.1, so nothing jumps.
+  if (y <= SAMPLES[hi].y) return out.set(0, y, axisZ(y));
   while (hi - lo > 1) {
     const mid = (lo + hi) >> 1;
     if (SAMPLES[mid].y > y) lo = mid;

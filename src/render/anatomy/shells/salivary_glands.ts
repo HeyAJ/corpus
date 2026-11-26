@@ -19,12 +19,12 @@ import { ellipsoid, mergeParts, polygonise, smoothUnion, type Sdf, type V3 } fro
  *     the canal's lower wall.
  *   - SUBMANDIBULAR: under the body of the mandible, below the mouth shell (whose floor is
  *     12 mm under its origin) and well to the side of the larynx (which is under 16 mm wide).
- *     Centre local (+-0.034, -0.03, 0.01).
+ *     Now medial to the mandible's inner surface, see SUBMANDIBULAR below.
  *   - SUBLINGUAL: the smallest, in the floor of the mouth beside the midline. It was first
  *     put at the mouth's centre height and too far forward (this frame sits 0.010 m above and
  *     0.022 m behind the mouth's, which the first placement forgot), so it floated inside the
- *     tongue; it now lies just under the floor the mouth atlas draws. Centre local
- *     (+-0.012, -0.0215, 0.025).
+ *     tongue; it now lies just under the floor the mouth atlas draws. Re-seated in its fossa by
+ *     lv1 (see SUBLINGUAL below).
  *
  * Sizes are drawing choices: the parotid is the largest and the sublingual the smallest,
  * which is the one fact about them a student must come away with. The interior
@@ -78,7 +78,7 @@ export function parotidField(side: number, grow = 0): Sdf {
  * slope between z 0 and z 40). Sizes and centres are drawing choices fitted to the bone, the
  * hyoid's greater horn and the mouth atlas, not measurements.
  */
-export const SUBMANDIBULAR = { c: [0.0125, -0.031, -0.015] as V3, r: [0.0075, 0.0062, 0.0125] as V3, tilt: 0.309 };
+export const SUBMANDIBULAR = { c: [0.0115, -0.038, -0.016] as V3, r: [0.0075, 0.0062, 0.0125] as V3, tilt: 0.309 };
 export const SUBLINGUAL = { c: [0.0058, -0.0215, 0.025] as V3, r: [0.0042, 0.0036, 0.0105] as V3 };
 
 /**

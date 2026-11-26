@@ -163,6 +163,14 @@ export const DISC_AFTER: readonly number[] = LAYOUT.discAfter;
 export const SACRUM_TOP: number = LAYOUT.end;
 export const SACRUM_BOTTOM = SACRUM_TOP - 0.09;
 export const COCCYX_BOTTOM = -0.197;
+/**
+ * The rigid displacement of the sacrum AND the coccyx, body y. The coccyx used to take the warp at
+ * its own height (-0.045, the full pelvic offset) while the sacrum took the warp at its middle
+ * (-0.025), which left the two bones 23 mm apart at the sacrococcygeal joint (lv2 measured it:
+ * sacrum bottom at world y -0.197, coccyx top at -0.220). Gray's has the coccyx articulate with the
+ * apex of the sacrum, so the coccyx now inherits the sacrum's displacement and the joint closes.
+ */
+export const SACRAL_SHIFT: number = warpOffsetY((SACRUM_TOP + SACRUM_BOTTOM) / 2);
 
 /** Size parameters of one vertebra, all in the vertebra's own frame (origin on the canal axis, y up, z forward). */
 export interface VertebraShape {
@@ -423,7 +431,7 @@ export function sacrumGeometry(cell: number): THREE.BufferGeometry {
 
 export function coccyxGeometry(cell: number): THREE.BufferGeometry {
   const g = polygonise(coccyxField(), [-0.015, COCCYX_BOTTOM - 0.004, -0.07], [0.015, SACRUM_BOTTOM + 0.002, 0.0], { cell });
-  g.translate(0, warpOffsetY(SACRUM_BOTTOM - 0.01), 0);
+  g.translate(0, SACRAL_SHIFT, 0);
   return g;
 }
 
