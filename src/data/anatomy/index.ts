@@ -38,6 +38,13 @@ import skull from './skull.json';
 import vertebralColumn from './vertebral_column.json';
 import thoracicCage from './thoracic_cage.json';
 import upperLimbBones from './upper_limb_bones.json';
+import headNeckMuscles from './head_neck_muscles.json';
+import chestWallMuscles from './chest_wall_muscles.json';
+import abdominalWallMuscles from './abdominal_wall_muscles.json';
+import backMuscles from './back_muscles.json';
+import shoulderArmMuscles from './shoulder_arm_muscles.json';
+import hipThighMuscles from './hip_thigh_muscles.json';
+import pelvicFloorMuscles from './pelvic_floor_muscles.json';
 import lowerLimbBones from './lower_limb_bones.json';
 
 /**
@@ -86,6 +93,13 @@ export const ANATOMY: Record<string, AnatomyFile> = {
   thoracic_cage: thoracicCage as unknown as AnatomyFile,
   upper_limb_bones: upperLimbBones as unknown as AnatomyFile,
   lower_limb_bones: lowerLimbBones as unknown as AnatomyFile,
+  head_neck_muscles: headNeckMuscles as unknown as AnatomyFile,
+  chest_wall_muscles: chestWallMuscles as unknown as AnatomyFile,
+  abdominal_wall_muscles: abdominalWallMuscles as unknown as AnatomyFile,
+  back_muscles: backMuscles as unknown as AnatomyFile,
+  shoulder_arm_muscles: shoulderArmMuscles as unknown as AnatomyFile,
+  hip_thigh_muscles: hipThighMuscles as unknown as AnatomyFile,
+  pelvic_floor_muscles: pelvicFloorMuscles as unknown as AnatomyFile,
 };
 
 export const ANATOMY_ATLASES: readonly string[] = Object.keys(ANATOMY);

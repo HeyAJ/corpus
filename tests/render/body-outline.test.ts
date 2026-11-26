@@ -46,7 +46,7 @@ function shell(def: OrganDef, weeks: number): THREE.BufferGeometry {
 
 function organsOf(body: OutlineBody): OrganDef[] {
   return ORGAN_DEFS.filter((d) => {
-    // The same rule as OrganSet.wants: a layer organ (the bones) is not part of the default body
+    // The same rule as OrganSet.wants: a layer organ (the bones, the muscles) is not part of the default body
     // and so is not in the figure's fit.
     if (d.layer) return false;
     if (d.sex && d.sex !== body.sex) return false;
@@ -120,6 +120,36 @@ describe('glass body outline', () => {
       }
     });
   }
+
+  it('leaves every layer organ out of the fit, the muscles as well as the bones', () => {
+    // The outline is built in the worker from the default organs and must not wait for, or change
+    // with, a lazy build, so no layer organ may be among the organs it is fitted to.
+    const male: OutlineBody = { sex: 'male', weeks: 0 };
+    const fitted = new Set(organsOf(male).map((d) => d.id));
+    const layered = ORGAN_DEFS.filter((d) => d.layer);
+    expect(layered.filter((d) => d.layer === 'muscles').map((d) => d.id).sort()).toEqual([
+      'abdominal_wall_muscles', 'back_muscles', 'chest_wall_muscles', 'head_neck_muscles',
+      'hip_thigh_muscles', 'pelvic_floor_muscles', 'shoulder_arm_muscles',
+    ]);
+    for (const d of layered) expect(fitted.has(d.id), d.id).toBe(false);
+  });
+
+  it('the stub muscle shells stay close to the glass figure (a regression bound, not a containment claim)', { timeout: 60000 }, () => {
+    // The figure is fitted to the organs the body always has, and the muscles are drawn OUTSIDE
+    // the ribs and the viscera, so a muscle sheet over the chest or the abdominal wall can stand
+    // a few millimetres beyond the glass. Unlike the bones (kept inside by a landmark sample in
+    // organSamples.ts) the muscles are NOT contained: this test pins how far they stand out, so
+    // that a content agent who thickens a muscle sees the number move. The bound is the worst
+    // measured excess for the stubs (6.3 mm, the chest wall) rounded up; 0.008 m is a regression
+    // bound and not an anatomical figure. The head, back, arm and pelvic floor are inside it.
+    const body: OutlineBody = { sex: 'male', weeks: 0 };
+    const model = outlineModel(samplesOf(body), body);
+    for (const def of ORGAN_DEFS.filter((d) => d.layer === 'muscles')) {
+      let worst = -Infinity;
+      for (const v of worldVertices(def, shell(def, 0))) worst = Math.max(worst, model.field(v.x, v.y, v.z));
+      expect(worst, `${def.id} stands out of the glass by`).toBeLessThan(0.008);
+    }
+  });
 
   it('at week 40 the figure encloses the whole gravid uterus', { timeout: 60000 }, () => {
     const body: OutlineBody = { sex: 'female', weeks: 40 };

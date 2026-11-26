@@ -1,0 +1,143 @@
+{
+  "atlas": "head_neck_muscles",
+  "about": "The muscles of the jaw, the hyoid, the front and side of the neck and the front of the cervical spine, drawn as one schematic silhouette per group in the right place against the skull, the hyoid and the cervical column. They are skeletal muscle, so the only drives are the whole-body ones the engine has: muscle tone (rigidity and paralysis), a seizure, swallowing and the rise in ventilation that recruits the neck's accessory breathing muscles. Chewing force, speech, facial expression and neck movement are not simulated, and the muscles of the face are not drawn. The widths of the muscle bellies are drawing choices, not measurements.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "mastication_muscles",
+      "label": "Muscles of Mastication",
+      "summary": "Temporalis and masseter, the jaw closers",
+      "function": "The temporalis fans over the side of the skull and the masseter lies over the ramus of the mandible; both close the jaw. Chewing itself is not simulated.",
+      "color": "#b8554c",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.35,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hyoid_muscles",
+      "label": "Hyoid Muscles",
+      "summary": "The suprahyoid and infrahyoid muscles around the hyoid bone",
+      "function": "The suprahyoid muscles join the hyoid to the jaw and the infrahyoid muscles join it to the sternum. They lift and steady the hyoid and the larynx, which is part of the swallow.",
+      "color": "#c26a60",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.4,
+          "note": "Swallowing raises the hyoid and the larynx, which these muscles do; the engine's swallowing signal is 1 while something is in the oesophagus.",
+          "source": "GRAYS42"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.25,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sternocleidomastoid",
+      "label": "Sternocleidomastoid",
+      "summary": "The strap muscle from behind the ear to the sternum and clavicle",
+      "function": "Each sternocleidomastoid runs from the mastoid process to the sternum and the medial clavicle. It turns and tilts the head, and in laboured breathing it helps lift the chest as an accessory muscle of inspiration.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "The sternocleidomastoid is an accessory muscle of inspiration, recruited when ventilation rises above rest.",
+          "source": "GRAYS42"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scalene_muscles",
+      "label": "Scalene Muscles",
+      "summary": "Three muscles from the neck to the first two ribs",
+      "function": "The scalenes run from the cervical vertebrae to the first and second ribs and bend the neck. They also lift the upper ribs in inspiration, and work harder as ventilation rises.",
+      "color": "#b35a50",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.3,
+          "note": "The scalenes raise the first and second ribs in inspiration and are recruited as ventilation rises above rest.",
+          "source": "GRAYS42"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "prevertebral_muscles",
+      "label": "Prevertebral Muscles",
+      "summary": "The deep flexors on the front of the cervical spine",
+      "function": "The longus colli and the longus capitis lie on the front of the cervical vertebrae and flex the neck. They are thin and lie in the narrow space between the spine and the pharynx.",
+      "color": "#9a4a44",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.25,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

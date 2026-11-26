@@ -57,6 +57,15 @@ const BUDGET: Record<string, number> = {
   // TOTAL_BUDGET nor LAYER_BUDGET was raised to make the report green.
   lower_limb_bones: 16000,
   upper_limb_bones: 12000,
+  // The muscles are LAYER organs too (LAYER_BUDGET below), and these figures are PROVISIONAL LOAD
+  // AND PERFORMANCE CHOICES set when the seven stub shells were scaffolded (each is well under
+  // 1,500 triangles today). They give the three content agents room to draw real muscles: the
+  // regions with the most separate muscles (the back, the shoulder and arm, the hip and thigh)
+  // get a little more than the 8,000 default, the rest keep the default. Content agents report
+  // their counts and these are revised from what is measured, not from anatomy.
+  back_muscles: 10000,
+  shoulder_arm_muscles: 10000,
+  hip_thigh_muscles: 12000,
 };
 const DEFAULT_BUDGET = 8000;
 const TOTAL_BUDGET = 240000;
@@ -72,7 +81,15 @@ const TOTAL_BUDGET = 240000;
  * number: it says how many triangles the bones may add to the screen before frame rate on a
  * phone is put at risk, and it is raised or lowered by measuring that, not by looking up bones.
  */
-const LAYER_BUDGET: Record<string, number> = { bones: 60000 };
+const LAYER_BUDGET: Record<string, number> = {
+  bones: 60000,
+  // PROVISIONAL, like the per-organ muscle figures above: the sum of those figures and the 8,000
+  // default for the other four organs (4 x 8,000 + 10,000 + 10,000 + 12,000 = 64,000). It says how
+  // many triangles the muscles may add to the screen before a phone's frame rate is at risk; with
+  // Bones and Muscles both on the two layers add up, so revise this by measuring on a phone with
+  // both layers on, not by looking up muscle.
+  muscles: 64000,
+};
 
 interface Row {
   id: string;

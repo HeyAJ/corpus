@@ -12,7 +12,7 @@ const FULL: ShareState = {
 
 describe('share link build and parse', () => {
   it('builds the documented format', () => {
-    expect(buildShareHash(FULL)).toBe('#v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=bones,vessels,nerves,hormones,activity&cut=front:0.5');
+    expect(buildShareHash(FULL)).toBe('#v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=bones,muscles,vessels,nerves,hormones,activity&cut=front:0.5');
   });
 
   it('round-trips a full state', () => {
@@ -71,7 +71,7 @@ const CASES: [string, string, ShareState][] = [
   ['cut with a bad axis and depth', '#v=1&organ=heart&cut=sideways:2', { organ: 'heart' }],
   ['cut depth over one', '#v=1&organ=heart&cut=front:1.5', { organ: 'heart' }],
   ['cut depth not a number', '#v=1&organ=heart&cut=front:abc', { organ: 'heart' }],
-  ['layers with one bad name (muscles is not a layer yet)', '#v=1&organ=heart&layers=vessels,muscles', { organ: 'heart' }],
+  ['layers with one bad name (lymph is not a layer yet)', '#v=1&organ=heart&layers=vessels,lymph', { organ: 'heart' }],
   ['empty layers', '#v=1&organ=heart&layers=', { organ: 'heart' }],
   ['a 10 kB value', '#v=1&organ=heart&part=' + 'a'.repeat(10000), {}],
   ['a 65 character value', '#v=1&sex=male&organ=' + 'a'.repeat(65), { sex: 'male' }],

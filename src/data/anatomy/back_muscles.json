@@ -1,0 +1,155 @@
+{
+  "atlas": "back_muscles",
+  "about": "The superficial and deep muscles of the back: the trapezius and latissimus dorsi over the back of the chest, the rhomboids beside the shoulder blade, the erector spinae column beside the spine and the deep muscles against the spinous processes. They are drawn on the back of the trunk's cross-section and along the spine's own back surface, and carry the exploded stack's warp like the spine. The drives are the whole-body ones the engine has: muscle tone, exertion and a seizure. Posture, spinal movement and force are not simulated. Outlines and radii are drawing choices.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "trapezius",
+      "label": "Trapezius",
+      "summary": "The large diamond-shaped muscle of the upper back",
+      "function": "The trapezius runs from the skull and the spines of the cervical and thoracic vertebrae to the clavicle and the shoulder blade. It raises, draws back and steadies the shoulder blade.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "latissimus_dorsi",
+      "label": "Latissimus Dorsi",
+      "summary": "The broad muscle of the lower back",
+      "function": "The latissimus dorsi runs from the lower spine and the iliac crest to the humerus. It pulls the arm down and back, and it takes part in forced breathing out and coughing.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rhomboid_muscles",
+      "label": "Rhomboids",
+      "summary": "The two muscles between the spine and the shoulder blade",
+      "function": "The rhomboids run from the spinous processes to the medial border of the scapula, deep to the trapezius. They draw the shoulder blade towards the spine.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.15,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "erector_spinae",
+      "label": "Erector Spinae",
+      "summary": "The long muscle column on each side of the spine",
+      "function": "The erector spinae runs from the sacrum and the iliac crest up to the skull in three columns. It straightens the spine and holds the trunk upright.",
+      "color": "#b35a50",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.4,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deep_back_muscles",
+      "label": "Deep Back Muscles",
+      "summary": "The short muscles against the spinous processes",
+      "function": "The multifidus and the rotatores lie in the groove beside the spinous processes and join one vertebra to another. They steady the spine and rotate it a little.",
+      "color": "#9a4a44",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

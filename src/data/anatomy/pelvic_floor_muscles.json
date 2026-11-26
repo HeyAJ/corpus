@@ -1,0 +1,97 @@
+{
+  "atlas": "pelvic_floor_muscles",
+  "about": "The muscles that close the bottom of the pelvis: the levator ani, the coccygeus, and the muscles of the perineum that the other atlases do not draw (the ischiocavernosus and the transverse perineal). The levator ani is drawn as a bowl hung from the pubis, the ischial spine and the coccyx with a central opening. The model's pelvic organs hang lower than its pelvic bones, so the bowl is hung deeper than the bone rim alone would give; the shell's header says so. The drives are the whole-body ones the engine has: muscle tone, exertion and a seizure. Continence, the pelvic floor's support of the organs and the muscles' force are not simulated.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "levator_ani",
+      "label": "Levator Ani",
+      "summary": "The muscular bowl that supports the pelvic organs",
+      "function": "The levator ani runs from the pubis and the pelvic wall to the coccyx and the midline behind. It holds the bladder, the rectum and the uterus or prostate up, and it has openings for the urethra and the anal canal.",
+      "color": "#c26a60",
+      "rest": 0.35,
+      "drives": [
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.25,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "exertion",
+          "weight": 0.15,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.2,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coccygeus",
+      "label": "Coccygeus",
+      "summary": "The small muscle from the ischial spine to the coccyx",
+      "function": "The coccygeus lies in the same plane as the levator ani, behind it. It helps close the back of the pelvic outlet and supports the coccyx.",
+      "color": "#b35a50",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.2,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perineal_muscles",
+      "label": "Perineal Muscles",
+      "summary": "The muscles of the perineum below the pelvic floor",
+      "function": "The ischiocavernosus runs along the pubic and ischial rami and the transverse perineal muscle crosses between the ischial tuberosities. They steady the perineal body below the levator ani.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "paralysis",
+          "weight": -0.25,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.2,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

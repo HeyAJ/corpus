@@ -38,6 +38,13 @@ import { parts as skull } from './skull.parts';
 import { parts as vertebralColumn } from './vertebral_column.parts';
 import { parts as thoracicCage } from './thoracic_cage.parts';
 import { parts as upperLimbBones } from './upper_limb_bones.parts';
+import { parts as headNeckMuscles } from './head_neck_muscles.parts';
+import { parts as chestWallMuscles } from './chest_wall_muscles.parts';
+import { parts as abdominalWallMuscles } from './abdominal_wall_muscles.parts';
+import { parts as backMuscles } from './back_muscles.parts';
+import { parts as shoulderArmMuscles } from './shoulder_arm_muscles.parts';
+import { parts as hipThighMuscles } from './hip_thigh_muscles.parts';
+import { parts as pelvicFloorMuscles } from './pelvic_floor_muscles.parts';
 import { parts as lowerLimbBones } from './lower_limb_bones.parts';
 
 /**
@@ -88,4 +95,11 @@ export const PART_BUILDERS: Record<string, PartBuilder> = {
   thoracic_cage: thoracicCage,
   upper_limb_bones: upperLimbBones,
   lower_limb_bones: lowerLimbBones,
+  head_neck_muscles: headNeckMuscles,
+  chest_wall_muscles: chestWallMuscles,
+  abdominal_wall_muscles: abdominalWallMuscles,
+  back_muscles: backMuscles,
+  shoulder_arm_muscles: shoulderArmMuscles,
+  hip_thigh_muscles: hipThighMuscles,
+  pelvic_floor_muscles: pelvicFloorMuscles,
 };

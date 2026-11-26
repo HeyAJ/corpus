@@ -1,0 +1,185 @@
+{
+  "atlas": "hip_thigh_muscles",
+  "about": "The muscles of the hip and the thigh: the gluteal muscles behind the hip, the short rotators deep to them, the quadriceps in front of the femur, the adductors on its inner side and the hamstrings behind it, drawn against the hip bone and the femur of the hip and thigh bone atlas. The thigh muscles are the largest muscle mass in the body, so they carry the strongest exertion drive. The drives are the whole-body ones the engine has: muscle tone, exertion, shivering and a seizure. Gait, force and the lower leg are not simulated. The figure's leg ends at the knee and the glass thigh is slim, so the muscle bellies are slim too.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "gluteal_muscles",
+      "label": "Gluteal Muscles",
+      "summary": "Gluteus maximus, medius and minimus",
+      "function": "The gluteus maximus covers the back of the hip and straightens it; the medius and minimus lie on the outer side of the ilium and move the thigh away from the midline and steady the pelvis.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.45,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "short_rotators",
+      "label": "Short Rotators of the Hip",
+      "summary": "The piriformis and the small muscles deep to the gluteus maximus",
+      "function": "The piriformis and the other short muscles run from the sacrum and the pelvis to the greater trochanter and turn the thigh outwards, holding the head of the femur in its socket.",
+      "color": "#a94b45",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "quadriceps_femoris",
+      "label": "Quadriceps Femoris",
+      "summary": "The large muscle on the front of the thigh",
+      "function": "The four heads of the quadriceps run from the hip bone and the femur to the patella and straighten the knee.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.45,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.3,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "adductor_muscles",
+      "label": "Adductor Muscles",
+      "summary": "The muscle group on the inner side of the thigh",
+      "function": "The adductors run from the pubis and the ischium to the femur and draw the thigh towards the midline.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.35,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hamstring_muscles",
+      "label": "Hamstrings",
+      "summary": "The muscles on the back of the thigh",
+      "function": "The hamstrings run from the ischial tuberosity to the bones of the lower leg, bend the knee and straighten the hip.",
+      "color": "#bc5c52",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.45,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.3,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

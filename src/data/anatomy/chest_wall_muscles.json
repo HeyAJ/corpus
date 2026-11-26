@@ -1,0 +1,132 @@
+{
+  "atlas": "chest_wall_muscles",
+  "about": "The muscles that lie on the rib cage: the intercostal layer between the ribs, the two pectoral muscles on the front of the chest and the serratus anterior on its side, drawn as thin sheets that follow the cage's own cross-section. The engine has no per-muscle state, so the drives are the whole-body ones: muscle tone, a seizure, exertion, and the rise in ventilation that the intercostals and the accessory muscles of inspiration answer. Force, fatigue and the work of breathing are not simulated. Sheet outlines and thicknesses are drawing choices.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "intercostal_muscles",
+      "label": "Intercostal Muscles",
+      "summary": "The muscles in the spaces between the ribs",
+      "function": "The external intercostals lift the ribs in inspiration and the internal and innermost intercostals draw them down in forced expiration. Together they stiffen the chest wall as it moves.",
+      "color": "#c0605a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.4,
+          "note": "The intercostals move the ribs for breathing, so they work harder as ventilation rises above rest.",
+          "source": "GRAYS42"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.4,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.25,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pectoralis_major",
+      "label": "Pectoralis Major",
+      "summary": "The broad muscle across the front of the upper chest",
+      "function": "The pectoralis major runs from the sternum, the clavicle and the upper ribs to the humerus. It pulls the arm across the body, and it lies under the breast.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pectoralis_minor",
+      "label": "Pectoralis Minor",
+      "summary": "The smaller pectoral muscle, deep to the major",
+      "function": "The pectoralis minor runs from ribs three to five to the coracoid process of the scapula. It draws the shoulder blade forward and down, and can help lift the ribs when the shoulder is fixed.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.2,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "ventilation",
+          "weight": 0.15,
+          "note": "With the scapula fixed, the pectoralis minor can lift the upper ribs as an accessory muscle of inspiration.",
+          "source": "GRAYS42"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serratus_anterior",
+      "label": "Serratus Anterior",
+      "summary": "The muscle on the side of the chest that holds the shoulder blade to the ribs",
+      "function": "The serratus anterior runs from the upper ribs round to the medial border of the scapula. It holds the shoulder blade against the chest and swings it forward when the arm reaches.",
+      "color": "#c26a60",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "ventilation",
+          "weight": 0.15,
+          "note": "With the scapula fixed, the serratus anterior can lift the ribs as an accessory muscle of inspiration.",
+          "source": "GRAYS42"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

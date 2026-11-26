@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { tubeAlong, type V3 } from '../sdf';
 import { warpOffsetY } from '../layout';
-import { cageRing } from './thoracic_cage';
+import { cageRing, sternumZ } from './thoracic_cage';
 
 /**
  * SHARED HELPERS FOR THE FIRST-PASS (STUB) SHELLS OF THE SEVEN MUSCLE ORGANS.
@@ -195,16 +195,41 @@ const PELVIS_Y = -0.15;
 const FRONT_TAPER = 0.2;
 const BACK_TAPER = 0.085;
 
+/**
+ * The front of the trunk is the cage ellipse only where the ribs are. Near the midline the front
+ * is the sternum and the costal cartilages, which lie well behind the ellipse (the sternum's
+ * front at y 0.2 is z 0.075 against the ellipse's 0.10): a sheet laid on the bare ellipse stood
+ * 1.8 cm proud of the sternum and outside the glass figure. The front is therefore limited to a
+ * ramp that starts at the sternum's front (`sternumZ` plus its half-thickness 0.004) and rises
+ * with lateral distance (steeply high on the chest, where the sternum leans back, and almost
+ * flat low down, where the cartilages run straight out) until it meets the ribs' own front
+ * ends, where the ellipse takes over. The two slopes are drawing choices fitted to those ends.
+ */
+const STERNUM_FRONT_HALF = 0.004;
+/** Ramp slope below the 6th rib's level, where the cartilages run nearly flat (ribs 5 to 7 end at z 0.087 to 0.074 across x 0.082 to 0.102), and at the top, where the sternum leans back (rib 2 ends at x 0.05, z 0.084 against the sternum's 0.064). Fitted to those ends. */
+const RAMP_LOW = 0.03;
+const RAMP_HIGH = 0.32;
+function limitFront(y: number, x: number, z: number): number {
+  if (z <= 0) return z;
+  const t = Math.max(0, Math.min(1, (Math.max(y, 0) - 0.12) / 0.1));
+  const slope = RAMP_LOW + (RAMP_HIGH - RAMP_LOW) * t * t * (3 - 2 * t);
+  return Math.min(z, sternumZ(Math.max(y, 0)) + STERNUM_FRONT_HALF + slope * Math.abs(x));
+}
+
 /** The cross-section ellipse of the trunk at height y, angle a (0 back midline, pi/2 right side, pi front midline): x and z, patient's right positive x. */
 export function trunkRing(y: number, a: number): [number, number] {
-  if (y >= 0) return cageRing(y, a);
+  if (y >= 0) {
+    const [x, z] = cageRing(y, a);
+    return [x, limitFront(y, x, z)];
+  }
   const [, zFront] = cageRing(0, Math.PI);
   const [, zBack] = cageRing(0, 0);
   const [xSide] = cageRing(0, Math.PI / 2);
   const t = Math.min(1, -y / -PELVIS_Y);
   const c = Math.cos(a);
   const depth = c > 0 ? -zBack * (1 - BACK_TAPER * t) : zFront * (1 - FRONT_TAPER * t);
-  return [xSide * Math.sin(a), -c * depth];
+  const x = xSide * Math.sin(a);
+  return [x, limitFront(0, x, -c * depth)];
 }
 
 /**

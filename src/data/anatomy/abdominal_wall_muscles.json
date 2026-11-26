@@ -1,0 +1,167 @@
+{
+  "atlas": "abdominal_wall_muscles",
+  "about": "The four muscles of the front and side of the abdominal wall (the rectus abdominis, the external and internal obliques and the transversus abdominis) and the muscles of its back wall (the psoas, the quadratus lumborum and the iliacus), drawn as sheets on the trunk's cross-section and as three spindles. The drives are the whole-body ones the engine has: muscle tone, exertion, a seizure, and vomiting, in which the textbook says the abdominal muscles contract strongly. Breathing out against resistance, posture and the force of any contraction are not simulated. Outlines and thicknesses are drawing choices.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "rectus_abdominis",
+      "label": "Rectus Abdominis",
+      "summary": "The paired vertical muscle beside the midline of the abdomen",
+      "function": "The rectus abdominis runs from the costal margin and the xiphoid process to the pubis. It bends the trunk forward and holds the abdominal contents.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.4,
+          "note": "Vomiting includes strong contraction of the abdominal wall muscles, which raises the pressure on the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_oblique",
+      "label": "External Oblique",
+      "summary": "The outermost flat muscle of the side of the abdomen",
+      "function": "The external oblique runs from the lower ribs down and forward towards the midline and the iliac crest. It bends and twists the trunk and compresses the abdomen.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.4,
+          "note": "Vomiting includes strong contraction of the abdominal wall muscles, which raises the pressure on the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_oblique",
+      "label": "Internal Oblique",
+      "summary": "The middle flat muscle of the side of the abdomen",
+      "function": "The internal oblique lies under the external oblique and its fibres run at right angles to it. It twists and bends the trunk and compresses the abdomen.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.4,
+          "note": "Vomiting includes strong contraction of the abdominal wall muscles, which raises the pressure on the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "transversus_abdominis",
+      "label": "Transversus Abdominis",
+      "summary": "The innermost flat muscle of the abdominal wall",
+      "function": "The transversus abdominis runs round the abdomen like a belt, deep to the obliques. It compresses the abdominal contents.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "vomiting",
+          "weight": 0.45,
+          "note": "Vomiting includes strong contraction of the abdominal wall muscles, which raises the pressure on the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "exertion",
+          "weight": 0.2,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_abdominal_wall",
+      "label": "Posterior Abdominal Wall Muscles",
+      "summary": "The psoas major, quadratus lumborum and iliacus",
+      "function": "The psoas major and the iliacus run from the lumbar spine and the iliac fossa to the lesser trochanter of the femur and bend the hip. The quadratus lumborum joins the twelfth rib to the iliac crest and bends the trunk to the side.",
+      "color": "#9a4a44",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

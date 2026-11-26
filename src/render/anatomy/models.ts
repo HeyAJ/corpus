@@ -31,6 +31,13 @@ import { skull } from './shells/skull';
 import { vertebralColumn } from './shells/vertebral_column';
 import { thoracicCage } from './shells/thoracic_cage';
 import { upperLimbBones } from './shells/upper_limb_bones';
+import { headNeckMuscles } from './shells/head_neck_muscles';
+import { chestWallMuscles } from './shells/chest_wall_muscles';
+import { abdominalWallMuscles } from './shells/abdominal_wall_muscles';
+import { backMuscles } from './shells/back_muscles';
+import { shoulderArmMuscles } from './shells/shoulder_arm_muscles';
+import { hipThighMuscles } from './shells/hip_thigh_muscles';
+import { pelvicFloorMuscles } from './shells/pelvic_floor_muscles';
 import { lowerLimbBones } from './shells/lower_limb_bones';
 
 /**
@@ -1100,6 +1107,14 @@ const BUILDERS: Record<string, (params: ModelParams) => THREE.BufferGeometry> = 
   thoracic_cage: thoracicCage,
   upper_limb_bones: upperLimbBones,
   lower_limb_bones: lowerLimbBones,
+  // The muscles layer, one file per organ under ./shells/ like the skeleton.
+  head_neck_muscles: headNeckMuscles,
+  chest_wall_muscles: chestWallMuscles,
+  abdominal_wall_muscles: abdominalWallMuscles,
+  back_muscles: backMuscles,
+  shoulder_arm_muscles: shoulderArmMuscles,
+  hip_thigh_muscles: hipThighMuscles,
+  pelvic_floor_muscles: pelvicFloorMuscles,
 };
 
 export function modelNames(): string[] {
