@@ -467,10 +467,10 @@ export function orient(g: THREE.BufferGeometry): void {
 
 /** A belly's outline: tendon at each end (a fraction of the length), fusiform between. A drawing choice. */
 export const fusiform = (t: number, a = 0.12, b = 0.12, tendon = 0.2): number => {
-  if (t < a) return tendon + (1 - tendon) * 0.0 + 0 * t;
-  if (t > 1 - b) return tendon;
+  if (t < a || t > 1 - b) return tendon;
   const s = (t - a) / (1 - a - b);
-  return Math.max(tendon, Math.pow(Math.sin(Math.PI * s), 0.6));
+  // sin(pi) is a hair below zero in floating point at the far end of the belly, and a negative number has no real 0.6 power.
+  return Math.max(tendon, Math.pow(Math.max(0, Math.sin(Math.PI * s)), 0.6));
 };
 /** Facing for a muscle on the back of the trunk: out and backward from the spine. */
 export const backFacing = (p: THREE.Vector3): THREE.Vector3 => new THREE.Vector3(p.x * 0.6, 0, p.z + 0.02).normalize();
@@ -481,7 +481,7 @@ export function ribbonBetween(
 ): THREE.BufferGeometry {
   const pts = railPoints(A, B, { ...o, gap: o.gap ?? t + 0.0005, steps: o.steps ?? 8 });
   const path = mid.length ? [pts[0], ...mid, pts[pts.length - 1]] : pts;
-  return belly(path, (u) => w * fusiform(u, o.a, o.b, o.tendon ?? 0.2), (u) => t * fusiform(u, o.a, o.b, o.tendon ?? 0.2), backFacing, Math.max(10, path.length * 2));
+  return belly(path, (u) => w * fusiform(u, o.a, o.b, o.tendon ?? 0.2), (u) => t * fusiform(u, o.a, o.b, o.tendon ?? 0.2), backFacing, Math.max(8, path.length), 6);
 }
 
 /**
@@ -503,7 +503,7 @@ export function laneBelly(
   void tm;
   if (o.ends?.bottom) pts[0] = o.ends.bottom;
   if (o.ends?.top) pts[pts.length - 1] = o.ends.top;
-  return belly(pts, w, t, backFacing, Math.max(12, ys.length * 2));
+  return belly(pts, w, t, backFacing, Math.max(10, Math.round(ys.length * 1.1)), 7);
 }
 
 
@@ -665,22 +665,22 @@ export function backMuscleLeaves(): Record<string, THREE.BufferGeometry[]> {
   out.rotatores = ['T12', 'T11', 'T10', 'T9', 'T8', 'T7', 'T6', 'T5', 'T4', 'T3', 'T2'].flatMap((n, i, all) => {
     void all;
     const upper = `T${12 - i - 1}`;
-    return pair(belly([transverse(n, 0.8), spinous(upper, 0.2, 0.003)], () => 0.0026, () => 0.0022, backFacing, 4, 6));
+    return pair(belly([transverse(n, 0.8), spinous(upper, 0.2, 0.003)], () => 0.0026, () => 0.0022, backFacing, 3, 5));
   });
   // Interspinales: paired slips between the tips of adjacent spinous processes (cervical and lumbar regions).
   out.interspinales = [['C2', 'C3'], ['C3', 'C4'], ['C4', 'C5'], ['C5', 'C6'], ['C6', 'C7'], ['L1', 'L2'], ['L2', 'L3'], ['L3', 'L4'], ['L4', 'L5']].flatMap(([u, l]) =>
-    pair(belly([spinous(u, 0.85, 0.0028), spinous(l, 0.85, 0.0028)], () => 0.0019, () => 0.0019, backFacing, 3, 6)),
+    pair(belly([spinous(u, 0.85, 0.0028), spinous(l, 0.85, 0.0028)], () => 0.0019, () => 0.0019, backFacing, 2, 5)),
   );
   // Intertransversarii: slips between the tips of adjacent transverse processes (cervical and lumbar).
   out.intertransversarii = [['C2', 'C3'], ['C3', 'C4'], ['C4', 'C5'], ['C5', 'C6'], ['C6', 'C7'], ['L1', 'L2'], ['L2', 'L3'], ['L3', 'L4'], ['L4', 'L5']].flatMap(([u, l]) =>
-    pair(belly([transverse(u, 0.9), transverse(l, 0.9)], () => 0.0026, () => 0.0026, backFacing, 3, 6)),
+    pair(belly([transverse(u, 0.9), transverse(l, 0.9)], () => 0.0026, () => 0.0026, backFacing, 2, 5)),
   );
 
   /* ---- the suboccipital muscles: four short muscles between the atlas, the axis and the occiput */
-  out.rectus_capitis_posterior_minor = pair(belly([spinous('C1', 1, 0.0015), occiput(0.009, 0.4045)], () => 0.0032 , () => 0.0022, backFacing, 6, 8));
-  out.rectus_capitis_posterior_major = pair(belly([spinous('C2', 0.85, 0.0022), occiput(0.022, 0.4105)], () => 0.0045, () => 0.0028, backFacing, 6, 8));
-  out.obliquus_capitis_inferior = pair(belly([spinous('C2', 0.8, 0.003), transverse('C1', 0.95)], () => 0.004, () => 0.0028, backFacing, 6, 8));
-  out.obliquus_capitis_superior = pair(belly([transverse('C1', 0.95), occiput(0.04, 0.414)], () => 0.004, () => 0.0028, backFacing, 6, 8));
+  out.rectus_capitis_posterior_minor = pair(belly([spinous('C1', 1, 0.0015), occiput(0.009, 0.4045)], () => 0.0032 , () => 0.0022, backFacing, 5, 6));
+  out.rectus_capitis_posterior_major = pair(belly([spinous('C2', 0.85, 0.0022), occiput(0.022, 0.4105)], () => 0.0045, () => 0.0028, backFacing, 5, 6));
+  out.obliquus_capitis_inferior = pair(belly([spinous('C2', 0.8, 0.003), transverse('C1', 0.95)], () => 0.004, () => 0.0028, backFacing, 5, 6));
+  out.obliquus_capitis_superior = pair(belly([transverse('C1', 0.95), occiput(0.04, 0.414)], () => 0.004, () => 0.0028, backFacing, 5, 6));
 
   /* ---- the thoracolumbar fascia: the posterior layer, a thin aponeurosis over the erector spinae from the spinous processes to the lateral raphe */
   const raphe = (y: number): Anchor => {

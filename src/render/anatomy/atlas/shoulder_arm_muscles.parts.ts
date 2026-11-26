@@ -99,8 +99,8 @@ function schematic(id: SchematicId): Record<string, THREE.BufferGeometry[]> {
       return {
         muscle_fascicle: centres.map(([x, z]) => cyl([x, 0, z], 0.00093, 0.0040, false, 7)),
         endomysium: centres.map(([x, z]) => cyl([x, 0, z], 0.00106, 0.0041, true, 8)),
-        perimysium: [cyl([0, 0, 0], 0.0034, 0.0041, true, 14)],
-        epimysium: [cyl([0, 0, 0], 0.0040, 0.0042, true, 16)],
+        perimysium: [cyl([0, 0, 0], 0.0033, 0.0040, true, 14)],
+        epimysium: [cyl([0, 0, 0], 0.0038, 0.0041, true, 16)],
       };
     }
     case 'muscle_fibre': {
