@@ -150,10 +150,10 @@
       "id": "vertebral_column",
       "triangles": 7244,
       "budget": 8000,
-      "boundingRadius_m": 0.31647,
+      "boundingRadius_m": 0.30652,
       "worldCentre_m": [
         0,
-        0.0749,
+        0.0849,
         -0.059
       ]
     },
