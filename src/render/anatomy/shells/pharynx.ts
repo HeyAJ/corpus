@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { warpGeometry } from '../layout';
-import { SPINAL_CORD_PATH } from '../paths';
+import { bodyFrontAt } from './vertebral_column';
 
 /**
  * PHARYNX, SHELL. An AXIAL organ.
@@ -40,7 +40,7 @@ export const BODY_Y0 = 0.37;
 export const BODY_Y1 = 0.4;
 /** The old centreline, kept for the part of the tube that must still meet the oesophagus. */
 const OLD: readonly (readonly [number, number, number])[] = [
-  [0.002, 0.37, -0.014],
+  [0.002, 0.37, -0.0185],
   [0.002, 0.381, -0.012],
   [0.001, 0.392, -0.01],
   [0, 0.4, -0.008],
@@ -50,10 +50,24 @@ const BLEND_FROM = 0.37;
 const BLEND_TO = 0.388;
 /** Front wall of the upper pharynx, scene z: where the mouth's isthmus ends. */
 export const FRONT_Z = 0.0135;
-/** Retropharyngeal space between the vertebral bodies and the back wall, metres. */
-const RETRO_GAP = 0.001;
-/** Thickness the vertebral column's stub tube adds in front of the cord path (canal plus body radius). */
-const BODY_FRONT_OFFSET = 0.024;
+/**
+ * Retropharyngeal space between the vertebral bodies and the back wall, metres. A DRAWING
+ * choice: 2.5 mm keeps a 2 mm clearance to the bone after the shell's 18 sides are
+ * faceted, and is of the order of the thin prevertebral layer in the textbook picture.
+ */
+const RETRO_GAP = 0.0025;
+/**
+ * Where the back wall lies from the skull base up, scene z: -0.001, the value it always had
+ * above the atlas (the old rule put it 1 mm in front of the C1 face, which was at z -0.002).
+ * Above the atlas there is no vertebral body to follow, only the base of the skull, and the
+ * ears' auditory tubes were aligned (hn2) to openings on a wall through z 0.0009 at x 0.0082,
+ * so this part of the wall must not ride back with the spine when the cervical column moves
+ * back. It is a drawing choice anchored to the mouth, not a measurement.
+ */
+const SKULL_BASE_BACK_Z = -0.001;
+/** The back wall hands over from following the vertebral bodies to the skull-base anchor between these body heights. */
+const CLIVUS_FROM = 0.384;
+const CLIVUS_TO = 0.397;
 
 function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
@@ -71,21 +85,9 @@ function alongOld(y: number, axis: 0 | 2): number {
   }
   return OLD[0][axis];
 }
-/** The cord's z at body height y (linear between its path points; held at the top point above it). */
-function cordZ(y: number): number {
-  const p = SPINAL_CORD_PATH;
-  if (y >= p[0][1]) return p[0][2];
-  for (let i = 1; i < p.length; i++) {
-    if (y >= p[i][1]) {
-      const f = (y - p[i][1]) / (p[i - 1][1] - p[i][1]);
-      return lerp(p[i][2], p[i - 1][2], f);
-    }
-  }
-  return p[p.length - 1][2];
-}
-/** The front face of the vertebral bodies at body height y, as the vertebral column's own tube has it. */
+/** The front face of the vertebral bodies at body height y (shells/vertebral_column.ts), kept under its old name for probes. */
 export function bodyFrontZ(y: number): number {
-  return cordZ(y) + BODY_FRONT_OFFSET;
+  return bodyFrontAt(y);
 }
 
 export interface Ring {
@@ -107,7 +109,10 @@ export function ringAt(y: number): Ring {
   const cx = lerp(0.002, 0, u);
   const z0 = alongOld(y, 2);
   const s = smooth(BLEND_FROM, BLEND_TO, y);
-  const back = lerp(z0 - r0, bodyFrontZ(y) + RETRO_GAP, s);
+  const vback = bodyFrontAt(y) + RETRO_GAP;
+  const anchored = lerp(vback, Math.max(SKULL_BASE_BACK_Z, vback), smooth(CLIVUS_FROM, CLIVUS_TO, y));
+  // Never behind the bone's face plus the gap, whatever the blend says: that is the clearance.
+  const back = Math.max(lerp(z0 - r0, anchored, s), vback);
   const front = lerp(z0 + r0, FRONT_Z, s);
   return { y, cx, cz: (front + back) / 2, rx: r0, dz: Math.max(0.0035, (front - back) / 2) };
 }

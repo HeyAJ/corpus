@@ -37,12 +37,12 @@ import { thoracicLevel } from './thoracic_cage';
  * its tip at L1-L2 and so must the column. The cord's cervical and lumbar enlargements then fall
  * in the cervical and lower thoracic vertebrae as in a textbook.
  *
- * THE NECK DOES NOT FIT, AND THIS IS NOT FIXABLE HERE. The oesophagus's back wall (z -0.029 from
- * body y 0.34 to 0.36) and the cord's front surface (z -0.028 at 0.34) are the same place, so
- * there is no room for the canal's front wall and a vertebral body between them. The bodies are
- * therefore clamped to stay behind `FRONT_LIMIT` (the minimum back wall of the pharynx and the
- * oesophagus, sampled from their shells) down to a body 4 mm deep, and the remaining overlap is
- * printed by the probe. The fix is to move the cord path or the oesophagus, which other files own.
+ * THE NECK NOW FITS. It used not to: the oesophagus's back wall (z -0.029 from body y 0.34 to
+ * 0.36) and the cord's front surface were the same place, so the bodies were clamped to 4 mm deep
+ * and still overlapped the oesophagus and pharynx by 5 to 14.7 mm. The fix was to move the cervical
+ * cord path back (paths.ts), which every consumer follows, and to remove the clamp: the cervical
+ * bodies have their full Gray's depth again and clear the oesophagus and pharynx (measured by
+ * the probe in the agent notes, signed distance from the body field to the shell vertices).
  *
  * IMPORT ORDER, FOR THE RECORD. The stub of this file read `SPINAL_CORD_PATH` inside its function
  * and said that was to dodge an import cycle with models.ts. That cycle no longer exists: the
@@ -74,29 +74,20 @@ function axisSlope(y: number): number {
 }
 
 /**
- * The most anterior z a vertebral body may reach at a height: the back wall of the pharynx and
- * the oesophagus (shells/pharynx.ts, models.ts oesophagus), sampled at the minimum z of their
- * vertices in 2 cm bands. Below the neck there is plenty of room and the limit is not reached.
+ * The tilt a vertebra is given, as a slope, which is the axis slope CAPPED. The cervical cord
+ * path has to fall back steeply (about 1 in 1) between the brainstem and C3, because the head
+ * sits further forward than the neck behind the pharynx and oesophagus (paths.ts). A vertebra
+ * rotated by that whole slope (45 degrees) swings its front face forward at the top and puts
+ * the atlas, axis and C3 back inside the pharynx, the very overlap the path move was meant to
+ * remove, and a 45 degree cervical vertebra looks wrong besides: real cervical bodies are
+ * close to horizontal. The tilt is therefore capped at 0.35 (about 19 degrees); the canal
+ * then deviates from the cord's own line by a few millimetres across one body's height, which
+ * the probe checks against the canal radius (the cord still has at least 1 mm of room). The
+ * thoracic and lumbar slopes are all below the cap and are unchanged.
  */
-const FRONT_LIMIT: readonly (readonly [number, number])[] = [
-  [0.42, -0.003],
-  [0.4, -0.003],
-  [0.38, -0.022],
-  [0.36, -0.03],
-  [0.2, -0.03],
-  [0.08, -0.016],
-  [-0.2, 0.0],
-];
-
-export function frontLimit(y: number): number {
-  const t = FRONT_LIMIT;
-  for (let i = 0; i < t.length - 1; i++) {
-    if (y <= t[i][0] && y >= t[i + 1][0]) {
-      const f = (t[i][0] - y) / (t[i][0] - t[i + 1][0]);
-      return t[i][1] + (t[i + 1][1] - t[i][1]) * f;
-    }
-  }
-  return 0;
+const MAX_TILT_SLOPE = 0.35;
+function tiltSlope(y: number): number {
+  return Math.max(-MAX_TILT_SLOPE, Math.min(MAX_TILT_SLOPE, axisSlope(y)));
 }
 
 export type Kind = 'atlas' | 'axis' | 'cervical' | 'thoracic' | 'lumbar';
@@ -198,11 +189,8 @@ export function shapeOf(level: Level): VertebraShape {
   else if (k === 'thoracic') base = { hw: 0.0125, hd: 0.0105, canalR: 0.0085, archR: 0.0025, spineLen: 0.02, spineDrop: 0.011, transLen: 0.015, bifid: false, foramen: false };
   else base = { hw: 0.0175, hd: 0.0125, canalR: 0.0095, archR: 0.003, spineLen: 0.016, spineDrop: 0.0, transLen: 0.015, bifid: false, foramen: false };
   if (level.name === 'C7') base = { ...base, spineLen: 0.021, spineDrop: 0.003 };
-  // The body must stay behind the front limit: shrink its depth to fit, down to 4 mm deep.
   const post = base.canalR + 0.0015;
-  const zAxis = axisZ(level.y);
-  const room = frontLimit(level.y) - zAxis - post;
-  const hd = k === 'atlas' ? base.hd : Math.max(0.002, Math.min(base.hd, room / 2));
+  const hd = base.hd;
   return { ...base, hd, hh, bodyZ: post + hd };
 }
 
@@ -289,7 +277,7 @@ export function vertebraBox(level: Level): { min: V3; max: V3 } {
 /** The matrix that puts a vertebra built in its own frame where it is in the exploded body. */
 export function placement(level: Level): THREE.Matrix4 {
   const y = level.y;
-  const slope = axisSlope(y);
+  const slope = tiltSlope(y);
   const m = new THREE.Matrix4().makeTranslation(0, y + warpOffsetY(y), axisZ(y));
   m.multiply(new THREE.Matrix4().makeRotationX(Math.atan(slope)));
   return m;
@@ -303,10 +291,43 @@ export function vertebraMesh(level: Level, cell: number): THREE.BufferGeometry {
   return g;
 }
 
+/**
+ * The front face of the vertebral bodies as a function of body height (unexploded y), metres z,
+ * for the pharynx to put its back wall against (shells/pharynx.ts). Each body's front face is a
+ * flat plane tilted with the vertebra, so its z at height y is
+ * zc + F sqrt(1 + m^2) + (y - yc) m with F the face's distance in front of the axis and m the
+ * axis slope (the rotation in `placement`); the polyline through every face's top and bottom
+ * end is interpolated linearly across the discs. The rounded edges of the box recede a little
+ * from this plane, so it errs on the side of the wall being too far back, never inside the bone.
+ * Only the cervical levels and the first three thoracic ones are listed because those are the
+ * ones beside the pharynx and the oesophagus. Above the atlas it returns the atlas's own face.
+ */
+export function bodyFrontAt(y: number): number {
+  const pts: [number, number][] = [];
+  for (const l of COLUMN_LEVELS.slice(0, 10)) {
+    const s = shapeOf(l);
+    const F = s.bodyZ + s.hd;
+    const m = tiltSlope(l.y);
+    const c = Math.cos(Math.atan(m));
+    const sn = Math.sin(Math.atan(m));
+    const zc = axisZ(l.y);
+    for (const ly of [l.h / 2, -l.h / 2]) pts.push([l.y - F * sn + ly * c, zc + ly * sn + F * c]);
+  }
+  pts.sort((a, b) => b[0] - a[0]);
+  if (y >= pts[0][0]) return pts[0][1];
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (y <= pts[i][0] && y >= pts[i + 1][0]) {
+      const f = (pts[i][0] - y) / (pts[i][0] - pts[i + 1][0] || 1);
+      return pts[i][1] + (pts[i + 1][1] - pts[i][1]) * f;
+    }
+  }
+  return pts[pts.length - 1][1];
+}
+
 /** Faces of a vertebra's body, world: top and bottom y after the exploded stack's rigid shift. */
 export function bodyFaces(level: Level): { top: number; bottom: number } {
   const shift = warpOffsetY(level.y);
-  const c = Math.cos(Math.atan(axisSlope(level.y)));
+  const c = Math.cos(Math.atan(tiltSlope(level.y)));
   return { top: level.y + shift + (level.h / 2) * c, bottom: level.y + shift - (level.h / 2) * c };
 }
 
