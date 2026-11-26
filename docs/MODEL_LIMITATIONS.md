@@ -937,7 +937,7 @@ is not a claim that it has none: Guyton and Hall do not name it. The mucosa of t
 sympathetic drive because no citation was found. The bone panels show EPO and haematocrit and
 nothing about bone itself.
 
-**Alignment limits, measured and not fixed.**
+**Alignment limits, and the ones since closed (ADR-053).** Items that say "no longer" or "now" were fixed; the rest are measured and not fixed.
 
 - The olfactory cleft is drawn far taller than a real one. The brain atlas's olfactory bulbs sit
   about 1 cm higher than a real skull places them, so the cribriform plate was raised to touch
@@ -945,14 +945,20 @@ nothing about bone itself.
 - The skull's bony cribriform plate top (0.4637) sits 5.4 mm below the nasal sieve (0.469 to
   0.472), because the cranial floor is tied to the brain shell. Olfactory-region vertices still
   inside solid bone: 22 of 234 (84 before the correction).
-- The brain shell enters the eyeballs by 4.7 mm at its measured worst; the eye shell vertices lie
-  5.8 mm inside the brain shell (sclera 4.1, retina 3.0).
+- The brain no longer enters the eyeballs: it is carved over each orbit by the skull's orbit cone
+  (grown 10 mm; a drawing choice). That raises the brain's underside about 20 mm over each orbit,
+  because the skull's orbit cone is much taller than the globe, so the lift is a smooth hollow
+  over the eye that is bigger than a real orbital roof would make it. The optic nerve ends 0.24 mm
+  below the brain's base at the chiasm by design, and the skull's orbital roof is open near the
+  optic canal (z 36 to 46 mm), which is where the canal passes into the cranium.
 - The internal acoustic meatus ends in the temporal bone and not at the brainstem. The inner ear,
   though outside the brain shell, is only just so (worst +1.25 mm).
-- The conus tapers from body y 0.045, inside T12; Gray's puts the conus at L1 to L2.
-- The sacroiliac auricular surfaces overlap with a 7.7 mm centre offset in z, and the y alignment
-  is rough (auricular patch y -0.127 against sacral alae -0.140 to -0.109). The pelvic bones are
-  shifted rigidly while the sacrum follows the continuous warp.
+- The conus now ends at the L1/L2 disc as Gray's puts it. `CONUS_TIP_Y` (0.013) in `paths.ts` is
+  kept equal by hand to the literal in `models.ts`, because that function may not gain an import;
+  change one and the other must follow.
+- The sacroiliac surfaces and the sacrococcygeal joint are aligned (the coccyx takes the sacrum's
+  shift, and the dural sac ends at the lower border of S2). The ilium's backward carry
+  (`WING_BACK_Z`) is a measured offset, not a literature figure.
 - The pharynx is squeezed to about 4 mm front to back at C2. The upper-neck cord path is steep
   (first cord segment 22.4 degrees from vertical against the medulla's 13.8; the next segments
   52.4 and 42.0) because the brain atlas's brainstem sits far forward.
@@ -961,12 +967,12 @@ nothing about bone itself.
 - The jaw and parotid were fixed to follow the ears: the condyle is 9.2 mm from the canal surface
   and 16.7 mm anterior to the meatus, and the canal clears the mandible by 2.9 mm. The parotid top
   is 3.7 mm below the canal axis by design (higher would cut the canal wall), so it does not quite
-  reach the meatus. The submandibular and sublingual glands overlap the mandible shell by up to
-  3.15 mm and the submandibular ganglion cord by 1.6 mm. The styloid root sits at canal level, so
-  the stylomastoid foramen is only 4.6 mm from each bone. The mouth atlas's parotid papilla is 1.2
-  mm behind the molar crown.
+  reach the meatus, and it still overlaps the ramus by 0.29 mm. The styloid root sits at canal
+  level, so the stylomastoid foramen is only 4.6 mm from each bone. The mouth atlas's parotid
+  papilla is 1.2 mm behind the molar crown. The lower salivary glands now sit in their fossae
+  with clearance from mandible and hyoid; their centres and sizes are drawing choices.
 
-**Budget headroom.** The default load is at 233,256 of its 240,000-triangle budget, about 6,700
-triangles of headroom, and the bones layer at 46,812 of 60,000. Both budgets are load and
+**Budget headroom.** The default load is at 233,184 of its 240,000-triangle budget, about 6,800
+triangles of headroom, and the bones layer at 47,160 of 60,000. Both budgets are load and
 performance choices; the next organ added to the default body will need one of them raised or
 something else made smaller.

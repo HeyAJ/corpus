@@ -2,7 +2,7 @@
 
 Browser-based real-time human physiology simulator. Vite + TypeScript strict + three.js r170 + React 18 + Zustand + Comlink/SharedArrayBuffer + Vitest. Now tracked in git, but generated data and long probes are easy to clobber — read before you overwrite.
 
-**Read this file instead of exploring the repo.** It exists so you do not have to re-derive the architecture from 52 ADRs and 40 source files. If something here is wrong, fix it here as well as in the code.
+**Read this file instead of exploring the repo.** It exists so you do not have to re-derive the architecture from 53 ADRs and 40 source files. If something here is wrong, fix it here as well as in the code.
 
 ---
 
@@ -192,7 +192,7 @@ Decisions are ADR-044 to ADR-047; stated limits are section 19 of `docs/MODEL_LI
 
 ## State as of 2026-11-26 (head, neck and skeleton)
 
-Decisions are ADR-048 to ADR-052; stated limits are section 20 of `docs/MODEL_LIMITATIONS.md`. Ten organs were added, so the registry now holds 42 (it held 32).
+Decisions are ADR-048 to ADR-053; stated limits are section 20 of `docs/MODEL_LIMITATIONS.md`. Ten organs were added, so the registry now holds 42 (it held 32).
 
 **The ten organs.** Five are ordinary default-load organs of the head and neck: **mouth** (69 parts), **salivary_glands** (27), **pharynx** (32; axial, warped like the oesophagus), **nasal_cavity** (38; titled "Nasal Cavity and Sinuses") and **ears** (61; both ears are one organ). Five are the skeleton and are LAYER organs (`layer: 'bones'`, body system `skeletal`): **skull** (65), **vertebral_column** (64), **thoracic_cage** (25; "Rib Cage"), **upper_limb_bones** (32; "Shoulder and Arm Bones") and **lower_limb_bones** (66; "Hip and Thigh Bones"). `OrganPanel` gained the groups `headneck` and `skeletal`. The atlases use the `parent` mechanism of ADR-045 and the textbook-depth standard of ADR-047.
 
@@ -208,7 +208,10 @@ Decisions are ADR-048 to ADR-052; stated limits are section 20 of `docs/MODEL_LI
 
 **Shared helpers.** `src/render/anatomy/atlas/stub_shared.ts` (`blob`, `rod`, `ringAt`, `bothSides`) for the head-and-neck atlases; `src/render/organs/layers.ts` for the layer gate and look. Magnified illustrations (taste bud, tooth section, acinus, tonsil section, an enlarged typical vertebra, bone tissue in the right femur) float beside their parent and are not true size or place.
 
+**Leftovers fixed by Gray's landmarks** (ADR-053). The brain is shaped over the orbits, so it no longer enters the eyeballs: `orbitalRoofCutter()` in `models.ts` (the skull orbit cone grown by `ORBIT_ROOF_GROW` 0.0100 m, smooth-subtracted from the cerebrum) is copied into `hemisphereBase` and `brainHull` in `brain.parts.ts`, and the three must change together. The skull's cranial floor is a hand-held table, `FLOOR_MM` in `skull.ts`, regenerated from the new brain shell. The conus ends at the L1/L2 disc (`CONUS_TIP_Y` 0.013 in `paths.ts`, hand-kept equal to a literal in `models.ts`), the filum terminale runs to the coccyx, the dural sac ends at S2, the coccyx takes the sacrum's shift (`SACRAL_SHIFT` -0.025 in `shells/vertebral_column.ts`), the sacroiliac surfaces align (`WING_BACK_Z`), and the submandibular and sublingual glands sit in their fossae (`SUBMANDIBULAR`, `SUBLINGUAL`). Remaining: the carve lifts the brain's underside about 20 mm over each orbit, and the parotid overlaps the ramus by 0.29 mm (section 20).
+
 **Traps from this round.**
+- Two things must be changed in step. The brain's orbital carve exists in `models.ts` AND `brain.parts.ts`; and `FLOOR_MM` in `skull.ts` does not follow the brain, so redrawing the brain means regenerating it. `CONUS_TIP_Y` and the conus literal in `models.ts` are likewise kept equal by hand.
 - A layer organ is excluded from the glass-outline fit. A bone found outside the glass needs a landmark sample in `organSamples.ts`, never a fit to lazily built meshes (the occiput was 9.9 mm outside until it had one).
 - `SPINAL_CORD_PATH` is read by several things: the cord shell and the cord atlas, the vertebral column (`COLUMN_PATH` is built from it), the rib cage, the nervous overlay, and through `bodyFrontAt` the pharynx. Anything placed at a fixed offset from the cord moves when the cord moves; the cervical ganglia did, and ended in the pharynx.
 - An organ that spans the cranial band must carry `axialWarp` (the pharynx does), or its centreline does not match the warped skull and neck.
@@ -216,4 +219,4 @@ Decisions are ADR-048 to ADR-052; stated limits are section 20 of `docs/MODEL_LI
 
 ## Docs worth reading, when relevant
 
-`docs/DECISIONS.md` (52 ADRs — the reasoning behind every non-obvious choice) · `docs/MODEL_LIMITATIONS.md` (what the model does *not* do; §15 is the tone for any new limitation) · `docs/MISSING_CONSTANTS.md` (generated; every unsourced field and every adjudicated data disagreement) · `docs/VISUAL_AUDIT.md` (the reference frames the renderer is calibrated against).
+`docs/DECISIONS.md` (53 ADRs — the reasoning behind every non-obvious choice) · `docs/MODEL_LIMITATIONS.md` (what the model does *not* do; §15 is the tone for any new limitation) · `docs/MISSING_CONSTANTS.md` (generated; every unsourced field and every adjudicated data disagreement) · `docs/VISUAL_AUDIT.md` (the reference frames the renderer is calibrated against).

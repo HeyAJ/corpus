@@ -1372,3 +1372,33 @@ wall. Its duct ends opposite the upper second molar crown, and the facial nerve 
 skull). Shrinking the inner ear to fit (the vestibular envelope was reduced only where the
 landmarks called for it). Leaving the overlap as a limitation (the cause was a placement error,
 not a modelling limit).
+
+## ADR-053 — The leftovers of the head and spine are resolved by Gray's landmarks
+
+After ADR-050 to ADR-052 the measurements still showed overlaps that the texts do not allow: the
+brain shell 5.8 mm inside each eyeball, the conus tapering from inside T12 (Gray's: the L1/L2
+disc), the sacroiliac surfaces 7.7 mm apart, the sacrum and coccyx 23 mm apart, the dural sac
+ending at S1, and the submandibular and sublingual glands and their ganglion cord inside the
+mandible by 1.6 to 3.15 mm.
+
+**The decision.** Each was moved to where Gray's puts it, not hidden. The orbital surface of the
+frontal lobe rests on the orbital plate, so the brain is carved over each orbit: the skull's orbit
+cone grown by `ORBIT_ROOF_GROW` 0.0100 m (a drawing choice, made of the cone skin, the cranial-floor
+margin and the bone) is smooth-subtracted from the cerebrum (`orbitalRoofCutter`, `models.ts`, with
+copies in `brain.parts.ts`), and the skull's hand-held `FLOOR_MM` table was regenerated from the new
+shell. The conus moved to y 0.013, the filum runs to the coccyx, the dural sac ends at S2, the
+coccyx takes the sacrum's shift (`SACRAL_SHIFT`, gap 23 mm to 0.63 mm), the ilium is carried back by
+`WING_BACK_Z`, and the lower salivary glands were refitted into their fossae. Afterwards the eye
+parts lie 7.04 mm clear of the brain shell, and the sacroiliac centres agree to 0.2 mm.
+
+**What it costs.** The skull's orbit cone is much taller than the globe, so the carve raises the
+brain's underside about 20 mm over each orbit: a smooth lift, not a gouge, but larger than life.
+The same hand-kept coupling (the carve in two files, `FLOOR_MM`, `CONUS_TIP_Y`) is a trap, recorded
+in CLAUDE.md. The parotid still overlaps the ramus by 0.29 mm.
+
+**Rejected.** Moving the eyes (the eyes were not wrong: the skull's orbits and the optic nerves are
+placed around them, so moving them would shift those to relieve one overlap, and Gray's has the
+brain resting on the orbital roof, not the globe beneath the brain). Accepting the overlaps (a
+brain inside an eye reads as a bug, and the limitations file is for what cannot be drawn, not what
+was not corrected). Shrinking the orbit cone to the globe (the skull's orbit would no longer match
+the orbit the rest of the skull is built around).
