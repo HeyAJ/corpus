@@ -3,7 +3,7 @@ import type { PartBuilder } from '../parts';
 import { warpGeometry, warpOffsetY, warpPoint } from '../layout';
 import { SPINAL_CORD_PATH, spinalCordRadius } from '../models';
 import { CONUS_TIP_Y } from '../paths';
-import { SACRUM_BOTTOM, SACRUM_TOP, axisZ } from '../shells/vertebral_column';
+import { SACRAL_SHIFT, SACRUM_BOTTOM, SACRUM_TOP, axisZ } from '../shells/vertebral_column';
 import { mulberry32 } from '../noise';
 import { mergeParts, tubeAlong, type V3 } from '../sdf';
 
@@ -207,7 +207,7 @@ function bean(c: V3, rx: number, ry: number, rz: number): THREE.BufferGeometry {
  * Where the filum terminale ends: the midline dorsal surface of the first coccygeal segment, in the
  * coccyx's own frame (body y -0.1793, i.e. SACRUM_BOTTOM - 0.004, the first segment's centre; the
  * back surface at z -0.0520 was read from `coccyxField` along x = 0 at that height). The coccyx is
- * then moved by the rigid pelvic shift, which the caller adds. Drawing positions, not measurements.
+ * then moved by the sacrum's own rigid shift (`SACRAL_SHIFT`, which the coccyx now shares), which the caller adds. Drawing positions, not measurements.
  */
 const COCCYX_FILUM_Y = SACRUM_BOTTOM - 0.004;
 const COCCYX_FILUM_Z = -0.052;
@@ -311,24 +311,23 @@ export const parts: PartBuilder = () => {
   // coccygeal segment); it used to stop with the sac at y -0.1, a hand's breadth short. The upper
   // part follows the cord and is warped with it, like every other part here. The lower part is
   // drawn in WORLD coordinates, down the sacral canal and across to the coccyx, because the
-  // sacrum and the coccyx are moved RIGIDLY by the exploded stack (shifts -0.025 and -0.045) while
+  // sacrum and the coccyx are moved RIGIDLY by the exploded stack (they now share one shift, -0.025) while
   // the continuous warp would carry a point at body y -0.15 by about -0.035: warping the lower
   // thread would put it up to 10 mm out of the sacral canal, whose radius at its lower end is
   // only 3 mm. The tip is the dorsal surface of the first coccygeal segment on the midline, found
   // from the coccyx's own field (see the probe in the agent notes), not typed.
   const filumUpper = tubeAlong(cordLine(CONUS_Y - 0.002, BOTTOM_Y, 16, 0, 0), () => 0.00022, { tubular: 40, radial: 4 });
   const shS = warpOffsetY((SACRUM_TOP + SACRUM_BOTTOM) / 2);
-  const shC = warpOffsetY(SACRUM_BOTTOM - 0.01);
   const lower: V3[] = [warpPoint([0, BOTTOM_Y, axisZ(BOTTOM_Y)])];
   for (let yb = BOTTOM_Y - 0.01; yb >= SACRUM_BOTTOM + 0.004; yb -= 0.01) lower.push([0, yb + shS, axisZ(yb)]);
-  lower.push([0, COCCYX_FILUM_Y + shC, COCCYX_FILUM_Z]);
+  lower.push([0, COCCYX_FILUM_Y + SACRAL_SHIFT, COCCYX_FILUM_Z]);
   const filumLower = tubeAlong(lower, () => 0.00022, { tubular: 60, radial: 4 });
 
   // THE MEMBRANES. The dura is the outer sac, the arachnoid lies just inside it, the pia
   // clings to the cord. They are sleeves along the whole length including the sac round the
   // cauda equina. The parent `meninges` is one sleeve between the dura and the arachnoid so
   // that it can be seen and picked when the children are hidden.
-  const sleeve = (frac: number) => col(TOP_Y, BOTTOM_Y + 0.004, 0, 0, frac, 40, 8);
+  const sleeve = (frac: number) => col(TOP_Y, BOTTOM_Y, 0, 0, frac, 40, 8);
   const meninges = sleeve(1.14);
   const dura = sleeve(1.3);
   const arachnoid = sleeve(1.2);
