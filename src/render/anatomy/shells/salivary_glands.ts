@@ -34,18 +34,18 @@ import { ellipsoid, mergeParts, polygonise, smoothUnion, type Sdf, type V3 } fro
  * "2 to 3 cm below and a little in front of" the ear canal where it stood when the ears were
  * drawn at the eyes' height. The ears were then moved 24 mm down to the Frankfort plane and the
  * gland was left behind, with its top about 24 mm ABOVE the ear (agent ea measured it). It is
- * now placed from the canal as it is: the canal's lower wall is at local y 0.0308 at the
- * lateral end, and the gland's upper border sits 0.7 mm under it, a clear gap (a numerical
- * check of the two shapes is in the agent's report, not in a test).
+ * now placed from the canal as it is: the gland's top is 62.0 mm below the skull's origin, 3.7 mm
+ * under the canal's axis at the same x (58.3 mm), and 1.2 mm clear of the canal's tube surface
+ * (0.2 mm for the atlas's slightly fatter halves). Raising it any further runs it into the canal.
  */
 
 /**
  * The right parotid's three ellipsoids (centre, radii), local frame. Converted from the skull's
- * frame as above. The superficial lobe's top, y -0.063 in the skull's frame, is 0.7 mm under the
- * lower wall of the ears' canal (axis y -0.0587 at its x, radius 3.6 mm); its front edge
- * (z -0.0035 skull) stays 7 mm behind the condylar neck so that the lobe does not touch the jaw
- * joint; its inner face (x 0.058) is the outer face of the ramus. The deep lobe is in the
- * groove between the ramus's back border and the mastoid. Every size is a drawing choice.
+ * frame as above. The superficial lobe's top (y -0.062 in the skull's frame) is under the lower
+ * wall of the ears' canal (radius 3.6 mm); its front edge (z -0.0035 skull) stays 10 mm behind
+ * the condyle so that the lobe does not touch the jaw joint; its inner face (x 0.058) is the outer
+ * face of the ramus. The deep lobe is in the groove between the ramus's back border and the
+ * mastoid. Every size is a drawing choice.
  */
 export const PAROTID = {
   superficial: { c: [0.0625, 0.0086, -0.033] as V3, r: [0.0045, 0.0195, 0.0095] as V3 },
