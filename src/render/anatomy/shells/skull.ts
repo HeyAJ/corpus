@@ -99,8 +99,14 @@ export const SKULL_LANDMARKS = {
   /** Orbit rim centre and apex (right side; x is mirrored). */
   orbitRim: [0.031, -0.034, 0.088] as V3,
   orbitApex: [0.013, -0.032, 0.024] as V3,
-  /** Foramen magnum axis: the cord's centreline at the skull base (paths.ts) is z = -0.026. */
-  foramenMagnum: [0, -0.1, -0.026] as V3,
+  /**
+   * Foramen magnum axis. The cord's centreline (paths.ts) falls back from z -0.0255 at the
+   * brainstem's tip (scene y about 0.40) to -0.0335 at scene y 0.38, which is where this hole
+   * is cut (local y -0.1 plus the origin's 0.48), so the hole's axis sits half way between at
+   * -0.030: 12.5 mm radius then holds the cord (5 mm radius) at both ends with room to spare.
+   * It used to be -0.026, the old cord's z.
+   */
+  foramenMagnum: [0, -0.1, -0.03] as V3,
   /** The pituitary's own bounding box centre, brain atlas: x 0, y -0.030..-0.014, z 0.005..0.014. */
   sella: [0, -0.0262, 0.0095] as V3,
   /** Right-hand external acoustic meatus: lateral opening and inner end (ears atlas puts the meatus at y -0.035, z -0.011). */
