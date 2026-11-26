@@ -1,23 +1,20 @@
-import * as THREE from 'three';
 import type { PartBuilder, PartGeometry } from '../parts';
 import { mergeParts } from '../sdf';
 import { headNeckMuscleGroups } from '../shells/head_neck_muscles';
 
 /**
- * THE INSIDE OF THE HEAD AND NECK MUSCLES: a FIRST-PASS STUB (the scaffold of the muscles layer).
+ * THE INSIDE OF THE HEAD AND NECK MUSCLES.
  *
- * This organ's shell is the union of one schematic silhouette per part (mastication, the hyoid, the sternocleidomastoid, the scalenes and the prevertebral muscles), so
- * the interior is simply each of those silhouettes drawn separately, in the organ's own frame,
- * under the part id the atlas file (src/data/anatomy/head_neck_muscles.json) gives it. The shell and the
- * parts therefore share one function (`headNeckMuscleGroups`) and cannot disagree about where a
- * muscle is. A content agent who draws these muscles properly replaces this file and adds the
- * finer structures with the atlas's `parent` field; until then nothing here is anatomy beyond
- * the placement the shell's own header describes.
+ * Every part, level 1 to 3, comes from the same function the shell comes from
+ * (`headNeckMuscleGroups`, shells/head_neck_muscles.ts), so the interior and the shell cannot
+ * disagree about where a muscle lies. A group (the muscles of mastication, the hyoid muscles, the
+ * scalenes, the prevertebral muscles, the sternocleidomastoid) is drawn as the union of its muscles
+ * at full radius and each muscle, head, belly and tendon inside it a little slimmer, so a focused
+ * group's own glass shows what it holds. The geometry is procedural and illustrative: the
+ * attachments are on the skeleton's own bones, the thickness of a belly is a drawing choice.
  */
 export const parts: PartBuilder = () => {
   const out: PartGeometry[] = [];
-  for (const [id, geometries] of Object.entries(headNeckMuscleGroups() as Record<string, THREE.BufferGeometry[]>)) {
-    out.push({ id, geometry: mergeParts(geometries) });
-  }
+  for (const [id, geometries] of Object.entries(headNeckMuscleGroups())) out.push({ id, geometry: mergeParts(geometries) });
   return out;
 };
