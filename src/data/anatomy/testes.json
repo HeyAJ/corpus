@@ -1,0 +1,433 @@
+{
+  "atlas": "testes",
+  "about": "The interior of the two testes: the fibrous capsule, the lobules with their coiled seminiferous tubules, the rete testis, the efferent ductules, the epididymis in three parts, the start of the vas deferens, the testicular artery and the veins of the pampiniform plexus, and the interstitial cells. Only a few lobules and tubules are drawn, large enough to follow, where a real testis has hundreds. The septa, the layers of the tubule wall, the other contents of the spermatic cord and the scrotum are left out, and the coil counts and sizes are chosen to read clearly rather than measured. Finer structures (marked as children in the Structures list) appear when their parent is selected or the camera is close; they are schematic drawings, and counts, sizes and layout are illustrative, not measured.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "tunica_albuginea",
+      "label": "Tunica Albuginea",
+      "summary": "The tough fibrous capsule that encloses each testis",
+      "function": "The tunica albuginea is a dense white fibrous capsule round the testis. At the back it thickens into the mediastinum, and thin partitions run inward from it to divide the gland into lobules. It is drawn here as glass so that the structures inside can be seen through it.",
+      "color": "#e8dcc0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lobules",
+      "label": "Testicular Lobules",
+      "summary": "The wedge-shaped compartments, each holding coiled seminiferous tubules",
+      "function": "Partitions from the capsule divide the testis into wedge-shaped lobules whose narrow ends point to the mediastinum at the back. Each lobule contains one or more seminiferous tubules packed in loose connective tissue. A few lobules are drawn, as glass, so that the tubule in each can be followed.",
+      "color": "#d9c08a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seminiferous_tubules",
+      "label": "Seminiferous Tubules",
+      "summary": "The tightly coiled tubes in which sperm are made",
+      "function": "Spermatogenesis takes place in the seminiferous tubules, where germ cells divide and mature in contact with the supporting Sertoli cells. Follicle-stimulating hormone acts on the Sertoli cells, and testosterone from the nearby interstitial cells is also needed for sperm to develop. Each tubule is long and coiled, and its two ends open into the rete testis. It brightens as testosterone and follicle-stimulating hormone rise.",
+      "color": "#e6d27a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "fsh",
+          "weight": 0.3,
+          "note": "Follicle-stimulating hormone acts on the Sertoli cells that support sperm development.",
+          "source": "GH14"
+        },
+        {
+          "signal": "testosterone",
+          "weight": 0.3,
+          "note": "Testosterone is needed for sperm development in the tubules.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interstitial_cells",
+      "label": "Interstitial (Leydig) Cells",
+      "summary": "Clusters of cells between the tubules that make testosterone",
+      "function": "The interstitial cells lie in the connective tissue between the seminiferous tubules and make testosterone under the control of luteinising hormone from the pituitary. Testosterone acts locally on sperm development and, through the blood, on the rest of the body. The beads glow more brightly as the testosterone level in the blood rises.",
+      "color": "#e0a030",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "lh",
+          "weight": 0.3,
+          "note": "Luteinising hormone stimulates the interstitial cells to secrete testosterone.",
+          "source": "GH14"
+        },
+        {
+          "signal": "testosterone",
+          "weight": 0.4,
+          "note": "The glow follows the circulating testosterone level, which these cells produce.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rete_testis",
+      "label": "Rete Testis",
+      "summary": "The network of channels in the mediastinum that collects sperm from the tubules",
+      "function": "The seminiferous tubules straighten and open into the rete testis, a network of channels in the mediastinum at the back of the testis. Sperm and testicular fluid collect here and leave through the efferent ductules. A slow stream of particles runs from a tubule through this network.",
+      "color": "#cdb4d8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "efferent_ductules",
+      "label": "Efferent Ductules",
+      "summary": "Small ducts that carry sperm from the rete testis to the epididymis",
+      "function": "A small number of efferent ductules leave the top of the rete testis and run to the head of the epididymis, where they join its single duct. Their lining moves fluid along and takes some of it back, so the sperm leave more concentrated.",
+      "color": "#b8a2d0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epididymis_head",
+      "label": "Epididymis: Head",
+      "summary": "The upper end of the epididymis, where the efferent ductules enter",
+      "function": "The head is the top of the epididymis, lying over the upper pole of the testis. The efferent ductules empty into its single, very long, coiled duct. Sperm that arrive here are not yet able to swim in a directed way.",
+      "color": "#d28f8f",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epididymis_body",
+      "label": "Epididymis: Body",
+      "summary": "The middle part of the epididymis, running down the back of the testis",
+      "function": "The body of the epididymis runs down the back of the testis as the same coiled duct. Sperm are stored and mature in the epididymis, gaining the ability to move and to fertilise as they pass along it, which takes some days.",
+      "color": "#c47e8c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epididymis_tail",
+      "label": "Epididymis: Tail",
+      "summary": "The lower end of the epididymis, which becomes the vas deferens",
+      "function": "The tail is the lower end of the epididymis, and the duct here turns upward and becomes the vas deferens. Sperm are stored mainly in the tail and the first part of the vas until ejaculation. Its wall contracts at emission, so it brightens during orgasm.",
+      "color": "#b86f84",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.3,
+          "note": "The smooth muscle of the duct contracts at emission, moving sperm onward.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vas_deferens",
+      "label": "Vas Deferens",
+      "summary": "The muscular duct that carries sperm up the spermatic cord",
+      "function": "The vas deferens is a thick-walled muscular tube that leaves the tail of the epididymis and climbs in the spermatic cord to the pelvis. At emission its smooth muscle contracts under sympathetic nerves and drives sperm toward the urethra. It brightens during orgasm and with sympathetic activity.",
+      "color": "#e0b38a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.4,
+          "note": "Emission is a strong contraction of the duct's muscle at orgasm.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.2,
+          "note": "Sympathetic nerves trigger contraction of the vas deferens.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "testicular_artery",
+      "label": "Testicular Artery",
+      "summary": "The artery that brings oxygenated blood down the cord to the testis",
+      "function": "The testicular artery arises from the aorta and runs down the spermatic cord, then divides to supply the testis, passing over the capsule before it enters the gland. The stream here is arterial blood, coloured by the saturation of arterial blood in the body.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pampiniform_plexus",
+      "label": "Pampiniform Plexus",
+      "summary": "The network of veins that drains the testis and surrounds the artery",
+      "function": "Several small veins leave the testis and wind round the testicular artery in the cord, forming the pampiniform plexus. Because the veins lie against the artery, heat passes from the arterial blood to the venous blood, which helps to keep the testis cooler than the body core. The stream here is venous blood.",
+      "color": "#6a4a7a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tunica_vaginalis",
+      "label": "Tunica Vaginalis",
+      "summary": "A double-layered serous sac that partly surrounds the testis",
+      "function": "The tunica vaginalis is the closed sac, a remnant of an outgrowth of the abdominal lining, that covers the front and sides of the testis. A thin film of fluid between its two layers lets the testis move freely.",
+      "color": "#e8e4d8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "visceral_layer",
+      "parent": "tunica_vaginalis",
+      "label": "Visceral Layer",
+      "summary": "The layer that is stuck to the surface of the testis",
+      "function": "The visceral layer of the tunica vaginalis covers the testis and the epididymis directly.",
+      "color": "#f0ece0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parietal_layer",
+      "parent": "tunica_vaginalis",
+      "label": "Parietal Layer",
+      "summary": "The outer layer that lines the scrotum",
+      "function": "The parietal layer is the outer wall of the sac. It lies against the inner fascia of the scrotum. It is continuous with the visceral layer at the back of the testis.",
+      "color": "#e0dccc",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tunica_vasculosa",
+      "label": "Tunica Vasculosa",
+      "summary": "The vascular layer just beneath the tunica albuginea",
+      "function": "The tunica vasculosa is a thin layer of loose tissue under the capsule that carries a network of fine blood vessels. It supplies the testis and extends inward along the septa. Vessels are drawn on the inner face of the capsule.",
+      "color": "#c8525a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mediastinum_testis",
+      "label": "Mediastinum Testis",
+      "summary": "The thickened ridge of capsule along the back of the testis",
+      "function": "The mediastinum is a wedge of fibrous tissue where the capsule is thickened along the back of the testis. The septa radiate from it, and the rete testis and the vessels and ducts run through it.",
+      "color": "#d8c8a0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "testicular_septa",
+      "label": "Septa",
+      "summary": "Thin fibrous partitions that divide the testis into lobules",
+      "function": "The septa are thin sheets of fibrous tissue that run from the mediastinum to the capsule. They divide the testis into the lobules. They are drawn as pale discs between lobules.",
+      "color": "#f0e4c0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spermatic_cord",
+      "label": "Spermatic Cord",
+      "summary": "The bundle of ducts, vessels and nerves that suspends the testis",
+      "function": "The spermatic cord runs from the testis up to the abdomen. It holds the vas deferens, the testicular artery, the pampiniform plexus, nerves and lymphatics inside coverings of fascia and muscle. It is drawn as a glass sleeve.",
+      "color": "#d8c0a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cremaster_muscle",
+      "label": "Cremaster Muscle",
+      "summary": "Loops of skeletal muscle in the cord that pull the testis up",
+      "function": "The cremaster is a thin skeletal muscle that comes from the abdominal wall and lies in the coverings of the cord. It raises the testis toward the body and lets it drop again. It is drawn as muscle loops round the cord.",
+      "color": "#b05a4a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scrotum",
+      "label": "Scrotum",
+      "summary": "The skin pouch that holds the testes",
+      "function": "The scrotum is the skin pouch that holds the testes and the lower cord. A midline ridge divides it into two compartments. It is drawn as a glass sac outside the testes.",
+      "color": "#d8a898",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dartos_muscle",
+      "parent": "scrotum",
+      "label": "Dartos Muscle",
+      "summary": "The thin smooth muscle just under the scrotal skin",
+      "function": "The dartos is a layer of smooth muscle in the scrotal wall. Its contraction wrinkles the skin and draws it closer to the testes.",
+      "color": "#c08878",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sertoli_cells",
+      "parent": "seminiferous_tubules",
+      "label": "Sertoli Cells",
+      "summary": "Tall supporting cells that hold and feed the developing sperm",
+      "function": "Sertoli cells stretch from the base of the tubule wall to its lumen. They support and nourish the cells that become sperm, and they make the fluid that carries sperm along the tubule. A magnified cross-section of one tubule is drawn inside a lobule.",
+      "color": "#d8c8e8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "fsh",
+          "weight": 0.3,
+          "note": "FSH acts on the Sertoli cells.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "blood_testis_barrier",
+      "parent": "seminiferous_tubules",
+      "label": "Blood-Testis Barrier",
+      "summary": "Tight junctions between Sertoli cells that seal off the inner part of the tubule wall",
+      "function": "Tight junctions join neighbouring Sertoli cells and divide the wall into an outer basal compartment and an inner compartment next to the lumen. The barrier keeps the developing sperm in a controlled environment. It is drawn as a ring.",
+      "color": "#8a78b0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "myoid_cells",
+      "parent": "seminiferous_tubules",
+      "label": "Peritubular Myoid Cells",
+      "summary": "Flat contractile cells that wrap each tubule",
+      "function": "Peritubular myoid cells form a layer round the outside of the tubule. Their slow contractions help move the sperm and fluid along the tubule.",
+      "color": "#b87a6a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spermatogonia",
+      "parent": "seminiferous_tubules",
+      "label": "Spermatogonia",
+      "summary": "The stem cells at the base of the tubule wall",
+      "function": "Spermatogonia lie against the base of the tubule wall. They divide to renew themselves and to produce the cells that go on to make sperm.",
+      "color": "#f0d878",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "fsh",
+          "weight": 0.2,
+          "note": "FSH supports the early cell divisions.",
+          "source": "GH14"
+        },
+        {
+          "signal": "testosterone",
+          "weight": 0.2,
+          "note": "Testosterone is needed for the later stages.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "primary_spermatocytes",
+      "parent": "seminiferous_tubules",
+      "label": "Primary Spermatocytes",
+      "summary": "Large cells that start the first division of meiosis",
+      "function": "Primary spermatocytes are large round cells that have crossed the barrier toward the lumen. Each undergoes the first meiotic division and gives two secondary spermatocytes.",
+      "color": "#e8c860",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "secondary_spermatocytes",
+      "parent": "seminiferous_tubules",
+      "label": "Secondary Spermatocytes",
+      "summary": "Smaller short-lived cells formed by the first meiotic division",
+      "function": "Secondary spermatocytes are smaller cells that divide almost at once by the second meiotic division to give spermatids. They are seldom seen in a section because they are so short-lived.",
+      "color": "#e0b850",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spermatids",
+      "parent": "seminiferous_tubules",
+      "label": "Spermatids",
+      "summary": "Small round cells that change shape into sperm",
+      "function": "Spermatids are small cells lying near the lumen. They do not divide again. They grow a tail, condense their nucleus and form an acrosome, and so become spermatozoa.",
+      "color": "#d8a840",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spermatozoa",
+      "parent": "seminiferous_tubules",
+      "label": "Spermatozoa",
+      "summary": "The mature sperm released into the lumen",
+      "function": "Spermatozoa are the mature sperm. They are released into the lumen of the tubule and carried along it toward the rete testis. A few are drawn in the lumen of the enlarged tubule.",
+      "color": "#f4ecd0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "fsh",
+          "weight": 0.15,
+          "note": "Release into the lumen follows the whole hormone-driven process.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sperm_head",
+      "parent": "spermatozoa",
+      "label": "Head with Acrosome",
+      "summary": "The head holds the nucleus and is capped by the acrosome",
+      "function": "The head of a sperm contains the nucleus with the father's DNA. Over its front end is the acrosome, a cap that holds enzymes used in fertilisation.",
+      "color": "#f0e0b0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sperm_midpiece",
+      "parent": "spermatozoa",
+      "label": "Midpiece",
+      "summary": "The part packed with mitochondria that powers the tail",
+      "function": "The midpiece lies between the head and the tail. It is packed with mitochondria, which supply the energy for swimming.",
+      "color": "#e8a050",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sperm_tail",
+      "parent": "spermatozoa",
+      "label": "Tail (Flagellum)",
+      "summary": "The whip-like tail that drives the sperm forward",
+      "function": "The tail is a long flagellum. Its beating pushes the sperm along. The tail and head shown here are magnified many times, and the tail's wave is drawn as a fixed shape.",
+      "color": "#f4ecd0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

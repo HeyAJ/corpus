@@ -1,0 +1,802 @@
+{
+  "atlas": "mouth",
+  "about": "The oral cavity as an anatomy textbook draws it: the lips and vestibule, the gums and teeth, the palate that roofs it, the tongue with its papillae, muscles and nerves, the floor and its folds, and two magnified diagrams (a taste bud and a molar). Only swallowing and vomiting are simulated, so the soft palate, tongue muscles and hypoglossal nerve carry those as display drives; taste, chewing, speech and saliva are not modelled, so every other part rests at its display anchor. Counts and sizes are schematic, and the taste bud and tooth are magnified diagrams, not true size.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "lips",
+      "label": "Lips",
+      "summary": "Muscular folds that close the front of the mouth",
+      "function": "The lips are a ring of muscle (orbicularis oris) covered by skin outside and mucous membrane inside. They seal the mouth, take in food and drink and shape speech.",
+      "color": "#d9667a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "upper_lip",
+      "parent": "lips",
+      "label": "Upper Lip",
+      "summary": "The upper fold of the ring that closes the mouth",
+      "function": "It meets the lower lip to seal the mouth and is marked in the midline by the philtrum groove. It takes in food and shapes speech.",
+      "color": "#d9667a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lower_lip",
+      "parent": "lips",
+      "label": "Lower Lip",
+      "summary": "The lower fold of the ring that closes the mouth",
+      "function": "It meets the upper lip to seal the mouth and holds in food and drink. It moves with the jaw in speech and chewing.",
+      "color": "#d2596f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "orbicularis_oris",
+      "parent": "lips",
+      "label": "Orbicularis Oris",
+      "summary": "The ring of muscle inside both lips",
+      "function": "This sphincter-like muscle closes and purses the lips. It lies between the skin outside and the mucous membrane inside.",
+      "color": "#a8324a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vermilion_border",
+      "parent": "lips",
+      "label": "Vermilion Border",
+      "summary": "The red edge of the lips where skin meets mucous membrane",
+      "function": "It marks the change from the skin of the face to the thin, richly supplied lining of the lip. Its colour shows the blood close under the surface.",
+      "color": "#e0405a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oral_vestibule",
+      "label": "Oral Vestibule",
+      "summary": "The slit between the lips and cheeks outside and the teeth inside",
+      "function": "It is the space that food passes through on its way in, and it is closed off from the cavity proper when the teeth are together. It is lined by mucous membrane that turns back onto the gums.",
+      "color": "#e7a0a8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gingivae",
+      "label": "Gingivae (Gums)",
+      "summary": "The mucous membrane that covers the tooth-bearing jaw bone",
+      "function": "The gingivae grip the necks of the teeth and cover the alveolar bone. They form a seal against the teeth.",
+      "color": "#e98f9a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palate",
+      "label": "Hard Palate",
+      "summary": "Roof of the mouth: the bony hard palate",
+      "function": "The hard palate is a bony plate that separates the mouth from the nasal cavity. The soft palate continues it backwards.",
+      "color": "#e08a8a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatine_rugae",
+      "parent": "palate",
+      "label": "Palatine Rugae",
+      "summary": "Transverse ridges in the front of the hard palate",
+      "function": "The ridges of the mucous membrane help the tongue grip and press food against the palate.",
+      "color": "#d6727f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "incisive_papilla",
+      "parent": "palate",
+      "label": "Incisive Papilla",
+      "summary": "A small bump behind the upper central incisors",
+      "function": "It lies over the opening of the incisive canal in the midline of the hard palate.",
+      "color": "#cc5f6f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "median_palatine_raphe",
+      "parent": "palate",
+      "label": "Median Palatine Raphe",
+      "summary": "The midline ridge of the hard palate",
+      "function": "It marks the line where the two halves of the palate met in development.",
+      "color": "#c75567",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "soft_palate",
+      "label": "Soft Palate",
+      "summary": "The muscular flap behind the hard palate",
+      "function": "During a swallow it rises and seals the nasopharynx so food does not pass into the nose. It is also raised in vomiting for the same reason.",
+      "color": "#e08a8a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.35,
+          "note": "During the swallow the soft palate is elevated to close the nasopharynx.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.3,
+          "note": "Vomiting lifts the soft palate to close the posterior nares.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "uvula",
+      "parent": "soft_palate",
+      "label": "Uvula",
+      "summary": "The small tongue-shaped tip hanging from the soft palate",
+      "function": "It hangs at the back of the mouth and moves up with the soft palate when the nasopharynx is closed.",
+      "color": "#d97a84",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatoglossal_arch",
+      "label": "Palatoglossal Arch",
+      "summary": "The fold running from the soft palate down to the side of the tongue",
+      "function": "This front pillar of the fauces marks the back of the mouth. It contains the palatoglossus muscle.",
+      "color": "#d4707c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oral_cavity_proper",
+      "label": "Oral Cavity Proper",
+      "summary": "The space inside the dental arches",
+      "function": "It is bounded by the palate above, the tongue and floor below and the teeth in front and to the sides. It opens behind into the oropharynx through the fauces.",
+      "color": "#f0b8c0",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "floor_of_mouth",
+      "label": "Floor of the Mouth",
+      "summary": "The soft tissue under the tongue",
+      "function": "It is a muscular sling with mucous membrane on top and it carries the openings of the salivary ducts. It supports the tongue.",
+      "color": "#d98a90",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mylohyoid",
+      "parent": "floor_of_mouth",
+      "label": "Mylohyoid",
+      "summary": "The muscle sheet that forms the floor",
+      "function": "It stretches from the inside of the lower jaw to a midline seam and to the hyoid bone. It lifts the floor of the mouth during a swallow.",
+      "color": "#b84057",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sublingual_folds",
+      "label": "Sublingual Folds",
+      "summary": "Ridges on the floor of the mouth beside the tongue",
+      "function": "They are raised by the sublingual glands lying beneath and carry the openings of their small ducts.",
+      "color": "#e3a0a6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sublingual_caruncles",
+      "parent": "sublingual_folds",
+      "label": "Sublingual Caruncles",
+      "summary": "Small papillae either side of the frenulum",
+      "function": "The submandibular ducts open on each caruncle, so saliva from the submandibular glands enters the mouth here.",
+      "color": "#d27585",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tongue",
+      "label": "Tongue",
+      "summary": "Muscular organ on the floor of the mouth",
+      "function": "The tongue is a mass of interlaced muscle carrying the taste buds. It moves food during chewing, pushes the bolus back to begin a swallow and shapes speech sounds.",
+      "color": "#c8505f",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The tongue presses the bolus back against the palate to begin a swallow.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oral_part",
+      "parent": "tongue",
+      "label": "Oral Part (Anterior Two-Thirds)",
+      "summary": "The part of the tongue that lies in the mouth",
+      "function": "It is the movable part that is seen when the tongue is put out. Its upper surface is covered in papillae.",
+      "color": "#d0606e",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pharyngeal_part",
+      "parent": "tongue",
+      "label": "Pharyngeal Part (Posterior Third)",
+      "summary": "The part of the tongue that faces the pharynx",
+      "function": "It lies behind the terminal sulcus and forms the front wall of the oropharynx. It carries the lingual tonsil rather than papillae.",
+      "color": "#c2506b",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "terminal_sulcus",
+      "parent": "tongue",
+      "label": "Terminal Sulcus",
+      "summary": "The V-shaped groove that divides the two parts of the tongue",
+      "function": "It points back towards the foramen caecum and lies just behind the vallate papillae.",
+      "color": "#8f2f45",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "foramen_caecum",
+      "parent": "tongue",
+      "label": "Foramen Caecum",
+      "summary": "A small pit at the point of the terminal sulcus",
+      "function": "It marks where the thyroid gland began in the embryo.",
+      "color": "#6f1f35",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "median_sulcus",
+      "parent": "tongue",
+      "label": "Median Sulcus",
+      "summary": "The groove down the middle of the upper surface",
+      "function": "It divides the tongue into right and left halves.",
+      "color": "#8f2f45",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lingual_frenulum",
+      "parent": "tongue",
+      "label": "Lingual Frenulum",
+      "summary": "The fold that joins the underside of the tongue to the floor of the mouth",
+      "function": "It steadies the tongue in the midline while leaving the tip free to move.",
+      "color": "#e59aa0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "filiform_papillae",
+      "parent": "tongue",
+      "label": "Filiform Papillae",
+      "summary": "The numerous fine conical projections of the tongue surface",
+      "function": "They give the surface its roughness for gripping food. They do not carry taste buds.",
+      "color": "#e8c6c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fungiform_papillae",
+      "parent": "tongue",
+      "label": "Fungiform Papillae",
+      "summary": "Mushroom-shaped red papillae scattered among the filiform ones",
+      "function": "They are most common at the tip and sides and carry taste buds on their upper surface.",
+      "color": "#d8394f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "foliate_papillae",
+      "parent": "tongue",
+      "label": "Foliate Papillae",
+      "summary": "Folds on the sides of the back of the tongue",
+      "function": "They carry taste buds in the walls of their grooves.",
+      "color": "#cf5a6a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vallate_papillae",
+      "parent": "tongue",
+      "label": "Vallate Papillae",
+      "summary": "The large papillae in a row in front of the terminal sulcus",
+      "function": "Each sits in a trench and has taste buds in its walls. Small glands empty into the trench.",
+      "color": "#b8485c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vallate_taste_buds",
+      "parent": "vallate_papillae",
+      "label": "Taste Buds of the Vallate Papillae",
+      "summary": "Taste receptors in the walls of the trench",
+      "function": "They sense the chemical qualities of dissolved food. They are drawn here as small beads and are shown magnified in the Taste Bud entry.",
+      "color": "#f2d58a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intrinsic_muscles",
+      "parent": "tongue",
+      "label": "Intrinsic Muscles",
+      "summary": "The muscle fibres that lie wholly inside the tongue",
+      "function": "Longitudinal, transverse and vertical fibres change the shape of the tongue. They shorten, flatten, narrow and curl it.",
+      "color": "#b03a52",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.25,
+          "note": "The tongue shapes and presses the bolus back in the oral stage of swallowing.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "extrinsic_muscles",
+      "parent": "tongue",
+      "label": "Extrinsic Muscles",
+      "summary": "The muscles that move the tongue from outside it",
+      "function": "Four pairs, from bone and the soft palate, protrude, retract, depress and raise the tongue. They change its position rather than its shape.",
+      "color": "#a3314a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.25,
+          "note": "The tongue pushes the bolus back against the palate in the oral stage of swallowing.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "genioglossus",
+      "parent": "extrinsic_muscles",
+      "label": "Genioglossus",
+      "summary": "The fan-shaped muscle from the chin to the tongue",
+      "function": "It makes up most of the bulk of the tongue and pulls it forward and down.",
+      "color": "#a3314a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hyoglossus",
+      "parent": "extrinsic_muscles",
+      "label": "Hyoglossus",
+      "summary": "The muscle from the hyoid bone to the side of the tongue",
+      "function": "It pulls the sides of the tongue down.",
+      "color": "#9c2c45",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "styloglossus",
+      "parent": "extrinsic_muscles",
+      "label": "Styloglossus",
+      "summary": "The muscle from the styloid process to the side of the tongue",
+      "function": "It draws the tongue up and back.",
+      "color": "#962a43",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatoglossus",
+      "parent": "extrinsic_muscles",
+      "label": "Palatoglossus",
+      "summary": "The muscle from the soft palate to the side of the tongue",
+      "function": "It lifts the back of the tongue and narrows the way into the throat. It lies in the palatoglossal arch.",
+      "color": "#8e2840",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tongue_nerves",
+      "parent": "tongue",
+      "label": "Nerves of the Tongue",
+      "summary": "The motor, sensory and taste nerves of the tongue",
+      "function": "One nerve moves the tongue. Others carry touch and taste from different parts of its surface.",
+      "color": "#e8d27a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hypoglossal_nerve",
+      "parent": "tongue_nerves",
+      "label": "Hypoglossal Nerve (XII)",
+      "summary": "The motor nerve of the tongue",
+      "function": "It supplies the intrinsic muscles and all the extrinsic muscles except palatoglossus.",
+      "color": "#e8d27a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.25,
+          "note": "Its motor fibres drive the tongue during swallowing.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lingual_nerve",
+      "parent": "tongue_nerves",
+      "label": "Lingual Nerve",
+      "summary": "The sensory nerve of the front of the tongue",
+      "function": "It carries touch, pain and temperature from the anterior two-thirds, and carries taste fibres from the chorda tympani.",
+      "color": "#f0dc8c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chorda_tympani",
+      "parent": "tongue_nerves",
+      "label": "Chorda Tympani",
+      "summary": "A branch of the facial nerve that joins the lingual nerve",
+      "function": "It carries taste from the anterior two-thirds of the tongue and parasympathetic fibres to the submandibular and sublingual glands.",
+      "color": "#d8c060",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glossopharyngeal_nerve",
+      "parent": "tongue_nerves",
+      "label": "Glossopharyngeal Nerve (IX)",
+      "summary": "The nerve of taste and sensation for the back of the tongue",
+      "function": "It carries both taste and general sensation from the posterior third, including the vallate papillae.",
+      "color": "#c9b455",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "teeth",
+      "label": "Teeth",
+      "summary": "Thirty-two permanent teeth set in the jaws",
+      "function": "Teeth are hard enamel-covered structures rooted in sockets of the upper and lower jaw. Incisors cut, canines tear, premolars and molars grind food before it is swallowed.",
+      "color": "#efe8d8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "incisors",
+      "parent": "teeth",
+      "label": "Incisors",
+      "summary": "The chisel-shaped front teeth",
+      "function": "They cut food. There are two in each quarter of the jaw.",
+      "color": "#f5efe0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "canines",
+      "parent": "teeth",
+      "label": "Canines",
+      "summary": "The pointed teeth beside the incisors",
+      "function": "They tear food. There is one in each quarter of the jaw.",
+      "color": "#efe6d0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "premolars",
+      "parent": "teeth",
+      "label": "Premolars",
+      "summary": "The two teeth between canine and molars in each quarter",
+      "function": "They crush and grind food.",
+      "color": "#ece3cc",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "molars",
+      "parent": "teeth",
+      "label": "Molars",
+      "summary": "The three large back teeth in each quarter",
+      "function": "Their broad crowns grind food before it is swallowed.",
+      "color": "#e8dfc6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oral_mucosa",
+      "label": "Oral Mucosa",
+      "summary": "The moist lining of the mouth",
+      "function": "It protects the tissue beneath and is kept wet by saliva. Its structure differs from region to region, being tougher where it is pressed by food.",
+      "color": "#f2a9b3",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "buccal_mucosa",
+      "parent": "oral_mucosa",
+      "label": "Buccal Mucosa",
+      "summary": "The lining of the cheeks",
+      "function": "It is soft and elastic so the cheek can move in chewing.",
+      "color": "#f0a0aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parotid_papilla",
+      "parent": "oral_mucosa",
+      "label": "Parotid Papilla",
+      "summary": "A small bump on the inside of the cheek",
+      "function": "The parotid duct opens here, opposite the upper second molar.",
+      "color": "#e0788a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "taste_bud",
+      "label": "Taste Bud (enlarged schematic)",
+      "summary": "An onion-shaped cluster of receptor cells, drawn magnified",
+      "function": "It is a microscopic organ, so this is a magnified diagram placed in the mouth, not at true size or position. Dissolved substances enter the pore and act on the receptor cells.",
+      "color": "#f2d58a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gustatory_receptor_cells",
+      "parent": "taste_bud",
+      "label": "Gustatory Receptor Cells",
+      "summary": "The taste-sensing cells",
+      "function": "They reach the pore with fine tips. When stimulated they excite the nerve fibres at their bases.",
+      "color": "#f4b04c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "supporting_cells",
+      "parent": "taste_bud",
+      "label": "Supporting Cells",
+      "summary": "The cells that surround the receptor cells",
+      "function": "They give the bud its shape and wrap the receptor cells.",
+      "color": "#d9c8a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "basal_cells",
+      "parent": "taste_bud",
+      "label": "Basal Cells",
+      "summary": "Stem cells at the foot of the bud",
+      "function": "They replace the receptor and supporting cells, which wear out.",
+      "color": "#b8a878",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "taste_pore",
+      "parent": "taste_bud",
+      "label": "Taste Pore",
+      "summary": "The small opening at the top of the bud",
+      "function": "Saliva and dissolved food reach the receptor cell tips through it.",
+      "color": "#8a6a40",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gustatory_nerve_fibres",
+      "parent": "taste_bud",
+      "label": "Gustatory Nerve Fibres",
+      "summary": "The nerve endings at the base of the bud",
+      "function": "They carry the signal from the receptor cells towards the brain.",
+      "color": "#e8d27a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tooth",
+      "label": "Tooth (enlarged molar, schematic)",
+      "summary": "One molar drawn magnified and in section",
+      "function": "This is a magnified diagram placed in the mouth, not at true size or position. It shows the layers common to every tooth.",
+      "color": "#efe8d8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tooth_crown",
+      "parent": "tooth",
+      "label": "Crown",
+      "summary": "The part of the tooth above the gum",
+      "function": "It is the visible part that meets food and is covered by enamel.",
+      "color": "#f4eede",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tooth_neck",
+      "parent": "tooth",
+      "label": "Neck",
+      "summary": "The narrow part where crown meets root",
+      "function": "It lies at the gum margin.",
+      "color": "#e8dfc8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tooth_root",
+      "parent": "tooth",
+      "label": "Root",
+      "summary": "The part of the tooth set in the jaw",
+      "function": "It anchors the tooth in its socket. A molar has more than one root.",
+      "color": "#e2d6b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "enamel",
+      "parent": "tooth_crown",
+      "label": "Enamel",
+      "summary": "The hard white covering of the crown",
+      "function": "It is the hardest tissue of the body and resists wear.",
+      "color": "#fbf8f0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dentine",
+      "parent": "tooth_crown",
+      "label": "Dentine",
+      "summary": "The yellowish bone-like bulk of the tooth",
+      "function": "It lies under the enamel and the cementum and forms most of the tooth.",
+      "color": "#ead9a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pulp_cavity",
+      "parent": "tooth_crown",
+      "label": "Pulp Cavity",
+      "summary": "The soft core of the crown",
+      "function": "It holds nerves and vessels that nourish and sense the tooth.",
+      "color": "#d8566a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gingival_sulcus",
+      "parent": "tooth_neck",
+      "label": "Gingival Sulcus",
+      "summary": "The shallow groove between gum and tooth",
+      "function": "It is the small gap at the gum margin around the neck.",
+      "color": "#c97a86",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "root_canal",
+      "parent": "tooth_root",
+      "label": "Root Canal",
+      "summary": "The channel of the pulp through the root",
+      "function": "It carries the pulp's nerves and vessels to the crown.",
+      "color": "#cf4a60",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "apical_foramen",
+      "parent": "tooth_root",
+      "label": "Apical Foramen",
+      "summary": "The opening at the tip of the root",
+      "function": "Nerves and vessels enter the root canal through it.",
+      "color": "#8e2a3c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cementum",
+      "parent": "tooth_root",
+      "label": "Cementum",
+      "summary": "The thin bony layer covering the root",
+      "function": "The fibres of the periodontal ligament attach to it.",
+      "color": "#d8c890",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "periodontal_ligament",
+      "parent": "tooth",
+      "label": "Periodontal Ligament",
+      "summary": "The fibrous sling between the root and its socket",
+      "function": "It holds the tooth in place and cushions it against the forces of chewing.",
+      "color": "#d9a8b0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alveolar_bone",
+      "parent": "tooth",
+      "label": "Alveolar Bone",
+      "summary": "The bone of the jaw that forms the socket",
+      "function": "It surrounds the root and holds it.",
+      "color": "#cfc3a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

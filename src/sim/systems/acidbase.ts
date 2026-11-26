@@ -1,6 +1,7 @@
 import { P } from '../core/constants';
 import type { SimState } from '../core/state';
 import { metabolicBicarbonate } from './respiratory';
+import { slowClockScale } from './reproductive';
 
 /**
  * ACID-BASE.
@@ -41,7 +42,11 @@ import { metabolicBicarbonate } from './respiratory';
 
 export function stepAcidBase(s: SimState, dt: number): void {
   const ab = s.acidBase;
-  const dtH = dt / 3600;
+  // The kidney's clocks are measured in days. While the reproductive clock is run ahead of
+  // real time (a time-lapsed pregnancy, or the catch-up window after a jump) they keep
+  // pace with it; the factor is exactly 1 otherwise. Both updates below are exact
+  // exponentials, so a very large factor cannot make them unstable.
+  const dtH = (dt * slowClockScale(s)) / 3600;
 
   const normalHco3 = P('blood.hco3_mEq_per_L');
   const paco2 = s.resp.arterialPco2;
@@ -52,9 +57,38 @@ export function stepAcidBase(s: SimState, dt: number): void {
 
   // Renal compensation for a sustained PaCO2 change: the chronic slope minus the acute
   // one, because the acute buffering is already counted separately below.
+  //
+  // THE KIDNEY COMPENSATES FOR A CHANGE FROM THIS BODY'S OWN RESTING PaCO2, NOT FROM 40.
+  // This line used to read (paco2 - 40). The textbook 40 is the population mean; this
+  // model's chemoreflex loop settles a healthy resting body at about 37.3 mmHg (see the
+  // note on resp.restingPaco2_mmHg - the offset is a property of the loop, not a disease).
+  // Against 40, a perfectly healthy resting body therefore had a standing "chronic
+  // respiratory alkalosis" for the kidney to compensate, and the kidney obliged: over
+  // simulated days bicarbonate crept from 23.7 to about 22.8 mEq/L and pH from 7.425 to
+  // 7.41, in a body to which nothing had happened. A 24 h test hid it because the renal
+  // clock is about a day long. The reproductive time-lapse exposed it: slowClockScale
+  // runs this clock thousands of times faster during the catch-up after a jump, so merely
+  // switching the body to female, or setting a cycle day, moved bicarbonate and pH for no
+  // physiological reason. neuro.ts already references cerebral CO2 reactivity to the same
+  // constant for the same reason. The ACUTE buffering term below is deliberately left
+  // referenced to 40: it is an instantaneous chemical equilibrium of haemoglobin, it has
+  // no clock to drift on, and the resting bicarbonate this model boots with was settled
+  // with it as written.
   const acute = P('acidbase.acuteHco3PerPaco2');
   const chronic = P('acidbase.chronicHco3PerPaco2');
-  const compensationTarget = (chronic - acute) * (paco2 - 40);
+  //
+  // THE CHRONIC SLOPE IS DIRECTION-SPECIFIC. This used to apply the hypercapnia slope
+  // (0.35 mEq/L per mmHg) to a FALL in PaCO2 as well. Madias and Adrogue (2003) give about
+  // 0.4 for chronic hypocapnia in humans, and the difference showed up in pregnancy, where
+  // PaCO2 sits near 30 mmHg for months: the model's pH came out 7.477, just above the
+  // cited 7.40-7.47. The slope is switched about the model's own resting PaCO2 (the same
+  // reference as above), so the resting body, where the difference is zero, is untouched.
+  // Only the CHRONIC slope has a retrieved source for the alkalosis direction; the acute
+  // slope below is left at the hypercapnia value in both directions rather than filled
+  // in from memory (see the note on acidbase.chronicHco3PerPaco2Alkalosis).
+  const dPaco2 = paco2 - P('resp.restingPaco2_mmHg');
+  const chronicSlope = dPaco2 >= 0 ? chronic : P('acidbase.chronicHco3PerPaco2Alkalosis');
+  const compensationTarget = (chronicSlope - acute) * dPaco2;
   const kRen = 1 - Math.exp(-dtH / P('acidbase.renalCompensationTau_h'));
   ab.renalCompensation += (compensationTarget - ab.renalCompensation) * kRen;
 

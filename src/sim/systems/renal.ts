@@ -1,6 +1,7 @@
 import { P } from '../core/constants';
 import type { SimState } from '../core/state';
 import { effect } from '../core/effects';
+import { slowClockScale } from './reproductive';
 
 /**
  * RENAL SYSTEM (spec 4.5).
@@ -101,8 +102,17 @@ export function stepRenal(s: SimState, dt: number): void {
   const PRODUCTION_MG_PER_MIN = 1.1;
   const volumeOfDistribution_dL = 420; // 0.6 L/kg x 70 kg
   const clearance = r.gfr / 100; // dL/min
-  const dCr = (PRODUCTION_MG_PER_MIN - r.creatinine * clearance) / volumeOfDistribution_dL;
-  r.creatinine = Math.max(0.1, r.creatinine + (dCr * dt) / 60);
+  //
+  // The day-scale clock keeps pace with a time-lapsed reproductive clock (slowClockScale,
+  // exactly 1 otherwise), so a pregnant body's creatinine can fall to its new steady
+  // value. The update is the exact solution of dC/dt = (production - C x clearance) / V,
+  // which relaxes to production / clearance with rate clearance / V, so a large factor
+  // cannot make it unstable the way an explicit Euler step could.
+  const rate_per_min = clearance / volumeOfDistribution_dL;
+  const steady = clearance > 1e-9 ? PRODUCTION_MG_PER_MIN / clearance : r.creatinine;
+  const elapsed_min = (dt * slowClockScale(s)) / 60;
+  const next = clearance > 1e-9 ? steady + (r.creatinine - steady) * Math.exp(-rate_per_min * elapsed_min) : r.creatinine + (PRODUCTION_MG_PER_MIN / volumeOfDistribution_dL) * elapsed_min;
+  r.creatinine = Math.max(0.1, next);
 
   // --- potassium and calcium: the two remaining dead renal targets ---------
   //

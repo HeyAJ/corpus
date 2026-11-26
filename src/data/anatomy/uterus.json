@@ -1,0 +1,503 @@
+{
+  "atlas": "uterus",
+  "about": "The inside of the uterus and the uterine tubes, and in pregnancy the placenta, umbilical cord and amniotic sac: the three layers of the wall, the layers and glands of the lining, the cavity, the regions of the body (fundus, body, isthmus, cervix), the cervical canal and its two openings, the parts of each tube including its course through the wall, the uterine arteries and veins, the ligaments that hold the uterus in the pelvis, the placental site with its villi, the cord, and the sac with its two membranes. Many parts hold finer structures of their own: select the lining, the placenta, the cord or the sac, or zoom in on it, and they appear inside it. Activity is a display index driven by the engine's hormone levels, cycle and pregnancy state, not a measured contraction or blood flow. The lining thickens and darkens with the cycle on the model's own endometrium scale; menstrual flow runs while the engine reports menstruating; tube streams run through the cycle and quicken at ovulation. Sizes, wall thicknesses, the number of glands, spiral arteries and villi, and the course of every ligament and of the cord are drawn to read clearly, not measured. The ovaries, the nerve supply and the pelvic floor are left out, and the fetus is a separate atlas.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "perimetrium",
+      "label": "Perimetrium",
+      "summary": "The peritoneal covering of the uterus",
+      "function": "The perimetrium is the outermost layer, a serous membrane continuous with the peritoneum of the pelvis. It covers the fundus and the body and lets the organ move and enlarge against its neighbours without friction. It is drawn as a faint glass skin, and it stretches with the organ as pregnancy advances.",
+      "color": "#d9a79c",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.4, "note": "The covering is stretched over a growing organ.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "myometrium",
+      "label": "Myometrium",
+      "summary": "The thick smooth-muscle wall",
+      "function": "The myometrium is the bulk of the uterine wall, interlaced bundles of smooth muscle. Oestrogen makes it more excitable and progesterone quietens it, and oxytocin makes it contract. It contracts in menstruation and with the orgasmic phase, and in pregnancy it enlarges greatly. It grows more opaque in this simulator when it is more active.",
+      "color": "#b5525f",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "oxytocin", "weight": 0.4, "note": "Oxytocin is the hormone that drives uterine smooth muscle to contract.", "source": "GH14" },
+        { "signal": "menstruating", "weight": 0.2, "note": "The wall contracts during menstruation.", "source": "GH14" },
+        { "signal": "orgasm", "weight": 0.3, "note": "The uterus contracts rhythmically in the orgasmic phase.", "source": "GH14" },
+        { "signal": "progesterone", "weight": -0.1, "note": "Progesterone quietens the muscle, so a high level dims it.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "endometrium",
+      "label": "Endometrium",
+      "summary": "The mucous lining of the cavity, the decidua in pregnancy",
+      "function": "The endometrium is the lining that receives a fertilised egg. Oestrogen thickens it in the first half of the cycle and progesterone prepares it in the second half; if there is no pregnancy it is shed as menstruation. In pregnancy it becomes the decidua. Here it thickens and reddens as the cycle's endometrium level rises and thins and darkens while the engine reports menstruation.",
+      "color": "#c9707a",
+      "rest": 0.3,
+      "drives": [
+        { "signal": "endometrium", "weight": 0.5, "note": "Its thickness is the engine's own endometrium level.", "source": "GH14" },
+        { "signal": "estradiol", "weight": 0.15, "note": "Oestrogen drives proliferation of the lining.", "source": "GH14" },
+        { "signal": "progesterone", "weight": 0.15, "note": "Progesterone makes the lining secretory.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "uterine_cavity",
+      "label": "Uterine Cavity",
+      "summary": "The flattened space inside the body of the uterus",
+      "function": "The cavity is a narrow triangular slit, open to the tubes at its upper corners and to the cervical canal below. It is the space in which a fertilised egg implants and in which menstrual blood collects. In this simulator its activity follows the lining and menstrual flow.",
+      "color": "#e8b7bd",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "menstruating", "weight": 0.4, "note": "Menstrual blood collects and leaves through the cavity.", "source": "GH14" },
+        { "signal": "pregnancy", "weight": 0.3, "note": "The cavity is the space the pregnancy fills.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fundus",
+      "label": "Fundus",
+      "summary": "The rounded top of the uterus above the tube openings",
+      "function": "The fundus is the dome of the uterus above the entrances of the tubes. It is the highest part of the organ and the part whose height rises as pregnancy advances. Its muscle contracts with the rest of the wall.",
+      "color": "#c4606c",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "oxytocin", "weight": 0.3, "note": "Oxytocin contracts the muscle of the whole body, fundus included.", "source": "GH14" },
+        { "signal": "pregnancy", "weight": 0.3, "note": "The fundus rises as the uterus enlarges.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "uterine_body",
+      "label": "Body of the Uterus",
+      "summary": "The main muscular part between the fundus and the isthmus",
+      "function": "The body is the largest part of the uterus and the part that enlarges in pregnancy to hold the fetus. Its walls are the myometrium with the lining inside. It brightens with the hormones that act on the wall and with the pregnancy.",
+      "color": "#bd5865",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "Oestrogen raises the activity and excitability of the wall.", "source": "GH14" },
+        { "signal": "pregnancy", "weight": 0.4, "note": "The body is the part that grows to hold the pregnancy.", "source": "GRAYS42" },
+        { "signal": "menstruating", "weight": 0.15, "note": "The wall contracts in menstruation.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "isthmus",
+      "label": "Isthmus of the Uterus",
+      "summary": "The narrowed zone between the body and the cervix",
+      "function": "The isthmus is the short narrowed zone at the internal os, joining the body above to the cervix below. In late pregnancy it stretches and becomes the lower segment of the uterus. It is drawn as a ring of glass between body and cervix.",
+      "color": "#c98d86",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.3, "note": "The isthmus is taken up into the stretching lower uterus in late pregnancy.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cervix",
+      "label": "Cervix",
+      "summary": "The firm neck of the uterus reaching into the vagina",
+      "function": "The cervix is the lower neck of the uterus, mostly fibrous tissue with some muscle. It holds the pregnancy in and is a barrier to the vagina, and its mucus changes with oestrogen and progesterone through the cycle. It is drawn as glass round the cervical canal.",
+      "color": "#d49a8f",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "Oestrogen thins and increases the cervical mucus.", "source": "GH14" },
+        { "signal": "progesterone", "weight": 0.1, "note": "Progesterone thickens the mucus.", "source": "GH14" },
+        { "signal": "sexualArousal", "weight": 0.15, "note": "The cervix and canal respond to the sexual response cycle.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cervical_canal",
+      "label": "Cervical Canal",
+      "summary": "The channel from the internal os to the external os",
+      "function": "The cervical canal runs from the cavity of the body to the vagina and carries menstrual blood out. Its mucus lets sperm through around ovulation and is a barrier at other times. While menstruation is under way the stream of blood runs along it.",
+      "color": "#e0a79a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "menstruating", "weight": 0.4, "note": "Menstrual blood leaves by this channel.", "source": "GH14" },
+        { "signal": "estradiol", "weight": 0.15, "note": "Oestrogen raises mucus secretion in the canal.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_os",
+      "label": "Internal Os",
+      "summary": "The upper opening of the cervical canal into the cavity",
+      "function": "The internal os is the narrow opening where the canal meets the uterine cavity. It is the upper end of the cervix and normally stays closed in pregnancy. It is drawn as a small solid ring so that it can be picked.",
+      "color": "#a8665f",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.2, "note": "It is held closed by the cervix while the pregnancy continues.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_os",
+      "label": "External Os",
+      "summary": "The lower opening of the canal into the vagina",
+      "function": "The external os is the opening of the cervical canal into the top of the vagina. Menstrual blood leaves through it and sperm enter through it. It is drawn as a small solid ring.",
+      "color": "#a35a58",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "menstruating", "weight": 0.3, "note": "Menstrual flow passes through this opening.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tube_isthmus",
+      "label": "Uterine Tube, Isthmus",
+      "summary": "The narrow part of the tube nearest the uterus",
+      "function": "The isthmus of the tube is its short, narrow, thick-walled part next to the uterine wall. It carries the egg and sperm on towards and away from the ampulla. A stream of fluid runs along the tube in the cycle, brisker at ovulation.",
+      "color": "#d8a57a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "Oestrogen raises ciliary beating and secretion in the tube.", "source": "GH14" },
+        { "signal": "lh", "weight": 0.2, "note": "The tube is most active around the surge of luteinising hormone that ends in ovulation.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tube_ampulla",
+      "label": "Uterine Tube, Ampulla",
+      "summary": "The long wide middle part where fertilisation usually occurs",
+      "function": "The ampulla is the longest and widest part of the tube. Fertilisation usually takes place here, and the egg is moved along by cilia and gentle muscle waves. It is drawn as glass with the stream running through it.",
+      "color": "#e0b185",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "Oestrogen raises ciliary beating and secretion in the tube.", "source": "GH14" },
+        { "signal": "lh", "weight": 0.25, "note": "The tube is most active around ovulation.", "source": "GH14" },
+        { "signal": "pregnancy", "weight": -0.15, "note": "The cyclic transport stream is not shown in pregnancy.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "infundibulum_fimbriae",
+      "label": "Infundibulum and Fimbriae",
+      "summary": "The funnel and fringes that gather the egg from the ovary",
+      "function": "The infundibulum is the funnel-shaped open end of the tube, fringed by finger-like fimbriae that sweep over the surface of the ovary at ovulation. They help to guide the released egg into the tube. They brighten around ovulation.",
+      "color": "#e8c08f",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "lh", "weight": 0.35, "note": "The fimbriae are most active around the luteinising hormone surge and ovulation.", "source": "GH14" },
+        { "signal": "estradiol", "weight": 0.15, "note": "Oestrogen supports the cilia on the fimbriae.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "uterine_arteries",
+      "label": "Uterine Arteries",
+      "summary": "The arteries that run up the sides of the uterus",
+      "function": "The uterine arteries rise along the sides of the uterus and send arcuate branches round the wall. They supply the myometrium and the lining, and their flow rises greatly in pregnancy to feed the placenta. The blood is drawn in the arterial colour, which follows the body's arterial saturation.",
+      "color": "#c8323a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "Oestrogen is a vasodilator in the uterine circulation.", "source": "GH14" },
+        { "signal": "pregnancy", "weight": 0.4, "note": "Uterine blood flow rises throughout pregnancy.", "source": "GH14" },
+        { "signal": "vasoconstriction", "weight": -0.15, "note": "Generalised vasoconstriction reduces flow to non-essential beds.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "placenta",
+      "label": "Placenta",
+      "summary": "The organ of exchange between mother and fetus, drawn from week 8",
+      "function": "The placenta forms on the uterine wall in early pregnancy. Maternal blood bathes its villi, and oxygen and nutrients pass to the fetus while carbon dioxide and wastes pass back. It also secretes hormones, among them human chorionic gonadotrophin early on. It is drawn only from week 8 of a pregnancy, with maternal blood running in and out.",
+      "color": "#9a3f4d",
+      "rest": 0.1,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.5, "note": "It exists and grows only in pregnancy.", "source": "GH14" },
+        { "signal": "hcg", "weight": 0.3, "note": "The placenta secretes human chorionic gonadotrophin.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "amniotic_sac",
+      "label": "Amniotic Sac",
+      "summary": "The fluid-filled membrane bag around the fetus, drawn from week 8",
+      "function": "The amniotic sac is a thin membrane holding the fetus in amniotic fluid. The fluid cushions the fetus, allows it to move and keeps its temperature even. It is drawn as glass and only in pregnancy from week 8.",
+      "color": "#cfd9e6",
+      "rest": 0.1,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.5, "note": "It exists only in pregnancy and fills the cavity as it advances.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "broad_ligament",
+      "label": "Broad Ligament",
+      "summary": "The double fold of peritoneum that drapes from the sides of the uterus to the wall of the pelvis",
+      "function": "The broad ligament carries the uterine tube along its upper edge and the vessels and nerves of the uterus between its two leaves. It helps keep the uterus in the middle of the pelvis. It is drawn as one glass sheet on each side.",
+      "color": "#e3b8ae",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.3, "note": "The fold is drawn out as the uterus grows.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mesometrium",
+      "label": "Mesometrium",
+      "parent": "broad_ligament",
+      "summary": "The largest part of the broad ligament, below the tube and the ovary",
+      "function": "The mesometrium is the broad ligament that lies against the side of the uterus, and the uterine vessels run in its base. It is drawn as a thicker lower part of the sheet.",
+      "color": "#d49a94",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mesosalpinx",
+      "label": "Mesosalpinx",
+      "parent": "broad_ligament",
+      "summary": "The upper part of the broad ligament, enclosing the uterine tube",
+      "function": "The mesosalpinx is the fold between the tube and the ovary's attachment, and it carries the vessels that supply the tube. It is drawn as a narrow strip along the upper edge of the sheet.",
+      "color": "#e8c4b8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "round_ligament",
+      "label": "Round Ligament of the Uterus",
+      "summary": "A fibrous cord from the uterine corner forward through the pelvic side wall",
+      "function": "The round ligament leaves the uterus below and in front of the tube and runs out and forward to the groin. It helps hold the uterus tipped forward, and it lengthens as the uterus enlarges.",
+      "color": "#d8cfc0",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.25, "note": "The cord stretches as the uterus rises out of the pelvis.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "uterosacral_ligaments",
+      "label": "Uterosacral Ligaments",
+      "summary": "Fibrous bands from the cervix backward towards the sacrum",
+      "function": "The uterosacral ligaments pass back on each side of the rectum and support the upper vagina and the cervix, holding the cervix back and up. They are drawn as one band on each side.",
+      "color": "#cdbfa8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cardinal_ligaments",
+      "label": "Cardinal Ligaments",
+      "summary": "Fibrous bands from the cervix and upper vagina out to the side wall of the pelvis",
+      "function": "The cardinal ligaments (transverse cervical ligaments) lie in the base of the broad ligament and carry the uterine vessels. They are the chief support of the cervix against descent.",
+      "color": "#c9b89c",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intramural_tube",
+      "label": "Intramural Part of the Tube",
+      "summary": "The part of the uterine tube that passes through the wall of the uterus",
+      "function": "The intramural part is the narrowest stretch of the tube, running through the myometrium at the uterine corner and opening into the cavity. It joins the isthmus of the tube outside the wall.",
+      "color": "#e0aaa0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "uterine_veins",
+      "label": "Uterine Veins",
+      "summary": "The veins that drain the uterus, in a plexus beside the arteries",
+      "function": "The uterine veins gather blood from the myometrium and the lining and carry it to the internal iliac veins. They run beside the uterine arteries and enlarge greatly in pregnancy. They are drawn in the venous colour.",
+      "color": "#6a4a8a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.4, "note": "Flow through the uterine veins rises with the uterine arteries in pregnancy.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "functional_layer",
+      "label": "Functional Layer",
+      "parent": "endometrium",
+      "summary": "The upper, thicker part of the lining that thickens each cycle and is shed in menstruation",
+      "function": "The functional layer is the part of the endometrium that responds to oestrogen and progesterone, and it is the part that comes away at menstruation. In pregnancy it becomes the decidua. It is drawn as glass so the glands and arteries inside it can be seen.",
+      "color": "#d98c94",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "basal_layer",
+      "label": "Basal Layer",
+      "parent": "endometrium",
+      "summary": "The thin deep layer of the lining next to the myometrium",
+      "function": "The basal layer is not shed. It holds the ends of the glands and is the source from which a new functional layer grows after menstruation.",
+      "color": "#a8505f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "uterine_glands",
+      "label": "Uterine Glands",
+      "parent": "endometrium",
+      "summary": "The simple tubular glands of the lining",
+      "function": "The uterine glands open on the surface of the lining and dip down through the functional layer. Their secretions are greatest in the second half of the cycle. They are drawn as a few slender wavy tubes, not a count.",
+      "color": "#f0d6a0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spiral_arteries",
+      "label": "Spiral Arteries",
+      "parent": "endometrium",
+      "summary": "The coiled arteries that supply the functional layer",
+      "function": "The spiral arteries rise from the basal layer through the functional layer and coil as it thickens. Their spasm and the loss of blood supply is a cause of the shedding at menstruation, and in pregnancy they feed the placental site. They are drawn as a few coiled tubes.",
+      "color": "#c8323a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "endometrial_stroma",
+      "label": "Endometrial Stroma",
+      "parent": "endometrium",
+      "summary": "The connective tissue in which the glands and vessels of the lining lie",
+      "function": "The stroma is a loose tissue of fibroblast-like cells and fine fibres that fills the lining between its glands and vessels. In pregnancy its cells enlarge to form the decidua. It is drawn as a pale glass band; in life it fills the whole lining.",
+      "color": "#e8b8b8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chorionic_villi",
+      "label": "Chorionic Villi",
+      "parent": "placenta",
+      "summary": "The branching fronds of fetal tissue that carry the fetal vessels into the placenta",
+      "function": "The villi project from the chorionic plate into the intervillous space, where maternal blood bathes them; exchange takes place across their walls. They are drawn as a few branching fronds, not a count.",
+      "color": "#b8505e",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intervillous_space",
+      "label": "Intervillous Space",
+      "parent": "placenta",
+      "summary": "The blood-filled space round the villi",
+      "function": "Maternal arterial blood from the spiral arteries enters the intervillous space and bathes the villi, then drains back through veins in the wall. It is drawn as glass.",
+      "color": "#c8323a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "decidua_basalis",
+      "label": "Decidua Basalis",
+      "parent": "placenta",
+      "summary": "The part of the maternal lining beneath the placenta",
+      "function": "The decidua basalis is the maternal side of the placenta, the lining of the uterine wall at the site of implantation. The maternal vessels enter the placenta through it.",
+      "color": "#8a3a48",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chorionic_plate",
+      "label": "Chorionic Plate",
+      "parent": "placenta",
+      "summary": "The fetal surface of the placenta, facing the amniotic cavity",
+      "function": "The chorionic plate is the covering of the placenta on the fetal side, from which the villi spring and into which the umbilical vessels spread. It is covered by the amnion.",
+      "color": "#a8505a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "umbilical_cord",
+      "label": "Umbilical Cord",
+      "parent": "placenta",
+      "summary": "The cord that joins the fetus to the placenta",
+      "function": "The umbilical cord leaves the fetal surface of the placenta and carries two arteries and one vein in a jelly-like tissue. Only its first stretch is drawn here; the rest of the cord, to the fetus, belongs to the fetus atlas.",
+      "color": "#e8d8c8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cord_arteries",
+      "label": "Umbilical Arteries (in the cord)",
+      "parent": "umbilical_cord",
+      "summary": "The two arteries of the cord",
+      "function": "The two umbilical arteries carry blood from the fetus to the placenta and twist round the vein. They are drawn in the deoxygenated colour.",
+      "color": "#6a4a7a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "cord_vein",
+      "label": "Umbilical Vein (in the cord)",
+      "parent": "umbilical_cord",
+      "summary": "The single vein of the cord",
+      "function": "The umbilical vein carries blood from the placenta to the fetus, and it is the vessel that carries the most oxygen. It is drawn in the oxygenated colour.",
+      "color": "#c8323a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "whartons_jelly",
+      "label": "Wharton's Jelly",
+      "parent": "umbilical_cord",
+      "summary": "The soft connective tissue that surrounds the vessels of the cord",
+      "function": "Wharton's jelly is a mucoid connective tissue that cushions the vessels so that the cord can twist and be compressed without shutting off the blood. It is drawn as glass.",
+      "color": "#f0e4d4",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "amnion",
+      "label": "Amnion",
+      "parent": "amniotic_sac",
+      "summary": "The thin inner membrane of the sac, next to the fluid",
+      "function": "The amnion is the innermost membrane of the sac. It lines the amniotic cavity and covers the chorionic plate and the cord.",
+      "color": "#dfe8f2",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chorion",
+      "label": "Chorion",
+      "parent": "amniotic_sac",
+      "summary": "The outer membrane of the sac, next to the lining of the uterus",
+      "function": "The chorion is the outer fetal membrane. Over the placental site it forms the chorionic plate, and elsewhere it lies against the decidua. It is drawn as a second glass layer outside the amnion.",
+      "color": "#c8d4e4",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "amniotic_fluid",
+      "label": "Amniotic Fluid",
+      "parent": "amniotic_sac",
+      "summary": "The fluid in which the fetus lies",
+      "function": "The amniotic fluid surrounds the fetus, cushions it and lets it move. It is drawn as a faint glass body inside the amnion.",
+      "color": "#e6eef8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GH14"
+    }
+  ]
+}

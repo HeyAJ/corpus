@@ -5,11 +5,12 @@ import type { ReceptorSnapshot } from '../../bridge/types';
 import { useStore } from '../store';
 import { DotMatrix } from '../components/primitives';
 import styles from './receptors.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * RECEPTOR PANEL (spec 8.5).
  *
- * The only dark surface in the application, matching the reference.
+ * Restyled as the light sheet every other panel uses (only the chart well is dark).
  *
  *  - a 60-second rolling multi-series chart, one line per active receptor
  *  - a dot-matrix occupancy bar, 20 columns at 5 % each
@@ -28,10 +29,10 @@ const RECEPTORS = (receptorsFile as unknown as ReceptorsFile).receptors;
 
 const GROUP_COLOR: Record<string, string> = {
   adrenergic: '#ff2d6b',
-  transporter: '#f0284c',
+  transporter: '#f5516c',
   'trace-amine': '#ff2d6b',
   serotonergic: '#e24be8',
-  histaminergic: '#8b5cf6',
+  histaminergic: '#a07af8',
   dopaminergic: '#ff7a3d',
   cholinergic: '#38c6f4',
   opioid: '#ff2d6b',
@@ -119,12 +120,7 @@ export function ReceptorPanel() {
   return (
     <div className={styles.card} role="region" aria-label="Receptor occupancy"
       data-panel="receptors">
-      <div className={styles.titleRow}>
-        <h2 className={styles.title}>Receptors</h2>
-        <button className={styles.close} onClick={toggle} aria-label="Close receptor panel">
-          {'×'}
-        </button>
-      </div>
+      <PanelHeader className={styles.titleRow} title="Receptors" onClose={() => toggle()} />
 
       <div className={styles.well}>
         <canvas ref={canvasRef} className={styles.chart} aria-hidden="true" />
@@ -149,7 +145,7 @@ export function ReceptorPanel() {
                 {r.label}
               </span>
               <span className={styles.occupancyValue}>{(r.occupancy * 100).toFixed(0)}%</span>
-              <DotMatrix value={r.occupancy} color="#ffffff" label={r.label} />
+              <DotMatrix value={r.occupancy} color="var(--ink)" label={r.label} />
             </div>
           );
         })}

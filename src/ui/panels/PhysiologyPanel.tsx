@@ -1,5 +1,6 @@
 import { useStore } from '../store';
 import styles from './physiology.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * WHAT IS HAPPENING TO THIS BODY, APART FROM DRUGS.
@@ -65,6 +66,7 @@ function Slider({ label, hint, value, onChange, actual, max = 1, step = 0.05, un
 
 export function PhysiologyPanel() {
   const open = useStore((s) => s.physiologyPanelOpen);
+  const toggle = useStore((s) => s.togglePhysiologyPanel);
   const dispatch = useStore((s) => s.dispatch);
   const snapshot = useStore((s) => s.snapshot);
   if (!open || !snapshot) return null;
@@ -86,14 +88,14 @@ export function PhysiologyPanel() {
 
   return (
     <section className={styles.panel} data-panel="physiology" aria-label="Physiology and pathology">
-      <header className={styles.header}>
-        <h2 className={styles.title}>Physiology</h2>
+      <div className={styles.header}>
+        <PanelHeader title="Physiology" onClose={() => toggle()} />
         <p className={styles.sub}>
           What the body is doing, feeling and suffering. Everything here reaches the body by
           the same route a drug does, so a beta blocker blunts fright and morphine blunts
           pain without either knowing the other happened.
         </p>
-      </header>
+      </div>
 
       <div className={styles.group}>
         <h3 className={styles.groupTitle}>Doing</h3>

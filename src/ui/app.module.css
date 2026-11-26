@@ -71,25 +71,41 @@
   gap: var(--gap-hud);
   pointer-events: none;
   z-index: 12;
-  max-width: min(44vw, 340px);
+  /* The layout box is unscaled, so give it the width the scaled cluster may use. */
+  max-width: calc(min(44vw, 340px) / 0.86);
   /*
    * DRAWN SMALLER THAN IT IS LAID OUT. At full size the cardiac readout (rhythm, ECG,
    * EF, pressure, EEG, detail lines) reached a third of the way down a phone and sat
    * over the brain. Scaling the whole cluster from its top-left corner shrinks every
    * chip, trace and gap in proportion, so nothing re-wraps and nothing has to be
    * re-tuned per component; transforms are composited, so it costs nothing per frame.
-   * 0.86 on a desktop and 0.78 on a phone keep the smallest text (the detail line)
-   * at ~9 px and the numbers at ~14 px: smaller, still readable.
+   * ONE SCALE OF 0.86 ON BOTH desktop and phone. It used to be 0.86 and 0.78, which drew
+   * the 12 px detail lines at 10.3 px and 9.4 px, the largest single group of readability
+   * failures measured (nothing may render below 11 px). The smallest readout text is now
+   * --text-md (13 px), which draws at 11.2 px at 0.86. The cluster is about a tenth larger
+   * on a phone than before; its width cap below is divided by the same scale.
    */
   transform: scale(0.86);
   transform-origin: top left;
 }
 
+/*
+ * FOLDED WHILE A SHEET IS OPEN, PHONES ONLY. Selecting an organ on a phone opens the
+ * bottom sheet and frames the organ in the band above it, but the readouts (ECG strip,
+ * EF, waveform, detail lines) hung over the upper-left of that very organ. The owner chose
+ * folding over moving or shrinking them (2026-11-16): only the first row (the organ chip
+ * and whatever shares its line) stays; every later row is display: none, so it is instant
+ * and leaves no invisible box to swallow touches. Closing the sheet drops data-folded and
+ * the full readouts return exactly as before. Desktop has room and is untouched.
+ */
 @media (max-width: 720px) {
-  .hud {
-    transform: scale(0.78);
-    /* The layout box is unscaled, so give it the width the scaled cluster may use. */
-    max-width: calc(min(44vw, 340px) / 0.78);
+  .hud[data-folded='true'] > :not(:first-child),
+  /* The panels menu rises over the upper body on a phone and is translucent, so the
+     readout rows behind it printed through its row labels (the checker reported "What is
+     happening" x "SV", "EDV", "CVP"). The menu is modal, so the rows fold exactly as they
+     do for a sheet and return when it closes. */
+  :global([data-menu='open']) .hud > :not(:first-child) {
+    display: none;
   }
 }
 
@@ -113,9 +129,9 @@
 }
 
 .booting {
-  font-size: 13px;
+  font-size: var(--text-md);
   font-weight: 700;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
 /* Screen-space, not a 3D sprite: pixel-crisp and never scales with distance. */
@@ -130,10 +146,27 @@
   font-size: var(--size-label);
   font-weight: 700;
   letter-spacing: 0.03em;
-  color: #111;
+  color: var(--ink);
   pointer-events: none;
   z-index: 14;
   text-shadow: 0 1px 12px rgba(246, 244, 228, 0.85);
+}
+
+/* The picked structure's name, set over the interior at its anchor (App.tsx PartLabel). */
+.partLabel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+  padding: 3px 10px;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--ink-inverse);
+  background: var(--chip-darker);
+  border-radius: var(--radius-pill);
+  pointer-events: none;
+  z-index: 15;
 }
 
 /* -------------------------------------------------------------------- sheet */
@@ -223,7 +256,7 @@
   animation: toastLife 2000ms ease forwards;
   padding: 6px 14px;
   border-radius: var(--radius-pill);
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   background: var(--chip-bg-strong);
   backdrop-filter: blur(8px);
@@ -243,7 +276,7 @@
 
 .log_info { color: var(--ink-dim); }
 .log_warn { background: var(--severity-warn-bg); color: var(--severity-warn-ink); }
-.log_critical { background: var(--severity-critical-bg); color: #fff; }
+.log_critical { background: var(--severity-critical-bg); color: var(--ink-inverse); }
 
 /* Permanently visible, not dismissible (spec 10.1). */
 .disclaimer {
@@ -252,9 +285,13 @@
   justify-content: center;
   gap: 12px;
   padding: 2px 8px;
-  font-size: 10px;
+  /* Was 10 px (9 px on a phone) in --ink-faint, about 2:1: the one line the project
+     requires to be permanently visible was the least legible text on the screen. Now the
+     11 px floor in --ink-mid (7.5:1 on the light surfaces). */
+  font-size: var(--text-xs);
+  font-weight: 600;
   letter-spacing: 0.05em;
-  color: var(--ink-faint);
+  color: var(--ink-mid);
   pointer-events: none;
 }
 
@@ -263,7 +300,7 @@
 }
 
 .disclaimer a {
-  color: var(--ink-faint);
+  color: var(--ink-mid);
   pointer-events: auto;
 }
 
@@ -291,13 +328,14 @@
   }
 
   /* 62vw once drawn: the box is laid out unscaled (see .hud), so divide by the scale. */
-  .hud { max-width: calc(62vw / 0.78); }
+  .hud { max-width: calc(62vw / 0.86); }
 
   /* One line, always: two wrapped lines of warning sat under the dock chips. */
   .disclaimer {
     gap: 8px;
-    font-size: 9px;
-    letter-spacing: 0.02em;
+    /* 11 px does not fit the line at 390 px with the desktop tracking, so the tracking is
+       removed here instead of shrinking the text. */
+    letter-spacing: 0;
     white-space: nowrap;
   }
 
@@ -305,4 +343,45 @@
   .disclaimer a {
     display: none;
   }
+}
+
+/*
+ * THE 3D-VIEW FALLBACK CARD. Centred on the stage, over the (blank or frozen) canvas and
+ * under the HUD, the dock and every sheet, so those keep working. Colours and sizes are
+ * display choices. It sits in the upper-middle so it does not hide the bottom dock.
+ */
+.glCard {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%);
+  width: min(420px, calc(100% - 2 * var(--inset-hud)));
+  box-sizing: border-box;
+  padding: 18px 20px;
+  border-radius: var(--radius-card);
+  background: var(--sheet-bg);
+  color: var(--ink);
+  font-size: var(--text-md);
+  line-height: 1.5;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.14);
+  z-index: 13;
+  pointer-events: auto;
+}
+
+.glCard p {
+  margin: 8px 0 0;
+  color: var(--ink-mid);
+}
+
+.glReload {
+  margin-top: 12px;
+  min-height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--ink-inverse);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }

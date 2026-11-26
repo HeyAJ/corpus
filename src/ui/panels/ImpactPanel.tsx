@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { HormoneSnapshot, SimSnapshot } from '../../bridge/types';
 import { useStore } from '../store';
 import styles from './impact.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * IMPACT PANEL — what everything you have done is doing to the body, right now.
@@ -291,15 +292,11 @@ export function ImpactPanel() {
 
   return (
     <aside className={styles.panel} role="dialog" aria-label="Impact of your actions" data-panel="impact">
-      <header className={styles.header}>
-        <h2 className={styles.title}>Impact</h2>
-        <span className={styles.count}>
-          {activeTargets === 0 ? 'nothing acting' : `${activeTargets} target${activeTargets === 1 ? '' : 's'} moving`}
-        </span>
-        <button className={styles.close} onClick={() => toggle()} aria-label="Close impact panel">
-          {'×'}
-        </button>
-      </header>
+      <PanelHeader
+        title="Impact"
+        meta={activeTargets === 0 ? 'nothing acting' : `${activeTargets} target${activeTargets === 1 ? '' : 's'} moving`}
+        onClose={() => toggle()}
+      />
 
       <p className={styles.lede}>
         Everything reaches the body through one bus: each drug, hormone, reflex and insult pushes a
@@ -353,7 +350,7 @@ export function ImpactPanel() {
 
         {/* Hormones: the levels themselves, with the range that makes them mean something. */}
         <section className={styles.group}>
-          <h3 className={styles.groupTitle}>Hormones</h3>
+          <h3 className={styles.groupTitle}>Hormone levels</h3>
           <ul className={styles.hormones}>
             {hormones.map((h) => {
               const { word, cls } = classifyHormone(h);

@@ -1,0 +1,702 @@
+{
+  "atlas": "skull",
+  "about": "The skull as an anatomy textbook draws it: the cranial bones that enclose the brain, the facial bones, the lower jaw, the hyoid bone that hangs free in the neck, the sutures where the bones meet, the orbits, the three cranial fossae and the openings and joints of the skull. The bones are cut from one hollow drawing of the skull, so they fit together exactly, but the places where they meet are drawn by rule and are not traced from a skull. Many bones hold finer parts of their own (the sella turcica of the sphenoid, the petrous part of the temporal bone, the ramus of the mandible): select a bone, or zoom in on it, and they appear; the Structures list nests them under their parent. The eyes, the nasal cavity with its sinuses, the ears and the teeth belong to other organs here; the skull draws only the bone round them, and where the neighbouring drawings overlap the bone by a few millimetres the bone follows them rather than the other way about. Bone is shown as ivory shells and the drawing is a schematic of an adult, not anyone's scan. Calcium handling and bone remodelling are not simulated, so no part has a live drive. The textbook cited for red blood cell production, Guyton and Hall, does not name the skull among the adult red-marrow sites; that is not a claim that the skull holds no marrow, and none is drawn.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "frontal_bone",
+      "label": "Frontal Bone",
+      "summary": "The bone of the forehead",
+      "function": "The frontal bone forms the forehead, the roofs of the orbits and the front of the floor of the cranial cavity. It meets the two parietal bones at the coronal suture.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parietal_bone_right",
+      "label": "Parietal Bone (right)",
+      "summary": "The right bone of the side and top of the vault",
+      "function": "The two parietal bones form most of the roof and the upper sides of the cranial vault. They meet each other at the sagittal suture, the frontal bone at the coronal suture and the occipital bone at the lambdoid suture.",
+      "color": "#d6ccae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parietal_bone_left",
+      "label": "Parietal Bone (left)",
+      "summary": "The left bone of the side and top of the vault",
+      "function": "The two parietal bones form most of the roof and the upper sides of the cranial vault. They meet each other at the sagittal suture, the frontal bone at the coronal suture and the occipital bone at the lambdoid suture.",
+      "color": "#d6ccae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporal_bone_right",
+      "label": "Temporal Bone (right)",
+      "summary": "The right bone of the side and base of the skull",
+      "function": "The temporal bone forms part of the side wall and the base of the cranium. It houses the organs of hearing and balance, carries the external acoustic meatus and the socket of the jaw joint, and gives a process to the cheekbone.",
+      "color": "#e0d6b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporal_bone_left",
+      "label": "Temporal Bone (left)",
+      "summary": "The left bone of the side and base of the skull",
+      "function": "The temporal bone forms part of the side wall and the base of the cranium. It houses the organs of hearing and balance, carries the external acoustic meatus and the socket of the jaw joint, and gives a process to the cheekbone.",
+      "color": "#e0d6b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "occipital_bone",
+      "label": "Occipital Bone",
+      "summary": "The bone of the back and base of the skull",
+      "function": "The occipital bone forms the back of the skull and much of its base. It has the foramen magnum, through which the brainstem becomes the spinal cord, and two condyles that rest on the first cervical vertebra.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sphenoid_bone",
+      "label": "Sphenoid Bone",
+      "summary": "The bat-shaped bone in the middle of the skull base",
+      "function": "The sphenoid bone lies across the middle of the base of the skull and touches nearly every other bone of the cranium. Its body holds the hollow in which the pituitary gland sits, and its wings and processes reach the side wall of the skull, the orbits and the back of the face.",
+      "color": "#ece3c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ethmoid_bone",
+      "label": "Ethmoid Bone",
+      "summary": "The light bone between the orbits and the nose",
+      "function": "The ethmoid bone lies between the two orbits at the roof of the nose. It forms part of the floor of the cranial cavity, the upper part of the nasal septum and much of the side wall of the nose. Its cribriform plate is pierced by the olfactory nerve fibres.",
+      "color": "#d2c8aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "nasal_bones",
+      "label": "Nasal Bones",
+      "summary": "The two small bones that form the bridge of the nose",
+      "function": "The two nasal bones join in the midline to form the bony bridge of the nose, below which cartilage carries the shape on to the tip.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "maxillae",
+      "label": "Maxillae",
+      "summary": "The upper jaw bones",
+      "function": "The two maxillae fuse in the midline to form the upper jaw. They carry the upper teeth, make most of the hard palate and the floor of each orbit, and each holds a large air-filled sinus.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "zygomatic_bones",
+      "label": "Zygomatic Bones",
+      "summary": "The cheekbones",
+      "function": "The zygomatic bones form the prominence of the cheek and part of the floor and outer wall of each orbit. A process of each joins one from the temporal bone to make the zygomatic arch.",
+      "color": "#ece3c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lacrimal_bones",
+      "label": "Lacrimal Bones",
+      "summary": "The small bones of the inner wall of the orbits",
+      "function": "Each lacrimal bone is a small plate on the inner wall of an orbit. A groove in it, with the maxilla, holds the lacrimal sac that drains tears towards the nose.",
+      "color": "#d2c8aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatine_bones",
+      "label": "Palatine Bones",
+      "summary": "The bones of the back of the hard palate",
+      "function": "The two palatine bones lie behind the maxillae. They make the back part of the hard palate and part of the floor and side wall of the nose.",
+      "color": "#e0d6b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_nasal_conchae",
+      "label": "Inferior Nasal Conchae",
+      "summary": "The two scroll-shaped bones on the side walls of the nose",
+      "function": "Each inferior nasal concha is a curled plate of bone on the side wall of the nasal cavity. It sits below the middle concha and increases the surface over which air passes. The nasal cavity atlas draws the soft tissue that covers it.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vomer",
+      "label": "Vomer",
+      "summary": "The thin bone that forms the lower back part of the nasal septum",
+      "function": "The vomer is a thin plate in the midline. With the perpendicular plate of the ethmoid and the septal cartilage it divides the nasal cavity into two.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mandible",
+      "label": "Mandible",
+      "summary": "The lower jaw",
+      "function": "The mandible is the only bone of the skull that moves. It carries the lower teeth and hinges on each side with the temporal bone at the temporomandibular joint, which lets the mouth open and close. It is drawn here with the lower tooth sockets that the mouth atlas's teeth fit.",
+      "color": "#e0d8c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hyoid",
+      "label": "Hyoid Bone",
+      "summary": "U-shaped bone in the neck above the larynx",
+      "function": "The hyoid does not join any other bone. It is held by muscles and ligaments, anchors the tongue and takes part in swallowing.",
+      "color": "#c6bd9f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coronal_suture",
+      "label": "Coronal Suture",
+      "summary": "The joint between the frontal bone and the two parietal bones",
+      "function": "The coronal suture runs over the top of the skull from side to side. Like every suture it is a fibrous joint that lets the bones of a child's skull grow and holds them rigidly in the adult.",
+      "color": "#8d8466",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sagittal_suture",
+      "label": "Sagittal Suture",
+      "summary": "The joint between the two parietal bones",
+      "function": "The sagittal suture runs along the midline of the roof of the skull between the two parietal bones, from the coronal suture at the front to the lambdoid suture at the back.",
+      "color": "#8d8466",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lambdoid_suture",
+      "label": "Lambdoid Suture",
+      "summary": "The joint between the parietal bones and the occipital bone",
+      "function": "The lambdoid suture runs across the back of the skull in the shape of an inverted V. It joins the two parietal bones to the occipital bone.",
+      "color": "#8d8466",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "squamous_sutures",
+      "label": "Squamous Sutures",
+      "summary": "The joints between the parietal and temporal bones",
+      "function": "On each side the squamous suture joins the thin flat part of the temporal bone to the lower edge of the parietal bone. Its bevelled edges overlap, which is why it is called squamous, meaning scale-like.",
+      "color": "#8d8466",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "orbits",
+      "label": "Orbits",
+      "summary": "The two bony sockets of the eyes",
+      "function": "Each orbit is a pyramid-shaped hollow that holds the eyeball, its muscles, nerves and vessels and the lacrimal gland. Seven bones take part in each: the frontal, sphenoid, ethmoid, zygomatic, maxilla, lacrimal and palatine. They are drawn as glass cones round the eyes; the eyes atlas draws the contents.",
+      "color": "#9fb7b0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_cranial_fossa",
+      "label": "Anterior Cranial Fossa",
+      "summary": "The front step of the floor of the cranial cavity",
+      "function": "The anterior cranial fossa is the highest step. The frontal lobes of the brain rest on it, above the orbits and the roof of the nose. It is formed by the frontal and ethmoid bones and the lesser wings of the sphenoid.",
+      "color": "#cbbf9d",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "middle_cranial_fossa",
+      "label": "Middle Cranial Fossa",
+      "summary": "The middle step of the floor of the cranial cavity",
+      "function": "The middle cranial fossa is a butterfly-shaped step behind the lesser wings of the sphenoid. The temporal lobes rest in its sides and the pituitary gland sits in the middle. It is formed by the sphenoid and the temporal bones.",
+      "color": "#c4b895",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_cranial_fossa",
+      "label": "Posterior Cranial Fossa",
+      "summary": "The lowest and largest step of the floor of the cranial cavity",
+      "function": "The posterior cranial fossa lies behind the petrous parts of the temporal bones. It holds the cerebellum and the brainstem and has the foramen magnum in its floor. It is formed mainly by the occipital bone.",
+      "color": "#bdb08c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "foramen_magnum",
+      "label": "Foramen Magnum",
+      "summary": "The large opening in the base of the skull",
+      "function": "The foramen magnum is the opening in the occipital bone through which the brainstem continues as the spinal cord. It is drawn as a ring round the opening, in line with the vertebral canal below.",
+      "color": "#8d8466",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_acoustic_meatus",
+      "label": "External Acoustic Meatus",
+      "summary": "The bony canal into the ear on each side",
+      "function": "The external acoustic meatus is the passage in the temporal bone that leads from the outside of the head towards the eardrum. Here it is drawn as a short bony dimple, because the ears atlas places the eardrum and the inner ear where the brain's drawing already lies.",
+      "color": "#8d8466",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mastoid_process",
+      "label": "Mastoid Process",
+      "summary": "The bony lump behind each ear",
+      "function": "The mastoid process is the rounded projection of the temporal bone that can be felt behind the ear. Several neck muscles attach to it and it holds air cells that connect with the middle ear.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporomandibular_joint",
+      "label": "Temporomandibular Joint",
+      "summary": "The joint between the lower jaw and the skull",
+      "function": "The temporomandibular joint is where the condyle of the mandible meets the temporal bone in front of the ear. It both hinges and glides, so the jaw can open, close and move from side to side. It is drawn here as a glass capsule round the two bones.",
+      "color": "#9fb7b0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mandibular_body",
+      "parent": "mandible",
+      "label": "Body of the Mandible",
+      "summary": "The curved horizontal part of the lower jaw",
+      "function": "The body of the mandible is the horseshoe-shaped part that forms the chin and carries the lower teeth in its upper edge.",
+      "color": "#d6ccae",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mandibular_ramus",
+      "parent": "mandible",
+      "label": "Ramus of the Mandible",
+      "summary": "The upright part of the lower jaw on each side",
+      "function": "The ramus rises from the back of the body of the mandible on each side. It gives attachment to the muscles that close the jaw and ends above in two processes, the coronoid and the condylar.",
+      "color": "#e0d6b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mandibular_angle",
+      "parent": "mandible",
+      "label": "Angle of the Mandible",
+      "summary": "The corner where the body meets the ramus",
+      "function": "The angle of the mandible is the rounded corner of the lower jaw below and in front of the ear, where the body turns upward into the ramus.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "condylar_process",
+      "parent": "mandible",
+      "label": "Condylar Process",
+      "summary": "The rounded head of the jaw that fits into the joint",
+      "function": "The condylar process is the upper back projection of the ramus. Its head fits into the hollow of the temporal bone and forms the lower half of the jaw joint.",
+      "color": "#ece3c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coronoid_process",
+      "parent": "mandible",
+      "label": "Coronoid Process",
+      "summary": "The flat triangular process at the front of the top of the ramus",
+      "function": "The coronoid process is the upper front projection of the ramus. The temporalis muscle, one of the muscles that closes the jaw, is attached to it.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mandibular_alveolar_part",
+      "parent": "mandible",
+      "label": "Alveolar Part of the Mandible",
+      "summary": "The upper edge of the body that holds the lower teeth",
+      "function": "The alveolar part is the thick upper edge of the body, pitted with the sockets in which the roots of the lower teeth sit. Gray's counts eight sockets on each side of each jaw.",
+      "color": "#d2c8aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mental_foramen",
+      "parent": "mandible",
+      "label": "Mental Foramen",
+      "summary": "The opening on the outside of the body of the mandible",
+      "function": "The mental foramen is a small opening on the outer surface of the body of the mandible below the premolar teeth. A nerve and vessels pass through it to supply the skin and tissue of the chin and lower lip. It is drawn as a small ring on each side.",
+      "color": "#8d8466",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "articular_disc",
+      "parent": "temporomandibular_joint",
+      "label": "Articular Disc",
+      "summary": "The cushion of fibrous tissue inside the jaw joint",
+      "function": "The articular disc lies between the head of the mandible and the temporal bone and divides the joint into an upper and a lower compartment. It lets the jaw both hinge and glide.",
+      "color": "#e8e0d0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mandibular_fossa",
+      "parent": "temporomandibular_joint",
+      "label": "Mandibular Fossa",
+      "summary": "The hollow of the temporal bone that holds the head of the jaw",
+      "function": "The mandibular fossa is a shallow oval hollow on the underside of the temporal bone, in front of the ear canal. The head of the mandible rests in it.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "articular_eminence",
+      "parent": "temporomandibular_joint",
+      "label": "Articular Eminence",
+      "summary": "The bony ridge in front of the mandibular fossa",
+      "function": "The articular eminence is the smooth ridge of the temporal bone in front of the mandibular fossa. When the mouth opens wide the head of the mandible and its disc glide forward onto it.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "joint_capsule",
+      "parent": "temporomandibular_joint",
+      "label": "Joint Capsule",
+      "summary": "The fibrous sleeve around the jaw joint",
+      "function": "The capsule of the temporomandibular joint is a loose fibrous sleeve that runs from the temporal bone to the neck of the mandible. Ligaments reinforce it. It is drawn as a thin glass envelope.",
+      "color": "#cfdad6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sella_turcica",
+      "parent": "sphenoid_bone",
+      "label": "Sella Turcica",
+      "summary": "The saddle-shaped hollow in the sphenoid that holds the pituitary gland",
+      "function": "The sella turcica is a hollow in the upper surface of the body of the sphenoid bone. The pituitary gland sits in it, which is why it is drawn directly under the pituitary of the brain atlas.",
+      "color": "#d2c8aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "greater_wings",
+      "parent": "sphenoid_bone",
+      "label": "Greater Wings of the Sphenoid",
+      "summary": "The two large side extensions of the sphenoid",
+      "function": "The greater wings reach out sideways from the body of the sphenoid. They form part of the floor of the middle cranial fossa, of the side wall of the skull and of the outer wall of each orbit.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lesser_wings",
+      "parent": "sphenoid_bone",
+      "label": "Lesser Wings of the Sphenoid",
+      "summary": "The two thin pointed extensions of the sphenoid above the greater wings",
+      "function": "The lesser wings are two thin triangular plates that project sideways from the front of the body of the sphenoid. Their back edges mark the border between the anterior and middle cranial fossae.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pterygoid_processes",
+      "parent": "sphenoid_bone",
+      "label": "Pterygoid Processes",
+      "summary": "The two plates that hang down from the sphenoid behind the upper jaw",
+      "function": "A pterygoid process hangs down on each side from the junction of the body and greater wing of the sphenoid. Each has two plates, to which muscles of the jaw attach.",
+      "color": "#ece3c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporal_squamous_part_right",
+      "parent": "temporal_bone_right",
+      "label": "Squamous Part (right temporal)",
+      "summary": "The thin flat plate of the temporal bone on the side of the head",
+      "function": "The squamous part is the large thin upper part of the temporal bone. It forms part of the side wall of the skull and gives off the zygomatic process, and it carries the socket of the jaw joint on its underside.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "petrous_part_right",
+      "parent": "temporal_bone_right",
+      "label": "Petrous Part (right temporal)",
+      "summary": "The dense pyramid of bone in the base of the skull that houses the inner ear",
+      "function": "The petrous part is a wedge of very hard bone that points inward and forward along the floor of the skull. It contains the cochlea and the semicircular canals of the inner ear; the ears atlas draws them, and its drawing lies at the level of the brain's floor.",
+      "color": "#cbbf9d",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tympanic_part_right",
+      "parent": "temporal_bone_right",
+      "label": "Tympanic Part (right temporal)",
+      "summary": "The curved plate that forms the floor and walls of the bony ear canal",
+      "function": "The tympanic part is a curved plate of bone below the squamous part that forms most of the wall of the bony external acoustic meatus.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporal_mastoid_part_right",
+      "parent": "temporal_bone_right",
+      "label": "Mastoid Part (right temporal)",
+      "summary": "The back of the temporal bone, with the mastoid process",
+      "function": "The mastoid part is the back part of the temporal bone. Its downward projection is the mastoid process, and its inside is honeycombed with air cells.",
+      "color": "#ece3c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "styloid_process_right",
+      "parent": "temporal_bone_right",
+      "label": "Styloid Process (right temporal)",
+      "summary": "The slender pointed spike below the ear canal",
+      "function": "The styloid process is a thin pointed process that projects down and forward from the underside of the temporal bone. Three muscles and two ligaments attach to it, among them ones that reach the tongue and the hyoid.",
+      "color": "#d2c8aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporal_zygomatic_process_right",
+      "parent": "temporal_bone_right",
+      "label": "Zygomatic Process (right temporal)",
+      "summary": "The arm of the temporal bone that forms the back of the cheek arch",
+      "function": "The zygomatic process projects forward from the squamous part of the temporal bone and joins the temporal process of the zygomatic bone to complete the zygomatic arch.",
+      "color": "#e0d6b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporal_squamous_part_left",
+      "parent": "temporal_bone_left",
+      "label": "Squamous Part (left temporal)",
+      "summary": "The thin flat plate of the temporal bone on the side of the head",
+      "function": "The squamous part is the large thin upper part of the temporal bone. It forms part of the side wall of the skull and gives off the zygomatic process, and it carries the socket of the jaw joint on its underside.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "petrous_part_left",
+      "parent": "temporal_bone_left",
+      "label": "Petrous Part (left temporal)",
+      "summary": "The dense pyramid of bone in the base of the skull that houses the inner ear",
+      "function": "The petrous part is a wedge of very hard bone that points inward and forward along the floor of the skull. It contains the cochlea and the semicircular canals of the inner ear; the ears atlas draws them, and its drawing lies at the level of the brain's floor.",
+      "color": "#cbbf9d",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tympanic_part_left",
+      "parent": "temporal_bone_left",
+      "label": "Tympanic Part (left temporal)",
+      "summary": "The curved plate that forms the floor and walls of the bony ear canal",
+      "function": "The tympanic part is a curved plate of bone below the squamous part that forms most of the wall of the bony external acoustic meatus.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporal_mastoid_part_left",
+      "parent": "temporal_bone_left",
+      "label": "Mastoid Part (left temporal)",
+      "summary": "The back of the temporal bone, with the mastoid process",
+      "function": "The mastoid part is the back part of the temporal bone. Its downward projection is the mastoid process, and its inside is honeycombed with air cells.",
+      "color": "#ece3c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "styloid_process_left",
+      "parent": "temporal_bone_left",
+      "label": "Styloid Process (left temporal)",
+      "summary": "The slender pointed spike below the ear canal",
+      "function": "The styloid process is a thin pointed process that projects down and forward from the underside of the temporal bone. Three muscles and two ligaments attach to it, among them ones that reach the tongue and the hyoid.",
+      "color": "#d2c8aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "temporal_zygomatic_process_left",
+      "parent": "temporal_bone_left",
+      "label": "Zygomatic Process (left temporal)",
+      "summary": "The arm of the temporal bone that forms the back of the cheek arch",
+      "function": "The zygomatic process projects forward from the squamous part of the temporal bone and joins the temporal process of the zygomatic bone to complete the zygomatic arch.",
+      "color": "#e0d6b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "occipital_condyles",
+      "parent": "occipital_bone",
+      "label": "Occipital Condyles",
+      "summary": "The two smooth knuckles by which the skull rests on the spine",
+      "function": "An occipital condyle lies on each side of the foramen magnum. Each fits into a hollow on the first cervical vertebra, the atlas, and together they let the head nod.",
+      "color": "#ece3c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_occipital_protuberance",
+      "parent": "occipital_bone",
+      "label": "External Occipital Protuberance",
+      "summary": "The bump in the middle of the back of the skull",
+      "function": "The external occipital protuberance is a bony prominence in the midline of the back of the skull that can be felt through the skin. The nuchal ligament of the neck attaches to it.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cribriform_plate",
+      "parent": "ethmoid_bone",
+      "label": "Cribriform Plate",
+      "summary": "The sieve-like plate that forms the roof of the nose",
+      "function": "The cribriform plate is the thin horizontal plate of the ethmoid that forms the roof of the nasal cavity and part of the floor of the anterior cranial fossa. It is pierced by many tiny holes through which the fibres of the olfactory nerve pass to the brain. The nasal cavity atlas draws the plate as a surface of the nose; this is the bone itself.",
+      "color": "#d2c8aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "crista_galli",
+      "parent": "ethmoid_bone",
+      "label": "Crista Galli",
+      "summary": "The small upright ridge of the ethmoid in the midline",
+      "function": "The crista galli, Latin for the cock's comb, is a small ridge of bone that rises from the cribriform plate into the cranial cavity. A fold of the membrane that surrounds the brain attaches to it.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perpendicular_plate",
+      "parent": "ethmoid_bone",
+      "label": "Perpendicular Plate",
+      "summary": "The thin plate of the ethmoid that forms the upper part of the nasal septum",
+      "function": "The perpendicular plate of the ethmoid hangs down in the midline from the cribriform plate and forms the upper part of the bony nasal septum. The vomer joins it behind and below.",
+      "color": "#d9cfb2",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ethmoidal_labyrinth",
+      "parent": "ethmoid_bone",
+      "label": "Ethmoidal Labyrinth",
+      "summary": "The two light masses of air cells on either side of the ethmoid",
+      "function": "The ethmoidal labyrinth is a mass of thin-walled air cells on each side, between the nose and the orbit. Its inner surface carries the superior and middle conchae. The nasal cavity atlas draws the air cells themselves.",
+      "color": "#ece3c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "maxillary_alveolar_process",
+      "parent": "maxillae",
+      "label": "Alveolar Process of the Maxilla",
+      "summary": "The lower edge of the upper jaw that holds the upper teeth",
+      "function": "The alveolar process is the thick curved lower border of the maxillae, pitted with the sockets in which the roots of the upper teeth sit, eight on each side.",
+      "color": "#d2c8aa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "maxillary_palatine_process",
+      "parent": "maxillae",
+      "label": "Palatine Process of the Maxilla",
+      "summary": "The horizontal shelf of each maxilla that forms the front of the hard palate",
+      "function": "The palatine process is a horizontal shelf of bone on the inside of each maxilla. The two meet in the midline and form the front part of the hard palate, the roof of the mouth and floor of the nose.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "maxillary_sinus_walls",
+      "parent": "maxillae",
+      "label": "Maxillary Sinus Walls",
+      "summary": "The thin bony walls of the air-filled sinus inside each maxilla",
+      "function": "Each maxilla contains a large air-filled space, the maxillary sinus, which opens into the nose. Only its thin bony wall is drawn here; the nasal cavity atlas draws the sinus itself.",
+      "color": "#cfdad6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

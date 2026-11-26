@@ -1,0 +1,329 @@
+{
+  "atlas": "prostate",
+  "about": "The interior of the prostate and the structures joined to it in this model: the capsule, the peripheral, central and transition zones, the prostatic urethra, the seminal colliculus, the two ejaculatory ducts, the seminal vesicles and the ampullae of the vas deferens. The anterior fibromuscular stroma, the gland's ducts and cells, the nerves, the venous plexus and the external sphincter are left out. The zone boundaries are smooth shapes chosen to show each zone's usual place and relative size, and the seminal vesicle's folded tube is drawn as one coil. Finer structures (marked as children in the Structures list) appear when their parent is selected or the camera is close; they are schematic drawings, and counts, sizes and layout are illustrative, not measured.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "prostatic_capsule",
+      "label": "Prostatic Capsule",
+      "summary": "The fibrous and muscular covering of the gland",
+      "function": "The prostate is surrounded by a capsule of fibrous tissue and smooth muscle. It is drawn here as glass so that the zones, the urethra and the ducts inside it can be seen through it.",
+      "color": "#d8c4a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "peripheral_zone",
+      "label": "Peripheral Zone",
+      "summary": "The largest zone, forming the back and sides of the gland",
+      "function": "The peripheral zone makes up most of the glandular tissue and lies behind and to the sides of the urethra. Its glands secrete the prostatic fluid, a thin alkaline fluid that forms part of the semen and helps sperm survive in the acid of the vagina. The gland depends on testosterone for its growth and function, so the zone brightens as testosterone rises.",
+      "color": "#d9a066",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "testosterone",
+          "weight": 0.3,
+          "note": "The prostate is an androgen-dependent gland.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.2,
+          "note": "The prostatic smooth muscle and glands empty into the urethra under sympathetic drive at emission.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "central_zone",
+      "label": "Central Zone",
+      "summary": "A wedge at the base of the gland, pierced by the ejaculatory ducts",
+      "function": "The central zone is a wedge of tissue at the base of the gland, behind the first part of the urethra, and the two ejaculatory ducts pass through it. It is drawn as glass so the ducts can be seen inside it.",
+      "color": "#c98a86",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "transition_zone",
+      "label": "Transition Zone",
+      "summary": "Two small lobes lying against the urethra",
+      "function": "The transition zone consists of two small lobes that lie on either side of the urethra, just below the bladder. It is a small part of the gland in a young adult, and it continues to grow slowly through life.",
+      "color": "#e0b86e",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "testosterone",
+          "weight": 0.2,
+          "note": "Growth of the gland depends on androgens.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "prostatic_urethra",
+      "label": "Prostatic Urethra",
+      "summary": "The part of the urethra that runs through the gland",
+      "function": "The urethra leaves the bladder and passes through the prostate from top to bottom, with a gentle forward curve. Urine passes along it when the bladder empties, and at ejaculation the semen is added to it from the ejaculatory ducts and the prostatic ducts. It is drawn as glass so that the streams inside it can be seen.",
+      "color": "#e3c04a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.2,
+          "note": "Semen enters the urethra at emission.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seminal_colliculus",
+      "label": "Seminal Colliculus",
+      "summary": "The small mound on the back wall of the urethra where the ducts open",
+      "function": "The seminal colliculus is a small rounded elevation on the back wall of the prostatic urethra. The two ejaculatory ducts open on either side of its summit, so sperm and seminal fluid enter the urethra here.",
+      "color": "#e08a5a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.3,
+          "note": "The ducts discharge onto it during emission.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ejaculatory_ducts",
+      "label": "Ejaculatory Ducts",
+      "summary": "The two short ducts that carry sperm and seminal fluid into the urethra",
+      "function": "Each ejaculatory duct is formed where the duct of a seminal vesicle joins the end of a vas deferens. It runs forward and downward through the central zone to open into the urethra at the seminal colliculus. During emission, sympathetic nerves cause the muscle of the vas, the vesicles and the prostate to contract and drive the contents along. The stream of particles in the ducts is drawn only during orgasm.",
+      "color": "#d4766a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.5,
+          "note": "Emission through the ducts takes place at orgasm.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.2,
+          "note": "Emission is triggered by sympathetic nerves.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seminal_vesicles",
+      "label": "Seminal Vesicles",
+      "summary": "Two glandular sacs behind the bladder that add fluid to the semen",
+      "function": "The seminal vesicles are a pair of folded, coiled glandular tubes lying behind the bladder, above the prostate. They secrete a thick fluid, rich in fructose, that makes up much of the volume of the semen and nourishes the sperm. The sacs are drawn as glass, with the coiled tube inside each, and they brighten during emission.",
+      "color": "#c9b27a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.4,
+          "note": "Their muscle contracts and empties them at emission.",
+          "source": "GH14"
+        },
+        {
+          "signal": "testosterone",
+          "weight": 0.2,
+          "note": "The vesicles depend on testosterone.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vesicle_lumen",
+      "label": "Seminal Vesicle Tubes",
+      "summary": "The coiled tube inside each seminal vesicle",
+      "function": "Each seminal vesicle is really a single long tube, folded on itself and held together by connective tissue, which is why it looks like a sac. Its lining secretes the seminal fluid, and the tube ends in a short duct that joins the vas deferens to form the ejaculatory duct.",
+      "color": "#b89a52",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.4,
+          "note": "The tube empties at emission.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ampullae",
+      "label": "Ampullae of the Vas Deferens",
+      "summary": "The widened ends of the two vasa deferentia beside the vesicles",
+      "function": "Near the prostate each vas deferens widens into an ampulla that lies against the seminal vesicle. Sperm collect here before emission. The ampulla narrows again and joins the duct of the vesicle to make the ejaculatory duct.",
+      "color": "#e0b38a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.4,
+          "note": "Emission moves sperm on from the ampullae.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_fibromuscular_stroma",
+      "label": "Anterior Fibromuscular Stroma",
+      "summary": "The gland-free band of muscle and fibrous tissue across the front of the prostate",
+      "function": "The anterior fibromuscular stroma is a layer of smooth muscle and connective tissue that covers the front of the gland. It contains no glands. It is drawn as a glass band in front of the urethra.",
+      "color": "#d8c4a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "prostatic_utricle",
+      "label": "Prostatic Utricle",
+      "summary": "A small blind pouch that opens on the seminal colliculus",
+      "function": "The prostatic utricle is a small pocket running up from the middle of the seminal colliculus, between the two ejaculatory ducts. It is a leftover of the embryonic duct system.",
+      "color": "#c98a86",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "prostatic_sinus",
+      "label": "Prostatic Sinus",
+      "summary": "The groove on each side of the seminal colliculus",
+      "function": "The prostatic sinus is the shallow groove in the back wall of the urethra on each side of the colliculus. Most of the ducts of the prostate open into it.",
+      "color": "#e8b070",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.25,
+          "note": "Secretions pour into the urethra through these ducts at emission.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "prostatic_ducts",
+      "label": "Prostatic Ducts",
+      "summary": "The ducts that carry the gland's secretion into the urethra",
+      "function": "Many small ducts lead from the glandular tissue of the prostate to open into the prostatic sinus. They carry the prostatic fluid that forms part of semen. A few are drawn schematically.",
+      "color": "#e0a060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.35,
+          "note": "The glandular ducts empty into the urethra at emission.",
+          "source": "GRAYS42"
+        },
+        {
+          "signal": "testosterone",
+          "weight": 0.2,
+          "note": "Androgens maintain the secretory tissue.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "neurovascular_bundles",
+      "label": "Neurovascular Bundles",
+      "summary": "The nerves and vessels that run along each back and side of the prostate",
+      "function": "A neurovascular bundle runs on each side of the prostate just outside its capsule. It carries the arteries, veins and the autonomic nerves that supply the gland and the erectile tissue of the penis. Each bundle is drawn as one tube.",
+      "color": "#e8d070",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "sympathetic",
+          "weight": 0.2,
+          "note": "Autonomic nerves travel in these bundles.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bulbourethral_glands",
+      "label": "Bulbourethral (Cowper) Glands",
+      "summary": "Two small glands below the prostate that open into the urethra",
+      "function": "The bulbourethral glands lie in the muscle below the prostate, and their ducts open into the urethra. They add a mucous secretion before ejaculation.",
+      "color": "#d8b890",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "orgasm",
+          "weight": 0.25,
+          "note": "Their secretion is added as the sexual response proceeds.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "prostatic_glands",
+      "label": "Glandular Tissue",
+      "summary": "The branching glands that make the prostatic fluid",
+      "function": "The glands of the prostate are branched tubes and sacs lined by secretory cells, embedded in muscle and connective tissue. They make the fluid that forms part of semen. Lobules of them are drawn in the peripheral zone.",
+      "color": "#e8a870",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "testosterone",
+          "weight": 0.3,
+          "note": "Androgens maintain the secretory tissue.",
+          "source": "GH14"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.3,
+          "note": "The muscle of the stroma squeezes the glands empty at emission.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "secretory_acini",
+      "parent": "prostatic_glands",
+      "label": "Secretory Acini",
+      "summary": "The small sacs at the ends of the ducts where the fluid is made",
+      "function": "An acinus is a small sac lined by secretory cells. The acini open into the branching ducts. They are drawn as clusters of small spheres.",
+      "color": "#f0b880",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corpora_amylacea",
+      "parent": "prostatic_glands",
+      "label": "Corpora Amylacea",
+      "summary": "Small rounded bodies of condensed secretion in the gland spaces",
+      "function": "Corpora amylacea are small concentric bodies of condensed secretion found in the spaces of the glands. They are more common with age. They are drawn as a few pale spheres.",
+      "color": "#f4ecd8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

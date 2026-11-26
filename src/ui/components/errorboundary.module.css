@@ -1,0 +1,57 @@
+/*
+ * The crash screen. It cannot assume the app's own layout rules loaded or worked, so it
+ * positions itself over the whole viewport. Sizes and colours are display choices.
+ */
+.root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px var(--inset-hud, 16px);
+  background: var(--page-bg, #f0f0f0);
+  color: var(--ink, #1a1a1a);
+  z-index: 100;
+}
+
+.card {
+  width: min(480px, 100%);
+  box-sizing: border-box;
+  padding: 22px;
+  border-radius: var(--radius-card, 18px);
+  background: #fff;
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.14);
+}
+
+.title {
+  margin: 0 0 8px;
+  font-size: var(--text-xl);
+}
+
+.message {
+  margin: 0 0 14px;
+  font-size: var(--text-md);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.reload {
+  min-height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 999px;
+  background: #1a1a1a;
+  color: var(--ink-inverse);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.banner {
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  text-align: center;
+}

@@ -1,5 +1,6 @@
 import { useStore } from '../store';
 import styles from './blood.module.css';
+import { PanelHeader } from './PanelHeader';
 
 /**
  * WHAT THE BLOOD IS CARRYING.
@@ -27,13 +28,14 @@ const COMPARTMENT_WORD: Record<string, string> = {
 export function BloodContents() {
   const snapshot = useStore((s) => s.snapshot);
   const visible = useStore((s) => s.bloodPanelOpen);
+  const toggle = useStore((s) => s.toggleBloodPanel);
 
   const t = snapshot?.transport;
   if (!visible || !t) return null;
 
   return (
     <aside className={styles.wrap} data-blood-contents aria-label="What the blood is carrying">
-      <h2 className={styles.title}>In the blood</h2>
+      <PanelHeader title="In the blood" onClose={() => toggle()} />
 
       <ul className={styles.list}>
         {t.markers.map((m) => (

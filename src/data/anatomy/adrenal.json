@@ -1,0 +1,292 @@
+{
+  "atlas": "adrenal",
+  "about": "The structure of one adrenal (suprarenal) gland as a textbook draws it: capsule, the three cortical zones, the medulla, the central vein, the arterial supply and the sympathetic fibres that reach the medulla. Both glands share this file; the left is drawn as a crescent and the right as a pyramid. Activity is a display index driven by the engine's own stress, sympathetic, renin and aldosterone signals; it is not a secretion rate or a blood flow. Layer thicknesses are drawing choices. Adrenal androgen output, the adrenal portal circulation at the cell level and the detailed histology are not modelled.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "capsule",
+      "label": "Capsule",
+      "summary": "Fibrous covering that encloses the whole gland",
+      "function": "A thin fibrous capsule surrounds the cortex and is pierced by the small arteries that supply the gland and by the vein that drains it. It holds the cortex and medulla together as a single organ. It is drawn as glass so the layers inside can be seen.",
+      "color": "#c8b48a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "zona_glomerulosa",
+      "label": "Zona Glomerulosa",
+      "summary": "Outer cortical zone; makes aldosterone",
+      "function": "The outermost cortical zone makes aldosterone, the mineralocorticoid that makes the kidney retain sodium and excrete potassium. Its main drivers are angiotensin II (through renin) and plasma potassium, rather than the pituitary. It brightens when the simulated aldosterone and renin drives rise, for example in blood loss.",
+      "color": "#e0a23c",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "aldosterone",
+          "weight": 0.45,
+          "note": "This zone is the source of aldosterone, so the aldosterone signal is its own output.",
+          "source": "GH14"
+        },
+        {
+          "signal": "reninDrive",
+          "weight": 0.2,
+          "note": "Renin forms angiotensin II, which stimulates aldosterone secretion from this zone.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "zona_fasciculata",
+      "label": "Zona Fasciculata",
+      "summary": "Thick middle zone; makes cortisol",
+      "function": "The broad middle zone makes cortisol under the control of pituitary ACTH, which in turn follows the hypothalamic-pituitary-adrenal stress axis and a daily rhythm. Cortisol raises blood glucose and restrains inflammation. It brightens when the stress axis is driven and dims a little in the small hours.",
+      "color": "#d9772f",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "stressAxis",
+          "weight": 0.4,
+          "note": "Stress drives ACTH, and ACTH drives cortisol synthesis in this zone.",
+          "source": "GH14"
+        },
+        {
+          "signal": "cortisol",
+          "weight": 0.3,
+          "note": "The zone's output is the cortisol activity above baseline.",
+          "source": "GH14"
+        },
+        {
+          "signal": "night",
+          "weight": -0.1,
+          "note": "ACTH and cortisol are lowest in the small hours of the daily rhythm.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "zona_reticularis",
+      "label": "Zona Reticularis",
+      "summary": "Inner cortical zone; makes adrenal androgens",
+      "function": "The innermost cortical zone makes the weak adrenal androgens, which are also ACTH-responsive. It lies against the medulla. It brightens with the stress axis, like the zone outside it.",
+      "color": "#b5523a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "stressAxis",
+          "weight": 0.3,
+          "note": "Adrenal androgens follow ACTH, so they rise with the stress axis.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "medulla",
+      "label": "Adrenal Medulla",
+      "summary": "Central core; releases adrenaline and noradrenaline",
+      "function": "The medulla is modified sympathetic tissue: its chromaffin cells release catecholamines, mostly adrenaline, straight into the blood when stimulated by sympathetic nerves. This is the fast arm of the alarm response and is also called on by exercise and low blood glucose. It brightens sharply with fright and sympathetic outflow.",
+      "color": "#c2476b",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "sympathetic",
+          "weight": 0.35,
+          "note": "Chromaffin cells are driven by sympathetic nerves.",
+          "source": "GH14"
+        },
+        {
+          "signal": "fright",
+          "weight": 0.3,
+          "note": "Acute alarm releases adrenaline from the medulla.",
+          "source": "GH14"
+        },
+        {
+          "signal": "hypoglycaemia",
+          "weight": 0.2,
+          "note": "Low blood glucose is one of the stimuli for adrenaline release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "central_vein",
+      "label": "Central (Suprarenal) Vein",
+      "summary": "Single vein that carries the hormones out",
+      "function": "A single central vein runs through the medulla and leaves at the hilum, collecting the blood that has passed from cortex to medulla. The left drains to the left renal vein and the right directly into the inferior vena cava. In the interior view the three hormone streams leave along it.",
+      "color": "#6a4a7a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "stressAxis",
+          "weight": 0.2,
+          "note": "More hormone output means more hormone carried in this vein.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.2,
+          "note": "Catecholamine release leaves in this vein.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "suprarenal_arteries",
+      "label": "Suprarenal Arteries",
+      "summary": "Superior, middle and inferior arterial supply",
+      "function": "Each gland is supplied by small arteries from the inferior phrenic artery, the aorta and the renal artery. They pierce the capsule and break into sinusoids that run inwards through the cortex to the medulla. Their glow follows cardiac output.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "outputRise",
+          "weight": 0.3,
+          "note": "Arterial inflow follows the output of the heart.",
+          "source": "GH14"
+        },
+        {
+          "signal": "outputFall",
+          "weight": -0.2,
+          "note": "A falling output means less inflow.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "splanchnic_fibres",
+      "label": "Splanchnic Nerve Fibres",
+      "summary": "Sympathetic fibres that end on the medulla",
+      "function": "Preganglionic sympathetic fibres of the splanchnic nerves pass through the cortex and end directly on the chromaffin cells, with no ganglion on the way. This is why the medulla answers a sudden alarm within seconds. Impulses run in along them faster as sympathetic outflow rises.",
+      "color": "#e8d27a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "sympathetic",
+          "weight": 0.5,
+          "note": "These are the sympathetic fibres themselves.",
+          "source": "GH14"
+        },
+        {
+          "signal": "fright",
+          "weight": 0.3,
+          "note": "Alarm raises sympathetic traffic to the medulla.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chromaffin_cells",
+      "parent": "medulla",
+      "label": "Chromaffin Cells",
+      "summary": "Hormone-making cells of the adrenal medulla (enlarged schematic)",
+      "function": "These cells are the sympathetic nervous system's own gland: when the sympathetic nerves fire they release adrenaline and noradrenaline into the blood. They are microscopic; the nests drawn here are a magnified diagram.",
+      "color": "#d65a8a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "adrenaline_secreting_cells",
+      "parent": "chromaffin_cells",
+      "label": "Adrenaline-Secreting Cells",
+      "summary": "The chromaffin cells that release adrenaline (schematic)",
+      "function": "They release adrenaline, which speeds the heart and mobilises fuel in an emergency. The two kinds are intermingled in life; the drawing separates them only to show both.",
+      "color": "#f06aa8",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "noradrenaline_secreting_cells",
+      "parent": "chromaffin_cells",
+      "label": "Noradrenaline-Secreting Cells",
+      "summary": "The chromaffin cells that release noradrenaline (schematic)",
+      "function": "They release noradrenaline, which tightens blood vessels. The two kinds are intermingled in life; the drawing separates them only to show both.",
+      "color": "#a8509a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "superior_suprarenal_arteries",
+      "parent": "suprarenal_arteries",
+      "label": "Superior Suprarenal Arteries",
+      "summary": "Several small arteries entering the gland from above",
+      "function": "They arise from the inferior phrenic artery and supply the upper part of the gland.",
+      "color": "#d8404a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "middle_suprarenal_artery",
+      "parent": "suprarenal_arteries",
+      "label": "Middle Suprarenal Artery",
+      "summary": "The artery entering the gland from the aorta",
+      "function": "It arises directly from the aorta and supplies the middle of the gland.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_suprarenal_artery",
+      "parent": "suprarenal_arteries",
+      "label": "Inferior Suprarenal Artery",
+      "summary": "The artery entering the gland from the renal artery",
+      "function": "It arises from the renal artery and supplies the lower part of the gland.",
+      "color": "#b02a32",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "glomerulosa_cell_cords",
+      "parent": "zona_glomerulosa",
+      "label": "Glomerulosa Cell Clusters",
+      "summary": "Rounded clusters and arches of cells (schematic)",
+      "function": "The cells of this outer zone lie in rounded clusters and arching columns just under the capsule. Drawn as arches far larger than real cells.",
+      "color": "#e8b050",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fasciculata_cell_cords",
+      "parent": "zona_fasciculata",
+      "label": "Fasciculata Cell Cords",
+      "summary": "Long straight columns of cells (schematic)",
+      "function": "The cells of the thick middle zone lie in long straight columns running from capsule towards medulla, with blood channels between. Drawn far thicker than real columns.",
+      "color": "#e58a45",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "reticularis_cell_cords",
+      "parent": "zona_reticularis",
+      "label": "Reticularis Cell Network",
+      "summary": "A meshwork of short joined cords (schematic)",
+      "function": "The cells of the inner zone form a branching, interconnected network of cords next to the medulla. Drawn far thicker than real cords.",
+      "color": "#c46a50",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

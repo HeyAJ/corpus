@@ -598,3 +598,777 @@ secretion is solved for.
 inflammatory stimulus: cortisol's anti-inflammatory effect was applied symmetrically, so
 every afternoon a resting body ran a low fever, sweated, leaked plasma and was
 tachycardic by 21:00. Suppression by excess is now applied only above baseline.
+
+---
+
+## ADR-028 — Organ interiors are data-driven atlases, and walls are glass
+
+Selecting an organ used to show a shell with telemetry beside it. Every organ now has an
+interior, and there are thirty of them, so a per-organ bespoke pipeline was never an option.
+
+**The decision.** One atlas per organ (`src/data/anatomy/<atlas>.json`), with the same
+fields everywhere: part id, label, summary, function, colour, a resting activity, a list of
+weighted drives and a source. Geometry and animation sit in two render files per atlas
+(`src/render/anatomy/atlas/<atlas>.parts.ts` builds the parts in a worker,
+`<atlas>.detail.ts` supplies the flow streams and the per-frame animation) and
+`OrganDetail.ts` shows them while the organ is selected. The Structures panel is generated
+from the same JSON, so the text a person reads and the part they see cannot disagree. The two
+kidneys share one atlas and so do the two adrenals; the uterus atlas is rebuilt per
+gestational week. Part geometry is procedural and illustrative.
+
+Any part with opacity below 0.98 is GLASS: it stops writing depth and is drawn after the
+solid parts. Walls, capsules, lobes and lumen-bearing tubes are glass, and what they
+contain is solid, so a chamber can be seen into and a stream seen inside it. Picking prefers
+the nearest solid part through glass. Neighbouring organs recede while one is selected.
+Stream particles are alpha-blended droplets, and arterial and venous colours come from one
+shared ramp (`detail/blood.ts`) so no organ draws its own.
+
+**Rejected.** Hand-writing each organ's panel: thirty copies of the same logic, each able
+to drift from the model. Additive-blended particles: they were invisible on the pale page.
+Depth-writing walls: they hid the very thing the interior exists to show. Traced anatomical
+meshes: the repository deliberately has no binary assets (see `CREDITS.md`), so the
+geometry is stated to be a drawing, and counts such as breast lobes or splenic follicles are
+schematic.
+
+## ADR-029 — Anatomy activity is a departure from the settled resting body
+
+Each part's activity is `clamp01(rest + sum(weight x signal))`. If the signals were
+absolute levels, a perfectly healthy resting body would light parts up, because a resting
+body is not a body with every quantity at zero.
+
+**The decision.** Signals are departures from the settled resting body. `captureAnatomyRest`
+records them once at the end of the engine warm-up (ADR-022), so a resting part sits at its
+JSON `rest` and anything above it means something happened. Cortisol is referenced to its
+circadian expectation for the clock hour, as the hormone drivers were in ADR-027. Some
+signals are legitimately non-zero at rest and are left so: night, bladder filling,
+ADH and dehydration in a body that has not drunk, and the menstrual-cycle state.
+`tests/sim/anatomy.test.ts` encodes this.
+
+**Rejected.** Absolute signals with a per-part fudge: it hides, rather than states, what the
+body is being compared with. Forcing every signal to zero at rest: it would erase real state
+(it is night; the bladder is filling). **The cost.** The reference is the boot-time body
+(male, 08:00), so a change of sex, a pregnancy or a cycle day reads its difference from that
+body as activity. This is recorded in `docs/MODEL_LIMITATIONS.md` section 17.
+
+## ADR-030 — The reproductive clock, `slowClockScale`, and a jump that is coherent
+
+A menstrual cycle is a month and a pregnancy is forty weeks. Watching either at real
+time is impossible, so `src/sim/systems/reproductive.ts` keeps a reproductive clock that
+`SET_REPRODUCTIVE_LAPSE` can run ahead of real time. Two things followed.
+
+**The kidney.** Renal acid-base compensation and creatinine run on a day-scale clock. A
+pregnancy that arrives in seconds with a kidney that notices in days is an incoherent body.
+`slowClockScale(s)` makes those clocks follow the reproductive clock in a female body, and
+runs them at 20000x for a catch-up window of 90 s after a jump. **The side effect, stated
+plainly:** a jump also corrects, at once, any metabolic acid-base disturbance that happened to
+be present. Related, the kidney's compensation is now referenced to the model's own resting
+PaCO2 (`resp.restingPaco2_mmHg`) rather than 40, because the 40-referenced version made a
+healthy resting body drift over simulated days, which the time-lapse made visible within
+seconds.
+
+**The jump.** Plasma expansion is paced over seconds, while vasodilation, venous capacity,
+the heart-rate trim and the renal vascular terms used to apply at once, so a jump to
+36 weeks presented hypotension, tachycardia and renal hypoperfusion for about a minute.
+The circulatory terms are now scaled by the plasma expansion actually realised, and drain
+with the volume after a pregnancy ends.
+
+**Rejected.** Running the day-scale clocks at real time (the body would be wrong for days of
+simulated time). Applying the catch-up factor permanently (it would break every
+non-reproductive scenario). Applying the pregnancy terms at their settled size from the first
+tick: that was the bug.
+
+## ADR-031 — The sexual response is fitted through the set point, venous tone and vasodilation, not a forced heart rate
+
+The cited response to orgasm raises systolic and diastolic pressure and heart rate
+together. The first calibration wrote heart rate directly, against a baroreflex that was
+trying to slow it; mean pressure then rose above the shifted set point and the excess landed
+in diastolic.
+
+**The decision.** The response reaches the body the way exercise does: a baroreflex
+set-point shift (`reflex.setpointShift`), sympathetic venous tone (`cardio.venousTone`), a
+FALL in systemic resistance, with the direct heart-rate gain kept small. The reflex then
+holds mean pressure at the shifted set point and supplies the tachycardia itself. At the
+start of orgasm, model against cited (dSBP / dDBP / dHR): male +21.1 / +18.0 / +21.2 against
++21.3 / +18.2 / +21.0, female +11.6 / +11.3 / +19.6 against +12.3 / +10.2 / +18.8.
+
+**Rejected.** Forcing the rate (diastolic too high). Vasodilation alone (heart rate above
+200). A more negative resistance or larger venous push to cure the remaining male diastolic
+error (about 12 mmHg high at the peak): it only moves heart rate out of the cited band, so
+the best fit is reported rather than forced. See `docs/MODEL_LIMITATIONS.md` sections 16
+and 17.
+
+## ADR-032 — The fetus is sized by an isometric rule from the cited weight, and is not shrunk silently
+
+The repository cites fetal WEIGHT by week and no fetal length. The fetus is therefore drawn
+at a linear scale of (W(w) / W(40))^(1/3): isometric scaling, a drawing rule derived from
+the cited weight and not a measured length. Before 10 weeks the weight table does not apply,
+so the fetus is held at the 10-week size rather than extrapolated. It is centred in the
+amniotic sac and clamped to the largest uniform scale at which it lies inside the sac. The
+scale asked for and the scale allowed are both kept, so the shortfall can be reported
+(`docs/MODEL_LIMITATIONS.md` section 17). The fetus stays at full density while the uterus
+is selected, because it is the uterus's content.
+
+**Rejected.** A term-sized fetus at every week: it hung out of a smaller uterus. Shrinking
+the fetus to fit without saying so. Inventing a length-by-week table that the data does not
+hold.
+
+## ADR-033 — Overlays and the brain scan are honest diagrams
+
+The nerve, hormone and scan displays are the easiest place to show a measurement that
+does not exist.
+
+**The decision.** Each is labelled for what it is. Nerve courses are derived from the vessel
+centrelines and are illustrative, and impulse speed is a display constant, not a conduction
+velocity; rate follows autonomic tone. Hormone arcs are a diagram, since hormones travel in
+the blood, and droplet rate follows level over resting level. The brain scan is a
+maximum-intensity projection of the activity index (ADR-029) through a thermal ramp, cool at
+rest and warm when active, captioned "activity index, not temperature", with nothing on the
+card in degrees. Hormones, Nerves and Vessels are three labelled switches, all off at start (a fourth, Activity, was added in ADR-035).
+
+**Rejected.** A ramp that reads as a temperature or BOLD signal: neither is simulated.
+Showing a conduction speed: none is modelled. Always-on overlays: they would bury the body.
+
+## ADR-034 — The fetal heart beats at a cited mean rate, replayed
+
+The fetal heart used to be drawn still because no cited rate was in the data. Three studies,
+each read on the retrieved source, now supply one.
+
+**The decision.** `fetalHeartRate(w)` in `src/sim/systems/reproductive.ts` returns null for a
+male body, a non-pregnant woman and gestational age under 10 weeks. From 10 to 14 weeks it is
+the straight line between the two Hyett (1996) means, 171 bpm at 10 weeks and 156 bpm at 14
+(6903 normal singleton pregnancies). From 14 to 20 weeks it is 156 plus Ursem's (1999) slope of
+-2.52 per week times the weeks since 14 (55 healthy women; the paper prints no unit, and weeks
+is the only reading that is physiologically possible). From 20 weeks it is the midpoint of the
+Pildner (2013) 95 percent confidence interval of the mean baseline rate for the band
+containing the week (13,015 cardiotocograph tracings); the paper prints the interval and not
+the mean, and the midpoint of a symmetric interval is the sample mean. The last band
+continues past 42 weeks. The result is a snapshot field, `fetalHeartRate_bpm`, shown in the
+Reproduction panel and as an FHR chip for the uterus and the fetus, and the fetal heart part
+pulses at it with a quick contraction and a slower filling, its phase accumulated from the
+rate so a change of rate never makes the beat jump. The amplitude is a display amplitude, not
+a wall motion. It is not on the effect bus, because nothing in the mother consumes it.
+
+**Why the 14-20 join is acceptable.** It is two cited numbers combined, labelled derived in the
+code. It reaches 140.88 bpm at 20 weeks, and the independent Pildner band that starts there has
+midpoint 141.348: they differ by less than 0.5 bpm, and a test asserts that they differ by
+less than 1. Two studies of different design that meet within that margin are better evidence
+than either alone.
+
+**Why nothing is shown below 10 weeks.** No source retrieved covers 9 to 10 weeks, and
+extending Hyett's line backwards would be an invented number. The fetus is drawn at its
+10-week size below 10 weeks (ADR-032) for the same reason.
+
+**Rejected.** Simulating a fetal circulation: nothing here would constrain it. Beat-to-beat
+variability or accelerations: no cited model of them is in the data. Putting the rate on the
+effect bus: the mother does not read it. A sine beat: a heart contracts faster than it fills.
+
+## ADR-035 — Organ colour is a pale tint, and Activity mode is one amber ramp
+
+The unselected organs were pink. `REST_TINT_MIX` was 0.84, so an organ's own hue was mixed
+almost completely into the page-coloured shell, and the body read as one pink mass in which the
+organs could not be told apart; the active tint, `ACTIVE_TINT_MIX`, was 0.5. Both are in
+`src/render/organs/OrganSet.ts`.
+
+**The decision.** The mixes are now 0.45 at rest and 0.2 when active. Three pairs were rendered
+before this was chosen: 0.6 and 0.3 was still pink, 0.45 and 0.2 kept each organ's identity
+without saturating, and 0.3 and 0.1 went muddy and lilac. A fourth overlay switch, **Activity**,
+is off at start. While it is on, every unselected shell takes its colour from ONE sequential
+amber ramp, indexed by the organ's eased engagement above its own rest
+(`snapshot.anatomy.organs[id]`, which is `clamp01(1.6 x max over parts of (activity - rest))`
+and was not changed). The ramp lives in `src/render/organs/activityRamp.ts` with no three.js
+import so that a test and the legend can read it: 0 is #f6ece0, 0.2 #f4d8b0, 0.4 #efbd78, 0.6
+#e29a3a, 0.8 #c0731a and 1 #8a4a0a. Density in Activity mode is 0.55 + 0.9 x activity, so an
+engaged organ is both darker and denser. The legend, then titled "Activity above rest" (it is now "Change from rest", ADR-044), carries the ramp bar
+and says in words that the colour is an index of how far each organ is from its own resting
+state, not a measurement.
+
+**Why one amber hue.** Red is already the alarm colour and the colour of arterial blood, and
+blue already means venous; a red or blue activity ramp would be read as a warning or as a
+vessel. A single hue also lets the eye rank organs by lightness alone. The ramp is a display
+choice, not a measured quantity.
+
+**Why tint and density, not glow.** The page is pale. An additive glow brightens toward white
+and therefore vanishes on it, which is the same reason the stream particles stopped being
+additive (see the anatomy notes in `CLAUDE.md`). Darkening a tint and raising the density of the
+multiply-blended absorption (ADR-002) is the direction in which a pale page can show a change.
+
+**Measured.** The liver's rendered centre luminance at activity 0, 0.25, 0.5, 0.75 and 1 was
+230.3, 212.2, 185.3, 154.9 and 126.7, strictly falling, so a darker organ always means a more
+engaged one.
+
+**Rejected.** A red-to-yellow thermal ramp (it reads as temperature and as an alarm; the brain
+scan already uses a thermal ramp and has to say it is not a temperature, ADR-033). Additive glow,
+for the reason above.
+
+## ADR-036 — The alarm pulse is a table from condition to organ, and an unlisted condition fails a test
+
+A condition that fires should be visible on the body as well as in the pills, but the body must
+not be lit by guesswork.
+
+**The decision.** `src/render/organs/alarmOrgans.ts` holds two explicit tables. `CONDITION_ORGANS`
+maps a condition to the organs that carry it: the heart for afib, arrest, asystole,
+bradycardia, pea, tachycardia, vfib and vt; both lungs for hypoxemia, hypercapnia and
+resp_depression; both kidneys for renal_failure; the brain for unconscious.
+`SYSTEMIC_CONDITIONS` lists the ones that belong to no single organ and therefore light none:
+hypovolemia, hypotension, hypertension, hypoglycemia, hyperglycemia, hyperkalemia, hypokalemia,
+lactic_acidosis, hyperthermia and hypothermia. (`oxygen`, `glucose` and `lactate` appear in
+`transport.ts` as blood-channel ids and are not conditions.) A warn or critical condition makes
+its organs pulse at about 1 Hz, mixing 0.75 toward `ALARM_HEX` (#c8433a, copied from
+`--severity-critical-bg`) with a density gain of 0.6; a `watch` condition never pulses, and
+under reduced motion the pulse is a steady 0.6. The 1 Hz is a display rhythm, not the heart rate,
+and a tachycardic heart does not pulse faster. `viewer.alarmOrgans` lists the organs pulsing now.
+
+**The guard.** `tests/render/activity.test.ts` reads `conditions.ts` and fails if a condition id
+is in neither table. A new condition therefore cannot ship silently unlit, and cannot be put on
+an organ without someone deciding that it belongs there.
+
+**Rejected.** Pulsing the whole body for a systemic
+condition: hypotension has no single organ, and a pulsing body would hide the one organ that
+is failing. Defaulting an unlisted condition to some organ: that is a plausible guess, and the house
+rule is that a documented absence beats one.
+
+## ADR-037 — The glass body outline is fitted to the model's own organs and vessels
+
+The organs float in empty space, and a visitor cannot tell which way up they are or where the
+body ends.
+
+**The decision.** `src/render/body/outlineModel.ts` is a pure signed-distance model built
+from THIS body: a loft of ellipses, one per 12 mm of height, fitted to the organ vertices and
+vessel centreline points (`organSamples.ts`), with the arms and legs as capsule chains along the
+subclavian and brachial and the femoral and popliteal centrelines, joined by a smooth union and
+checked by an enclosure guard that evaluates the field at every point it is meant to enclose
+(a 6 mm margin).
+`outlineMesh.ts` polygonises it (15k triangle cap, per-vertex fade), `BodyOutline.ts` owns the
+scene object, and `src/render/materials/BodyGlass.ts` draws it as a Fresnel-alpha ink. It is
+built in the geometry worker, rebuilt at most every 500 ms and one at a time, fades to 0.33
+while an organ is open and is never picked. Margins are display choices: 0.03 m of skin on the
+trunk, 0.014 m on the head and neck. In a pregnancy the abdomen follows the week only through
+the uterus model's own `gravidBody(weeks)`; no growth curve was added. The trunk loft ends at the
+pelvic floor; the external genitalia have their own blob; the thighs are separate capsule chains
+offset outward so that their outer edge meets the hip's; the legs fade over the lower half of the
+femoral centreline with a linear ramp.
+
+**Why fitted.** Typed-in body proportions would be a second description of the body that
+disagrees with the first one wherever the organ layout differs from them, and would then cut
+through organs. Fitting to the model's own geometry means the outline cannot contradict it, and
+the enclosure guard checks it (`tests/render/body-outline.test.ts`).
+
+**The floor shadow.** A contact shadow under the figure was tried and removed. A torso that
+dissolves at mid-thigh touches no floor, and the shadow read as a smudge about 4 cm below the
+fade.
+
+**Rejected.** A smoothstep leg fade: it was nearly flat at its top. The outline has no interface
+switch; it is always on.
+
+## ADR-038 — A readability contract: one type scale, ink tokens, WCAG AA, 44 px touch areas
+
+The interface had grown 16 to 18 different font sizes, text as small as 9 px rendering at 2:1
+contrast, and controls too small to tap. Each panel had been right locally.
+
+**The decision.** `src/ui/tokens.css` defines the contract. Seven type steps, `--text-xs` 11,
+`--text-sm` 12, `--text-md` 13, `--text-lg` 15, `--text-xl` 18, `--text-2xl` 24 and
+`--text-display` 32 px; the older `--size-chip/tag/label/body` point at them so there is one scale
+and not two. Ink tokens: `--ink` #141414, `--ink-mid` #4a4a4a, `--ink-dim` #595959 (it was
+#6e6e6e, which failed), `--ink-inverse` #fff for dark fills only, and the coloured inks
+`--ink-alarm` #a8322c, `--ink-warn` #8a5a00, `--ink-ok` #1f6b3a and `--ink-info` #1d5fa8.
+`--ink-faint` #a8a8a8 is for NON-TEXT only (hairlines, ticks), because it does not reach 4.5:1.
+An `--accent-*` is never used as text. Text meets WCAG AA, 4.5:1 on every light surface. Any
+tappable control has a 44 x 44 px effective area; where the drawn control is smaller, an
+invisible hit area supplies the rest. Hierarchy is carried by size and weight, not by paleness.
+The top readouts are one block drawn with a single `transform: scale(0.86)` at every width,
+because the phone's earlier 0.78 rendered 12 px text at 9.4 px; the smallest readout text is
+`--text-md`, which renders at 11.2 px. Panels share `PanelHeader.tsx` (title exactly as in the
+menu, an optional meta chip, a close button drawn at 32 px with a 44 x 44 hit area), and every
+selected chip, segment and tab is `--accent-selected` #c8433a (white on it 4.86:1). Blue is kept
+only where it means venous.
+
+**How it is measured.** A script walks 27 interface states and reports, for the phone (390 x
+844) and the desktop (1440 x 900), text rendered below 11 px, WCAG AA failures, distinct font
+sizes and touch areas under 44 x 44. Before: phone 125, 206, 18 and 57; desktop 196, 281 and 16
+sizes. After: 0, 0, 7 and 1 on the phone (the one touch offender, `.more` in the Structures panel, has since been given a 44 px invisible hit area), and 0, 0
+and 7 on the desktop. The Playwright layout checks (ADR-041) also fail on any covered control
+and any text painted over text.
+
+**The measurement had a false positive.** The first audit's Food tab reported 1.3:1 contrast.
+That was not a defect: under software WebGL on a loaded machine the sheet's 300 ms fade had not
+advanced, so the capture photographed it mid-fade. Both capture tools now wait for every finite
+CSS animation to finish before measuring (`settle` in `tests/e2e/helpers.ts`).
+
+**Rejected.** A per-panel size for each need (the cause of the 18 sizes). Making the faint ink
+darker: it exists so that hairlines can be quiet, and its rule is that text never uses it.
+Keeping 11 px for reference ranges, units, sources and the Structures summaries: it
+measured 10.8 to 10.9 px rendered, so they are `--text-sm`, 12 px.
+
+## ADR-039 — The slice plane: semantics, picking through the cut, and a cut-edge contour
+
+An organ's interior is easier to read in section, and a glass organ cut open shows nothing
+unless the cut is marked.
+
+**The decision.** `Viewer.setSlice(axis, depth)` with `axis` one of `'front'`, `'side'`, `'top'`
+or null and `depth` from 0 to 1. It applies to the selected organ's parts, streams and shell and
+never to the body outline, and it returns to null on any selection change. Depth 0 removes
+nothing, 0.5 passes through the centre of the organ's bounding sphere and 1 removes everything.
+`'front'` removes from the patient's front, a coronal section. `'side'` removes from scene +x,
+which is the patient's LEFT, because the body is mirrored in x; orbit to azimuth +90 degrees to
+face the cut. `'top'` removes from the top down; orbit over the top to face it. The plane is
+fixed when it is set, so a beating heart moves slightly against it. Picking ignores cut-away
+tissue: a click inside a cut kidney picks `renal_pelvis` or `renal_cortex`, not the part that
+was removed. Back faces of cut solid parts are drawn flat at 0.55 x the part's colour so that a
+hollow organ reads as hollow.
+
+**The cut-edge contour.** `src/render/materials/sliceCut.ts` patches each fragment shader: the
+original `main` becomes `cutMain`, and a wrapper redraws kept-side fragments that lie within
+`uCutEdge` of the plane at `SLICE_EDGE_DARKEN` 0.35 x their colour with alpha 1, for parts, walls
+and the organ shell; streams opt out. The width is the larger of `SLICE_EDGE_WIDTH` (1.2 percent of
+the organ's bounding radius) and `SLICE_EDGE_MIN_PX` (3 px at the framing distance), computed in
+`Viewer.setSlice`. A glass organ cut open needed this: its walls are drawn after the solids at
+low opacity, so the cut had no visible edge and the wall appeared to end for no reason. With the
+contour, the kidney's capsule and cortex boundary read as rings. The dither pass makes the
+contour dotted rather than solid; that is stated as a limitation.
+
+**Accepted costs.** The plane does not follow the heart, and the contour is dotted by the
+dither pass. Both are stated in `docs/MODEL_LIMITATIONS.md`.
+
+## ADR-040 — The drug database is loaded on demand, and fetched, not imported
+
+The entry chunk carried all 152 drugs although most visits never open the drug sheet.
+
+**The decision.** `src/ui/drugData.ts` holds `loadDrugData()`, one shared promise that is
+memoised on success only, `drugDataIfLoaded()` and `useDrugData(enabled)`, so a closed sheet
+loads nothing. The first engine snapshot arms a prefetch that runs 3 s later at browser idle
+(`requestIdleCallback`, 10 s timeout, a `setTimeout` fallback); boot never waits for it. The
+sheet shows "Loading the drug list..." while it waits and "The drug list could not be loaded"
+with a Retry button on failure. `causeOf` in `explanations.ts` reads the loaded map and skips
+the drug-group step if it is absent; the invariant, kept in a comment, is that a drug can only be
+in the blood after the sheet or a scenario has loaded the data, so `causeOf` stays synchronous.
+`resolveIntents(sc)` in `scenarios.ts` awaits the loader, and the Body panel's `runScenario`
+awaits it before RESET. The simulation worker still bundles all 152 drugs.
+
+**Measured.** The main script went from 1,764.63 kB (346 kB gzip) to 867.22 kB (255.69 kB gzip).
+The data is its own file, `drugs-<hash>.json`, 1,178.84 kB (103.36 kB gzip), served as
+application/json with the COOP and COEP headers.
+
+**Why fetch and not `import()`.** The first version was a dynamic `import()` and it worked until a
+download failed. After one failed download Retry did nothing, because Chromium caches a failed
+dynamic import of a module and returns the same rejection. The data is now
+`import drugsUrl from '../data/drugs.json?url'` and a `fetch`, which is not cached on failure.
+Anything that must be retryable is fetched. The orchestrator reproduced it by failing the download
+once and pressing Retry, and the list then appeared.
+
+**Rejected.** Leaving it in the entry chunk (the size above). Importing it dynamically (the
+cached failure). `tests/sim/scenarios.test.ts` stubs `fetch` to read `src/data/drugs.json` from disk,
+because the asset URL does not exist under node.
+
+## ADR-041 — CI is split into shards, and the built app is tested in a browser under software GL
+
+One CI job ran the whole suite in about 36 minutes, and no test ever loaded the production build.
+A page that was blank while `tsc` was clean has happened before (see the Vite cache trap in
+`CLAUDE.md`).
+
+**The decision.** `.github/workflows/ci.yml` has three jobs. `verify` runs npm ci, lint,
+typecheck, build, the ingest idempotence check and the placeholder triangle budget. `test` is a
+six-way matrix running `npm test -- --shard=N/6` with `fail-fast: false`; Vitest assigns each file
+to a shard by a hash of its path, so a new test file is always picked up. `e2e` installs
+Chromium, builds, runs `npm run e2e`, and uploads `playwright-report/` and `test-results/` for
+7 days on failure. A run takes about 15 minutes end to end (the slowest shard was 14), against
+about 36. To make the shards balance, `tests/sim/nutrition.test.ts` (45 simulated hours, about
+19 minutes on one runner) was split into `nutrition-glycaemic`, `nutrition-absorption`,
+`nutrition-ethanol` and `nutrition-caffeine` test files with shared helpers in
+`nutrition-helpers.ts`: 11 tests and 21 assertions, moved verbatim.
+
+**The browser tests.** `playwright.config.ts` has a `desktop` project (1440 x 900) and a `phone`
+project (390 x 844, touch), Chromium with software-GL flags (`--use-gl=angle
+--use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`), 120 s per test, one
+retry and two workers on CI, and `vite preview` on port 4173. `@playwright/test` is pinned to
+1.63.0 to match the browser preinstalled in the cloud sandbox. The specs are `tests/e2e/*.spec.ts`
+(Vitest collects only `*.test.ts`, so neither runner sees the other's files): boot (title, banner,
+cross-origin isolation, no "degraded waveform transport", clean console), welcome (shown once),
+select, layout (no covered control, no text over text, over rest, the menu, panels, the drug sheet
+and a selected organ) and nogl (the fallback card). `settle()` in `helpers.ts` waits for every
+finite CSS animation first, because on a loaded runner a 300 ms fade was still at opacity 0
+after 1.5 s. Two local runs of the final code passed 9 tests with 1 skipped (nogl runs on the
+desktop project only), in about 4.4 minutes with one worker.
+
+**Why the production build.** The tests run against `vite preview`, so they see the built
+chunks and the COOP and COEP headers that the boot spec asserts; the dev server would not.
+
+## ADR-042 — A share link restores the body and the view, through a strict whitelist
+
+A visitor should be able to send someone the same body, looking at the same organ, and the
+address bar is the only thing both browsers share. It is also text that anyone can edit by hand
+and that a stranger can send, so every value in it is untrusted input to a simulation.
+
+**The decision.** `src/ui/shareLink.ts` is pure: `buildShareHash(state)` writes the link and
+`parseShareHash(hash, catalogue)` reads it. The format is
+`#v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=vessels,nerves,hormones,activity&cut=front:0.5`.
+The parser is a whitelist, and a value that fails its rule is dropped, never repaired:
+
+- `v` must be 1. Without `v=1` nothing at all is applied, so a link from a future format is
+  ignored instead of half understood.
+- `sex` is `male` or `female`.
+- `weeks` is an integer from 0 to `pregnancy.maxWeeks`, read from `reproduction.json` and not
+  typed again here, and only for a female body.
+- `organ` must exist in the catalogue of that body (a prostate in a female link is dropped), and
+  `part` must belong to that organ's atlas.
+- `layers` must be a subset of the four overlay names; one bad name drops the whole key.
+- `cut` is `axis:number` with the number in [0, 1].
+- Unknown keys are ignored, a duplicated key is dropped, any value longer than 64 characters is
+  dropped, and values are limited to a safe character set.
+
+A link is applied once the engine is ready, on load and again on `hashchange`, in this order:
+`SET_BODY`, then `SET_PREGNANCY` with the parsed numbers only, then the layers, the organ, the
+part and the cut. A field that is absent leaves that part of the view as it was. The welcome
+dialog still shows to a first-time visitor who arrives by a link, because the not-for-clinical-use
+notice must be read before anything. "Copy link to this view" sits at the end of the panels menu
+(the clipboard, with a read-only field as the fallback). The toasts say what a link is:
+"Link copied. It opens this body and this view, not what has happened to it." and "Link opened. It
+restores this body and this view, not what has happened to it."
+
+**A link restores the body and the view, never the history.** Drugs given and events are not in
+it. The toasts say so in words, so that two people opening the same link do not expect to see the
+same history. Nothing in a link can carry a dose.
+
+**Rejected.** Applying a link before the engine is ready: it is applied once the engine is ready, so
+its intents reach a running engine. A permissive parser that clamps a bad number: a clamped value is a
+body nobody asked for, and a dropped one leaves the visitor's own state. Encoding the whole
+snapshot: it would be long, and most of it is not the visitor's to set. `tests/ui/shareLink.test.ts`
+has 38 tests, 28 of them malformed inputs, and none throws.
+
+## ADR-043 — Search finds organs and structures, and Reset view appears only when the view has moved
+
+With 32 organs and 301 parts in the atlases (the count when this was decided; the 2026-11-22 round, ADR-045, took the atlas files to 963 entries), finding the renal medulla meant opening the kidney
+and scrolling.
+
+**The decision.** `src/ui/search.ts` is pure and builds a catalogue of the organs and parts THIS
+body has, because sex and pregnancy decide which exist. Paired organs list a part once per side
+("Medullary Pyramids, left kidney"). Ranking is label prefix, then word start, then substring; on
+a tie an organ comes before a part; at most 8 results; matching ignores case and accents
+(`tests/ui/search.test.ts`, 8 tests). `SearchBox.tsx`, "Find an organ or structure", is at the
+top of the panels menu and its results replace the list while it has text. Arrows move, Enter
+opens the highlighted result, Escape clears the text and a second Escape closes the menu.
+Choosing a part selects its organ, then the part, then flies the camera to it
+(`viewer.focusPart`) once `viewer.interiorReady`; `App` re-applies the part because selecting an
+organ clears the picked part.
+
+**Reset view.** `ResetViewButton.tsx` is a pill shown only while `viewer.viewAtHome` is false
+(store `viewAtHome`, fed by `viewer.onViewChanged`), so it appears when the camera has been moved
+and offers the way back, and is absent when there is nothing to reset. On a phone it is hidden
+while a sheet or the menu is open; on a wide screen it stays visible beside an open sheet.
+
+**Hover.** A mouse hover sets the store's `hoveredOrgan` (from `viewer.onHoverChanged`) and the
+canvas cursor becomes a pointer. A separate name tag beside the pointer was built and removed:
+the viewer already draws the hovered organ's name as its big label, and the two names sat side
+by side.
+
+**Rejected.** Searching only the organ names (the parts are the reason to search). Showing the
+Reset view pill always (it would be a control that does nothing at rest). A second name tag, for
+the reason above.
+
+## ADR-044 — Activity is diverging: suppression is shown in teal, from a second index
+
+The Activity switch of ADR-035 colours an organ by how far it has risen above its own rest.
+Testing found the stomach never rose above 0.05 in fright, exertion, a 2 L bleed or cardiac
+arrest, and the model's limitations page recorded that as unexplained. It was explained once
+looked at: every response the stomach and bowel have to stress is a decrease (sympathetic
+inhibition, vagal withdrawal), and `organs[id]` counted only rises. The display was deaf to half
+of physiology, and a viewer watching a bleed saw the gut stay pale while it was being shut down.
+
+**The decision.** `snapshot.anatomy.organsBelow[id]` is a second index,
+`clamp01(1.6 x max over parts of (rest - activity))`, computed beside `organs[id]` in
+`src/sim/derive/anatomy.ts` and typed in `src/bridge/types.ts`; `organs` is unchanged. Above rest
+the shell keeps the amber `ACTIVITY_RAMP`; below rest it takes the teal `ACTIVITY_RAMP_BELOW`
+in `activityRamp.ts` (t 0, .2, .4, .6, .8, 1 = #f6ece0, #cde6dc, #9dd0c4, #5fb2a7, #2a8680,
+#0f5855). The two ramps share the pale at-rest stop, so a resting organ is the same colour
+either way and the two arms leave it in opposite directions. `OrganSet.setActivityBelow` takes
+the suppression arm and an organ shows its LARGER departure, because an organ can have parts
+both above and below rest (in arrest the brain reads 0.44 up and 0.47 down). The legend is
+titled "Change from rest" and is labelled "suppressed", "at rest", "engaged"; it still says it is
+an index and not a measurement. Rendered liver luminance falls strictly with the index on both
+arms (engaged 219.2, 194.5, 162.9, 128.3, 100.4; suppressed 221.5, 196.7, 160.2, 124.0, 98.0 at
+0, .25, .5, .75, 1), so the eye can still rank by lightness.
+
+**The gut needed drives to suppress.** Its parts had no negative drive, so there was nothing to
+show. Stomach body and antrum got a `sympathetic` weight of -0.3, and the small-bowel and
+colonic parts -0.2, source `GH14`. These are display weights, not measured gains: at -0.2 the
+stomach in exertion stayed below the 0.15 visibility threshold, which is why it is -0.3. Measured
+after the change (departures over 0.15): fright, stomach 0.40, small bowel 0.35, large bowel
+0.32; exertion, stomach 0.17; a 2 L bleed, stomach and kidneys 0.40; arrest, stomach 0.36 and
+kidneys 0.40. At rest every `organsBelow` is under 0.05.
+
+**Why teal.** Red is the alarm and arterial colour and blue means venous (ADR-035), so a cold
+colour for "less" that is blue would read as a vein. Teal is neither, is far from amber in hue,
+and the two arms stay distinguishable to a viewer who cannot tell hues apart because the
+below-rest arm also darkens.
+
+**Why a twin index and not one signed number.** A signed index would cancel inside an organ with
+parts moving both ways, and would show an organ whose parts rose and fell as at rest, the
+opposite of a departure. Two non-negative indices keep `organs` meaning what every existing
+reader, test and the alarm logic took it to mean.
+
+**Rejected.** Raising the stomach's rest value so a fall reads as a rise (it would break the
+"a resting part sits at its JSON rest" contract of the atlases). Making the stomach respond by
+inventing an excitatory drive (rule 1: a decrease is what the physiology says). A blue
+below-rest ramp (above). Raising the gain on the existing index so a small rise shows (the
+stomach had no rise to amplify).
+
+## ADR-045 — Structures within structures: a `parent` field, a depth of three, and a reveal rule
+
+Textbook depth means the papillary muscles inside the left ventricle, the nephron inside the
+kidney and the lobule inside the liver. Drawn all at once they hide each other and cost too many
+triangles; the atlases (one flat list of parts per organ) had no way to say "inside".
+
+**The decision.** A part has an optional `parent`, another part id in the same atlas, and
+`MAX_PART_DEPTH = 3` in `src/data/anatomy-types.ts` caps the chain. Where a real hierarchy is
+deeper it is flattened to siblings: airway generations are siblings under `bronchial_tree`,
+alveolar cells sit under the alveolar sac, and breast TDLU, alveoli and myoepithelial cells are
+siblings under `breast_lobule`. The atlases grew from a few hundred parts to 963 entries; the heart
+17 to 52, the brain 21 to 137.
+
+**The reveal rule** is the pure `src/render/anatomy/detail/reveal.ts`. A child is visible when the
+selected or flown-to part is its parent, an ancestor, itself or a sibling, or when the camera is
+near the parent: within `max(0.13 m, min(6.5 x parent radius, 3.5 x organ radius))`, constants
+measured at 1280 x 860 where the rig frames the left ventricle at about 9 radii. A level-3 child
+also needs its parent shown. Children fade in over 0.35 s and out over 0.25 s (instant under
+reduced motion), the parent's glass drops 55 % while its children show, hidden children are
+neither picked nor labelled, a child with no drives shows its parent's activity, and children ride
+their parent's pose. These are display constants.
+
+**What went wrong, twice.** (1) The proximity floor was an ABSOLUTE distance. The systematic
+probe (every organ opened, expecting no child shown) passed 31 of 32 and failed the right
+adrenal: the rig frames a small organ so closely (0.119 m) that opening it already sat inside the
+0.13 m floor, and all nine children appeared at once (the left, at 0.135 m, did not). The fix is
+the organ-relative `zoomedIn`: proximity also requires the camera to be closer to the open
+organ's centre than `REVEAL_ZOOM_FRACTION` 0.75 x the distance the rig framed it at on open
+(`rig.framingDistance`, passed by `Viewer` each frame). Re-run 32 of 32. (2) Focusing deep inside
+an organ still revealed OTHER parents' children by proximity: a thalamus focus showed 55 children
+instead of 5, and a mitral focus revealed the pericardium's three closed shells, washing the view
+pink. A focused part now narrows proximity reveal to its own descendants.
+
+**The panel and search.** The Structures panel is a tree (`src/ui/anatomyTree.ts`,
+`AnatomyPanel.tsx`) with a count, a disclosure and indentation; selecting a parent selects it,
+flies to it and unfolds it. Search and share links include children, and a search result's
+subtitle names its parents so it is clear where a part sits.
+
+**Triangle guideline.** An organ may grow to about twice its previous triangle count and no more,
+so that a deepened organ does not cost the renderer an unbounded amount more; the figure is a guideline chosen in this round, not a measured budget. The heart (24,276 before) is guarded by a test;
+the brain went 39,922 to 79,594 against a ceiling of 79,844, the kidney is 2.01x with perirenal
+fat and renal fascia drawn as single closed surfaces to hold it, and the eyes are about 0.5 % over
+after the sclera and retina caps were thinned.
+
+**Rejected.** Revealing children only on selection (a visitor who zooms by hand would never find
+them). Revealing by camera distance alone (the adrenal bug). An absolute floor with a smaller
+number (it moves the failure to the next small organ). Unlimited depth (the cell-level chains are
+schematic anyway, and the panel tree becomes unreadable). Showing all children always (the
+structures hide each other and the count rises past the triangle budget).
+
+## ADR-046 — Close-look legibility: particles are capped in pixels, and what is not in focus recedes
+
+Zoomed to a mitral valve, the stream and vessel particles became huge red rings that hid the
+cusps. The children were also faint behind glass shells and the forced vessel overlay.
+
+**The decision.** The cause was world-sized particles: a droplet sized in metres grows without
+limit as the camera comes close. Organ-stream droplets (`FlowField.ts`) are now capped at
+`MAX_POINT_PX` 14 px and vessel-overlay particles (`VascularSystem.ts`) at
+`MAX_VESSEL_POINT_PX` 12 px, and both fade out between 0.07 m and 0.03 m from the camera. In a
+**close look** (`reveal.ts` `isCloseLook`: the selected or focused part has children or is a
+child; the amount is eased over `FOCUS_EASE_S` 0.15 and instant under reduced motion) non-family
+and non-ancestor parts go to faint glass without depth write (`FOCUS_FAINT_OPACITY` 0.12), the
+focused parent thins (`FOCUS_PARENT_GLASS_DROP` 0.8), organ streams fall to
+`FOCUS_STREAM_FRACTION` 0.3, the vessel overlay is thinned inside 1.15 x the organ radius
+(`setFocusDim`, `FOCUS_OVERLAY_DIM` 0.85), an ancestor dims to `FOCUS_ANCESTOR_OPACITY` 0.25, and
+the neighbours' recede density and rim are cut by `CLOSE_LOOK_RECEDE_CUT` 0.75 while the open
+organ's own glass shell is cut by `CLOSE_LOOK_SHELL_CUT` 0.85 (`OrganSet.closeLook`). Parts below
+`PICK_MIN_OPACITY` 0.05 are not picked. `focusPart` frames the part with its descendants
+(`familySphere`) and the rig never comes nearer than `FOCUS_MIN_RADII` 4 x that radius
+(`OrbitRig.ts`), a framing floor so that a small part is not approached to the point where its
+children fill the lens. Every one of these is a display constant.
+
+**What it achieved, and what it did not.** A left ventricle focus shows its papillary muscles and
+chordae without a cut and a mitral focus has no particle rings with a crisp annulus. The mitral
+leaflets, however, are thin and faint in their open pose behind a remaining pink wash: partly
+legible, not clearly so. That is recorded as a limit, not as fixed.
+
+**Rejected.** Hiding the particles entirely in a close look (a part with a stream, such as a
+valve, then looks dead). A smaller world size for every particle (they would vanish at the
+framing the rest of the interface is calibrated to). Cutting the neighbours altogether (the
+visitor loses where they are).
+
+## ADR-047 — The textbook-depth content standard
+
+Deepening 31 atlases to textbook level is a large amount of anatomy to draw, and the greatest
+risk in it is the one rule 1 exists for: a plausible number that is not a number anyone measured.
+
+**The decision.** Structure and naming come chiefly from the two reference texts cited in the atlases,
+`GRAYS42` (Gray's Anatomy, 42nd edition) and `GH14` (Guyton and Hall, 14th edition), and every
+new part carries a source. No number appears unless it is cited: counts of glands, villi,
+cavernous spaces, follicles, lobules, alveoli and the like are layout choices (stated as
+"schematic counts"), layer depths and radii are drawing proportions, and a cell-level part is a
+magnified single example, never a map. A part that is a schematic is labelled as one in the
+atlas, and `docs/MODEL_LIMITATIONS.md` section 19 says so per group. A display rhythm (the cilia
+sweep, the aqueous circuit) is a display rate.
+
+**OpenStax is excluded.** Its anatomy and physiology texts are licensed CC BY-NC-SA and its terms
+forbid ingestion into AI systems without permission. Its licence is non-commercial and share-alike and its terms forbid ingestion into AI systems without permission, so it was not used as a source, even for naming.
+
+**Rejected.** Typing in textbook dimensions for the sake of realism (rule 1; a plausible figure
+without a source is worse than a drawing proportion plainly called one). Leaving the cell-level
+parts out (the depth is the point). Calling the schematics anatomy (a visitor could read a bead
+scatter as a count of cells).
+
+## ADR-048 — Layer organs, and one Layers control
+
+Ten organs were to be added, five of them the skeleton (about 46,800 triangles of shells alone, and
+far more in their interiors). The default load was already close to its triangle budget (218,172
+of 240,000 before this round), and most visitors never look at a bone. The four overlay switches
+in the bottom-left corner were also already reaching mid-abdomen over the body at 390 px, and a
+fifth would have covered more of it.
+
+**The decision.** An organ may carry `layer: 'bones'` in `organs.json`. The rule, in the pure
+`src/render/organs/layers.ts` (`layerOrganVisible`, `layerBuildNeeded`): a layer organ is drawn
+and picked while its layer is on OR it is itself the selected organ; it is built lazily the first
+time it is needed and cached; selecting one never changes the layer flag, so deselecting hides it
+again; and if the selected organ is not yet built, its camera flight and interior wait for the
+geometry (`openPending`). Layer organs do not count against the default `TOTAL_BUDGET` 240,000;
+bones have their own `LAYER_BUDGET` 60,000 and per-organ entries (lower limb 16,000, upper limb
+12,000), all load and performance choices. They are excluded from the glass body-outline fit,
+because that outline is built in a worker from the default organs and must not change when a
+visitor switches Bones on; a bone that would otherwise poke through the glass is held in by a
+landmark sample (`organSamples.ts`). One **Layers** control (a chip with a count of layers on)
+replaces the four corner switches and adds Bones: an anchored popover with rows Bones, Vessels,
+Nerves, Hormones, Activity, each with a one-line description, closing on an outside press, Escape
+or a panel opening. It is deliberately outside `openOnly` (a layer is not a panel, and a visitor
+must be able to leave Vessels on while a sheet is open). Each row keeps its old accessible name
+and `aria-pressed`. The popover is 320 px wide (display).
+
+**What went wrong on the way.** `BONE_DENSITY` 0.42 was set on the stub bones to keep organs
+legible. Once the real skeleton existed, its thin rib tubes and single limb shafts read as faint
+ivory lines at 0.42 (pelvis and arms barely visible), so it is now 0.62, which keeps lungs, heart,
+liver and bowel legible through the rib cage while the skeleton reads at a glance (front and side
+views checked).
+
+**Rejected.** Building the skeleton at start like every other organ (it would have spent the load
+budget on something most visitors do not open). A fifth corner switch (it covered the body). A
+Layers sheet that joins the one-panel rule (turning a layer on would close the panel the visitor
+was reading). Fitting the glass outline to the bones once built (the silhouette would change under
+the visitor's hand, and the fit would wait on a lazy build).
+
+## ADR-049 — Head-and-neck organs are ordinary organs, and say what they do not simulate
+
+Mouth, salivary glands, pharynx, nasal cavity and ears had no organ. Giving them organs makes the
+swallow, the breath, saliva and vertigo something to look at; it also invites the reading that
+taste, hearing and balance are simulated.
+
+**The decision.** They are ordinary default-load organs with the textbook-depth standard of
+ADR-047 (parts of 14, 10, 16, 24 and 26 at level 1, with 55, 17, 16, 14 and 35 children). What is
+driven is stated, and nothing else is: the swallow gesture plays once on the rising edge of the
+engine's `swallowing` signal (a display gesture; its timing is not simulated); vomiting drives
+only the soft palate (Guyton: it lifts to close the posterior nares); saliva droplets follow
+parasympathetic drive, with a small sympathetic weight of 0.08 (Guyton: a small, thick
+secretion); nasal and pharynx airflow follow the breath; and the vestibular apparatus follows
+`vertigo`, the engine's pathology state. **Why vertigo is the right drive:** vertigo is the
+vestibular system reporting a movement that is not happening (GH14), so the part that reports
+movement is the part that lights, at a weight (0.4) that is a display choice. Mucus flow and the
+cilia sweep run at a fixed display rhythm, since clearance is not simulated. Hearing, balance,
+taste, smell and chewing are stated as not simulated in `docs/MODEL_LIMITATIONS.md` section 20.
+Magnified schematics (taste bud, tooth section, acinus, tonsil section, hair cells, otoconia) are
+drawn as enlarged samples, never as counts. The ears have no auricle: it would have pulled the
+glass head outward, because the glass is fitted to organ shells.
+
+**What went wrong.** The pharynx panel first said the swallow is not simulated while the organ
+drew one; the copy now says the swallow is a display gesture on the engine's signal. The pharynx
+spans the cranial band, so it carries an `axialWarp` like the oesophagus; its first anchor at the
+oesophagus join pinned it while the vertebral stub intruded 4.5 to 17 mm.
+
+**Rejected.** A drive on the ears from heart rate or posture (nothing cited ties them). A
+sympathetic drive on the nasal mucosa (no citation was found). Leaving the organs as labels on
+the head (nothing for a swallow or a vertigo state to act on).
+
+## ADR-050 — The skeleton is five regional organs, stacked, warped and contained
+
+**The decision.** The skeleton is five layer organs (ADR-048), not one: skull (65 parts), vertebral
+column (64), rib cage (25), shoulder and arm bones (32), hip and thigh bones (66). The ribs and the
+spine need the same exploded view as the viscera, each region wants its own camera framing and
+Structures tree, and one organ of about 250 parts would have been neither pickable nor
+budgetable (each region has its own triangle entry). The vertebral column is an exploded stack:
+each of the 24 vertebrae is a rigid piece, tilted to the cord tangent (capped at slope 0.5,
+`MAX_TILT_SLOPE`, because a 45 degree tilt put C2 back in the pharynx) and shifted by the warp
+offset at its centre, with discs opening the gaps; the sacrum follows the continuous warp.
+**Containment rules**, each measured: the brain lies inside the cranial cavity (worst 0.5 mm), the
+eyes inside the orbit cones (worst 1 mm), the cord inside the canal at every level, the lungs and
+heart inside the rib cage (closest right lung 7.7 mm, heart 13.7 mm), the scapula standing off
+the ribs (`SCAPULA_STANDOFF` 0.0135), and every bone inside the glass outline (worst bone vertex
+2.4 to 10.8 mm inside across both sexes, after the landmark samples of ADR-048). **Red marrow**
+is the only live part: `epo` drives it (weight 0.6, rest 0.25) at the sites Guyton and Hall name,
+the membranous bones (vertebrae, sternum, ribs, ilia) and the proximal humeri, the exception to
+long-bone marrow turning fatty after about 20; this body ends at the knee, so the tibiae are not
+drawn. The skull has no marrow part (the texts do not name it; that is silence, not a claim).
+Calcium handling and remodelling are not simulated. Rib movement with `resp.inflation`, the skull
+wall (`SKULL_WALL` 0.0065), the bone tissue in the right femur (magnified, cortex thicker than
+real) and the enlarged vertebra are display choices.
+
+**Rejected.** One skeleton organ (above). Marrow in every long bone (against GH14 for an adult).
+A calcium or remodelling model (no sourced magnitudes in this project). Fitting bones loosely
+inside the glass without measuring (the occiput stood 9.9 mm outside the glass until it got a
+landmark sample).
+
+## ADR-051 — The neck is reconciled by moving the cervical cord back
+
+Bones exposed what the soft organs had hidden: the model's neck was too shallow front to back.
+`SPINAL_CORD_PATH` ran the cervical cord at z -0.026 to -0.05 against an oesophagus back wall at
+-0.029, leaving no room for vertebral bodies, and C1 to C7 overlapped the oesophagus and pharynx
+by 5 to 14.7 mm (worst C3).
+
+**The decision.** Move the cervical cord path back about 3.5 cm (the points now run from z -0.0255
+at y 0.39 to -0.0655 at y 0.29, unchanged from y 0.22 down), and let every dependant follow. The
+path moved to `src/render/anatomy/paths.ts` (it had to leave `models.ts` to break an import cycle
+with the vertebral column; `models.ts` re-exports it). The 4 mm clamp on the vertebral body depth
+was removed. `bodyFrontAt(y)` gives the front of the bodies; the **pharynx is re-anchored** to it
+(its back wall `RETRO_GAP` 4 mm in front, blending above y 0.384 to a skull-base anchor so it does
+not ride back with the spine); the oesophagus's extra top point was dropped (it put oesophagus
+vertices inside the trachea) and the pharynx takes over above y 0.352. The three **cervical
+sympathetic ganglia**, which had been placed at a fixed offset behind the cord (cordZ + 0.036,
+0.032, 0.028) and so followed it back into the pharynx, are anchored to the bone instead,
+`bodyFrontAt(y) - 0.004`, now 8.0 mm behind the pharynx. Measured after: oesophagus clearance 2.6
+mm at C2 rising to 11.2 mm at T3, pharynx 2.2 to 5.2 mm at C1 to C3, cord within the canal at every
+level, no trachea or oesophagus vertex inside the other.
+
+**Rejected.** Moving the anterior neck forward (the trachea, thyroid, oesophagus and the glass
+all hang from it, so every one of them would have to move and be re-checked). Accepting the
+overlap (bone through the airway is not a limitation to put in a limitations file; it reads as a
+bug). Shrinking the vertebral bodies (that hides the fault, and the cord would still pass through
+the oesophagus wall).
+
+**What it cost.** The upper-neck cord path is now steep, because the brain atlas's brainstem sits
+far forward (medulla axis 13.8 degrees from vertical, the next cord segments 52.4 and 42.0), and
+the pharynx is squeezed to about 4 mm front to back at C2. Both are limitations in section 20.
+
+## ADR-052 — The ears are placed by Gray's landmarks
+
+The scaffold put the ears at the eyes' height (scene y 0.446) while the brain floor beside them
+is at 0.436 to 0.439, so the inner ear sat 4.8 to 19.4 mm inside the brain shell.
+
+**The decision.** Place them by the landmarks of Gray's Anatomy: on the Frankfort horizontal the
+top of the external acoustic meatus (porion) is level with the lowest point of the infraorbital
+margin (orbitale), and the pharyngotympanic tube runs anteromedially and downward. The ears
+organ moved 24 mm down (y 0.386 to 0.362); the tube descends monotonically 15 mm; the lateral
+canal and the endolymphatic duct and sac moved forward and down to clear the cerebellar floor;
+the skull's meatus is a bony canal on the canal axis with a temporal-bone mass round it
+(`TEMPORAL_EAR_MASS`, a drawing choice; the skull surface had stopped 22 mm short of the canal).
+Measured: the inner ear is outside the brain shell (worst +1.25 mm, the vestibular apparatus),
+porion within 1.3 mm of orbitale, the tube opening level with the posterior end of the inferior
+concha.
+
+**The jaw and parotid had to follow.** Moving the ears put the canal through the mandible's
+condyle and ramus, and left the parotid about 24 mm above the ear. Gray's puts the condyle in the
+fossa in front of the meatus with the tympanic plate between, so the joint was rebuilt as a stack
+(condyle, disc, fossa roof; the fossa had been a cup under the condyle) and the condyle moved from
+z -15.5 to +5.5 mm (`CONDYLE_Z`; condyle 16.7 mm anterior to the meatus, canal clearing the mandible
+by 2.9 mm). The parotid (superficial, deep and bridge lobes) lies below the meatus wrapping the
+ramus; its top is 3.7 mm below the canal axis on purpose, because any higher cuts the canal's lower
+wall. Its duct ends opposite the upper second molar crown, and the facial nerve leaves through
+`STYLOMASTOID_FORAMEN`, 4.6 mm from styloid and mastoid.
+
+**Rejected.** Pushing the brain shell up (it is the reference for the cranial cavity and the
+skull). Shrinking the inner ear to fit (the vestibular envelope was reduced only where the
+landmarks called for it). Leaving the overlap as a limitation (the cause was a placement error,
+not a modelling limit).

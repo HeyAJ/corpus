@@ -1,0 +1,573 @@
+{
+  "atlas": "oesophagus",
+  "about": "The inside of the oesophagus, drawn as anatomy: the upper and lower oesophageal sphincters, the wall in its cervical, thoracic and abdominal segments, the mucosal lining, the muscular coat, the lumen, and the vagal plexus on the surface. A swallowed bolus is shown carried down the lumen at the position the engine reports for the food or drink in the oesophagus, and the stream runs backwards while the simulator reports vomiting. It leaves out the submucosal glands, the real thickness of each layer, the crural fibres around the lower sphincter and the individual nerve branches. Activity bars are display indices, not measurements. Its wall is drawn layer by layer, each layer holding finer structures (glands, nerve plexuses, muscle types) that appear when you select it or zoom in; the narrowings and the Z-line are marked by rings. Layer thicknesses and the heights of the narrowings are drawing proportions, not measurements.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "upper_sphincter",
+      "label": "Upper Oesophageal Sphincter",
+      "summary": "Muscular ring at the top that opens to let a swallowed bolus in",
+      "function": "The upper oesophageal sphincter is a ring of striated muscle at the junction of the pharynx and the oesophagus. It stays closed between swallows, which keeps air out of the oesophagus, and relaxes for an instant as the swallowed bolus arrives. It brightens while something is being swallowed and during vomiting.",
+      "color": "#c0485a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "It opens as the bolus is passed from the pharynx.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.3,
+          "note": "It opens as stomach contents are expelled.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cervical_segment",
+      "label": "Cervical Oesophagus",
+      "summary": "The short top segment, in the neck, behind the trachea",
+      "function": "The cervical oesophagus is the first segment, lying in the neck behind the trachea. Its muscle is striated, so its contraction is under the swallowing centre of the brainstem. It brightens as a bolus passes.",
+      "color": "#d98c7a",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "The bolus passes through this segment first.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.2,
+          "note": "Expelled contents pass back through it.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thoracic_segment",
+      "label": "Thoracic Oesophagus",
+      "summary": "The longest segment, running down through the chest behind the heart",
+      "function": "The thoracic oesophagus is the longest segment. It runs through the chest behind the trachea and the heart and passes through the diaphragm at the oesophageal hiatus. Its wall changes from striated to smooth muscle as it descends. It brightens as a bolus passes.",
+      "color": "#d27a6c",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "The bolus is carried through this segment by peristalsis.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.2,
+          "note": "Expelled contents pass back through it.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "abdominal_segment",
+      "label": "Abdominal Oesophagus",
+      "summary": "A very short length below the diaphragm, joining the stomach",
+      "function": "The abdominal oesophagus is the short last segment below the diaphragm, which ends at the stomach. It brightens as a bolus passes and as the stomach is filled.",
+      "color": "#c86d68",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.4,
+          "note": "The bolus reaches this segment last.",
+          "source": "GH14"
+        },
+        {
+          "signal": "gastricFill",
+          "weight": 0.15,
+          "note": "A filled stomach presses on the segment that joins it.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mucosa",
+      "label": "Mucosa",
+      "summary": "Stratified squamous lining that protects against the passing bolus",
+      "function": "The mucosa is the lining of the oesophagus. It is a tough stratified squamous epithelium that resists abrasion by food, and it is kept moist and lubricated with mucus. It brightens while something is swallowed and during vomiting, when acid from the stomach reaches it.",
+      "color": "#e8a0a4",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The bolus touches the lining as it passes.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.3,
+          "note": "Vomited contents pass over the lining.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscularis",
+      "label": "Muscular Coat",
+      "summary": "Circular and longitudinal muscle: striated above, smooth below",
+      "function": "The muscular coat has an inner circular and an outer longitudinal layer. In the upper part of the oesophagus the muscle is striated, in the lower part it is smooth, and the two overlap in between. A wave of contraction, primary peristalsis, follows each swallow and pushes the bolus down. It brightens while something is being swallowed and when vagal outflow is high.",
+      "color": "#b5555a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "Peristalsis follows each swallow.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.2,
+          "note": "The vagus carries the motor signals that drive the wave.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.2,
+          "note": "The coat is active when contents are expelled.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lumen",
+      "label": "Lumen",
+      "summary": "The channel the bolus travels in; collapsed when empty",
+      "function": "The lumen is the channel inside the oesophagus. When nothing is passing it is collapsed, and it is opened by the arrival of the bolus. In this simulator the swallowed bolus is shown as a stream of particles in the lumen, at the position the engine reports, and it runs backwards during vomiting.",
+      "color": "#f0c8a0",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.6,
+          "note": "The lumen opens and fills as a bolus travels in it.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.3,
+          "note": "Expelled contents travel back up it.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lower_sphincter",
+      "label": "Lower Oesophageal Sphincter",
+      "summary": "Muscular ring at the stomach end that stops contents flowing back",
+      "function": "The lower oesophageal sphincter is a zone of tonically contracted smooth muscle at the junction with the stomach. It relaxes as a swallowed bolus approaches, which lets it into the stomach, and then closes again to hold stomach contents back. It relaxes during vomiting. It brightens with swallowing, vomiting and nausea.",
+      "color": "#a8465c",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.35,
+          "note": "It relaxes as a swallowed bolus reaches it.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.4,
+          "note": "It relaxes to let stomach contents pass.",
+          "source": "GH14"
+        },
+        {
+          "signal": "nausea",
+          "weight": 0.15,
+          "note": "Nausea precedes the relaxation of the sphincter in vomiting.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vagal_plexus",
+      "label": "Vagal Plexus",
+      "summary": "Fine nerve network on the surface from the vagus nerves",
+      "function": "The vagus nerves form a plexus on the surface of the lower oesophagus and send branches into its wall. They carry the motor signals for peristalsis and the sensory signals of stretch. The braid drawn here is schematic, not a traced map of the nerves. It brightens with vagal outflow, swallowing and nausea.",
+      "color": "#e8d060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.4,
+          "note": "The plexus is the vagus nerves' own network.",
+          "source": "GH14"
+        },
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "Swallowing is coordinated by vagal motor signals.",
+          "source": "GH14"
+        },
+        {
+          "signal": "nausea",
+          "weight": 0.2,
+          "note": "Nausea is carried partly by vagal afferents.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "narrowing_cricopharyngeal",
+      "label": "Cricopharyngeal Narrowing",
+      "summary": "The narrowing where the pharynx becomes the oesophagus, level with the cricoid cartilage",
+      "function": "This is the first of the constrictions of the oesophagus, where the tube begins behind the cricoid cartilage. The muscle that closes it is the upper oesophageal sphincter. A swallowed bolus has to pass it before it enters the oesophagus proper.",
+      "color": "#c0485a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.4,
+          "note": "The bolus passes through it at the start of every swallow.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "narrowing_aortic_arch",
+      "label": "Aortic Arch Narrowing",
+      "summary": "The narrowing where the arch of the aorta lies against the oesophagus",
+      "function": "Where the aortic arch crosses beside the oesophagus it leaves the tube slightly indented. It is one of the places where a swallowed bolus can be seen to slow on imaging. The ring is drawn at an illustrative height.",
+      "color": "#b85a62",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The bolus passes this indentation on its way down.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "narrowing_bronchial",
+      "label": "Left Main Bronchus Narrowing",
+      "summary": "The narrowing where the left main bronchus crosses in front of the oesophagus",
+      "function": "The left main bronchus crosses the front of the oesophagus and presses a shallow indentation into it. It is the third of the classical narrowings, counted from the top. The ring is drawn at an illustrative height.",
+      "color": "#b85a62",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The bolus passes this indentation on its way down.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "narrowing_diaphragmatic",
+      "label": "Diaphragmatic Narrowing",
+      "summary": "The narrowing where the oesophagus passes through the diaphragm",
+      "function": "As the oesophagus goes through the oesophageal hiatus of the diaphragm it is gripped by the muscle around the opening. This is the lowest of the classical narrowings. It brightens as a bolus passes and as the stomach fills.",
+      "color": "#a8465c",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The bolus passes the hiatus on its way to the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "gastricFill",
+          "weight": 0.1,
+          "note": "A filled stomach presses upward on the hiatus.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gastro_oesophageal_junction",
+      "label": "Gastro-oesophageal Junction (Z-line)",
+      "summary": "The ragged line where the oesophagus joins the stomach and the lining changes type",
+      "function": "At the Z-line the pale squamous lining of the oesophagus gives way to the glandular lining of the stomach. The border is zigzag rather than straight, which is why it is named for the letter Z. It brightens with swallowing, vomiting and nausea.",
+      "color": "#e0786a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The bolus crosses it as it enters the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.3,
+          "note": "Stomach contents pass back across it.",
+          "source": "GH14"
+        },
+        {
+          "signal": "nausea",
+          "weight": 0.1,
+          "note": "Nausea precedes the relaxation of the junction.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "submucosa",
+      "label": "Submucosa",
+      "summary": "Loose connective tissue layer between the mucosa and the muscle, carrying vessels, glands and a nerve plexus",
+      "function": "The submucosa is a loose layer that lets the mucosa slide over the muscle. It carries blood vessels, the mucous glands of the oesophagus and the submucosal nerve plexus. It brightens while a bolus is swallowed.",
+      "color": "#e6b9a8",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.25,
+          "note": "The mucous glands in it release mucus as food passes.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "adventitia",
+      "label": "Adventitia",
+      "summary": "The outer connective-tissue sleeve that fastens the oesophagus to its neighbours",
+      "function": "Most of the oesophagus has no serous coat; it is wrapped in an adventitia of loose connective tissue that anchors it among the structures of the neck and chest. Only the short abdominal part is covered by peritoneum.",
+      "color": "#d8c4a8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epithelium",
+      "label": "Stratified Squamous Epithelium",
+      "parent": "mucosa",
+      "summary": "The many-layered flat-cell lining that faces the lumen",
+      "function": "Several layers of flat cells form a tough surface that resists abrasion by food. The surface cells are shed and replaced from below.",
+      "color": "#f0b8b8",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The bolus rubs against it as it passes.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lamina_propria",
+      "label": "Lamina Propria",
+      "parent": "mucosa",
+      "summary": "Thin connective-tissue layer under the epithelium",
+      "function": "The lamina propria supports the epithelium and carries small vessels and lymphoid tissue. It lies between the epithelium and the muscularis mucosae.",
+      "color": "#e8a8a0",
+      "rest": 0.12,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscularis_mucosae",
+      "label": "Muscularis Mucosae",
+      "parent": "mucosa",
+      "summary": "A thin sheet of smooth muscle at the base of the mucosa",
+      "function": "The muscularis mucosae is a thin layer of smooth muscle that moves the mucosa a little independently of the main muscle coat. In the oesophagus its fibres run mostly lengthwise.",
+      "color": "#c46a6a",
+      "rest": 0.12,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "submucosal_glands",
+      "label": "Submucosal Glands",
+      "parent": "submucosa",
+      "summary": "Small mucous glands in the submucosa whose ducts open into the lumen",
+      "function": "These glands make mucus that lubricates the passage of food and helps protect the lining. They are drawn as a sparse scatter of enlarged flasks, many times life size.",
+      "color": "#f0d890",
+      "rest": 0.12,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "Mucus is released as food passes.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.15,
+          "note": "Vagal outflow stimulates gland secretion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "submucosal_plexus",
+      "label": "Submucosal (Meissner) Plexus",
+      "parent": "submucosa",
+      "summary": "The nerve network of the submucosa",
+      "function": "The submucosal plexus is part of the enteric nervous system of the gut wall. It controls local secretion and the movement of the mucosa. The braid drawn here is schematic, not a traced nerve map.",
+      "color": "#e8d060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal fibres connect with the enteric neurons of the plexus.",
+          "source": "GH14"
+        },
+        {
+          "signal": "swallowing",
+          "weight": 0.15,
+          "note": "Swallowing engages the secretory side of the plexus.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inner_circular_muscle",
+      "label": "Inner Circular Muscle",
+      "parent": "muscularis",
+      "summary": "The inner muscle layer, whose fibres run round the tube",
+      "function": "When the circular fibres contract they narrow the lumen behind and at the bolus, which is how the wave of peristalsis squeezes it onward. It is the inner of the two muscle layers.",
+      "color": "#b5555a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.4,
+          "note": "Peristalsis follows each swallow.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.2,
+          "note": "The vagus carries the motor signal for the wave.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "outer_longitudinal_muscle",
+      "label": "Outer Longitudinal Muscle",
+      "parent": "muscularis",
+      "summary": "The outer muscle layer, whose fibres run along the tube",
+      "function": "The longitudinal fibres shorten the oesophagus as the wave passes and so help to open the segment ahead of the bolus. It is the outer of the two muscle layers.",
+      "color": "#a04a52",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.4,
+          "note": "Peristalsis follows each swallow.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.2,
+          "note": "The vagus carries the motor signal for the wave.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "striated_muscle_zone",
+      "label": "Striated Muscle Zone",
+      "parent": "muscularis",
+      "summary": "The upper part of the coat, made of skeletal muscle",
+      "function": "In the upper oesophagus the muscle is skeletal (striated), so its contraction is commanded directly by the swallowing centre of the brainstem. Below it the coat becomes smooth muscle through a mixed zone.",
+      "color": "#cc4a52",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "The brainstem swallowing centre commands this muscle directly.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "smooth_muscle_zone",
+      "label": "Smooth Muscle Zone",
+      "parent": "muscularis",
+      "summary": "The lower part of the coat, made of smooth muscle",
+      "function": "In the lower oesophagus the muscle is smooth, driven by the vagus and by the enteric plexuses of the wall. A mixed zone of both muscle types lies between it and the striated zone.",
+      "color": "#d88a8a",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.4,
+          "note": "The wave of peristalsis passes along it.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.2,
+          "note": "The vagus drives the smooth muscle.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "myenteric_plexus",
+      "label": "Myenteric (Auerbach) Plexus",
+      "parent": "muscularis",
+      "summary": "The nerve network between the two muscle layers",
+      "function": "The myenteric plexus is part of the enteric nervous system and coordinates the wave of contraction of the muscle coat. The braid drawn here is schematic, not a traced nerve map.",
+      "color": "#e8d060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal fibres connect with the enteric neurons of the plexus.",
+          "source": "GH14"
+        },
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "It coordinates the peristaltic wave.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

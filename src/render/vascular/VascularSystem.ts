@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { bloodColour } from '../anatomy/detail/blood';
 import type { SimSnapshot } from '../../bridge/types';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
@@ -9,6 +10,16 @@ import {
   saturationFor,
   type Centreline,
 } from './centrelines';
+
+/**
+ * The largest a vessel-overlay particle is drawn, in pixels, at any zoom, and the distance band
+ * (metres of scene) inside which it fades out (gone at END, whole at START). Before these the
+ * size was only `radius * 2600 / depth`, so from 0.08 m the aorta's particles were hundreds of
+ * pixels across. DISPLAY constants, same values in spirit as the organ streams' in FlowField.
+ */
+export const MAX_VESSEL_POINT_PX = 12;
+export const VESSEL_NEAR_FADE_END_M = 0.03;
+export const VESSEL_NEAR_FADE_START_M = 0.07;
 
 /**
  * THE VASCULAR OVERLAY.
@@ -90,9 +101,6 @@ const HEART_ORIGIN = new THREE.Vector3(-0.016, 0.168, 0.016);
 /** Markers that are steady-state properties of the blood rather than injected boluses. */
 const STEADY_MARKERS = new Set(['glucose', 'lactate']);
 
-const OXY_COLOUR = new THREE.Color(0xc8323a);
-const DEOXY_COLOUR = new THREE.Color(0x6a4a7a);
-
 interface Particle {
   line: number;
   s: number;
@@ -129,6 +137,16 @@ export class VascularSystem {
   private readonly sizeAttr: THREE.BufferAttribute;
 
   private readonly wallMaterials: THREE.ShaderMaterial[] = [];
+  /**
+   * FOCUS DIMMING, shared by the flow particles and every vessel wall. Inside the sphere (centre
+   * in this overlay's own frame, radius in metres) the overlay is drawn at `1 - amount` of its
+   * strength; outside it nothing changes. See `setFocusDim` for why.
+   */
+  private readonly dimUniforms = {
+    uDimCentre: { value: new THREE.Vector3() },
+    uDimRadius: { value: 0 },
+    uDimAmount: { value: 0 },
+  };
   private readonly wallSides: string[] = [];
 
   /** Per-line normalised distance of the line's midpoint from the heart, 0..1. */
@@ -218,31 +236,42 @@ export class VascularSystem {
 
     const material = new THREE.ShaderMaterial({
       name: 'VascularFlow',
-      uniforms: { uOpacity: { value: 0.85 } },
+      uniforms: { uOpacity: { value: 0.85 }, ...this.dimUniforms },
       vertexShader: /* glsl */ `
         attribute vec3 aColour;
         attribute float aSize;
+        uniform vec3 uDimCentre;
+        uniform float uDimRadius;
+        uniform float uDimAmount;
         varying vec3 vColour;
+        varying float vKeep;
         void main() {
           vColour = aColour;
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
           // Floored: a renal artery is a fifth the radius of the aorta, and without a
           // floor its particles land under one pixel and simply vanish, which reads as
           // "no blood goes to the kidney" rather than "this vessel is narrow".
-          gl_PointSize = max(2.2, aSize * (1.0 / -mv.z));
+          // CAPPED at MAX_VESSEL_POINT_PX and faded out within the near distance, as the organ
+          // streams are: zoomed in on a valve the aorta's fat particles used to fill the frame.
+          gl_PointSize = clamp(aSize * (1.0 / -mv.z), 2.2, ${MAX_VESSEL_POINT_PX.toFixed(1)});
+          float near = smoothstep(${VESSEL_NEAR_FADE_END_M.toFixed(3)}, ${VESSEL_NEAR_FADE_START_M.toFixed(3)}, -mv.z);
+          // Focus dimming: inside the open organ's sphere the particles are drawn at 1 - amount.
+          float inside = 1.0 - smoothstep(0.8 * uDimRadius, uDimRadius, distance(position, uDimCentre));
+          vKeep = near * (1.0 - uDimAmount * inside);
           gl_Position = projectionMatrix * mv;
         }
       `,
       fragmentShader: /* glsl */ `
         uniform float uOpacity;
         varying vec3 vColour;
+        varying float vKeep;
         void main() {
           // Round, soft-edged point. A square particle reads as a glitch.
           vec2 d = gl_PointCoord - vec2(0.5);
           float r = dot(d, d);
           if (r > 0.25) discard;
           float falloff = 1.0 - smoothstep(0.0, 0.25, r);
-          gl_FragColor = vec4(vColour * falloff * uOpacity, 1.0);
+          gl_FragColor = vec4(vColour * falloff * uOpacity * vKeep, 1.0);
         }
       `,
       // BUCKET 2. Additive, depth-test on so vessels behind organs stay behind them,
@@ -311,11 +340,14 @@ export class VascularSystem {
       uniforms: {
         uTint: { value: new THREE.Color(0xc8323a) },
         uDensity: { value: density },
+        ...this.dimUniforms,
       },
       vertexShader: /* glsl */ `
         varying vec3 vNormalW;
         varying vec3 vViewDirW;
+        varying vec3 vLocal;
         void main() {
+          vLocal = position;
           vec4 wp = modelMatrix * vec4(position, 1.0);
           vNormalW = normalize(mat3(modelMatrix) * normal);
           vViewDirW = cameraPosition - wp.xyz;
@@ -325,8 +357,12 @@ export class VascularSystem {
       fragmentShader: /* glsl */ `
         uniform vec3 uTint;
         uniform float uDensity;
+        uniform vec3 uDimCentre;
+        uniform float uDimRadius;
+        uniform float uDimAmount;
         varying vec3 vNormalW;
         varying vec3 vViewDirW;
+        varying vec3 vLocal;
         void main() {
           vec3 N = normalize(vNormalW);
           vec3 V = normalize(vViewDirW);
@@ -339,6 +375,10 @@ export class VascularSystem {
           // outline that read as plumbing rather than as something blood is in.
           float path = 1.0 / max(ndv, 0.34);
           vec3 T = exp(-uDensity * path * (1.0 - uTint));
+          // Focus dimming: inside the open organ's sphere the wall absorbs less (a multiply
+          // blend, so mixing towards 1 is "less ink"), soft over the outer fifth of the radius.
+          float inside = 1.0 - smoothstep(0.8 * uDimRadius, uDimRadius, distance(vLocal, uDimCentre));
+          T = mix(T, vec3(1.0), uDimAmount * inside);
           gl_FragColor = vec4(T, 1.0);
         }
       `,
@@ -362,6 +402,21 @@ export class VascularSystem {
 
   setVisible(on: boolean): void {
     this.root.visible = on;
+  }
+
+  /**
+   * Thin the overlay inside a sphere while the visitor is looking closely at a part of the organ
+   * in it. Selecting the heart forces this overlay on, and when a valve or a ventricle is then
+   * focused the vessel walls and the particles inside the organ lay over the very structures
+   * the visitor flew in to see (the papillary muscles were legible only behind a cut). `amount`
+   * 0 leaves the overlay alone, 1 hides it inside the sphere; outside the sphere (the great
+   * vessels leaving the organ, the rest of the body) nothing changes. `centre` is in the
+   * overlay's own (body) frame. A display rule, not a physiological one.
+   */
+  setFocusDim(centre: THREE.Vector3, radius: number, amount: number): void {
+    this.dimUniforms.uDimCentre.value.copy(centre);
+    this.dimUniforms.uDimRadius.value = Math.max(0, radius);
+    this.dimUniforms.uDimAmount.value = Math.max(0, Math.min(1, amount));
   }
 
   get visible(): boolean {
@@ -426,7 +481,10 @@ export class VascularSystem {
     for (const p of this.particles) {
       const side = this.lines[p.line].side;
       const sat = saturationFor(side, this.arterialSat, this.venousSat);
-      p.base.copy(DEOXY_COLOUR).lerp(OXY_COLOUR, Math.max(0, Math.min(1, (sat - 0.5) / 0.5)));
+      // The ONE blood ramp (anatomy/detail/blood.ts), so a vessel and the heart stream that
+      // feeds it are the same red/violet at the aorta and the venae cavae. This used its own
+      // 0.5..1.0 ramp against the heart's 0.65..0.95 and the two disagreed in hue.
+      bloodColour(p.base, sat);
     }
   }
 
@@ -486,7 +544,7 @@ export class VascularSystem {
         this.venousSat,
       );
       const tint = this.wallMaterials[i].uniforms.uTint.value as THREE.Color;
-      tint.copy(DEOXY_COLOUR).lerp(OXY_COLOUR, Math.max(0, Math.min(1, (sat - 0.5) / 0.5)));
+      bloodColour(tint, sat);
     }
   }
 

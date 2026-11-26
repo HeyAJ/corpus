@@ -1,6 +1,5 @@
 import type { SimSnapshot } from '../bridge/types';
-import drugsFile from '../data/drugs.json';
-import type { DrugsFile } from '../data/pharma-types';
+import { drugDataIfLoaded } from './drugData';
 
 /**
  * WHAT THE HELL IS HAPPENING.
@@ -28,8 +27,6 @@ import type { DrugsFile } from '../data/pharma-types';
  * except the people who already knew.
  */
 
-const DRUGS = (drugsFile as unknown as DrugsFile).drugs;
-const GROUP_BY_ID = new Map(DRUGS.map((d) => [d.id, d.drawerGroup]));
 
 export interface Explanation {
   plain: string;
@@ -180,12 +177,18 @@ export function causeOf(condition: string, snapshot: SimSnapshot): string | null
   const explanation = EXPLANATIONS[condition];
   if (!explanation) return null;
 
+  // THE INVARIANT: the drug database is loaded lazily (drugData.ts), but a drug can only
+  // be in the blood after the drug sheet or a scenario has loaded it, because both wait for
+  // it before they dispatch. So the group map is present whenever a drug could be the
+  // cause. If it is somehow absent, we skip the drug-group step and fall through to the
+  // plain cause below, rather than name a wrong culprit from a guess.
+  const groupById = drugDataIfLoaded()?.byId;
   const groups = explanation.causedBy;
-  if (groups && groups.length > 0) {
+  if (groupById && groups && groups.length > 0) {
     const culprits = snapshot.drugs
       .filter((d) => d.plasma_ng_per_mL > 0)
       .filter((d) => {
-        const group = GROUP_BY_ID.get(d.drugId);
+        const group = groupById.get(d.drugId)?.drawerGroup;
         return group !== undefined && groups.includes(group);
       })
       .sort((a, b) => b.plasma_ng_per_mL - a.plasma_ng_per_mL);

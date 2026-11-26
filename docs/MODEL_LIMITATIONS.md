@@ -361,7 +361,7 @@ uses, and one that it does not.
 still gives up all of its carbohydrate eventually, so the index changes the shape of the
 curve and not the area under it. That distinction is the whole point: an index that
 altered total absorption would be a fudge factor on energy rather than a model of how
-fast a food is digested, and `tests/sim/nutrition.test.ts` asserts the area is preserved.
+fast a food is digested, and `tests/sim/nutrition-absorption.test.ts` asserts the area is preserved.
 
 **Fibre slows absorption in proportion to the parcel's own carbohydrate**, because 5 g of
 fibre alongside 10 g of carbohydrate is a quite different food from 5 g alongside 80 g.
@@ -645,3 +645,328 @@ computed number. The important caveats:
 - That the absence of a modelled adverse effect means the drug does not have it.
   Most adverse effects are not modelled at all.
 - That a successful resuscitation here says anything about a real one.
+
+---
+
+## 16. Calibration notes, 2026-11-14 (reproductive engine)
+
+- **Respiratory alkalosis uses the hypercapnia slope for its ACUTE buffering.** Only the
+  chronic renal slope is direction-specific (0.4 mEq/L per mmHg fall in PaCO2, Madias and
+  Adrogue 2003, retrieved and quoted in `acidbase.chronicHco3PerPaco2Alkalosis`). No page
+  stating Adrogue and Madias's own acute alkalosis figure could be retrieved (the 2010 JASN
+  paper is behind a subscription); a secondary source gave 1-2 mEq/L per 10 mmHg, which
+  brackets the 0.1 in use, so no new number was invented. Consequence: mid-pregnancy pH
+  sits at 7.4700, on the upper edge of the cited 7.40-7.47, and the test compares at the
+  cited two-decimal precision.
+- **The sexual response now reproduces the cited systolic, diastolic and heart-rate rises
+  at the start of orgasm, in both sexes; the male orgasmic diastolic is still about 12
+  mmHg high.** The earlier calibration drove heart rate directly (+43 bpm) against a
+  baroreflex that was trying to slow it, which pushed mean pressure above the shifted set
+  point and the excess landed in diastolic (men +24 against cited +18). In the body the
+  tachycardia of sexual activity comes with falling resistance, and the fix is the same
+  in the model: negative `sexual.resistance_arousal_*` (about -0.23) lets the reflex hold
+  mean pressure at the shifted set point and supply the tachycardia itself, so the direct
+  heart-rate gains fell to about 20 bpm; sympathetic venoconstriction (`cardio.venousTone`,
+  as in exercise) and contractility keep stroke volume up so the pulse pressure widens.
+  The gains were found by a joint search (`.cache/probes/sexsearch.ts`), not one at a
+  time; vasodilation on its own still runs heart rate above 200. Start of orgasm, model
+  against cited (XUERUI2008): men +21.1 / +18.0 mmHg systolic / diastolic, +21.2 bpm,
+  mean pressure +20.9 % (cited +21.3 / +18.2 / +21.0, +21.7 %); women +11.6 / +11.3 /
+  +19.6 bpm, +12.8 % (cited +12.3 / +10.2 / +18.8, +13.4 %). The set-point shifts were not
+  changed. All differences are within 3 mmHg or bpm and 2 percentage points of mean
+  pressure. The male orgasmic peak is about 161/91 mmHg at 115 bpm against about 162/79
+  and 114-117 cited (NEMEC1976): systolic and heart rate match, but diastolic stays about
+  12 mmHg high, because a more negative orgasmic resistance or a larger venous push
+  lowers it only by dragging heart rate out of the cited band, so the best fit is
+  reported rather than forced. The orgasmic venous-tone gain (0.36) is above what exercise
+  writes at full exertion (0.28); it is fitted, not measured, and applies for seconds.
+- Recovery after stimulation stops reaches within 5 % of baseline in about 6-7 minutes (men 6.6, women 5.9);
+  the residual excursion is gone by the cited 10-20 minutes.
+- **A jump to a gestational age no longer shows a false tachycardia.** The volume
+  expansion is paced over a few seconds while the vasodilation, venous capacity, heart-rate
+  trim and renal vascular terms used to apply at once, so for about twenty seconds after a
+  jump to week 24 or 36 the body was relatively hypovolaemic (HR 115-145, hypotension,
+  even renal failure at week 36). Those terms are now scaled by the realised fraction of
+  the target plasma expansion, and after ending a pregnancy they drain with the volume
+  (`endedWeeks`), so a jump presents a coherent body throughout; the settled values do
+  not change. During the first seconds the heart rate is therefore BELOW its settled
+  value and climbs to it (the body is still the non-pregnant one), and a pregnancy that
+  has just ended keeps its raised heart rate for the roughly 20 s that its volume takes
+  to leave.
+
+---
+
+## 17. Organ interiors, reproduction and the overlays (2026-11-15)
+
+Section 16 already states the male orgasmic diastolic error, the 6-7 minute recovery and
+the pH edge in pregnancy; they are not repeated here.
+
+**The interiors are drawings.**
+
+- Part geometry is procedural and illustrative, not a traced atlas. Counts such as breast
+  lobes or splenic follicles are schematic.
+- The fetal circulation is drawn, not simulated. The fetal heart beats at the mean rate of
+  the cited populations for the gestational week, from 10 weeks (ADR-034). That rate is
+  pieced from three studies with one derived join at 14 to 20 weeks, and it is a replay of
+  means, not a simulation: no beat-to-beat variability, no accelerations, no response to
+  the mother's state. Below 10 weeks no rate is shown, because no source retrieved covers it.
+- The fetus is drawn at 41 to 64 percent of the size its weight implies, because the
+  model's uterine cavity is smaller than a real one at every week. Below 10 weeks it is held
+  at the 10-week size, because the weight table starts there (ADR-032).
+- The diaphragm moves as a rigid sheet, down on inspiration and up on expiration, by a
+  display amplitude (0.016 m of scene height) on the same inflation signal that swells the
+  lungs. The amplitude is chosen to be visible, not measured, and the dome does not flatten
+  as a real diaphragm does when it contracts.
+- The placenta is drawn only while the uterus is selected, because it is a part of the
+  uterus's interior atlas and not of the organ's outer shell.
+
+**The activity index is not a measurement.**
+
+- It is a display derivation. No BOLD signal is simulated, and the brain scan's colour is
+  not a temperature.
+- The resting reference is the boot-time body (male, 08:00), so a change of sex, a
+  pregnancy or a cycle day reads its difference from that body as activity (ADR-029).
+- The nerve and hormone overlays are diagrams: impulse speed is a display constant and
+  hormone arcs are not routes (ADR-033).
+
+**Reproduction and hormones.**
+
+- hCG has no percentile range. The male hormone list has no LH or FSH. Adrenaline and
+  noradrenaline have no plasma level; the adrenal medulla is shown as output relative to
+  basal.
+- Creatinine production is not sex-specific: pregnancy creatinine reads 0.62 mg/dL against
+  about 0.50 cited. Blood volume in pregnancy rises 33 percent against a cited 45 percent.
+- Female orgasm increments are assumed from male data, and the female orgasm peak has no
+  cited figure.
+- A reproductive time-lapse jump also corrects, at once, any metabolic acid-base
+  disturbance that happened to be present (ADR-030).
+- Glucagon does not fall after a glucose load: it stays at 70 pg/mL while insulin rises from
+  15.8 to 41 uU/mL at 30 minutes.
+
+**Not modelled at all:** bile and gallbladder emptying, lactation, thymic involution, and
+calcium (the parathyroids and C cells have no drive).
+
+---
+
+## 18. Design packages A to E (2026-11-19)
+
+These are limits of the things drawn on the body in the 2026-11-19 design work (ADR-035
+to ADR-041). None of them changes a number the simulation computes.
+
+**The body outline is an illustration.**
+
+- It is an illustrative surface drawn around the model's organs and vessels, not an anatomical
+  surface. Its proportions follow the model's organ layout, not anthropometry, because it is
+  fitted to the organ vertices and vessel centrelines of this body (ADR-037).
+- It has no face and no jaw: the model has no data for them.
+- The arms and legs end in fades, and the legs fade out over the lower half of the femoral
+  centreline instead of ending in feet.
+- Seen from the front there is no notch between the thighs. The external genitalia sit on the
+  midline and are enclosed by the outline.
+- In pregnancy the abdomen follows the week only through the uterus model's own body shape. No
+  growth curve was added to the outline.
+
+**The Activity colour is an index, not a measurement.**
+
+- It shows how far an organ is from its own settled resting state, in two parts: the rise
+  above rest (`clamp01(1.6 x the largest part departure above rest)`, an amber ramp) and the
+  fall below rest (`organsBelow`, `clamp01(1.6 x the largest part departure below rest)`, a teal
+  ramp). It is not a metabolic rate, a blood flow or a temperature, and a darker organ is not a
+  hotter one (ADR-035, ADR-044).
+- An organ with parts moving both ways shows the larger departure, so the other is not shown.
+- The stomach used to stay at rest colour in all four whole-body triggers measured, because all
+  its responses are decreases and the index counted only rises. It now responds as suppression.
+  The gut's negative sympathetic drives are display weights (stomach body and antrum -0.3,
+  bowel -0.2, source GH14), not measured gains, and -0.3 was chosen because -0.2 left the stomach
+  under the visibility threshold in exertion. Measured departures over 0.15: fright, stomach
+  0.40, small bowel 0.35, large bowel 0.32; exertion, stomach 0.17; a 2 L bleed, stomach 0.40 and
+  kidneys 0.40; arrest, stomach 0.36 and kidneys 0.40.
+
+**The alarm pulse is a display convention.**
+
+- A condition on an organ pulses at about 1 Hz, a fixed display rhythm. It is not the heart
+  rate, and a faster arrhythmia does not pulse faster (ADR-036).
+- Systemic conditions (hypovolemia, hypotension, hypertension, hypoglycemia, hyperglycemia,
+  hyperkalemia, hypokalemia, lactic acidosis, hyperthermia, hypothermia) light no organ,
+  because no single organ carries them. A body in shock can therefore show no pulsing organ
+  while the pills are red.
+
+**The slice cuts illustrative geometry.**
+
+- The organ interiors are procedural drawings (section 17), so a slice shows a cut through a
+  drawing, not a section of tissue.
+- The plane is fixed when it is set, so a beating heart moves slightly against it.
+- The cut lines are dotted rather than solid, because the dither pass breaks them up (ADR-039).
+- A double-tap on an organ opens it as well as moving the camera closer, because the first tap
+  of the pair selects it as any tap does.
+
+**A share link restores the starting point, not the history.**
+
+- A link carries the body (sex and gestational week) and the view (organ, part, overlay layers
+  and cut). It does not carry the drugs given or the events that have happened (ADR-042).
+  Two people opening the same link see the same starting point and not the same history, and the
+  link's toasts say so.
+
+## 19. Textbook depth (2026-11-22)
+
+These are limits of the interior structures drawn in the 2026-11-22 textbook-depth work
+(ADR-044 to ADR-047). None of them changes a number the simulation computes. Structure and
+naming follow Gray's Anatomy and Guyton and Hall; no new physiological number was added, so
+every size, count and spacing below is a drawing choice. Where a part is a schematic it is
+described as one, never as a measurement.
+
+**Everywhere.**
+
+- Part positions are drawn, and sizes, counts and layer spacings are chosen to be seen. A
+  count of cells, glands, villi, lobules, alveoli, follicles or vessels is a layout choice and
+  not a census.
+- Cell-level and microscopic parts are magnified single examples, many times life size, and
+  not a map of the organ. They sit beside their parent rather than at a measured position.
+- A part that spans a paired organ (the retina in both eyes, the testis tubules in both testes)
+  or a long organ (spinal grey matter) is framed from far, so its children are small until the
+  visitor zooms in by hand. This is known and not fixed.
+- The mitral leaflets, as measured after the close-look work, are thin and faint in their open
+  pose behind a remaining pink wash: partly legible, not clearly so (ADR-046).
+- Display rhythms (the cilia sweep at 0.28 mm and 9 rad/s, the slow aqueous circuit, the
+  ureter's glow while a bolus travels) are display rates; the ureter muscle glows and does not
+  carry a travelling squeeze band.
+
+**Brain.** Positions are drawn by eye and deep structures are packed tighter than in life.
+Nerves, arteries and sinuses follow plausible, not measured, paths. Pituitary cell types and the
+cortical layers (one schematic column under the somatosensory cortex) are magnified schematics.
+Hippocampal subfields are offset tubes. The falx and the tentorium are not drawn. The brain-scan
+inset maps level-1 regions only and skips the vessels, nerves and sulci.
+
+**Lungs, trachea, diaphragm.** Bronchopulmonary segment borders are a Voronoi division of each
+lobe by hand-picked seeds: the names are Gray's, the borders are a drawing choice. Lung surfaces
+are cut from one coarse mesh by centre position. Alveolar cells, capillaries, pores, the
+respiratory membrane, cilia, goblet cells and glands are magnified schematics with schematic
+counts. Pleural layers are offset copies of the lung surface (-1.6, +1.8 and +3.6 mm; recess
++7 mm). Arcuate ligament endpoints and the dome split are by eye. Larynx parts ride the swallow
+lift. The depth cap flattens the airway chain into siblings.
+
+**Oesophagus, stomach, intestines.** Layer radii are drawing proportions, not thicknesses, and
+so are the narrowings, the Z-line, the duodenal cuts and the start of the anal canal. Cells,
+glands, the villus and the crypt are many times life size with schematic counts, and the
+magnified villus and crypts float above the villus patch. Omenta, the mesentery and the
+mesocolons are flat sheets; epiploic appendages are a schematic scatter; the vagal trunks end at
+the pylorus; the nerve plexuses are decorative braids. `pyloric_sphincter` overlaps `pylorus`
+in meaning.
+
+**Kidney, ureters, bladder, prostate, testes, penis.** All new parts are schematic. The
+glomerulus, the nephron segments, the juxtaglomerular apparatus, the macula densa and the
+tubule's cell layers are magnified single examples (about 3x for the tubule). The thin ascending
+limb is drawn as the first 30 % of the ascending leg, a drawing choice and not a measured
+proportion. The macula densa contact is a thin bridge, because the enlarged nephron cannot loop
+back to its own glomerulus. Counts of cavernous spaces, helicine arteries, prostatic lobules,
+umbrella cells and pyramids are chosen. The tunica vaginalis is drawn closed all round, where the
+real sac is bare at the back. The sperm tail is a fixed shape; the urothelium is the mucosa grown
+0.7 mm; ureter wall layers are nested sleeves; bladder muscle is a few schematic bundles.
+Perirenal fat, renal fascia, scrotum, dartos, parietal tunica vaginalis, prepuce, the median
+umbilical ligament and the Cowper glands lie partly outside the organ shell, as in life. Perirenal
+fat and renal fascia are single closed surfaces, to stay inside the triangle guideline.
+
+**Spinal cord and eyes.** Tract and funiculus positions are a schematic cross-section with drawn
+start and end heights. Retinal and corneal layer spacing is about 0.1 mm each, not to scale. The
+lid opening is a round window, not an almond. The extraocular muscles share one origin ring and
+their insertions are approximate. Ganglion, nerve and rami lengths are a few millimetres.
+Lacrimal drainage is placed by eye. Motor-neuron beads are not counted cells. The eyes are about
+0.5 % over the 2x triangle guideline, with the sclera and retina caps thinned to compensate. The
+eyelids read as white halos in the focused eye view, which has not been fixed.
+
+**Liver, gallbladder, pancreas.** The lobule, the acinus and the islet are single magnified
+schematics with layout-chosen counts; islet cell types are laid out in bands (beta central) only
+to tell them apart. Couinaud boundaries are straight planes, where the real ones follow the
+hepatic and portal veins. Acinar zones are concentric rings, the textbook simplification.
+Surface landmarks are placed from description. Gallbladder wall layers are about 0.3 mm apart,
+which is not their relative thickness. The ampulla and the sphincter of Oddi sit just past the
+shell because the duodenal wall is not drawn in this atlas.
+
+**Adrenal, thyroid, thymus, spleen.** Cell-level parts are seeded schematic scatters. The three
+enlarged follicles per thyroid lobe are diagrams, not a follicle map. Alternating chromaffin
+nests are a device: the two cell kinds intermingle in life. Germinal centres sit in every third
+follicle by design. Ligament extents are drawing choices. Thymic adipose replacement is a
+descriptive faint part and is not simulated.
+
+**Female organs and fetus.** Ligament courses are hand-placed and the broad ligament is a flat
+sheet. Counts of glands, spiral arteries, villi and alveoli are schematic, and layer depths are
+drawing proportions. The labia, mons and orifice positions are display placements, and the vulval
+pads extend slightly beyond the shell. The hymen is a simple ring. Fetal organ positions are
+drawing proportions. The uterus draws only the first stretch of the umbilical cord, which is not
+aligned with the fetus atlas's own cord end. Breast TDLU, alveoli and myoepithelial cells are
+flattened to siblings by the depth cap.
+
+---
+
+## 20. Head, neck and skeleton (2026-11-26)
+
+These are limits of the ten organs added in the 2026-11-23 to 2026-11-26 round: mouth, salivary
+glands, pharynx, nasal cavity and sinuses, ears, skull, vertebral column, rib cage, shoulder and
+arm bones, hip and thigh bones (ADR-048 to ADR-052). None of them changes a number the
+simulation computes. Where something is a schematic, a display motion or a magnified
+illustration it is said to be one, and none of it is a measurement.
+
+**Schematic and magnified.**
+
+- Taste bud, tooth section, salivary acinus, tonsil section, the olfactory and respiratory
+  epithelium, hair cells and otoconia, the enlarged typical vertebra (2x life size, beside the
+  column) and the bone tissue in the right femur (osteon, canals, lamellae, cells, trabeculae;
+  the cortex drawn thicker than real) are magnified examples or enlarged samples, not counts and
+  not a map. Several float in free space and are not at true size or place.
+- Teeth are drawn at about two-thirds width, and the teeth children are the same teeth at 1.06x,
+  overlapping their parent. Arch shape, papillae, gland lobules, minor glands, the cribriform
+  foramina lattice and the cochlea's turns (drawn at Gray's 2.75; the data text states no number)
+  are layout choices.
+- The skull's bones are territories of one hollow bone field and its sutures are ribbons on the
+  outer surface; wall thickness (`SKULL_WALL` 0.0065), the temporal-bone mass round the ear canal
+  and the hyoid are drawing choices. The typical rib is a right rib 6 drawn 1.8x thicker.
+- The ear has no auricle: it would have pulled the glass head outward, since the glass is fitted
+  to organ shells.
+
+**Display motions, not physiology.** The swallow gesture (palate and tongue rise, a constriction
+wave down the pharynx) is drawn on the engine's `swallowing` signal; its timing and extent are
+display values. Saliva droplet rate, mucus flow, the cilia sweep, and the rise and forward travel
+of the ribs, cartilages and sternum with the breath are display amplitudes, frozen under reduced
+motion. The airflow in the nose and pharynx follows the breath but is not a flow calculation.
+
+**Not simulated.** Hearing, balance (other than the vertigo drive below), taste, smell, chewing,
+saliva volume, mucociliary clearance, calcium handling and bone remodelling. Only a few things
+are live: the vestibular apparatus follows `vertigo`, the pathology state that drives nausea;
+saliva follows parasympathetic drive; red marrow follows EPO. The skull has no marrow part, which
+is not a claim that it has none: Guyton and Hall do not name it. The mucosa of the nose has no
+sympathetic drive because no citation was found. The bone panels show EPO and haematocrit and
+nothing about bone itself.
+
+**Alignment limits, measured and not fixed.**
+
+- The olfactory cleft is drawn far taller than a real one. The brain atlas's olfactory bulbs sit
+  about 1 cm higher than a real skull places them, so the cribriform plate was raised to touch
+  them. Plate and bulbs meet as in life; the excess height is a drawing choice.
+- The skull's bony cribriform plate top (0.4637) sits 5.4 mm below the nasal sieve (0.469 to
+  0.472), because the cranial floor is tied to the brain shell. Olfactory-region vertices still
+  inside solid bone: 22 of 234 (84 before the correction).
+- The brain shell enters the eyeballs by 4.7 mm at its measured worst; the eye shell vertices lie
+  5.8 mm inside the brain shell (sclera 4.1, retina 3.0).
+- The internal acoustic meatus ends in the temporal bone and not at the brainstem. The inner ear,
+  though outside the brain shell, is only just so (worst +1.25 mm).
+- The conus tapers from body y 0.045, inside T12; Gray's puts the conus at L1 to L2.
+- The sacroiliac auricular surfaces overlap with a 7.7 mm centre offset in z, and the y alignment
+  is rough (auricular patch y -0.127 against sacral alae -0.140 to -0.109). The pelvic bones are
+  shifted rigidly while the sacrum follows the continuous warp.
+- The pharynx is squeezed to about 4 mm front to back at C2. The upper-neck cord path is steep
+  (first cord segment 22.4 degrees from vertical against the medulla's 13.8; the next segments
+  52.4 and 42.0) because the brain atlas's brainstem sits far forward.
+- The femoral neck is steep and short, because the glass thigh is narrow. The humerus and femur end at the
+  glass arm and leg fade (about body y 0.129 and -0.312), and this body ends at the knee.
+- The jaw and parotid were fixed to follow the ears: the condyle is 9.2 mm from the canal surface
+  and 16.7 mm anterior to the meatus, and the canal clears the mandible by 2.9 mm. The parotid top
+  is 3.7 mm below the canal axis by design (higher would cut the canal wall), so it does not quite
+  reach the meatus. The submandibular and sublingual glands overlap the mandible shell by up to
+  3.15 mm and the submandibular ganglion cord by 1.6 mm. The styloid root sits at canal level, so
+  the stylomastoid foramen is only 4.6 mm from each bone. The mouth atlas's parotid papilla is 1.2
+  mm behind the molar crown.
+
+**Budget headroom.** The default load is at 233,256 of its 240,000-triangle budget, about 6,700
+triangles of headroom, and the bones layer at 46,812 of 60,000. Both budgets are load and
+performance choices; the next organ added to the default body will need one of them raised or
+something else made smaller.

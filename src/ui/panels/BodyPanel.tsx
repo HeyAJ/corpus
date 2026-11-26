@@ -1,7 +1,8 @@
 import { useStore } from '../store';
 import { clearTrends } from '../trends';
-import { SCENARIOS, type Scenario } from '../scenarios';
+import { SCENARIOS, resolveIntents, type Scenario } from '../scenarios';
 import styles from './body.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * BODY / SCENARIO PANEL (spec 8.6, "body icon").
@@ -24,6 +25,7 @@ const RHYTHMS = [
 
 export function BodyPanel() {
   const tool = useStore((s) => s.tool);
+  const setTool = useStore((s) => s.setTool);
   const dispatch = useStore((s) => s.dispatch);
   const snapshot = useStore((s) => s.snapshot);
   const pushLog = useStore((s) => s.pushLog);
@@ -43,14 +45,22 @@ export function BodyPanel() {
    * because they describe WHO is being simulated rather than what has happened to them,
    * and a scenario run on a 50 kg subject should stay a 50 kg scenario.
    */
-  const runScenario = (sc: Scenario) => {
+  const runScenario = async (sc: Scenario) => {
+    // Wait for the drug list first (usually already prefetched) so that a drug step takes
+    // its amount and unit from drugs.json; the reset happens after, so a slow load never
+    // leaves a reset body waiting for its scenario.
+    const intents = await resolveIntents(sc).catch(() => null);
+    if (!intents) {
+      pushLog(`Scenario: ${sc.label} could not load its drug data`, 'warn');
+      return;
+    }
     dispatch({ type: 'RESET' });
     clearEvents();
     clearTrends();
     resetUiState();
     dispatch({ type: 'SET_BODY', mass_kg: body.mass_kg, height_m: body.height_m, age_y: body.age_y, sex: body.sex });
     dispatch({ type: 'IV_ACCESS', on: true });
-    for (const intent of sc.intents()) dispatch(intent);
+    for (const intent of intents) dispatch(intent);
     setTimeScale(sc.timeScale ?? 1);
     pushLog(`Scenario: ${sc.label}`, 'warn');
     pushEvent({ kind: 'state', label: `Scenario: ${sc.label}`, detail: sc.description, tone: 'warn' });
@@ -59,7 +69,7 @@ export function BodyPanel() {
   return (
     <div className={styles.panel} role="region" aria-label="Body and scenario"
       data-panel="body">
-      <h2 className={styles.title}>Body</h2>
+      <PanelHeader className={styles.head} title="Body" onClose={() => setTool('none')} />
 
       <dl className={styles.stats}>
         <div>
@@ -132,7 +142,7 @@ export function BodyPanel() {
       </p>
       <div className={styles.scenarios}>
         {SCENARIOS.map((sc) => (
-          <button key={sc.id} className={styles.scenario} onClick={() => runScenario(sc)} title={sc.description}>
+          <button key={sc.id} className={styles.scenario} onClick={() => void runScenario(sc)} title={sc.description}>
             <strong>{sc.label}</strong>
             <span>{sc.description}</span>
           </button>

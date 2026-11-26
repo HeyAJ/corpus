@@ -1,37 +1,32 @@
-/* The only dark surface in the app (spec 8.5, VISUAL_AUDIT section 8). */
+/*
+ * RECEPTOR PANEL.
+ *
+ * This was the only dark panel in the app (a charcoal card with white text at 35 %
+ * opacity, which measured about 2:1 and rendered its footnote at 10 px). Every other
+ * panel is the light sheet, so a reader moving between them met a different surface,
+ * a different title size and a different close control. It is now the same sheet, the
+ * same ink tokens and the same row rhythm as the Laboratory and Endocrine panels.
+ *
+ * Only the chart well stays dark. It is a plot area, not a panel: the receptor accent
+ * colours (pink, violet, cyan, lime, a near-white for metabolic) are pale and would
+ * vanish on the light sheet, and they are lines and fills, never text.
+ */
 
-/* The only dark surface in the app; it keeps that identity as a rail card. */
 .card {
   width: 100%;
-  background: var(--chip-darker);
+  max-height: min(70vh, 640px);
+  overflow-y: auto;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-radius: var(--radius-card);
-  padding: 14px 12px 10px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  padding: 14px 16px;
+  pointer-events: auto;
 }
 
+/* Placement only: the header itself (type, close button) is PanelHeader's. */
 .titleRow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
   margin-bottom: 10px;
-}
-
-.title {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: 0.02em;
-}
-
-.close {
-  position: absolute;
-  right: 4px;
-  top: -2px;
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 20px;
-  line-height: 1;
 }
 
 .well {
@@ -48,6 +43,8 @@
   display: block;
 }
 
+/* Text on the dark well: white at 0.35 opacity measured about 2:1; it is now the
+   inverse ink at 0.85, which holds well above 4.5:1 on the near-black well. */
 .wellEmpty {
   position: absolute;
   inset: 0;
@@ -57,9 +54,10 @@
   margin: 0;
   padding: 0 24px;
   text-align: center;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--ink-inverse);
+  opacity: 0.85;
 }
 
 .rows {
@@ -77,39 +75,52 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   transition: transform var(--tween-reorder) var(--ease-out);
   will-change: transform;
 }
 
+/* The accent colour is a FILL; the label on it is the ink token. The two fills that
+   held the old #111 below 4.5:1 (transporter, histaminergic) were lightened in the
+   component's colour table. */
 .receptorPill {
   display: inline-flex;
   align-items: center;
   padding: 7px 14px;
   min-height: 34px;
   border-radius: var(--radius-pill);
-  font-size: 15px;
-  font-weight: 700;
-  color: #111;
+  font-size: var(--text-lg);
+  font-weight: var(--weight-bold);
+  color: var(--ink);
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
 
 .occupancyValue {
-  font-size: 12px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.55);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mid);
   min-width: 34px;
 }
 
-.rows :global(.dotMatrix),
 .row > span:last-child {
   margin-left: auto;
 }
 
+/* The shared dot matrix draws its empty dots #5a5a5a, built for the old dark card; on
+   the light sheet that reads as a filled dot. Empty dots are a pale hairline here. The
+   filled dots take their colour inline (the component passes the ink token). */
+.row > span:last-child > span {
+  background: rgba(0, 0, 0, 0.16);
+}
+
 .footnote {
-  margin: 8px 4px 0;
-  font-size: 10px;
+  margin: 8px 0 0;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  font-size: var(--text-xs);
   line-height: 1.45;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--ink-dim);
 }

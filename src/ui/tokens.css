@@ -19,9 +19,32 @@
   /* --- ink ------------------------------------------------------------ */
   --ink: #141414;
   --ink-mid: #4a4a4a;
-  --ink-dim: #6e6e6e;
+  /* --ink-dim was #6e6e6e, which measured 4.1:1 on the #e8e8e8 sheet and about 2.5:1 once
+     it sat on a tinted chip, so most small captions failed WCAG AA. #595959 holds 4.5:1 on
+     every light surface in the app. The greys are now close together, so hierarchy has to
+     come from SIZE and WEIGHT, not from paleness. */
+  --ink-dim: #595959;
+  /* NON-TEXT ONLY from now on (hairlines, ticks, disabled glyphs). At #a8a8a8 it is about
+     2:1 on the light surfaces, which is why the permanent banner and every caption that
+     used it were unreadable. Text uses --ink-dim or --ink-mid. */
   --ink-faint: #a8a8a8;
   --ink-inverse: #ffffff;
+
+  /* Coloured TEXT on a light surface. The --accent-* colours are fills and strokes and
+     fail as text; these four each hold at least 4.8:1 on #e8e8e8. */
+  --ink-alarm: #a8322c;
+  --ink-warn: #8a5a00;
+  --ink-ok: #1f6b3a;
+  --ink-info: #1d5fa8;
+
+  /* ONE COLOUR FOR "SELECTED". Selected chips, segments and tabs were red in most panels
+     and a pale blue in Environment and Reproduction, so a visitor could not learn what a
+     filled chip means. Every selected state now points at these two. White text on
+     --accent-selected measures 4.86:1. Blue is kept ONLY where it carries meaning (venous
+     blood, deoxygenated, informational text), never for "selected". The soft tint is the
+     hover state of a control that could be selected. */
+  --accent-selected: #c8433a;
+  --accent-selected-soft: rgba(200, 67, 58, 0.14);
 
   /* --- organ accents (measured, VISUAL_AUDIT 2.1) --------------------- */
   --organ-active: #c8433a;
@@ -47,7 +70,7 @@
   --severity-warn-bg: #f6d8d6;
   --severity-warn-ink: #a8322c;
   --severity-watch-bg: rgba(0, 0, 0, 0.05);
-  --severity-watch-ink: #6e6e6e;
+  --severity-watch-ink: #595959;
 
   /* --- geometry ------------------------------------------------------- */
   --radius-pill: 999px;
@@ -62,14 +85,32 @@
   /* Reserved height of the bottom bar (timeline + dock + warning). The drug drawer
      clears this so it can never sit on top of the tool dock. */
   --corpus-bar-h: 92px;
+  /* Where a FULL-HEIGHT phone sheet must stop at the top: just below the speed chip, which
+     sits at 22 px from the top and is 44 px tall (timescale.module.css), plus 8 px of air.
+     The full administration sheet used to run to 24 px from the top and its handle strip
+     was painted over the "Simulation speed" chip (measured). A layout choice, not a
+     measured value. */
+  --sheet-top-clear: calc(env(safe-area-inset-top, 0px) + 74px);
 
   /* --- type ----------------------------------------------------------- */
-  --font-ui: 'Nunito', 'Varela Round', 'M PLUS Rounded 1c', ui-rounded,
+  --font-ui: 'Nunito Variable', 'Nunito', 'Varela Round', 'M PLUS Rounded 1c', ui-rounded,
     -apple-system, 'Segoe UI', system-ui, sans-serif;
-  --size-chip: 17px;
-  --size-tag: 15px;
-  --size-label: 34px;
-  --size-body: 15px;
+  /* THE TYPE SCALE. Measured before this pass: 18 different sizes in use and 125 of 470
+     text pieces rendering under 11 px on a phone. Every font-size is now one of these
+     seven steps and nothing may RENDER below 11 px (including inside a scaled container,
+     so a container scaled by 0.86 needs --text-md or larger inside it). */
+  --text-xs: 11px; /* the floor: units, reference ranges, captions, tags */
+  --text-sm: 12px; /* secondary text, chips, small buttons */
+  --text-md: 13px; /* body text */
+  --text-lg: 15px; /* row titles, emphasised values */
+  --text-xl: 18px; /* panel titles, large values */
+  --text-2xl: 24px; /* hero numbers */
+  --text-display: 32px; /* the one display size */
+  /* The older names point at the nearest step so there is one scale, not two. */
+  --size-chip: var(--text-xl);
+  --size-tag: var(--text-lg);
+  --size-label: var(--text-display);
+  --size-body: var(--text-lg);
   --weight-bold: 700;
 
   /* --- motion --------------------------------------------------------- */

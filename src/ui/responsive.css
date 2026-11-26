@@ -24,7 +24,7 @@
 @media (max-width: 1080px) {
   :root {
     /* The organ label competes with the HUD for the same corner at this width. */
-    --size-label: 26px;
+    --size-label: var(--text-2xl);
     --inset-hud: 12px;
   }
 }
@@ -33,9 +33,9 @@
 
 @media (max-width: 720px) {
   :root {
-    --size-label: 22px;
-    --size-chip: 15px;
-    --size-tag: 13px;
+    --size-label: var(--text-xl);
+    --size-chip: var(--text-lg);
+    --size-tag: var(--text-md);
     --inset-hud: 10px;
     --gap-hud: 7px;
     /* The bottom bar is shorter on a phone; the drawer clears this smaller value. */
@@ -58,7 +58,7 @@
 
 @media (max-height: 560px) {
   :root {
-    --size-label: 20px;
+    --size-label: var(--text-xl);
     --corpus-bar-h: 76px;
   }
 }

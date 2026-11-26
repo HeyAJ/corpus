@@ -1,0 +1,474 @@
+{
+  "atlas": "pharynx",
+  "about": "The pharynx, the muscular tube behind the nose, mouth and larynx that carries both air and food, drawn in its three levels with the wall muscles, the openings into it, the recesses and the ring of tonsils. Swallowing, ventilation and the immune response are simulated, so the wall muscles carry swallowing (a wave from top to bottom, drawn as a display band), the air passages carry ventilation and the tonsils carry immune activation and infection. The shape of the openings, the recesses and the tonsils is schematic, and the enlarged tonsil section is a magnified diagram placed in the lumen, not at true size or position.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "nasopharynx",
+      "label": "Nasopharynx",
+      "summary": "Upper part, behind the nasal cavity",
+      "function": "The nasopharynx lies above the soft palate and receives the back openings of the nose. The auditory tubes from the middle ears open into its side walls. Air passes through it; food normally does not.",
+      "color": "#bf6b52",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.15,
+          "note": "Air passes through the pharynx with every breath, more with greater ventilation.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "choanal_openings",
+      "parent": "nasopharynx",
+      "label": "Choanae (Posterior Nasal Openings)",
+      "summary": "The openings from the nasal cavity into the nasopharynx",
+      "function": "Air from the nose passes through them into the pharynx. They lie in the front wall of the nasopharynx.",
+      "color": "#e0907a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oropharynx",
+      "label": "Oropharynx",
+      "summary": "Middle part, behind the mouth",
+      "function": "The oropharynx lies behind the mouth from the soft palate down to the level of the hyoid bone and holds the tonsils. Air and food both pass through it. It brightens a little when a swallow is under way.",
+      "color": "#c97a5c",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "The pharyngeal stage of a swallow drives the bolus down through the oropharynx.",
+          "source": "GH14"
+        },
+        {
+          "signal": "ventilation",
+          "weight": 0.15,
+          "note": "Air passes through the pharynx with every breath, more with greater ventilation.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "isthmus_of_fauces",
+      "parent": "oropharynx",
+      "label": "Isthmus of the Fauces",
+      "summary": "The opening from the mouth into the oropharynx",
+      "function": "It is bounded by the palatoglossal arches and is where the mouth joins the pharynx.",
+      "color": "#d98a70",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "laryngopharynx",
+      "label": "Laryngopharynx",
+      "summary": "Lower part, behind the larynx",
+      "function": "The laryngopharynx runs from the hyoid bone to the lower border of the cricoid cartilage, where it becomes the oesophagus. The larynx opens into its front wall, and the epiglottis covers that opening during a swallow. It brightens a little when a swallow is under way.",
+      "color": "#b35f48",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "The pharyngeal stage of a swallow drives the bolus down through the laryngopharynx.",
+          "source": "GH14"
+        },
+        {
+          "signal": "ventilation",
+          "weight": 0.15,
+          "note": "Air passes through the pharynx with every breath, more with greater ventilation.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "laryngeal_inlet",
+      "parent": "laryngopharynx",
+      "label": "Laryngeal Inlet",
+      "summary": "The opening from the larynx into the laryngopharynx",
+      "function": "Air enters the larynx here. It is covered by the epiglottis during a swallow.",
+      "color": "#c9705a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_constrictor",
+      "label": "Superior Pharyngeal Constrictor",
+      "summary": "The uppermost of the three muscle sheets of the wall",
+      "function": "It wraps the back and sides of the upper pharynx and meets its partner at the raphe. It squeezes the bolus on in the swallow.",
+      "color": "#a8383f",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "The pharyngeal stage of a swallow is a wave of constriction passing down the pharynx.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "middle_constrictor",
+      "label": "Middle Pharyngeal Constrictor",
+      "summary": "The middle muscle sheet of the wall",
+      "function": "It overlaps the superior constrictor from outside and fans out from the hyoid bone. It squeezes the bolus down.",
+      "color": "#b0424a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "The pharyngeal stage of a swallow is a wave of constriction passing down the pharynx.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_constrictor",
+      "label": "Inferior Pharyngeal Constrictor",
+      "summary": "The lowest and thickest muscle sheet of the wall",
+      "function": "It overlaps the middle constrictor from outside and arises from the laryngeal cartilages. It drives the bolus toward the oesophagus.",
+      "color": "#bb4d55",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.5,
+          "note": "The pharyngeal stage of a swallow is a wave of constriction passing down the pharynx.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cricopharyngeus",
+      "label": "Cricopharyngeus (Upper Oesophageal Sphincter)",
+      "summary": "The lowest fibres of the inferior constrictor",
+      "function": "It is the ring of muscle at the lower end of the pharynx that normally holds the oesophagus closed. It relaxes to let the bolus through.",
+      "color": "#9a2f3a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The sphincter opens as the bolus arrives at the end of the pharyngeal stage.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pharyngeal_longitudinal_muscles",
+      "label": "Longitudinal Muscles",
+      "summary": "The muscles that run down the wall inside the constrictors",
+      "function": "They shorten and widen the pharynx and lift it over the bolus.",
+      "color": "#c26268",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.3,
+          "note": "The pharynx is raised during swallowing.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "stylopharyngeus",
+      "parent": "pharyngeal_longitudinal_muscles",
+      "label": "Stylopharyngeus",
+      "summary": "The muscle from the styloid process",
+      "function": "It enters the wall between the superior and middle constrictors and raises the pharynx.",
+      "color": "#c26268",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "salpingopharyngeus",
+      "parent": "pharyngeal_longitudinal_muscles",
+      "label": "Salpingopharyngeus",
+      "summary": "The muscle from the auditory tube",
+      "function": "It runs down the side wall and raises the pharynx. It makes a fold over the tube's opening.",
+      "color": "#b85a60",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatopharyngeus",
+      "parent": "pharyngeal_longitudinal_muscles",
+      "label": "Palatopharyngeus",
+      "summary": "The muscle from the soft palate",
+      "function": "It forms the palatopharyngeal arch and raises the pharynx and larynx.",
+      "color": "#ae5258",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pharyngeal_raphe",
+      "label": "Pharyngeal Raphe",
+      "summary": "The midline seam at the back of the pharynx",
+      "function": "The fibres of the constrictors on each side meet here.",
+      "color": "#d8b8a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "auditory_tube_openings",
+      "label": "Pharyngeal Openings of the Auditory Tubes",
+      "summary": "The openings of the tubes from the middle ears",
+      "function": "Each tube opens in the side wall of the nasopharynx and lets air reach the middle ear.",
+      "color": "#d07860",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "torus_tubarius",
+      "parent": "auditory_tube_openings",
+      "label": "Torus Tubarius",
+      "summary": "The cushion of cartilage above and behind the opening",
+      "function": "It is the raised rim of the auditory tube's cartilage.",
+      "color": "#c06a56",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "piriform_recesses",
+      "label": "Piriform Recesses",
+      "summary": "The pear-shaped pouches either side of the laryngeal inlet",
+      "function": "Food and drink can pass down these channels to the oesophagus without entering the airway.",
+      "color": "#b86858",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epiglottic_valleculae",
+      "label": "Epiglottic Valleculae",
+      "summary": "The pair of small pouches between the tongue base and the epiglottis",
+      "function": "They lie either side of a midline fold, in the front wall of the oropharynx.",
+      "color": "#c8786a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatopharyngeal_arch",
+      "label": "Palatopharyngeal Arch",
+      "summary": "The fold from the soft palate down the side wall",
+      "function": "This rear pillar of the fauces lies behind the palatine tonsil and contains the palatopharyngeus muscle.",
+      "color": "#b86a60",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "The fold is drawn up in swallowing.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pharyngeal_plexus",
+      "label": "Pharyngeal Plexus",
+      "summary": "The network of nerves on the outside of the wall",
+      "function": "Branches of the vagus and glossopharyngeal nerves form it. It supplies the muscles and the lining.",
+      "color": "#e8d27a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "The nerve network coordinates the pharyngeal stage.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "waldeyers_ring",
+      "label": "Waldeyer's Ring (Tonsils)",
+      "summary": "The ring of lymphoid tissue round the entrance to the throat",
+      "function": "It is formed by the tonsils of the nasopharynx, the sides of the oropharynx and the back of the tongue. It guards the entry of air and food.",
+      "color": "#e8b0a0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "immune",
+          "weight": 0.3,
+          "note": "The tonsils are lymphoid tissue that responds to antigens entering the mouth and nose.",
+          "source": "GH14"
+        },
+        {
+          "signal": "infection",
+          "weight": 0.3,
+          "note": "The tonsils are lymphoid tissue that responds to antigens entering the mouth and nose.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pharyngeal_tonsil",
+      "parent": "waldeyers_ring",
+      "label": "Pharyngeal Tonsil (Adenoid)",
+      "summary": "Lymphoid tissue on the roof of the nasopharynx",
+      "function": "It is folded into ridges and lies at the back of the nose.",
+      "color": "#e8b0a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tubal_tonsils",
+      "parent": "waldeyers_ring",
+      "label": "Tubal Tonsils",
+      "summary": "Lymphoid tissue by the opening of each auditory tube",
+      "function": "They lie behind the tube openings.",
+      "color": "#e0a898",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatine_tonsils",
+      "parent": "waldeyers_ring",
+      "label": "Palatine Tonsils",
+      "summary": "The pair of tonsils between the palatal arches",
+      "function": "They are the ones seen at the back of the mouth.",
+      "color": "#f0b8a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lingual_tonsil",
+      "parent": "waldeyers_ring",
+      "label": "Lingual Tonsil",
+      "summary": "Lymphoid tissue on the back third of the tongue",
+      "function": "It forms the lumpy surface behind the terminal sulcus.",
+      "color": "#dca090",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "palatine_tonsil_section",
+      "label": "Palatine Tonsil (enlarged schematic)",
+      "summary": "A magnified section of a palatine tonsil",
+      "function": "This is a magnified diagram placed in the lumen, not at true size or position. It shows how the tonsil is built.",
+      "color": "#f0b8a8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "immune",
+          "weight": 0.3,
+          "note": "The tonsils are lymphoid tissue that responds to antigens entering the mouth and nose.",
+          "source": "GH14"
+        },
+        {
+          "signal": "infection",
+          "weight": 0.3,
+          "note": "The tonsils are lymphoid tissue that responds to antigens entering the mouth and nose.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tonsillar_capsule",
+      "parent": "palatine_tonsil_section",
+      "label": "Capsule",
+      "summary": "The fibrous layer on the deep side of the tonsil",
+      "function": "It separates the tonsil from the wall muscle beneath.",
+      "color": "#d8c0a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tonsillar_crypts",
+      "parent": "palatine_tonsil_section",
+      "label": "Crypts",
+      "summary": "Deep clefts in the surface",
+      "function": "They run into the tonsil and increase the surface that meets antigens.",
+      "color": "#b8706a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lymphoid_follicles",
+      "parent": "palatine_tonsil_section",
+      "label": "Lymphoid Follicles",
+      "summary": "Rounded collections of lymphocytes",
+      "function": "They lie beside the crypts, in the tissue below the surface.",
+      "color": "#f4d0c0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "immune",
+          "weight": 0.3,
+          "note": "The tonsils are lymphoid tissue that responds to antigens entering the mouth and nose.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "germinal_centres",
+      "parent": "lymphoid_follicles",
+      "label": "Germinal Centres",
+      "summary": "Pale centres where B cells multiply",
+      "function": "They enlarge when the follicle responds to an antigen.",
+      "color": "#fff0e0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "immune",
+          "weight": 0.3,
+          "note": "Germinal centres enlarge as the follicle responds to an antigen.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tonsil_surface_epithelium",
+      "parent": "palatine_tonsil_section",
+      "label": "Surface Epithelium",
+      "summary": "The stratified squamous covering of the tonsil",
+      "function": "It is the same type of lining as the rest of the mouth and throat, and it dips into the crypts.",
+      "color": "#e8a0a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

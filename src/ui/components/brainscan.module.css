@@ -1,0 +1,187 @@
+/*
+ * BRAIN SCAN INSET.
+ *
+ * A floating card, top-right of the stage, below the row of condition tags. On a wide
+ * screen the panel sheet occupies the right-hand column when it is open (root carries
+ * data-sheet="open"), so the card steps left of it by the sheet's own width; on a phone the
+ * sheet is at the bottom and the card stays in the corner. The card is sized by its
+ * canvas (a square), so the scan never stretches.
+ */
+
+.card {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
+  right: var(--inset-hud);
+  z-index: 20;
+  width: fit-content;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+}
+
+/* The sheet is min(380px, 38vw) wide at right: 16px; keep a 12px gap beside it. */
+:global([data-sheet='open']) .card {
+  /* The alarm pills stack in a column against the sheet at the same height, so the card
+     also clears them: 232 px is the widest pill ("Renal Hypoperfusion" at 15 px, 190 px)
+     plus the pills' 32 px offset and a gap, a display choice. The checker printed
+     "Hypotension" x "Brain activity" and "Tachycardia" x the legend before this. */
+  right: calc(var(--inset-hud) + min(380px, 38vw) + 12px + 232px);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-left: 4px;
+}
+
+.title {
+  margin: 0;
+  flex: 1 1 auto;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.pin {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -4px -4px 0;
+  padding: 0;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.pin[aria-pressed='true'] {
+  color: var(--ink);
+  background: var(--chip-bg-strong);
+}
+
+/* 168 px on screens at least 900 px wide, 116 px below (display sizes). */
+.canvas {
+  display: block;
+  width: 116px;
+  height: 116px;
+  background: var(--well-black);
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+}
+
+/* Legend ticks sit at their true position along the bar (left = t of the ramp). */
+.ticks {
+  position: relative;
+  /* Two staggered rows. At 11 px (it was 10 px, and 8 px on a phone) "quiet" and "resting"
+     sit closer together than their own widths on the 116 px bar and printed as one word,
+     "quietresting". Alternate ticks drop to a second row instead of shrinking the text. */
+  height: 30px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+
+.tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.tick:nth-child(even) {
+  top: 15px;
+}
+
+/* The last label is centred on 0.9 of the bar and would otherwise overhang the card. */
+.tick:last-child {
+  transform: translateX(-80%);
+}
+
+.change {
+  margin: 0;
+  min-height: 14px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  color: var(--ink);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.change[data-steady='true'] {
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+
+.caption {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+@media (min-width: 900px) {
+  .canvas {
+    width: 168px;
+    height: 168px;
+  }
+}
+
+@media (max-width: 720px) {
+  .card {
+    padding: 6px;
+    /* The speed chip is 44 px tall (22 + 44 = 66), so the card starts below it; it was 56 px
+       when the chip was 36 px and the pin's touch area then reached under the chip. */
+    top: calc(env(safe-area-inset-top, 0px) + 72px);
+  }
+
+  /* The sheet is a bottom sheet here: the card does not move for it. */
+  :global([data-sheet='open']) .card {
+    right: var(--inset-hud);
+  }
+
+  /*
+   * WITH A SHEET OPEN THE CARD MOVES TO THE LEFT. Selecting the brain opens the sheet, and
+   * any alarm pills (cardiac arrest shows up to nine) stack down the right edge from 78 px,
+   * straight through a card parked there: the checker printed "Hypovolemia" x "Brain
+   * activity" and "Unresponsive" x the legend. The phone HUD is folded to its first row
+   * while a sheet is open (app.module.css), so the left edge below that row is free.
+   */
+  :global([data-card='open']) .card {
+    right: auto;
+    left: var(--inset-hud);
+  }
+
+  /* The phone used to shrink the title to 9 px, the ticks and caption to 8 px and the
+     change line to 10 px, all under the 11 px floor. They now keep --text-xs everywhere;
+     the card grows by a few pixels instead of the text shrinking. */
+
+  /* 44 px touch target on the pin without growing the card: extend the hit area. */
+  .pin {
+    position: relative;
+  }
+
+  .pin::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+  }
+}

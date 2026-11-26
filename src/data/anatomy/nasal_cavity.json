@@ -1,0 +1,505 @@
+{
+  "atlas": "nasal_cavity",
+  "about": "The nasal cavity and its sinuses as an anatomy textbook draws them: the vestibule, the septum and its bones, the three conchae and the meatuses beneath them, the sieve-like roof with the smell-sensing lining, the choanae, and the air-filled sinuses in the surrounding bones. Smell, nasal resistance and mucus clearance are not simulated. Airflow follows the breath, the cilia and mucus move at a fixed display rate, and only the mucosa, the conchae and the swell bodies carry drives (histamine, inflammation and infection brighten them). The cell clusters are enlarged schematics, and the sizes and positions are drawing choices, not measurements of any nose.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "nasal_vestibule",
+      "label": "Nasal Vestibule",
+      "summary": "Entrance of the nose, just inside the nostril",
+      "function": "The vestibule is the widened front of each nasal passage, lined with skin rather than mucous membrane. It carries stiff hairs that catch large particles before air goes further in.",
+      "color": "#c9a07a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.25,
+          "note": "The air of a deeper or faster breath passes through this channel in greater volume.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vibrissae",
+      "parent": "nasal_vestibule",
+      "label": "Vibrissae",
+      "summary": "Coarse hairs at the nostril",
+      "function": "The vibrissae are short stiff hairs of the vestibule. They trap dust and larger particles from the incoming air.",
+      "color": "#8a6a4a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "nasal_septum",
+      "label": "Nasal Septum",
+      "summary": "Wall that divides the cavity into left and right",
+      "function": "The septum is cartilage in front and thin bone behind, covered with mucous membrane. It divides the nasal cavity into two passages.",
+      "color": "#7fb8c6",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "septal_cartilage",
+      "parent": "nasal_septum",
+      "label": "Septal Cartilage",
+      "summary": "Cartilage plate forming the front of the septum",
+      "function": "The septal cartilage is the flexible front part of the septum. It joins the perpendicular plate above and behind and the vomer below and behind.",
+      "color": "#9fd0e0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perpendicular_plate",
+      "parent": "nasal_septum",
+      "label": "Perpendicular Plate of the Ethmoid",
+      "summary": "Thin bone forming the upper back of the septum",
+      "function": "This plate of the ethmoid bone descends from the roof of the cavity to form the upper part of the septum. It is continuous above with the cribriform plate.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vomer",
+      "parent": "nasal_septum",
+      "label": "Vomer",
+      "summary": "Thin bone forming the lower back of the septum",
+      "function": "The vomer is a thin flat bone that completes the septum behind and below. Its lower edge sits on the floor of the cavity.",
+      "color": "#d8ccaa",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "turbinates",
+      "label": "Nasal Turbinates",
+      "summary": "Scroll-shaped shelves on the outer walls",
+      "function": "The superior, middle and inferior turbinates fold the cavity wall into shelves. They slow and swirl the air so that it is warmed, moistened and filtered. Their blood-rich lining is the part that swells when histamine is released. Here the three shelves are drawn separately as the superior, middle and inferior concha, and this part marks the wall they hang from.",
+      "color": "#d9798a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "histamine",
+          "weight": 0.3,
+          "note": "Histamine dilates the vessels of the nasal lining and makes them leak, which swells the mucosa.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_concha",
+      "label": "Superior Nasal Concha",
+      "summary": "Uppermost shelf on the outer wall",
+      "function": "The superior concha is the smallest of the three shelves on the lateral wall. The superior meatus lies beneath it.",
+      "color": "#d9798a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "histamine",
+          "weight": 0.3,
+          "note": "Histamine dilates the vessels of the nasal lining and makes them leak, which swells the mucosa.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "middle_concha",
+      "label": "Middle Nasal Concha",
+      "summary": "Middle shelf on the outer wall",
+      "function": "The middle concha is a scroll of the ethmoid bone covered with mucous membrane. The middle meatus, which the sinuses drain into, lies beneath it.",
+      "color": "#d9798a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "histamine",
+          "weight": 0.3,
+          "note": "Histamine dilates the vessels of the nasal lining and makes them leak, which swells the mucosa.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_concha",
+      "label": "Inferior Nasal Concha",
+      "summary": "Lowest and largest shelf on the outer wall",
+      "function": "The inferior concha is a separate bone, the longest of the three shelves. It slows and swirls the air so that it is warmed and moistened, and the nasolacrimal duct opens beneath it.",
+      "color": "#d9798a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "histamine",
+          "weight": 0.3,
+          "note": "Histamine dilates the vessels of the nasal lining and makes them leak, which swells the mucosa.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_meatus",
+      "label": "Superior Meatus",
+      "summary": "Channel beneath the superior concha",
+      "function": "The superior meatus is the short passage under the superior concha. The posterior ethmoidal cells drain into it.",
+      "color": "#8fc3d1",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.2,
+          "note": "The air of a deeper or faster breath passes through this channel in greater volume.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "middle_meatus",
+      "label": "Middle Meatus",
+      "summary": "Channel beneath the middle concha",
+      "function": "The middle meatus carries the ethmoidal bulla and the semilunar hiatus. The frontal, maxillary and anterior ethmoidal sinuses drain into it.",
+      "color": "#8fc3d1",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.2,
+          "note": "The air of a deeper or faster breath passes through this channel in greater volume.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_meatus",
+      "label": "Inferior Meatus",
+      "summary": "Channel beneath the inferior concha",
+      "function": "The inferior meatus is the longest passage, under the inferior concha. The nasolacrimal duct opens into its front part and carries tears from the eye.",
+      "color": "#8fc3d1",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.2,
+          "note": "The air of a deeper or faster breath passes through this channel in greater volume.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sphenoethmoidal_recess",
+      "label": "Sphenoethmoidal Recess",
+      "summary": "Small space above the superior concha",
+      "function": "This recess lies above the superior concha, in front of the sphenoid bone. The sphenoidal sinus opens into it.",
+      "color": "#8fc3d1",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "semilunar_hiatus",
+      "label": "Semilunar Hiatus",
+      "summary": "Curved cleft in the middle meatus",
+      "function": "The semilunar hiatus is a crescent-shaped groove below the ethmoidal bulla. The frontal, maxillary and anterior ethmoidal sinuses drain through it.",
+      "color": "#6aa8b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ethmoidal_bulla",
+      "label": "Ethmoidal Bulla",
+      "summary": "Rounded swelling above the semilunar hiatus",
+      "function": "The bulla is a bulge in the wall of the middle meatus formed by middle ethmoidal cells. Their openings lie on or just above it.",
+      "color": "#b8d8e0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "nasolacrimal_opening",
+      "label": "Opening of the Nasolacrimal Duct",
+      "summary": "Where tears drain into the nose",
+      "function": "The nasolacrimal duct from the eye ends in a small opening in the front of the inferior meatus. Tears that are not lost over the eyelid drain into the nose by this route.",
+      "color": "#6fa8dc",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "olfactory_region",
+      "label": "Olfactory Region",
+      "summary": "Smell-sensing lining of the cavity roof",
+      "function": "A small patch of specialised lining high in the cavity holds the smell receptor cells. Their fibres pass up through the roof of the cavity to the brain. Smell is not simulated.",
+      "color": "#a98bd0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "olfactory_epithelium",
+      "label": "Olfactory Epithelium",
+      "summary": "The smell-sensing layer of the roof",
+      "function": "The olfactory epithelium is the specialised lining of the upper nasal cavity. It holds the receptor neurons that detect odours. Smell is not simulated.",
+      "color": "#b59bd8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "olfactory_receptor_neurons",
+      "parent": "olfactory_epithelium",
+      "label": "Olfactory Receptor Neurons",
+      "summary": "Nerve cells that detect odours",
+      "function": "Each receptor neuron has a dendrite that reaches the surface and an axon that leaves through the roof. This is an enlarged schematic cluster of a few cells, not a count.",
+      "color": "#8a5fc8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sustentacular_cells",
+      "parent": "olfactory_epithelium",
+      "label": "Sustentacular Cells",
+      "summary": "Supporting cells between the receptors",
+      "function": "The sustentacular cells are tall columns that support and insulate the receptor neurons. This is an enlarged schematic cluster.",
+      "color": "#c9b8e8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "basal_cells",
+      "parent": "olfactory_epithelium",
+      "label": "Basal Cells",
+      "summary": "Stem cells at the base of the epithelium",
+      "function": "Basal cells lie against the base of the epithelium. They are the source of new receptor neurons and supporting cells. This is an enlarged schematic cluster.",
+      "color": "#7a5aa8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "olfactory_glands",
+      "parent": "olfactory_epithelium",
+      "label": "Olfactory (Bowman) Glands",
+      "summary": "Glands under the epithelium that wet its surface",
+      "function": "The olfactory glands lie beneath the epithelium and send ducts to its surface. Their secretion dissolves odour molecules. This is an enlarged schematic cluster.",
+      "color": "#d8c05a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "olfactory_nerve_fila",
+      "parent": "olfactory_epithelium",
+      "label": "Olfactory Nerve Fila",
+      "summary": "Bundles of receptor axons that pass through the roof",
+      "function": "The axons of the receptor neurons gather into small bundles and pass through the holes of the cribriform plate to the olfactory bulb of the brain. The bulb itself is drawn with the brain and rests on the plate. In this model the nasal roof is carried up to the bulb as a tall narrow cleft, much taller than a real one.",
+      "color": "#e8cc58",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cribriform_plate",
+      "label": "Cribriform Plate",
+      "summary": "Sieve-like bone of the roof",
+      "function": "The cribriform plate is the perforated part of the ethmoid bone that forms the roof of the nasal cavity. The olfactory nerve fila pass up through its holes. The bony ridge between its two halves is the crista galli.",
+      "color": "#e6dcc0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "choanae",
+      "label": "Choanae",
+      "summary": "Openings at the back into the throat",
+      "function": "The two choanae are the openings at the back of the nasal cavity. They lead into the nasopharynx, the upper part of the throat.",
+      "color": "#6aa8b8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.25,
+          "note": "The air of a deeper or faster breath passes through this channel in greater volume.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "nasal_floor",
+      "label": "Nasal Floor",
+      "summary": "Floor of the cavity, the upper surface of the hard palate",
+      "function": "The floor is formed by the bony palate, which separates the nasal cavity from the mouth. It is covered with mucous membrane.",
+      "color": "#e0c8a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "kiesselbach_area",
+      "label": "Septal Anastomotic Area (Kiesselbach, Little)",
+      "summary": "Network of small arteries on the front of the septum",
+      "function": "Several small arteries meet on the lower front part of the septum. Their rich supply and exposed position make this a common site of nosebleed.",
+      "color": "#d9534f",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "frontal_sinuses",
+      "label": "Frontal Sinuses",
+      "summary": "Air spaces in the forehead bone",
+      "function": "The frontal sinuses lie above the orbits and drain into the nasal cavity. Their size varies a good deal from person to person.",
+      "color": "#a6dbe4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ethmoidal_cells",
+      "label": "Ethmoidal Cells",
+      "summary": "Honeycomb of small air spaces between the orbit and the nose",
+      "function": "The ethmoidal cells are many small air spaces in the ethmoid bone. They drain into the middle and superior meatuses. The number varies, and the drawing is schematic.",
+      "color": "#a6dbe4",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "maxillary_sinuses",
+      "label": "Maxillary Sinuses",
+      "summary": "Largest sinuses, in the cheekbones below the orbits",
+      "function": "Each maxillary sinus is an air-filled space in the upper jaw bone that drains into the nasal cavity. The sinuses lighten the skull and add resonance to the voice.",
+      "color": "#8fd0dc",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sphenoidal_sinus",
+      "label": "Sphenoidal Sinus",
+      "summary": "Air space in the sphenoid bone behind the nose",
+      "function": "The sphenoidal sinus lies in the body of the sphenoid bone and drains into the sphenoethmoidal recess. The two sides are often unequal.",
+      "color": "#8fd0dc",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "respiratory_mucosa",
+      "label": "Respiratory Mucosa",
+      "summary": "Moist lining of most of the cavity",
+      "function": "This lining warms and moistens the air and traps particles in mucus. Histamine, inflammation and infection make it swell and glow in the display. Nasal resistance is not simulated.",
+      "color": "#e89aa8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "histamine",
+          "weight": 0.3,
+          "note": "Histamine dilates the vessels of the nasal lining and makes them leak, which swells the mucosa.",
+          "source": "GH14"
+        },
+        {
+          "signal": "inflammation",
+          "weight": 0.25,
+          "note": "Inflammation brings blood and fluid into the lining, so it swells and reddens.",
+          "source": "GH14"
+        },
+        {
+          "signal": "infection",
+          "weight": 0.2,
+          "note": "An infection draws the inflammatory response into the lining it infects.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ciliated_epithelium",
+      "parent": "respiratory_mucosa",
+      "label": "Pseudostratified Ciliated Columnar Epithelium",
+      "summary": "Surface layer with beating cilia",
+      "function": "The surface cells bear cilia that sweep mucus toward the throat. This is an enlarged schematic cluster of a few cells, not a count.",
+      "color": "#f0b8c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cilia",
+      "parent": "ciliated_epithelium",
+      "label": "Cilia",
+      "summary": "Hair-like projections that move mucus",
+      "function": "Each cilium beats in a set direction. Together they carry the mucus blanket, with the particles it caught, back toward the nasopharynx. The beat shown is a display rhythm, not simulated clearance.",
+      "color": "#fbe3d0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "goblet_cells",
+      "parent": "respiratory_mucosa",
+      "label": "Goblet Cells",
+      "summary": "Mucus-secreting cells in the surface layer",
+      "function": "Goblet cells are scattered between the ciliated cells and release mucus onto the surface. This is an enlarged schematic cluster.",
+      "color": "#6fb7c9",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "seromucous_glands",
+      "parent": "respiratory_mucosa",
+      "label": "Seromucous Glands",
+      "summary": "Glands under the surface that add watery mucus",
+      "function": "These glands lie in the layer beneath the surface and open onto it by small ducts. They add to the moist film that covers the lining. This is an enlarged schematic cluster.",
+      "color": "#d8c05a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "swell_bodies",
+      "parent": "respiratory_mucosa",
+      "label": "Cavernous Venous Plexuses (Swell Bodies)",
+      "summary": "Large thin-walled veins in the conchae",
+      "function": "The conchae contain large venous plexuses that can fill and swell the lining. Textbooks tie this swelling to congestion. Histamine and inflammation brighten it in the display.",
+      "color": "#6f6fb8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "histamine",
+          "weight": 0.35,
+          "note": "Histamine dilates the vessels of the nasal lining and makes them leak, which swells the mucosa.",
+          "source": "GH14"
+        },
+        {
+          "signal": "inflammation",
+          "weight": 0.3,
+          "note": "Inflammation brings blood and fluid into the lining, so it swells and reddens.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

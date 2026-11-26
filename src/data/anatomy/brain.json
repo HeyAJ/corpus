@@ -1,0 +1,2385 @@
+{
+  "atlas": "brain",
+  "about": "The interior of the brain in about a hundred and forty parts: the cortical lobes and their named areas, the deep midline and limbic structures, the basal ganglia, thalamus, brainstem and cerebellum, the ventricles, the meninges, the main arteries and venous sinuses, and the cranial nerves. Many parts hold finer structures of their own (the nuclei of the thalamus and hypothalamus, the subfields of the hippocampus, the cell types of the pituitary, the layers of the cortex, the deep nuclei of the cerebellum): select a part, or zoom in on it, and they appear inside it. Each glows with an activity index built from the simulator's own signals; a structure with no drive of its own shows its parent's, or rests. The particle streams are the major tracts. Shapes are authored by eye from textbook proportions, not traced from a scan; deep structures are packed more tightly than in life, vessels and nerves are schematic paths, the cortical layers are one magnified schematic column, and the cell clusters in the pituitary are drawn larger than life. The directions of the orgasm-related drives come from the imaging studies cited (qualitative region lists only; they disagree about the amygdala, so it is not given an orgasm drive). The adult human brain holds roughly 86 billion neurons (Azevedo and colleagues, 2009). Activity is a display index, not a firing rate or a BOLD signal. Nothing here is clinical advice.",
+  "sources": {
+    "KANDEL6": {
+      "label": "Kandel ER, Koester JD, Mack SH, Siegelbaum SA (eds). Principles of Neural Science, 6th ed. McGraw Hill, 2021.",
+      "url": "https://neurology.mhmedical.com/book.aspx?bookID=3024"
+    },
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "AZEVEDO2009": {
+      "label": "Azevedo FAC et al. J Comp Neurol 2009;513:532-541.",
+      "url": "https://doi.org/10.1002/cne.21974"
+    },
+    "HOLSTEGE2003": {
+      "label": "Holstege G et al. J Neurosci 2003;23:9185-9193.",
+      "url": "https://doi.org/10.1523/jneurosci.23-27-09185.2003"
+    },
+    "GEORGIADIS2006": {
+      "label": "Georgiadis JR et al. Eur J Neurosci 2006;24:3305-3316.",
+      "url": "https://doi.org/10.1111/j.1460-9568.2006.05206.x"
+    },
+    "GEORGIADIS2007": {
+      "label": "Georgiadis JR et al. Neuroreport 2007;18:553-557.",
+      "url": "https://doi.org/10.1097/wnr.0b013e3280b10bfe"
+    },
+    "KOMISARUK2004": {
+      "label": "Komisaruk BR et al. Brain Res 2004;1024:77-88.",
+      "url": "https://doi.org/10.1016/j.brainres.2004.07.029"
+    },
+    "WISE2017": {
+      "label": "Wise NJ et al. J Sex Med 2017;14:1380-1391.",
+      "url": "https://doi.org/10.1016/j.jsxm.2017.08.014"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "prefrontal_cortex",
+      "label": "Prefrontal Cortex",
+      "summary": "Anterior frontal lobe: planning, judgement and control of impulses",
+      "function": "The prefrontal cortex holds goals and rules in mind, plans ahead and restrains impulses, and it is the cortex most changed by sustained stress. Its activity is reported to fall at ejaculation. In this simulator it brightens when the stress slider is raised and dims in sleep, under sedatives and as consciousness is lost.",
+      "color": "#d9a066",
+      "rest": 0.4,
+      "drives": [
+        {
+          "signal": "stress",
+          "weight": 0.25,
+          "note": "Sustained psychological load engages prefrontal control circuits.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "orgasm",
+          "weight": -0.25,
+          "note": "Prefrontal activity is deactivated at ejaculation.",
+          "source": "GEORGIADIS2007"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.2,
+          "note": "Association cortex is least active in deep sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.2,
+          "note": "Central depressants quieten the cortex.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.3,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "motor_cortex",
+      "label": "Motor Cortex",
+      "summary": "Precentral gyrus: commands for voluntary movement",
+      "function": "The primary motor cortex lies in the precentral gyrus, just in front of the central sulcus. Its large pyramidal cells send the corticospinal tract down to the spinal cord to command voluntary muscles. It brightens with exercise and in a seizure, and dims in sleep and under sedation.",
+      "color": "#c98a5a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.45,
+          "note": "Voluntary muscular work is driven from the motor strip.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A cortical seizure discharges through the motor strip.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical output falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical excitability.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "somatosensory_cortex",
+      "label": "Somatosensory Cortex",
+      "summary": "Postcentral gyrus: touch, pressure and the location of pain",
+      "function": "The primary somatosensory cortex lies in the postcentral gyrus, behind the central sulcus, and maps touch, pressure, temperature and pain from the body surface. Imaging shows genital stimulation activating it. It brightens with pain and with sexual arousal.",
+      "color": "#d4b86a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "pain",
+          "weight": 0.25,
+          "note": "Felt pain is localised in the sensory strip.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "nociception",
+          "weight": 0.15,
+          "note": "Noxious input reaches it by the spinothalamic route.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sexualArousal",
+          "weight": 0.25,
+          "note": "Genital stimulation activates the somatosensory cortex.",
+          "source": "GEORGIADIS2006"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical responsiveness falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "parietal_lobe",
+      "label": "Parietal Lobe",
+      "summary": "Posterior parietal cortex: spatial sense and body position",
+      "function": "The posterior parietal cortex combines vision, balance and body sense into a map of space and of where the body is within it. It helps direct attention and reaching. It brightens when the simulation reports vertigo, and dims in sleep and under sedation.",
+      "color": "#a8c46a",
+      "rest": 0.28,
+      "drives": [
+        {
+          "signal": "vertigo",
+          "weight": 0.3,
+          "note": "Vestibular signals converge on parietal cortex.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Association cortex quietens in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "temporal_lobe",
+      "label": "Temporal Lobe",
+      "summary": "Hearing, language comprehension and memory",
+      "function": "The temporal lobe lies below the lateral fissure. Its upper surface receives hearing, its lateral cortex takes part in language and recognition, and its medial part holds the hippocampus and amygdala. It is a common origin of seizures, so it brightens when a seizure is under way, and it dims in sleep and under sedation.",
+      "color": "#6aaed4",
+      "rest": 0.28,
+      "drives": [
+        {
+          "signal": "seizure",
+          "weight": 0.45,
+          "note": "Temporal cortex is a frequent site of seizure activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "occipital_lobe",
+      "label": "Occipital Lobe",
+      "summary": "Visual cortex at the back of the brain",
+      "function": "The occipital lobe receives vision from the eyes by way of the thalamus and builds it into edges, motion and form. It brightens in the simulator when a psychedelic is active, which alters visual experience, and dims in sleep and under sedation.",
+      "color": "#8a7fd0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "psychedelia",
+          "weight": 0.4,
+          "note": "Visual cortex takes part in the altered perception these drugs produce.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Visual cortex is quiet with the eyes closed in deep sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "insula",
+      "label": "Insula",
+      "summary": "Cortex deep to the lateral fissure: body state and feeling",
+      "function": "The insula reads the internal state of the body (nausea, pain, heartbeat, visceral sensation) and links it to emotion. Imaging shows it active in sexual arousal and orgasm. It brightens with nausea, pain, anxiety and arousal.",
+      "color": "#c8789a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "nausea",
+          "weight": 0.25,
+          "note": "Visceral sensation is represented in the insula.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "pain",
+          "weight": 0.25,
+          "note": "The insula takes part in the felt quality of pain.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "anxiety",
+          "weight": 0.15,
+          "note": "Interoceptive awareness rises in anxiety.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sexualArousal",
+          "weight": 0.15,
+          "note": "Insular activity rises with sexual arousal.",
+          "source": "WISE2017"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.2,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "cingulate_cortex",
+      "label": "Cingulate Cortex",
+      "summary": "Medial cortex arching over the corpus callosum: pain, effort, emotion",
+      "function": "The cingulate gyrus arches over the corpus callosum and joins emotion, attention and the unpleasantness of pain. Its anterior part is active in pain and in stress. Imaging shows it active at orgasm. It brightens with pain, stress and orgasm.",
+      "color": "#d98a8a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "pain",
+          "weight": 0.25,
+          "note": "The anterior cingulate carries the unpleasantness of pain.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "stress",
+          "weight": 0.2,
+          "note": "It monitors conflict and threat.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.25,
+          "note": "Anterior cingulate activity rises at orgasm.",
+          "source": "KOMISARUK2004"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.2,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "corpus_callosum",
+      "label": "Corpus Callosum",
+      "summary": "The great C-shaped band of fibres joining the two hemispheres",
+      "function": "The corpus callosum is the largest bundle of nerve fibres in the brain. It lets the two hemispheres share information and coordinate. In this simulator it carries the callosal streams, and brightens when a seizure spreads across the brain.",
+      "color": "#e8e2d0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "seizure",
+          "weight": 0.4,
+          "note": "Seizure activity spreads between hemispheres through the callosum.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.1,
+          "note": "Traffic between the cortices falls as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "thalamus",
+      "label": "Thalamus",
+      "summary": "The relay station between the senses and the cortex",
+      "function": "The thalamus relays almost all sensory information to the cortex and gates it with the state of arousal: in sleep and under sedatives the relay largely shuts. Pain pathways pass through it on the way to the cortex. It brightens with pain and dims in sleep and sedation.",
+      "color": "#7fb0c8",
+      "rest": 0.4,
+      "drives": [
+        {
+          "signal": "pain",
+          "weight": 0.2,
+          "note": "Spinothalamic pain pathways synapse in the thalamus.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.2,
+          "note": "The thalamic relay is gated shut in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.2,
+          "note": "Sedatives suppress thalamocortical transmission.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.2,
+          "note": "Thalamocortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "hypothalamus",
+      "label": "Hypothalamus",
+      "summary": "Small base-of-brain centre for temperature, thirst, hormones and drives",
+      "function": "The hypothalamus keeps the internal environment steady: it sets body temperature, senses osmolality and glucose, drives thirst and runs the stress axis through the pituitary. In this simulator it brightens with stress-axis drive, fever, dehydration, low glucose and at orgasm, when oxytocin-producing cells are active.",
+      "color": "#e0a050",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "stressAxis",
+          "weight": 0.25,
+          "note": "The paraventricular nucleus drives the stress axis.",
+          "source": "GH14"
+        },
+        {
+          "signal": "fever",
+          "weight": 0.25,
+          "note": "The hypothalamic thermostat sets a raised temperature.",
+          "source": "GH14"
+        },
+        {
+          "signal": "dehydration",
+          "weight": 0.2,
+          "note": "Osmoreceptors here drive thirst and vasopressin release.",
+          "source": "GH14"
+        },
+        {
+          "signal": "hypoglycaemia",
+          "weight": 0.15,
+          "note": "Glucose-sensing neurons here raise counter-regulation.",
+          "source": "GH14"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.2,
+          "note": "The paraventricular nucleus is active at orgasm.",
+          "source": "KOMISARUK2004"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "pituitary",
+      "label": "Pituitary Gland",
+      "summary": "The pea-sized master gland hanging below the hypothalamus",
+      "function": "The pituitary hangs from the hypothalamus on a stalk. The anterior lobe releases hormones such as ACTH, LH and prolactin under hypothalamic control, and the posterior lobe releases vasopressin and oxytocin made in the hypothalamus. It brightens when these hormones are raised.",
+      "color": "#f0c060",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "stressAxis",
+          "weight": 0.25,
+          "note": "ACTH is released in response to hypothalamic CRH.",
+          "source": "GH14"
+        },
+        {
+          "signal": "adh",
+          "weight": 0.2,
+          "note": "The posterior lobe releases vasopressin.",
+          "source": "GH14"
+        },
+        {
+          "signal": "lh",
+          "weight": 0.15,
+          "note": "The anterior lobe releases LH.",
+          "source": "GH14"
+        },
+        {
+          "signal": "prolactin",
+          "weight": 0.15,
+          "note": "The anterior lobe releases prolactin.",
+          "source": "GH14"
+        },
+        {
+          "signal": "oxytocin",
+          "weight": 0.2,
+          "note": "The posterior lobe releases oxytocin.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "pineal",
+      "label": "Pineal Gland",
+      "summary": "Small gland behind the thalamus that makes melatonin at night",
+      "function": "The pineal gland releases melatonin in darkness under the control of the body's circadian clock, signalling night to the rest of the body. In this simulator it brightens during the small hours and is dim by day.",
+      "color": "#9a7ac8",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "night",
+          "weight": 0.5,
+          "note": "Melatonin secretion rises in the dark phase of the clock.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "hippocampus",
+      "label": "Hippocampus",
+      "summary": "Curved structure of the medial temporal lobe: forming new memories",
+      "function": "The hippocampus is needed to lay down new memories of events and of places. It is sensitive to stress hormones, and imaging shows it active at orgasm. It brightens with stress and orgasm.",
+      "color": "#5fc0a0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "stress",
+          "weight": 0.2,
+          "note": "The hippocampus is rich in stress-hormone receptors and engaged by stress.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.25,
+          "note": "Hippocampal activity rises towards orgasm.",
+          "source": "WISE2017"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "amygdala",
+      "label": "Amygdala",
+      "summary": "Almond-shaped nucleus that detects threat and gives events emotional weight",
+      "function": "The amygdala lies in front of the hippocampus and rapidly assesses threat, setting off fear responses through the hypothalamus and brainstem. It brightens with fright, anxiety, stress and pain. Imaging studies disagree about its behaviour at orgasm, so no drive is set for it.",
+      "color": "#d06060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fright",
+          "weight": 0.3,
+          "note": "Acute alarm engages the amygdala.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "anxiety",
+          "weight": 0.2,
+          "note": "Anxiety involves heightened amygdala activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "stress",
+          "weight": 0.15,
+          "note": "Sustained stress keeps it more active.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "pain",
+          "weight": 0.15,
+          "note": "The amygdala adds emotional weight to pain.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "basal_ganglia",
+      "label": "Basal Ganglia",
+      "summary": "Caudate and putamen: selecting and smoothing movement",
+      "function": "The caudate nucleus and putamen lie lateral to the thalamus. They help select wanted movements and suppress unwanted ones, and take part in habit and reward learning. They brighten with exertion.",
+      "color": "#b08ad0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.4,
+          "note": "Movement selection loops are busier during physical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce striatal activity.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "nucleus_accumbens",
+      "label": "Nucleus Accumbens",
+      "summary": "Ventral striatum: the brain's reward hub",
+      "function": "The nucleus accumbens receives dopamine from the midbrain and assigns value to rewarding events. It is active in reward, euphoria and orgasm. It brightens with these signals, and the gold mesolimbic stream runs to it.",
+      "color": "#e8b030",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "reward",
+          "weight": 0.35,
+          "note": "Reinforcement is signalled through accumbens dopamine.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "euphoria",
+          "weight": 0.2,
+          "note": "Euphoric states engage the reward circuit.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.25,
+          "note": "Accumbens activity rises at orgasm.",
+          "source": "WISE2017"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "midbrain",
+      "label": "Midbrain",
+      "summary": "Top of the brainstem: dopamine, pain control and eye movement",
+      "function": "The midbrain holds the ventral tegmental area, the source of the reward dopamine pathway, and the periaqueductal grey, which controls pain from above. It brightens with reward, orgasm and analgesia.",
+      "color": "#c0a070",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "reward",
+          "weight": 0.25,
+          "note": "The ventral tegmental area signals reward.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.25,
+          "note": "The ventral tegmental region is active at ejaculation.",
+          "source": "HOLSTEGE2003"
+        },
+        {
+          "signal": "analgesia",
+          "weight": 0.25,
+          "note": "The periaqueductal grey drives descending pain suppression.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "pons",
+      "label": "Pons",
+      "summary": "Bridge between the cerebrum and cerebellum; breathing rhythm and arousal",
+      "function": "The pons carries fibres across to the cerebellum, houses the locus coeruleus, the brain's main noradrenaline source for alertness and alarm, and shapes the rhythm of breathing. It brightens with fright, stress and respiratory drive.",
+      "color": "#8aa0b8",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "fright",
+          "weight": 0.2,
+          "note": "The locus coeruleus fires in alarm.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "stress",
+          "weight": 0.2,
+          "note": "Sustained load raises locus coeruleus activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "respDrive",
+          "weight": 0.3,
+          "note": "Pontine centres shape the breathing pattern.",
+          "source": "GH14"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "medulla",
+      "label": "Medulla Oblongata",
+      "summary": "Lowest brainstem: breathing, blood pressure and vomiting centres",
+      "function": "The medulla contains the respiratory centres, the cardiovascular control centres that receive the baroreceptor signal, and the vomiting centre. All descending motor fibres cross here on the way to the spinal cord. It brightens with respiratory drive, baroreflex action, nausea, vomiting and sympathetic outflow.",
+      "color": "#7a90a0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "respDrive",
+          "weight": 0.25,
+          "note": "The medullary respiratory groups generate the breathing drive.",
+          "source": "GH14"
+        },
+        {
+          "signal": "baroreflex",
+          "weight": 0.15,
+          "note": "Baroreceptor signals are integrated in the medulla.",
+          "source": "GH14"
+        },
+        {
+          "signal": "nausea",
+          "weight": 0.1,
+          "note": "Nausea is processed by medullary centres.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.1,
+          "note": "The vomiting centre is in the medulla.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.15,
+          "note": "Sympathetic outflow originates in the rostral ventrolateral medulla.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "cerebellum",
+      "label": "Cerebellum",
+      "summary": "The little brain: coordination, balance and timing of movement",
+      "function": "The cerebellum compares intended with actual movement and corrects it, and keeps balance by working with the vestibular system. It brightens with exertion and vertigo. Imaging shows strong cerebellar activation at orgasm, and it joins in a seizure.",
+      "color": "#7a9a6a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Movement coordination is busier during exercise.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "vertigo",
+          "weight": 0.15,
+          "note": "The vestibulocerebellum receives balance signals.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.2,
+          "note": "Strong cerebellar activation is reported at orgasm.",
+          "source": "HOLSTEGE2003"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.1,
+          "note": "Generalised seizure activity reaches the cerebellum.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "KANDEL6"
+    },
+    {
+      "id": "premotor_cortex",
+      "label": "Premotor Cortex",
+      "summary": "Frontal cortex just in front of the primary motor strip",
+      "function": "It helps plan and guide movements, especially those set off by what we see or hear. It sends its plans on to the motor strip.",
+      "color": "#cf9a6a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Planned voluntary movement engages the premotor areas.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "supplementary_motor_area",
+      "label": "Supplementary Motor Area",
+      "summary": "Medial frontal cortex above the cingulate gyrus, in front of the motor strip",
+      "function": "It helps plan and sequence movements, particularly those carried out from memory or begun from within. It works with the basal ganglia and the motor cortex.",
+      "color": "#c88a62",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Sequenced voluntary movement engages the supplementary motor area.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "frontal_eye_field",
+      "label": "Frontal Eye Field",
+      "summary": "Cortex of the middle frontal gyrus that directs the eyes",
+      "function": "It starts voluntary eye movements and the quick jumps of the gaze towards a target. Its output goes to the brainstem centres that turn the eyes.",
+      "color": "#d8b070",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "brocas_area",
+      "label": "Broca's Area",
+      "summary": "Part of the inferior frontal gyrus, usually on the left",
+      "function": "In most people it is on the left side and is needed to form fluent speech. Damage leaves understanding largely intact but makes speaking effortful.",
+      "color": "#e0a878",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "wernickes_area",
+      "label": "Wernicke's Area",
+      "summary": "Rear of the superior temporal gyrus, usually on the left",
+      "function": "In most people it is on the left side and is needed to understand spoken and written language. Damage gives fluent speech that carries little meaning.",
+      "color": "#7fb8dc",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "primary_auditory_cortex",
+      "label": "Primary Auditory Cortex",
+      "summary": "Heschl gyrus, on the upper surface of the temporal lobe inside the lateral sulcus",
+      "function": "It is the first cortical stage for sound, receiving from the medial geniculate nucleus of the thalamus. Different pitches are laid out in an orderly map across it.",
+      "color": "#5fa0d0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "primary_visual_cortex",
+      "label": "Primary Visual Cortex (Calcarine)",
+      "summary": "Cortex along the calcarine sulcus on the inner surface of the occipital lobe",
+      "function": "It is the first cortical stage for vision, receiving from the lateral geniculate nucleus. Each hemisphere maps the opposite half of the visual field.",
+      "color": "#9a8fe0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "psychedelia",
+          "weight": 0.4,
+          "note": "Visual cortex takes part in the altered perception these drugs produce.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.1,
+          "note": "Cortical activity falls in sleep.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.1,
+          "note": "Depressants reduce cortical activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Cortical activity fails as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "olfactory_bulb_tract",
+      "label": "Olfactory Bulb and Tract",
+      "summary": "The swelling and stalk under the frontal lobe that carry smell",
+      "function": "The bulb receives the olfactory nerve fibres from the nose, and the tract carries the signal on to olfactory cortex. Smell is the one sense that reaches the cortex without first relaying through the thalamus.",
+      "color": "#e8d890",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "optic_chiasm",
+      "label": "Optic Chiasm",
+      "summary": "The X-shaped crossing of the optic nerves in front of the pituitary stalk",
+      "function": "Fibres from the inner half of each retina cross here, so that each optic tract carries the opposite half of the visual field. The tracts run on round the midbrain to the lateral geniculate nucleus.",
+      "color": "#f2e6b0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mammillary_bodies",
+      "label": "Mammillary Bodies",
+      "summary": "Two small round swellings at the back of the floor of the hypothalamus",
+      "function": "They receive the fornix from the hippocampus and relay to the thalamus, as part of a memory circuit. Damage to them is linked with severe memory loss.",
+      "color": "#e8a860",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fornix",
+      "label": "Fornix",
+      "summary": "The arched bundle of fibres that leaves the hippocampus",
+      "function": "It carries signals from the hippocampus up and over the thalamus, then down to the mammillary bodies and septal region. It is a main output pathway of the hippocampus.",
+      "color": "#efe8d4",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "septum_pellucidum",
+      "label": "Septum Pellucidum",
+      "summary": "The thin vertical sheet between the two lateral ventricles",
+      "function": "It hangs from the underside of the corpus callosum to the fornix and separates the front parts of the two lateral ventricles. It is a membrane, not a working nucleus.",
+      "color": "#dad8c8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ventricles",
+      "label": "Ventricles",
+      "summary": "The connected fluid-filled cavities inside the brain",
+      "function": "They are filled with cerebrospinal fluid, which cushions the brain and carries away waste. The fluid is made mainly by the choroid plexus and flows from the lateral ventricles to the third, down the aqueduct to the fourth, and out to the space round the brain.",
+      "color": "#7ab8e8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_ventricles",
+      "parent": "ventricles",
+      "label": "Lateral Ventricles",
+      "summary": "The two C-shaped cavities, one in each hemisphere",
+      "function": "Each has a frontal horn, a body, an atrium, and occipital and temporal horns, curving round the thalamus. Each opens into the third ventricle through an interventricular foramen.",
+      "color": "#8cc4ee",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "third_ventricle",
+      "parent": "ventricles",
+      "label": "Third Ventricle",
+      "summary": "The narrow midline slit between the two halves of the thalamus and hypothalamus",
+      "function": "It receives fluid from both lateral ventricles and passes it on through the cerebral aqueduct. The thalami and hypothalamus form its walls.",
+      "color": "#6aaee0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fourth_ventricle",
+      "parent": "ventricles",
+      "label": "Fourth Ventricle",
+      "summary": "The diamond-shaped cavity behind the pons and medulla, in front of the cerebellum",
+      "function": "It receives fluid from the aqueduct and lets it out into the space round the brain through openings in its roof. It also continues down as the central canal of the spinal cord.",
+      "color": "#6aaee0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cerebral_aqueduct",
+      "parent": "ventricles",
+      "label": "Cerebral Aqueduct",
+      "summary": "The narrow channel through the midbrain",
+      "function": "It joins the third ventricle to the fourth. Because it is so narrow, a blockage here can dam fluid back into the ventricles above.",
+      "color": "#5a9ed8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interventricular_foramina",
+      "parent": "ventricles",
+      "label": "Interventricular Foramina (Monro)",
+      "summary": "The two short channels from the lateral ventricles to the third",
+      "function": "Each lets fluid pass from a lateral ventricle into the third ventricle. The choroid plexus is continuous through them.",
+      "color": "#5a9ed8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "choroid_plexus",
+      "label": "Choroid Plexus",
+      "summary": "Frond-like tufts of capillaries and epithelium in the ventricles",
+      "function": "It makes most of the cerebrospinal fluid and forms the barrier between blood and that fluid. It lies in the floor of the lateral ventricles and the roofs of the third and fourth.",
+      "color": "#d86a78",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "meninges",
+      "label": "Meninges",
+      "summary": "The three membranes that wrap the brain",
+      "function": "Dura mater, arachnoid mater and pia mater lie between the brain and the skull. Together with the cerebrospinal fluid they protect and support it.",
+      "color": "#d8c8b8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dura_mater",
+      "parent": "meninges",
+      "label": "Dura Mater",
+      "summary": "The tough outer membrane, next to the skull",
+      "function": "It is a thick fibrous sheet that also folds into the gap between the hemispheres and under the occipital lobes. The large venous sinuses run within it.",
+      "color": "#c8b8a0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "arachnoid_mater",
+      "parent": "meninges",
+      "label": "Arachnoid Mater",
+      "summary": "The delicate middle membrane, like a web",
+      "function": "It lies under the dura and bridges over the folds of the brain. The cerebrospinal fluid circulates beneath it, in the subarachnoid space.",
+      "color": "#d8d0c0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pia_mater",
+      "parent": "meninges",
+      "label": "Pia Mater",
+      "summary": "The thin inner membrane that follows every fold of the brain",
+      "function": "It clings to the surface of the cortex and dips into the sulci. Small arteries run through it on their way into the brain.",
+      "color": "#e8c8c8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dural_venous_sinuses",
+      "label": "Dural Venous Sinuses",
+      "summary": "Blood channels that run between the layers of the dura",
+      "function": "They collect blood from the brain and from the cerebrospinal fluid drainage, and carry it to the internal jugular veins. Their walls are dura, not muscle, so they stay open.",
+      "color": "#4a6ac0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_sagittal_sinus",
+      "parent": "dural_venous_sinuses",
+      "label": "Superior Sagittal Sinus",
+      "summary": "The sinus along the top midline",
+      "function": "It runs from front to back in the upper edge of the fold between the hemispheres and drains the upper surface of the brain. Arachnoid granulations return cerebrospinal fluid to its blood.",
+      "color": "#3f5fb8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_sagittal_sinus",
+      "parent": "dural_venous_sinuses",
+      "label": "Inferior Sagittal Sinus",
+      "summary": "The small sinus in the lower edge of the fold between the hemispheres",
+      "function": "It runs above the corpus callosum and joins the great cerebral vein to form the straight sinus.",
+      "color": "#5272c8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "straight_sinus",
+      "parent": "dural_venous_sinuses",
+      "label": "Straight Sinus",
+      "summary": "The sinus that slopes back and down from the middle of the brain",
+      "function": "It carries blood from deep veins and the inferior sagittal sinus to the confluence of sinuses at the back.",
+      "color": "#4a6ac0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "transverse_sinuses",
+      "parent": "dural_venous_sinuses",
+      "label": "Transverse Sinuses",
+      "summary": "The paired sinuses running sideways from the back of the head",
+      "function": "They carry blood from the confluence of sinuses round the edge of the tentorium towards the sigmoid sinuses.",
+      "color": "#3f5fb8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sigmoid_sinuses",
+      "parent": "dural_venous_sinuses",
+      "label": "Sigmoid Sinuses",
+      "summary": "The S-shaped continuations that turn down towards the neck",
+      "function": "Each carries blood from a transverse sinus to the internal jugular vein as it leaves the skull.",
+      "color": "#5272c8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cavernous_sinuses",
+      "parent": "dural_venous_sinuses",
+      "label": "Cavernous Sinuses",
+      "summary": "The paired sinuses on either side of the pituitary fossa",
+      "function": "They receive blood from the eye region and the base of the brain. The internal carotid artery and several cranial nerves pass beside or through them.",
+      "color": "#4a6ac0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cerebral_arterial_circle",
+      "label": "Cerebral Arterial Circle (Willis)",
+      "summary": "The ring of arteries at the base of the brain",
+      "function": "It joins the blood supply from the two internal carotid arteries to that from the vertebral-basilar system. If one inflow is narrowed the others can often supply its territory through the ring.",
+      "color": "#d8404a",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_carotid_artery",
+      "parent": "cerebral_arterial_circle",
+      "label": "Internal Carotid Arteries",
+      "summary": "The two arteries that rise from the neck in front of the brainstem",
+      "function": "Each divides into the anterior and middle cerebral arteries. Together they supply most of the front and sides of the cerebrum.",
+      "color": "#c8323e",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vertebral_arteries",
+      "parent": "cerebral_arterial_circle",
+      "label": "Vertebral Arteries",
+      "summary": "The two arteries that climb along the sides of the medulla",
+      "function": "They join in front of the lower brainstem to form the basilar artery and give branches to the medulla and cerebellum.",
+      "color": "#c8323e",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "basilar_artery",
+      "parent": "cerebral_arterial_circle",
+      "label": "Basilar Artery",
+      "summary": "The single artery running up the front of the pons",
+      "function": "It supplies the pons and cerebellum and ends by dividing into the two posterior cerebral arteries.",
+      "color": "#c8323e",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_cerebral_arteries",
+      "parent": "cerebral_arterial_circle",
+      "label": "Anterior Cerebral Arteries",
+      "summary": "The arteries that run forward then arch over the corpus callosum",
+      "function": "They supply the medial surfaces of the frontal and parietal lobes. The two are joined by the anterior communicating artery.",
+      "color": "#c8323e",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "middle_cerebral_arteries",
+      "parent": "cerebral_arterial_circle",
+      "label": "Middle Cerebral Arteries",
+      "summary": "The largest branches of the internal carotids, running out into the lateral sulcus",
+      "function": "They supply most of the lateral surface of the hemisphere, including the motor and sensory areas for the face and hand and the language areas.",
+      "color": "#c8323e",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_cerebral_arteries",
+      "parent": "cerebral_arterial_circle",
+      "label": "Posterior Cerebral Arteries",
+      "summary": "The two end branches of the basilar artery",
+      "function": "They curve round the midbrain to supply the occipital lobe, including the primary visual cortex, and the lower temporal lobe.",
+      "color": "#c8323e",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "communicating_arteries",
+      "parent": "cerebral_arterial_circle",
+      "label": "Communicating Arteries",
+      "summary": "The anterior communicating artery and the two posterior communicating arteries",
+      "function": "The anterior one joins the two anterior cerebral arteries; each posterior one joins an internal carotid to a posterior cerebral artery. They complete the ring.",
+      "color": "#c8323e",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cranial_nerves",
+      "label": "Cranial Nerves",
+      "summary": "The twelve pairs of nerves that leave the brain directly",
+      "function": "Unlike spinal nerves they attach to the brain and brainstem and leave the skull through its openings. They carry smell, vision, eye movement, facial sensation, taste, hearing, balance, swallowing and much of the parasympathetic supply.",
+      "color": "#e8d070",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_i_olfactory",
+      "parent": "cranial_nerves",
+      "label": "Olfactory Nerve (I)",
+      "summary": "Fine fibres from the nose to the olfactory bulb",
+      "function": "It carries the sense of smell. Its fibres pass through the roof of the nasal cavity to reach the bulb.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_ii_optic",
+      "parent": "cranial_nerves",
+      "label": "Optic Nerve (II)",
+      "summary": "The nerve from each retina to the optic chiasm",
+      "function": "It carries vision from the eye. It is really a tract of the brain, wrapped in meninges.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_iii_oculomotor",
+      "parent": "cranial_nerves",
+      "label": "Oculomotor Nerve (III)",
+      "summary": "Leaves the midbrain between the cerebral peduncles",
+      "function": "It moves the eye in most directions, lifts the upper lid, and through its parasympathetic fibres narrows the pupil and focuses the lens.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "miosis",
+          "weight": 0.3,
+          "note": "Its parasympathetic fibres constrict the pupil.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_iv_trochlear",
+      "parent": "cranial_nerves",
+      "label": "Trochlear Nerve (IV)",
+      "summary": "The only cranial nerve to leave from the back of the brainstem",
+      "function": "It supplies the superior oblique muscle of the eye, which turns the eye down and inwards.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_v_trigeminal",
+      "parent": "cranial_nerves",
+      "label": "Trigeminal Nerve (V)",
+      "summary": "The large nerve attached to the side of the pons",
+      "function": "It carries touch, temperature and pain from the face and supplies the muscles of chewing.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "pain",
+          "weight": 0.1,
+          "note": "Pain from the face travels in the trigeminal nerve.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_vi_abducens",
+      "parent": "cranial_nerves",
+      "label": "Abducens Nerve (VI)",
+      "summary": "Leaves between the pons and the medulla",
+      "function": "It supplies the lateral rectus muscle, which turns the eye outwards.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_vii_facial",
+      "parent": "cranial_nerves",
+      "label": "Facial Nerve (VII)",
+      "summary": "Leaves at the junction of pons and medulla, beside the vestibulocochlear nerve",
+      "function": "It moves the muscles of facial expression, carries taste from the front of the tongue and supplies the tear and salivary glands.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_viii_vestibulocochlear",
+      "parent": "cranial_nerves",
+      "label": "Vestibulocochlear Nerve (VIII)",
+      "summary": "Runs beside the facial nerve to the inner ear",
+      "function": "It carries hearing from the cochlea and balance from the vestibular organs.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "vertigo",
+          "weight": 0.3,
+          "note": "Vestibular signals travel in this nerve.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_ix_glossopharyngeal",
+      "parent": "cranial_nerves",
+      "label": "Glossopharyngeal Nerve (IX)",
+      "summary": "Rootlets from the side of the medulla",
+      "function": "It carries taste and sensation from the back of the tongue and throat, and signals from the carotid sinus and body. It supplies the parotid gland.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.2,
+          "note": "It carries sensation from the throat and helps swallowing.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_x_vagus",
+      "parent": "cranial_nerves",
+      "label": "Vagus Nerve (X)",
+      "summary": "Rootlets from the side of the medulla, below the glossopharyngeal nerve",
+      "function": "It is the main parasympathetic nerve, slowing the heart and driving the gut, and it supplies the muscles of the throat and voice box. Most of its fibres carry sensation back from the organs.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal outflow is the main parasympathetic pathway.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_xi_accessory",
+      "parent": "cranial_nerves",
+      "label": "Accessory Nerve (XI)",
+      "summary": "Rootlets from the lowest medulla and upper spinal cord",
+      "function": "It supplies the trapezius and sternocleidomastoid muscles, which move the shoulder and turn the head.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cn_xii_hypoglossal",
+      "parent": "cranial_nerves",
+      "label": "Hypoglossal Nerve (XII)",
+      "summary": "Rootlets between the pyramid and the olive of the medulla",
+      "function": "It supplies the muscles of the tongue, for speech, chewing and swallowing.",
+      "color": "#e8cc58",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cerebral_peduncles",
+      "label": "Cerebral Peduncles",
+      "summary": "The two thick columns on the front of the midbrain",
+      "function": "They carry the descending fibres from the cortex to the pons, medulla and spinal cord. They are the main route by which the cortex sends commands for movement.",
+      "color": "#d8c090",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Voluntary movement sends descending fibres through them.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.1,
+          "note": "Cortical output falls as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_colliculi",
+      "label": "Superior Colliculi",
+      "summary": "The upper pair of bumps on the back of the midbrain",
+      "function": "They direct the gaze and head towards things seen, using a map of the visual field. They also take part in reflex orienting to sudden movement.",
+      "color": "#b8a878",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_colliculi",
+      "label": "Inferior Colliculi",
+      "summary": "The lower pair of bumps on the back of the midbrain",
+      "function": "They are an important relay in the auditory pathway, passing sound signals to the medial geniculate nucleus. They also take part in reflex turning towards a sound.",
+      "color": "#a89868",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "substantia_nigra",
+      "label": "Substantia Nigra",
+      "summary": "The dark band of cells in the midbrain behind the cerebral peduncle",
+      "function": "Its cells make dopamine and send it to the striatum, which is needed for starting and smoothly controlling movement. Loss of these cells causes Parkinson disease.",
+      "color": "#5a4a6a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.2,
+          "note": "Movement selection loops are busier during physical activity.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "red_nucleus",
+      "label": "Red Nucleus",
+      "summary": "A rounded nucleus in the midbrain tegmentum",
+      "function": "It receives from the cerebellum and the motor cortex and sends fibres to the spinal cord and the olive. It takes part in the control of limb movement.",
+      "color": "#c8505a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.15,
+          "note": "Limb movement engages the rubrospinal and cerebellar loops.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "reticular_formation",
+      "label": "Reticular Formation",
+      "summary": "A network of nuclei running through the core of the brainstem",
+      "function": "It controls arousal and wakefulness through its upward connections, and takes part in the control of breathing, blood pressure and muscle tone. General anaesthetics and sleep act partly by quietening it.",
+      "color": "#d0b878",
+      "rest": 0.35,
+      "drives": [
+        {
+          "signal": "sleep",
+          "weight": -0.25,
+          "note": "The arousing network is least active in sleep.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sedation",
+          "weight": -0.2,
+          "note": "Sedatives suppress the arousal system.",
+          "source": "GH14"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.25,
+          "note": "Arousal fails as consciousness is lost.",
+          "source": "GH14"
+        },
+        {
+          "signal": "pain",
+          "weight": 0.1,
+          "note": "Painful stimuli raise arousal.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "locus_coeruleus",
+      "label": "Locus Coeruleus",
+      "summary": "A small group of noradrenaline cells in the floor of the pons",
+      "function": "It is the main source of noradrenaline in the brain and raises alertness and attention. It fires strongly in alarm.",
+      "color": "#4a5a98",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fright",
+          "weight": 0.25,
+          "note": "The locus coeruleus fires in alarm.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "stress",
+          "weight": 0.2,
+          "note": "Sustained load raises its activity.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "sleep",
+          "weight": -0.15,
+          "note": "Its firing falls in sleep.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "raphe_nuclei",
+      "label": "Raphe Nuclei",
+      "summary": "A column of serotonin cells along the midline of the brainstem",
+      "function": "They are the main source of serotonin in the brain and send it widely to the cortex and spinal cord. It affects mood, sleep and pain.",
+      "color": "#8a6ab8",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "sleep",
+          "weight": -0.15,
+          "note": "Serotonin cells fire most when awake.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ventral_tegmental_area",
+      "label": "Ventral Tegmental Area",
+      "summary": "A cluster of dopamine cells in the midbrain next to the substantia nigra",
+      "function": "Its dopamine cells project to the nucleus accumbens and the prefrontal cortex and signal reward. It is central to the circuit that drugs of abuse act on.",
+      "color": "#e8b838",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "reward",
+          "weight": 0.3,
+          "note": "The ventral tegmental area signals reward.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.2,
+          "note": "The ventral tegmental region is active at ejaculation.",
+          "source": "HOLSTEGE2003"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "central_sulcus",
+      "label": "Central Sulcus",
+      "summary": "The deep groove that separates the frontal and parietal lobes",
+      "function": "It runs from the top of the hemisphere down towards the lateral sulcus. The motor strip lies in front of it and the sensory strip behind it.",
+      "color": "#a89888",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_sulcus",
+      "label": "Lateral Sulcus (Sylvian Fissure)",
+      "summary": "The deep groove separating the temporal lobe from the frontal and parietal lobes",
+      "function": "It hides the insula in its depths. The primary auditory cortex lies on its lower lip.",
+      "color": "#a89888",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "precentral_gyrus",
+      "parent": "motor_cortex",
+      "label": "Precentral Gyrus",
+      "summary": "The ridge of cortex just in front of the central sulcus",
+      "function": "It holds the primary motor cortex. Its cells send the main commands for voluntary movement, with the body laid out in an orderly map.",
+      "color": "#c88050",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "postcentral_gyrus",
+      "parent": "somatosensory_cortex",
+      "label": "Postcentral Gyrus",
+      "summary": "The ridge of cortex just behind the central sulcus",
+      "function": "It holds the primary somatosensory cortex, which receives touch and position signals from the opposite side of the body, laid out in an orderly map.",
+      "color": "#c8a850",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_capsule",
+      "label": "Internal Capsule",
+      "summary": "The band of white matter between the thalamus and the basal ganglia",
+      "function": "Nearly all fibres running between the cortex and the brainstem and thalamus pass through it, in an anterior limb, a genu and a posterior limb. A small injury here can cause wide paralysis.",
+      "color": "#ece4d0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Voluntary movement sends fibres down through it.",
+          "source": "KANDEL6"
+        },
+        {
+          "signal": "unconscious",
+          "weight": -0.1,
+          "note": "Cortical traffic falls as consciousness is lost.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cortex_layer_1",
+      "parent": "somatosensory_cortex",
+      "label": "Cortical Layer I (Molecular)",
+      "summary": "The outermost layer, with few cells and many fibres (schematic column)",
+      "function": "It is mostly the branched tips of dendrites and fibres that connect distant regions.",
+      "color": "#d8c47a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cortex_layer_2",
+      "parent": "somatosensory_cortex",
+      "label": "Cortical Layer II (External Granular)",
+      "summary": "A layer of small, densely packed cells (schematic column)",
+      "function": "It sends and receives short connections with neighbouring cortex.",
+      "color": "#d8c47a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cortex_layer_3",
+      "parent": "somatosensory_cortex",
+      "label": "Cortical Layer III (External Pyramidal)",
+      "summary": "A layer of medium pyramidal cells (schematic column)",
+      "function": "It gives rise to fibres that link one cortical area with another, including the corpus callosum.",
+      "color": "#d8c47a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cortex_layer_4",
+      "parent": "somatosensory_cortex",
+      "label": "Cortical Layer IV (Internal Granular)",
+      "summary": "A layer of small cells that is thickest in sensory cortex (schematic column)",
+      "function": "It is the main place where signals from the thalamus arrive.",
+      "color": "#d8c47a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cortex_layer_5",
+      "parent": "somatosensory_cortex",
+      "label": "Cortical Layer V (Internal Pyramidal)",
+      "summary": "A layer of large pyramidal cells (schematic column)",
+      "function": "It sends fibres out to the basal ganglia, brainstem and spinal cord. It is especially thick in motor cortex.",
+      "color": "#d8c47a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cortex_layer_6",
+      "parent": "somatosensory_cortex",
+      "label": "Cortical Layer VI (Multiform)",
+      "summary": "The deepest layer, of cells of varied shape (schematic column)",
+      "function": "It sends fibres back to the thalamus.",
+      "color": "#d8c47a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "caudate_nucleus",
+      "parent": "basal_ganglia",
+      "label": "Caudate Nucleus",
+      "summary": "The comma-shaped nucleus curving beside the lateral ventricle",
+      "function": "With the putamen it forms the striatum, the main input to the basal ganglia. It takes part in movement and in learning and decision making.",
+      "color": "#b898d8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "putamen",
+      "parent": "basal_ganglia",
+      "label": "Putamen",
+      "summary": "The rounded nucleus on the outer side of the globus pallidus",
+      "function": "With the caudate it forms the striatum and receives from the cortex. It is mainly involved in the control of movement.",
+      "color": "#a878d0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "globus_pallidus",
+      "parent": "basal_ganglia",
+      "label": "Globus Pallidus",
+      "summary": "The pale nucleus on the inner side of the putamen",
+      "function": "It is the main output of the basal ganglia, sending inhibitory signals to the thalamus that shape which movements go ahead.",
+      "color": "#d0b0e8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "subthalamic_nucleus",
+      "parent": "basal_ganglia",
+      "label": "Subthalamic Nucleus",
+      "summary": "A small lens-shaped nucleus below the thalamus",
+      "function": "It is the main excitatory nucleus of the basal ganglia and helps to hold back unwanted movements. Lesions of it cause wild flinging movements of the opposite limbs.",
+      "color": "#9868c0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_geniculate_nucleus",
+      "parent": "thalamus",
+      "label": "Lateral Geniculate Nucleus",
+      "summary": "A small layered nucleus on the underside of the thalamus",
+      "function": "It receives the optic tract and relays vision to the primary visual cortex.",
+      "color": "#7fb0c8",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "medial_geniculate_nucleus",
+      "parent": "thalamus",
+      "label": "Medial Geniculate Nucleus",
+      "summary": "A small nucleus beside the lateral geniculate",
+      "function": "It receives hearing signals from the inferior colliculus and relays them to the primary auditory cortex.",
+      "color": "#7fb0c8",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vpl_nucleus",
+      "parent": "thalamus",
+      "label": "Ventral Posterolateral Nucleus",
+      "summary": "A relay nucleus at the back of the thalamus",
+      "function": "It receives touch, position and pain signals from the body and relays them to the somatosensory cortex.",
+      "color": "#6fa0b8",
+      "rest": 0.4,
+      "drives": [
+        {
+          "signal": "pain",
+          "weight": 0.2,
+          "note": "Spinothalamic pain pathways synapse in the thalamus.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vpm_nucleus",
+      "parent": "thalamus",
+      "label": "Ventral Posteromedial Nucleus",
+      "summary": "The relay nucleus next to the ventral posterolateral nucleus",
+      "function": "It receives touch, pain and taste from the face and head and relays them to the somatosensory cortex.",
+      "color": "#6fa0b8",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pulvinar",
+      "parent": "thalamus",
+      "label": "Pulvinar",
+      "summary": "The large posterior nucleus of the thalamus",
+      "function": "It connects with the visual and association cortex and helps direct visual attention.",
+      "color": "#8fc0d8",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "suprachiasmatic_nucleus",
+      "parent": "hypothalamus",
+      "label": "Suprachiasmatic Nucleus",
+      "summary": "A small nucleus just above the optic chiasm",
+      "function": "It is the body clock. It receives light information from the retina and sets the daily rhythm of sleep, hormones and temperature.",
+      "color": "#f0b860",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "night",
+          "weight": 0.4,
+          "note": "The clock nucleus times the dark phase and melatonin release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "paraventricular_nucleus",
+      "parent": "hypothalamus",
+      "label": "Paraventricular Nucleus",
+      "summary": "A nucleus beside the upper third ventricle",
+      "function": "It releases corticotropin-releasing hormone to drive the stress axis and makes oxytocin and vasopressin for the posterior pituitary.",
+      "color": "#e8a040",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "stressAxis",
+          "weight": 0.3,
+          "note": "It drives the stress axis.",
+          "source": "GH14"
+        },
+        {
+          "signal": "oxytocin",
+          "weight": 0.2,
+          "note": "It makes oxytocin.",
+          "source": "GH14"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.2,
+          "note": "The paraventricular nucleus is active at orgasm.",
+          "source": "KOMISARUK2004"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "supraoptic_nucleus",
+      "parent": "hypothalamus",
+      "label": "Supraoptic Nucleus",
+      "summary": "A nucleus above the optic tract",
+      "function": "Its large cells make vasopressin and oxytocin and send them down the stalk to the posterior pituitary. Vasopressin release rises when the blood becomes more concentrated.",
+      "color": "#e89830",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "adh",
+          "weight": 0.3,
+          "note": "It makes vasopressin.",
+          "source": "GH14"
+        },
+        {
+          "signal": "dehydration",
+          "weight": 0.2,
+          "note": "Osmoreceptors drive its vasopressin release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "arcuate_nucleus",
+      "parent": "hypothalamus",
+      "label": "Arcuate Nucleus",
+      "summary": "A nucleus in the floor of the hypothalamus beside the infundibulum",
+      "function": "It senses hunger signals from the blood and releases hormones that control the anterior pituitary through the portal vessels.",
+      "color": "#f0b060",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "hypoglycaemia",
+          "weight": 0.2,
+          "note": "Hypothalamic feeding circuits respond to low glucose.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ventromedial_nucleus",
+      "parent": "hypothalamus",
+      "label": "Ventromedial Nucleus",
+      "summary": "A rounded nucleus in the middle of the hypothalamus",
+      "function": "It is a satiety centre, signalling that enough has been eaten. Damage to it in animals leads to overeating.",
+      "color": "#e0a850",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_hypothalamic_area",
+      "parent": "hypothalamus",
+      "label": "Lateral Hypothalamic Area",
+      "summary": "The broad region on the outer side of the hypothalamus",
+      "function": "It acts as a feeding centre and contains cells that promote wakefulness. It connects widely with the cortex and brainstem.",
+      "color": "#d89848",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dentate_gyrus",
+      "parent": "hippocampus",
+      "label": "Dentate Gyrus",
+      "summary": "A tightly curled strip of cortex tucked into the hippocampus",
+      "function": "It receives the main input from the entorhinal cortex. It is one of the few places where new neurons are thought to form in adults.",
+      "color": "#5fc0a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ca3_field",
+      "parent": "hippocampus",
+      "label": "CA3 Field",
+      "summary": "The part of the hippocampus next to the dentate gyrus",
+      "function": "Its cells are richly interconnected with each other, which is thought to help store and recall patterns of memory.",
+      "color": "#4fb090",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ca1_field",
+      "parent": "hippocampus",
+      "label": "CA1 Field",
+      "summary": "The part of the hippocampus next to the subiculum",
+      "function": "It receives from CA3 and sends the output to the subiculum and entorhinal cortex. It is especially sensitive to lack of oxygen.",
+      "color": "#6fd0b0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "subiculum",
+      "parent": "hippocampus",
+      "label": "Subiculum",
+      "summary": "The transition zone between the hippocampus and the entorhinal cortex",
+      "function": "It is the main output of the hippocampus, sending signals back to the entorhinal cortex and on through the fornix.",
+      "color": "#7fd8b8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "entorhinal_cortex",
+      "parent": "hippocampus",
+      "label": "Entorhinal Cortex",
+      "summary": "Cortex at the front of the parahippocampal gyrus",
+      "function": "It is the gateway between the hippocampus and the rest of the cortex. Nearly all signals to and from the hippocampus pass through it.",
+      "color": "#4fb8a0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "basolateral_amygdala",
+      "parent": "amygdala",
+      "label": "Basolateral Nuclei",
+      "summary": "The large group of nuclei on the outer side of the amygdala",
+      "function": "They receive sensory information from the cortex and thalamus and attach emotional meaning to it, as in learning what to fear.",
+      "color": "#d06060",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "central_amygdala",
+      "parent": "amygdala",
+      "label": "Central Nucleus",
+      "summary": "The nucleus on the inner side of the amygdala",
+      "function": "It is the main output of the amygdala to the hypothalamus and brainstem, setting off the body responses to fear.",
+      "color": "#c05050",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "fright",
+          "weight": 0.2,
+          "note": "Its output drives the autonomic response to alarm.",
+          "source": "KANDEL6"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_pituitary",
+      "parent": "pituitary",
+      "label": "Anterior Lobe",
+      "summary": "The front, glandular part of the pituitary",
+      "function": "It makes growth hormone, prolactin, ACTH, thyroid-stimulating hormone and the gonadotropins, under the control of hormones sent from the hypothalamus through a small portal circulation.",
+      "color": "#f0c060",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "somatotrophs",
+      "parent": "anterior_pituitary",
+      "label": "Somatotrophs",
+      "summary": "Cells of the anterior lobe that make growth hormone (magnified schematic)",
+      "function": "They release growth hormone into the blood when the hypothalamus signals them to.",
+      "color": "#e8b850",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lactotrophs",
+      "parent": "anterior_pituitary",
+      "label": "Lactotrophs",
+      "summary": "Cells of the anterior lobe that make prolactin (magnified schematic)",
+      "function": "They release prolactin into the blood when the hypothalamus signals them to.",
+      "color": "#e8b850",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "prolactin",
+          "weight": 0.15,
+          "note": "These cells release prolactin.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corticotrophs",
+      "parent": "anterior_pituitary",
+      "label": "Corticotrophs",
+      "summary": "Cells of the anterior lobe that make ACTH (magnified schematic)",
+      "function": "They release ACTH into the blood when the hypothalamus signals them to.",
+      "color": "#e8b850",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "stressAxis",
+          "weight": 0.25,
+          "note": "ACTH is released in response to hypothalamic CRH.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thyrotrophs",
+      "parent": "anterior_pituitary",
+      "label": "Thyrotrophs",
+      "summary": "Cells of the anterior lobe that make thyroid-stimulating hormone (magnified schematic)",
+      "function": "They release thyroid-stimulating hormone into the blood when the hypothalamus signals them to.",
+      "color": "#e8b850",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gonadotrophs",
+      "parent": "anterior_pituitary",
+      "label": "Gonadotrophs",
+      "summary": "Cells of the anterior lobe that make luteinising hormone and follicle-stimulating hormone (magnified schematic)",
+      "function": "They release luteinising hormone and follicle-stimulating hormone into the blood when the hypothalamus signals them to.",
+      "color": "#e8b850",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "lh",
+          "weight": 0.15,
+          "note": "These cells release LH.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_pituitary",
+      "parent": "pituitary",
+      "label": "Posterior Lobe",
+      "summary": "The back part of the pituitary, made of nerve endings",
+      "function": "It stores and releases vasopressin and oxytocin, which are made in the hypothalamus and arrive along nerve fibres.",
+      "color": "#e8d090",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "adh",
+          "weight": 0.2,
+          "note": "The posterior lobe releases vasopressin.",
+          "source": "GH14"
+        },
+        {
+          "signal": "oxytocin",
+          "weight": 0.2,
+          "note": "The posterior lobe releases oxytocin.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "infundibulum",
+      "parent": "pituitary",
+      "label": "Infundibulum",
+      "summary": "The stalk that joins the pituitary to the hypothalamus",
+      "function": "It carries nerve fibres to the posterior lobe and the portal vessels that bring hypothalamic releasing hormones to the anterior lobe.",
+      "color": "#f0d890",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cerebellar_vermis",
+      "parent": "cerebellum",
+      "label": "Vermis",
+      "summary": "The narrow midline part of the cerebellum",
+      "function": "It controls the muscles of the trunk and the position of the body as a whole, and helps keep balance.",
+      "color": "#7a9a6a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cerebellar_hemispheres",
+      "parent": "cerebellum",
+      "label": "Cerebellar Hemispheres",
+      "summary": "The two large lateral lobes of the cerebellum",
+      "function": "They coordinate the limbs and fine movements on the same side of the body, and help time and smooth voluntary movement.",
+      "color": "#8aaa7a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cerebellar_peduncles",
+      "parent": "cerebellum",
+      "label": "Cerebellar Peduncles",
+      "summary": "The three pairs of fibre bundles joining the cerebellum to the brainstem",
+      "function": "They carry all the signals in and out of the cerebellum.",
+      "color": "#c8d0a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_cerebellar_peduncle",
+      "parent": "cerebellar_peduncles",
+      "label": "Superior Cerebellar Peduncle",
+      "summary": "The upper pair, leading to the midbrain",
+      "function": "It is the main route out of the cerebellum, carrying its output towards the red nucleus and thalamus.",
+      "color": "#c8d0a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "middle_cerebellar_peduncle",
+      "parent": "cerebellar_peduncles",
+      "label": "Middle Cerebellar Peduncle",
+      "summary": "The largest pair, from the pons",
+      "function": "It carries signals from the cortex, relayed in the pons, into the cerebellum.",
+      "color": "#c8d0a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_cerebellar_peduncle",
+      "parent": "cerebellar_peduncles",
+      "label": "Inferior Cerebellar Peduncle",
+      "summary": "The lowest pair, from the medulla",
+      "function": "It carries position and balance signals from the spinal cord and vestibular system into the cerebellum.",
+      "color": "#c8d0a8",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deep_cerebellar_nuclei",
+      "parent": "cerebellum",
+      "label": "Deep Cerebellar Nuclei",
+      "summary": "Four pairs of nuclei buried in the white matter of the cerebellum",
+      "function": "They are the relays through which the cerebellar cortex sends its output to the rest of the brain.",
+      "color": "#6a8a5a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "dentate_nucleus",
+      "parent": "deep_cerebellar_nuclei",
+      "label": "Dentate Nucleus",
+      "summary": "The largest and most lateral deep nucleus",
+      "function": "It sends signals from the lateral hemisphere to the thalamus and motor cortex.",
+      "color": "#6a8a5a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "emboliform_nucleus",
+      "parent": "deep_cerebellar_nuclei",
+      "label": "Emboliform Nucleus",
+      "summary": "A small deep nucleus beside the globose nucleus",
+      "function": "With the globose nucleus it receives from the intermediate part of the hemisphere and helps control limb movement.",
+      "color": "#6a8a5a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "globose_nucleus",
+      "parent": "deep_cerebellar_nuclei",
+      "label": "Globose Nucleus",
+      "summary": "A small deep nucleus beside the emboliform nucleus",
+      "function": "With the emboliform nucleus it receives from the intermediate part of the hemisphere and helps control limb movement.",
+      "color": "#6a8a5a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fastigial_nucleus",
+      "parent": "deep_cerebellar_nuclei",
+      "label": "Fastigial Nucleus",
+      "summary": "The most medial deep nucleus, near the vermis",
+      "function": "It receives from the vermis and sends signals to the vestibular nuclei and reticular formation to help balance and posture.",
+      "color": "#6a8a5a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "callosal_rostrum",
+      "parent": "corpus_callosum",
+      "label": "Rostrum",
+      "summary": "The thin lower front end of the corpus callosum",
+      "function": "It connects the orbital parts of the two frontal lobes.",
+      "color": "#e8e2d0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "callosal_genu",
+      "parent": "corpus_callosum",
+      "label": "Genu",
+      "summary": "The bent front end of the corpus callosum",
+      "function": "It connects the two prefrontal cortices.",
+      "color": "#e8e2d0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "callosal_body",
+      "parent": "corpus_callosum",
+      "label": "Body",
+      "summary": "The long arched middle of the corpus callosum",
+      "function": "It connects the motor, sensory and parietal areas of the two hemispheres.",
+      "color": "#e8e2d0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "callosal_splenium",
+      "parent": "corpus_callosum",
+      "label": "Splenium",
+      "summary": "The thick rounded back end of the corpus callosum",
+      "function": "It connects the occipital and temporal lobes of the two hemispheres, including the visual areas.",
+      "color": "#e8e2d0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ import type { HormoneSnapshot } from '../../bridge/types';
 import { useStore } from '../store';
 import { Sparkline } from '../components/Sparkline';
 import styles from './endocrine.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * ENDOCRINE PANEL.
@@ -94,17 +95,14 @@ export function EndocrinePanel() {
   const abnormal = rows.filter((r) => r.deviation > 0).length;
 
   return (
-    <aside className={styles.panel} role="dialog" aria-label="Endocrine panel"
+    <aside className={styles.panel} role="dialog" aria-label="Hormone levels panel"
       data-panel="endocrine">
-      <header className={styles.header}>
-        <h2 className={styles.title}>Endocrine</h2>
-        <span className={styles.clock} title="Simulated time of day. Several hormones carry a circadian term.">
-          {e ? clockLabel(e.clockHour) : '—'}
-        </span>
-        <button className={styles.close} onClick={() => toggle()} aria-label="Close endocrine panel">
-          {'×'}
-        </button>
-      </header>
+      <PanelHeader
+        title="Hormone levels"
+        meta={e ? clockLabel(e.clockHour) : '—'}
+        metaTitle="Simulated time of day. Several hormones carry a circadian term."
+        onClose={() => toggle()}
+      />
 
       {e && (
         <p className={styles.summary}>
@@ -128,7 +126,7 @@ export function EndocrinePanel() {
           return (
             <li key={h.id} className={styles.row}>
               <div className={styles.rowHead}>
-                <span className={styles.name}>{h.label}</span>
+                <span className={styles.name} title={h.label}>{h.label}</span>
                 <span className={styles.gland}>{h.gland}</span>
                 <span className={styles.value}>
                   {fmt(h.level)} <span className={styles.unit}>{h.unit}</span>
@@ -149,6 +147,8 @@ export function EndocrinePanel() {
                 />
                 <span className={`${styles.needle} ${cls}`} style={{ left: `${g.needle}%` }} />
               </div>
+
+              {h.note && <p className={styles.note}>{h.note}</p>}
 
               <div className={styles.rowFoot}>
                 <span>

@@ -144,14 +144,14 @@
 }
 
 .itemText strong {
-  font-size: 14px;
+  font-size: var(--text-md);
   font-weight: 700;
   color: var(--ink);
 }
 
 .itemText small {
-  font-size: 11px;
-  color: var(--ink-faint);
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -173,52 +173,158 @@ a.item {
   color: inherit;
 }
 
-/* ------------------------------------------------------------ vessels switch */
+/* ------------------------------------------------------------ hormone legend */
 
 /*
- * Bottom-left corner of the stage, just above the dock. The body is centred, so this
- * corner is empty at every width; the bottom offset is the MEASURED bar height, the
- * same number the drawer and sheet use, so the switch can never sit under the dock.
+ * THE LEGENDS COLUMN. Above the Layers chip (44 px plus 8 px of air), left-aligned with it. It holds the Hormones legend and the Activity legend one
+ * above the other, so with both switches on they cannot collide (each used to position
+ * itself, and a second legend would have landed on the first). The Activity legend sits
+ * nearest the switches; the hormone list is the part that shrinks and scrolls inside
+ * itself when the column outgrows the room between the dock and the readouts above it, so
+ * it never climbs into them. The column takes no pointer events of its own.
  */
-.vessels {
+.legends {
   position: absolute;
   left: var(--inset-hud);
-  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px + 52px);
   z-index: 14;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: 36px;
-  padding: 4px 12px 4px 9px;
-  border: none;
-  border-radius: var(--radius-pill);
-  background: var(--chip-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* 200 px is the room kept for the HUD's first rows (a display choice). */
+  max-height: calc(100% - var(--corpus-bar-actual, var(--corpus-bar-h)) - 200px - 52px);
+  pointer-events: none;
+}
+
+.legends > * {
+  pointer-events: auto;
+}
+
+/*
+ * The hormone list: two columns, 190 px, small type.
+ */
+.hormLegend {
+  flex: 0 1 auto;
+  min-height: 0;
+  box-sizing: border-box;
+  width: 190px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px 4px;
+  padding: 6px;
+  border-radius: 12px;
+  background: rgba(255, 253, 248, 0.88);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  font-size: 12px;
-  font-weight: 700;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  /* Was 9.5 px; --text-xs is the floor, and the legend grows a little instead. */
+  font-size: var(--text-xs);
+  line-height: 1.2;
   color: var(--ink);
-  cursor: pointer;
-  transition: background 140ms ease;
+  overscroll-behavior: contain;
 }
 
-.vessels:hover {
-  background: var(--chip-bg-strong);
+.hormRow {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
 }
 
-.vesselsOn {
-  background: var(--chip-bg-strong);
-  box-shadow: inset 0 0 0 1.5px rgba(214, 58, 47, 0.45);
+.hormDot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
 
-.vesselsState {
-  font-size: 10px;
+.hormName {
+  flex: 1;
+  min-width: 0;
+  /* Never an ellipsis: a long name wraps between words instead of being cut. */
+  white-space: normal;
+  font-weight: 600;
+}
+
+.hormMark {
+  flex: none;
+  color: var(--ink-dim);
   font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
 }
 
-.vesselsOn .vesselsState {
-  color: #d63a2f;
+.hormMarkOn {
+  color: var(--ink);
+}
+
+/*
+ * PHONE, A CARD IS OPEN: THE CORNER SWITCHES AND THE HORMONE LEGEND STEP OUT OF THE WAY.
+ * A bottom sheet or the resuscitation card covers the bottom-left corner of the stage, so
+ * the four switches (and the legends above them) were still in the DOM, still looked
+ * tappable, and were painted over (the checker reported "Show blood vessels" covered under
+ * Charge, 120 J and Compress). Nothing a visitor can tap may sit under something else, and
+ * a control they cannot reach is better absent than present-but-dead. data-card is set on
+ * the shell from the same flags that fold the HUD (App.tsx sheetOpen). Desktop is not
+ * touched: its sheet is a right-hand column and the corner stays free.
+ */
+@media (max-width: 720px) {
+  :global([data-card='open']) .legends {
+    display: none;
+  }
+}
+
+/*
+ * THE PANELS MENU HIDES THE LEGEND, AT EVERY WIDTH. The launcher opens upward from the dock
+ * over the bottom-left corner, so the legends were painted through its rows. It returns the
+ * moment the menu closes. The Layers popover also hides it while open (data-layers), so the
+ * popover never lies over text it would cover.
+ */
+:global([data-menu='open']) .legends,
+:global([data-layers='open']) .legends {
+  display: none;
+}
+
+/* ------------------------------------------------------- search row and link item */
+
+/* The search field is the first row of the launcher and stays put while the list scrolls
+   under it (the launcher is the scroll container; the background is opaque enough to cover
+   rows, which are the same sheet colour). */
+.searchRow {
+  position: sticky;
+  top: -6px; /* the launcher's own 6px padding sits inside its scrollport */
+  z-index: 1;
+  padding: 6px 4px 2px;
+  margin: -6px -6px 0;
+  background: var(--sheet-bg);
+  border-radius: 18px 18px 0 0;
+}
+
+/* The read-only field that shows the link when the clipboard refused. */
+.fallback {
+  padding: 6px 10px 10px;
+}
+
+.fallback label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fallback small {
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
+}
+
+.fallbackField {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: 12px;
 }

@@ -3,6 +3,7 @@ import type { SimSnapshot } from '../../bridge/types';
 import { useStore } from '../store';
 import { Sparkline } from '../components/Sparkline';
 import styles from './lab.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * LABORATORY PANEL.
@@ -242,15 +243,7 @@ export function LabPanel() {
   return (
     <aside className={styles.panel} role="dialog" aria-label="Laboratory panel"
       data-panel="lab">
-      <header className={styles.header}>
-        <h2 className={styles.title}>Laboratory</h2>
-        <span className={styles.count}>
-          {abnormal === 0 ? 'all in range' : `${abnormal} abnormal`}
-        </span>
-        <button className={styles.close} onClick={() => toggle()} aria-label="Close laboratory panel">
-          {'×'}
-        </button>
-      </header>
+      <PanelHeader title="Laboratory" meta={abnormal === 0 ? 'all in range' : `${abnormal} abnormal`} onClose={() => toggle()} />
 
       <div className={styles.scroll} data-dense>
         {sections.map((section) => (

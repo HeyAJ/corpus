@@ -14,8 +14,8 @@
   border-radius: 14px;
   border: 2px solid #b4342c;
   background: transparent;
-  color: #b4342c;
-  font-size: 17px;
+  color: var(--ink-alarm);
+  font-size: var(--text-xl);
   font-weight: 700;
   pointer-events: auto;
   transition: background 200ms ease, opacity 200ms ease;
@@ -60,7 +60,11 @@
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 16px;
+  /* The MEASURED bottom-bar height, as the sheet and drawer use. A fixed 16px let this card
+     reach down over the tool dock on a phone, so the Cancel button was unreachable. */
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  max-height: calc(100% - var(--corpus-bar-actual, var(--corpus-bar-h)) - 24px);
+  overflow-y: auto;
   width: min(340px, calc(100% - 24px));
   background: var(--sheet-bg);
   backdrop-filter: blur(16px);
@@ -74,28 +78,30 @@
   z-index: 26;
 }
 
-.headerRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.title {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 700;
-}
-
-.downtime {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--severity-warn-ink);
+/*
+ * WIDE SCREENS: DOCKED TO THE RIGHT LIKE THE PANEL CARD. Centre-bottom put this card over the
+ * very chest it is acting on and was the one panel not on the right. It now takes the shell
+ * card's width and top inset (app.module.css .sheet) and is content-height, with its height
+ * capped so it stops above the MEASURED bottom bar. The defib pads stay on the thorax (they
+ * are placed from the stage centre, not from this card). The phone keeps its bottom card.
+ * It carries data-stage-cover (ProcedurePanel.tsx).
+ */
+@media (min-width: 721px) {
+  .panel {
+    left: auto;
+    right: 16px;
+    transform: none;
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    bottom: auto;
+    width: min(380px, 38vw);
+    max-height: calc(100% - env(safe-area-inset-top, 0px) - 16px - var(--corpus-bar-actual, var(--corpus-bar-h)) - 8px);
+  }
 }
 
 .metrics {
   display: flex;
   gap: 12px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   color: var(--ink-dim);
 }
@@ -112,7 +118,7 @@
   border-radius: var(--radius-chip);
   background: rgba(0, 0, 0, 0.07);
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--text-lg);
   touch-action: none;
   user-select: none;
 }
@@ -120,18 +126,18 @@
 .cprButton:active,
 .cprActive {
   background: var(--organ-active);
-  color: #fff;
+  color: var(--ink-inverse);
 }
 
 .quality {
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   min-width: 96px;
   text-align: right;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
-.quality_good { color: #2f7d4f; }
+.quality_good { color: var(--ink-ok); }
 .quality_slow { color: var(--severity-warn-ink); }
 .quality_fast { color: var(--severity-warn-ink); }
 
@@ -146,12 +152,12 @@
   border-radius: var(--radius-chip);
   background: rgba(0, 0, 0, 0.05);
   font-weight: 700;
-  font-size: 14px;
+  font-size: var(--text-md);
 }
 
 .energyActive {
-  background: rgba(0, 0, 0, 0.14);
-  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, 0.16);
+  background: var(--accent-selected);
+  color: var(--ink-inverse);
 }
 
 .actionRow {
@@ -165,7 +171,7 @@
   padding: 12px;
   border-radius: var(--radius-chip);
   font-weight: 700;
-  font-size: 15px;
+  font-size: var(--text-lg);
 }
 
 .charge {
@@ -174,7 +180,7 @@
 
 .shock {
   background: var(--organ-active);
-  color: #fff;
+  color: var(--ink-inverse);
 }
 
 .charge:disabled,
@@ -186,14 +192,14 @@
 .outcome {
   border-radius: var(--radius-chip);
   padding: 10px 12px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.5;
 }
 
 .outcome strong {
   display: block;
   margin-bottom: 4px;
-  font-size: 13px;
+  font-size: var(--text-md);
 }
 
 .outcome p {
@@ -203,7 +209,7 @@
 
 .outcomeGood {
   background: rgba(47, 125, 79, 0.12);
-  color: #1f5c39;
+  color: var(--ink-ok);
 }
 
 .outcomeBad {

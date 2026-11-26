@@ -1,0 +1,485 @@
+/*
+ * STRUCTURES PANEL.
+ *
+ * A sheet card like the environment panel it is modelled on. It scrolls inside itself
+ * (the sheet gives it a bounded height) so a long atlas never pushes the header away, and
+ * every tappable row is at least 44 px tall.
+ */
+
+.panel {
+  width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+}
+
+/*
+ * The header is sticky inside the panel's own scroll, so it must be OPAQUE (the sheet's
+ * background is translucent and rows would show through it). The negative margins and the
+ * padding put it flush with the card's edges and give the 16px of breathing room back.
+ * #e8e8e8 is --sheet-bg without its alpha. z-index keeps rows and their meters beneath it.
+ */
+.header {
+  position: sticky;
+  top: -16px; /* the panel's 16px padding is inside the scrollport: cancel it so the header sits flush */
+  z-index: 5;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: -16px -16px 0;
+  padding: 12px 16px 8px;
+  background: #e8e8e8;
+  border-bottom: 1px solid var(--chip-bg-strong);
+}
+
+/*
+ * PHONE: the bottom sheet (not this panel) is the scroll container, and a sticky child binds
+ * to the nearest ancestor that has overflow, so a panel with `overflow: auto` would capture
+ * the header against a scrollport that never scrolls and it would ride away with the list.
+ * Let the panel be plain content here; the header then sticks to the sheet's top edge
+ * (the sheet has no padding, so top is 0), with its own rounded top corners because the
+ * panel no longer clips it.
+ */
+@media (max-width: 720px) {
+  .panel {
+    overflow: visible;
+    max-height: none;
+  }
+
+  .header {
+    top: 0;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+  }
+}
+
+.lead {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink-mid);
+}
+
+/* ---------------------------------------------------------------- organ list */
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.organs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.organButton {
+  min-height: 44px;
+  padding: 0 14px;
+  font: inherit;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+}
+
+.organButton:hover {
+  background: var(--chip-bg-strong);
+}
+
+/* --------------------------------------------------------------- organ atlas */
+
+.back {
+  min-width: 44px;
+  min-height: 44px;
+  margin-left: -10px;
+  border: none;
+  background: none;
+  font-size: var(--text-display);
+  line-height: 1;
+  color: var(--ink-mid);
+  cursor: pointer;
+}
+
+.about {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink-mid);
+}
+
+.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.more {
+  /* Drawn 32 px tall, as before; the touch area is widened to 44 x 44 by the ::after below
+     (readability rule 4), which is invisible and so does not make the link look bigger. It
+     stays clear of the 12 px gap above the next row, so it overlaps no other control. */
+  position: relative;
+  min-height: 32px;
+  padding: 0;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.quiet {
+  margin: 0;
+  font-size: var(--text-md);
+  color: var(--ink-dim);
+}
+
+.active {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.activeTitle {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 12px;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--chip-bg);
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+.swatchSmall {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* ---------------------------------------------------------------------- parts */
+
+.parts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.partItem {
+  border-radius: var(--radius-chip);
+  background: var(--chip-bg);
+}
+
+.partItem[data-open='true'] {
+  background: var(--chip-bg-strong);
+}
+
+.rowLine {
+  display: flex;
+  align-items: stretch;
+}
+
+/* The disclosure is its own button, 44 px wide at least, so folding a list never selects the part. */
+.disclose {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 52px;
+  min-height: 44px;
+  padding: 0 10px;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--ink-dim);
+  background: none;
+  border: none;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+}
+
+.discloseCount {
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  display: inline-block;
+  font-size: var(--text-xl);
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.chevron[data-open='true'] {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
+
+/* Finer structures: indented under their parent behind a hairline (non-text, so --ink-faint). */
+.children {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0 8px 8px 14px;
+  padding: 0 0 0 8px;
+  border-left: 2px solid var(--ink-faint);
+}
+
+.partRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.swatch {
+  flex: 0 0 auto;
+  width: 12px;
+  height: 12px;
+  margin-top: 3px;
+  border-radius: 4px;
+}
+
+.partText {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.partTop {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.partLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+
+.meter {
+  flex: 0 0 64px;
+  height: 6px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-pill);
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  background: var(--ink-mid);
+  border-radius: var(--radius-pill);
+}
+
+.partSummary {
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--ink-dim);
+}
+
+.detail {
+  padding: 0 12px 12px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.prose {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.5;
+  color: var(--ink-mid);
+}
+
+.subTitle {
+  margin: 4px 0 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.drives,
+.sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--ink-mid);
+}
+
+.drive {
+  display: flex;
+  gap: 8px;
+}
+
+.up,
+.down {
+  flex: 0 0 auto;
+  font-size: var(--text-xs);
+  line-height: 1.9;
+}
+
+.up {
+  color: var(--organ-active);
+}
+
+.down {
+  color: var(--ink-info);
+}
+
+.sources a {
+  color: var(--ink-mid);
+  overflow-wrap: anywhere;
+}
+
+.more::after {
+  content: '';
+  position: absolute;
+  inset: -6px -8px;
+}
+
+/* ------------------------------------------------------------------------- the cut row */
+
+.cut {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.segments {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--chip-bg);
+  border-radius: var(--radius-pill);
+}
+
+.segment {
+  flex: 1 1 0;
+  min-height: 44px;
+  font: inherit;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink);
+  background: none;
+  border: none;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+}
+
+/* Every selected chip, segment and tab in the app uses --accent-selected (white text on it
+ * measures 4.86:1); the Cut control was the one still drawn in the dark chip colour. */
+.segmentOn {
+  background: var(--accent-selected);
+  color: var(--ink-inverse);
+}
+
+.depth {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-mid);
+}
+
+.depth span {
+  flex: none;
+  min-width: 78px;
+}
+
+.depth input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  cursor: pointer;
+}
+
+.cutNote {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--ink-dim);
+}

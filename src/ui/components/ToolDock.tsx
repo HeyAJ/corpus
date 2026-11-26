@@ -1,5 +1,12 @@
+import { useEffect, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import type { Viewer } from '../../render/scene/Viewer';
+import { LEGEND_HIGH, LEGEND_LOW, type HormoneLegendEntry } from '../../render/endocrine/HormoneTraffic';
 import { useStore, type ToolMode } from '../store';
+import { SearchBox } from './SearchBox';
+import { buildShareHash, LINK_COPIED_TOAST, LAYER_NAMES, type LayerName } from '../shareLink';
+import { ActivityLegend } from './ActivityLegend';
+import { BloodDrop } from './layerGlyphs';
 import styles from './dock.module.css';
 import { useVitalsAudio } from '../audio/useVitalsAudio';
 
@@ -38,42 +45,53 @@ function DockButton({ label, active, onClick, children }: DockButtonProps) {
 const S = 20;
 
 /**
- * THE VESSELS SWITCH, in the bottom-left corner of the stage, above the dock.
- *
- * Its own labelled control rather than an unlabelled chip in the dock. The anatomy
- * opens WITHOUT the vessels (user choice, 2026-09-26: the organs first, the vascular
- * tree on request), and a round drop icon among four tools did not say "vessels" to
- * anyone. A word and an on/off state does.
+ * THE HORMONE LEGEND. Shown whenever the Hormones layer is on, above the Layers chip.
+ * It lists every hormone present in the snapshot right now (the overlay's own legend()), so
+ * the list follows the body: a woman's shows oestradiol, a man's testosterone. A colour dot
+ * says which colour on the body is which; the mark says whether the level is above (up
+ * arrow), below (down arrow) or near (dash) its own resting value. It states no reference
+ * range and no advice. It polls twice a second: levels move over minutes, and a React
+ * render per frame would be waste. Two columns, at most 170 px, so at 390 px it stays left
+ * of the body's midline.
  */
-export function VesselToggle() {
-  const on = useStore((s) => s.vascularVisible);
-  const toggle = useStore((s) => s.toggleVascular);
+export function HormoneLegend({ viewerRef, ready }: { viewerRef: React.MutableRefObject<Viewer | null>; ready: boolean }) {
+  const on = useStore((s) => s.hormonesVisible);
+  const [rows, setRows] = useState<HormoneLegendEntry[]>([]);
+  useEffect(() => {
+    if (!on || !ready) return;
+    const read = () => setRows(viewerRef.current?.hormoneLegend() ?? []);
+    read();
+    const id = window.setInterval(read, 500);
+    return () => window.clearInterval(id);
+  }, [on, ready, viewerRef]);
+  if (!on || rows.length === 0) return null;
   return (
-    <button
-      className={`${styles.vessels} ${on ? styles.vesselsOn : ''}`}
-      onClick={toggle}
-      aria-pressed={on}
-      aria-label={on ? 'Hide blood vessels' : 'Show blood vessels'}
-      title={on ? 'Hide blood vessels' : 'Show blood vessels'}
-    >
-      <BloodDrop filled={on} />
-      <span>Vessels</span>
-      <span className={styles.vesselsState}>{on ? 'on' : 'off'}</span>
-    </button>
+    <div className={styles.hormLegend} role="list" aria-label="Hormone colours">
+      {rows.map((r) => {
+        const mark = r.ratio > LEGEND_HIGH ? '\u2191' : r.ratio < LEGEND_LOW ? '\u2193' : '\u2013';
+        const word = r.ratio > LEGEND_HIGH ? 'above its resting level' : r.ratio < LEGEND_LOW ? 'below its resting level' : 'near its resting level';
+        return (
+          <div key={r.id} className={styles.hormRow} role="listitem" title={`${r.label}: ${word}`}>
+            <span className={styles.hormDot} style={{ background: r.colour }} />
+            <span className={styles.hormName}>{r.label}</span>
+            <span className={`${styles.hormMark} ${mark === '\u2013' ? '' : styles.hormMarkOn}`} aria-label={word}>{mark}</span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
-function BloodDrop({ filled }: { filled: boolean }) {
+/**
+ * The legends column: the Hormones legend and the Activity legend, stacked so that both
+ * switches on at once cannot make them collide (see .legends in dock.module.css).
+ */
+export function LegendStack({ viewerRef, ready }: { viewerRef: React.MutableRefObject<Viewer | null>; ready: boolean }) {
   return (
-    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        d="M12 2.5c3.6 4.4 6.5 8 6.5 11.4A6.5 6.5 0 0 1 12 20.4a6.5 6.5 0 0 1-6.5-6.5C5.5 10.5 8.4 6.9 12 2.5Z"
-        fill={filled ? '#d63a2f' : 'none'}
-        stroke="#d63a2f"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <div className={styles.legends}>
+      <HormoneLegend viewerRef={viewerRef} ready={ready} />
+      <ActivityLegend />
+    </div>
   );
 }
 
@@ -110,6 +128,54 @@ function Runner({ filled }: { filled: boolean }) {
         <path d="M13.3 14.4 9.6 16.7 7.4 20.6" />
         <path d="M11.6 11 7.9 12.1 5.6 15" />
         <path d="M15.4 9.1 19 11.3l1.2 3.1" />
+      </g>
+    </svg>
+  );
+}
+
+/** The view as a link: this body, the open organ and part, the layers and the section. */
+function currentShareHash(): string {
+  const s = useStore.getState();
+  const repro = s.snapshot?.reproductive;
+  const layersOn: Record<LayerName, boolean> = {
+    bones: s.bonesVisible,
+    vessels: s.vascularVisible,
+    nerves: s.nervesVisible,
+    hormones: s.hormonesVisible,
+    activity: s.activityVisible,
+  };
+  return buildShareHash({
+    sex: repro?.sex,
+    weeks: repro?.pregnancy?.pregnant ? Math.round(repro.pregnancy.gestationWeeks) : undefined,
+    organ: s.selectedOrgan ?? undefined,
+    part: s.selectedOrgan && s.selectedPart ? s.selectedPart : undefined,
+    layers: LAYER_NAMES.filter((n) => layersOn[n]),
+    cut: s.selectedOrgan && s.cutAxis ? { axis: s.cutAxis, depth: s.cutDepth } : undefined,
+  });
+}
+
+/**
+ * Copy the link to the clipboard. Resolves null when it was copied (and the toast has been
+ * shown), or with the URL when the clipboard refused (an insecure origin, a blocked
+ * permission), so the menu can show it in a read-only field that is already selected.
+ */
+async function copyViewLink(): Promise<string | null> {
+  const url = window.location.origin + window.location.pathname + window.location.search + currentShareHash();
+  try {
+    await navigator.clipboard.writeText(url);
+    useStore.getState().pushLog(LINK_COPIED_TOAST, 'info');
+    return null;
+  } catch {
+    return url;
+  }
+}
+
+function LinkGlyph() {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <g fill="none" stroke="#1a1a1a" strokeWidth="1.8" strokeLinecap="round">
+        <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
+        <path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
       </g>
     </svg>
   );
@@ -162,7 +228,7 @@ function Syringe({ filled }: { filled: boolean }) {
   );
 }
 
-/** A flask: the endocrine panel. */
+/** A flask: the Hormone levels panel (the measured levels, not the Hormones overlay switch). */
 function Flask({ filled }: { filled: boolean }) {
   return (
     <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
@@ -203,6 +269,16 @@ function Impact({ filled }: { filled: boolean }) {
   );
 }
 
+/** Stacked slices: the structures panel (what is inside an organ). */
+function Layers({ filled }: { filled: boolean }) {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 4 21 9l-9 5-9-5Z" fill={filled ? '#1a1a1a' : 'none'} stroke="#1a1a1a" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="m3 13 9 5 9-5" fill="none" stroke="#1a1a1a" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 /** A mountain under a sun: the environment panel — altitude, temperature, oxygen. */
 function Mountain({ filled }: { filled: boolean }) {
   return (
@@ -215,6 +291,16 @@ function Mountain({ filled }: { filled: boolean }) {
         strokeWidth="1.5"
         strokeLinejoin="round"
       />
+    </svg>
+  );
+}
+
+/** A ring with a phase dot on it: the reproduction panel (the cycle). */
+function Cycle({ filled }: { filled: boolean }) {
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="7.5" fill={filled ? '#1a1a1a' : 'none'} stroke="#1a1a1a" strokeWidth="1.6" />
+      <circle cx="12" cy="4.5" r="2.4" fill={filled ? '#fff' : '#1a1a1a'} stroke="#1a1a1a" strokeWidth="1" />
     </svg>
   );
 }
@@ -299,11 +385,24 @@ export function ToolDock() {
   const closePanels = useStore((s) => s.closePanels);
   const menuOpen = useStore((s) => s.menuOpen);
   const setMenuOpen = useStore((s) => s.setMenuOpen);
+  // The search text lives here, not in SearchBox, because the menu must swap its own list for the
+  // results while there is text, and must forget the text when it closes.
+  const [query, setQuery] = useState('');
+  // Set only when the clipboard refused the copy: the link is then shown in a read-only field.
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!menuOpen) {
+      setQuery('');
+      setFallbackUrl(null);
+    }
+  }, [menuOpen]);
 
   // Only the panel flags and their toggles - a bare useStore() would re-render the dock
   // on every snapshot, twenty times a second, for nothing.
   const st = useStore(
     useShallow((s) => ({
+      anatomyPanelOpen: s.anatomyPanelOpen,
+      toggleAnatomyPanel: s.toggleAnatomyPanel,
       statusPanelOpen: s.statusPanelOpen,
       toggleStatusPanel: s.toggleStatusPanel,
       impactPanelOpen: s.impactPanelOpen,
@@ -312,6 +411,8 @@ export function ToolDock() {
       togglePhysiologyPanel: s.togglePhysiologyPanel,
       environmentPanelOpen: s.environmentPanelOpen,
       toggleEnvironmentPanel: s.toggleEnvironmentPanel,
+      reproductionPanelOpen: s.reproductionPanelOpen,
+      toggleReproductionPanel: s.toggleReproductionPanel,
       infectionPanelOpen: s.infectionPanelOpen,
       toggleInfectionPanel: s.toggleInfectionPanel,
       endocrinePanelOpen: s.endocrinePanelOpen,
@@ -328,9 +429,11 @@ export function ToolDock() {
     { key: 'status', label: 'What is happening', hint: 'the body in plain words', icon: <Pulse />, active: st.statusPanelOpen, onClick: st.toggleStatusPanel },
     { key: 'impact', label: 'Impact', hint: 'what your actions changed', icon: <Impact filled={st.impactPanelOpen} />, active: st.impactPanelOpen, onClick: st.toggleImpactPanel },
     { key: 'physiology', label: 'Physiology', hint: 'sleep, exercise, stress, pain, bleeding', icon: <Runner filled={st.physiologyPanelOpen} />, active: st.physiologyPanelOpen, onClick: st.togglePhysiologyPanel },
+    { key: 'anatomy', label: 'Structures', hint: 'what is inside each organ', icon: <Layers filled={st.anatomyPanelOpen} />, active: st.anatomyPanelOpen, onClick: st.toggleAnatomyPanel },
     { key: 'environment', label: 'Environment', hint: 'temperature, altitude, oxygen, posture', icon: <Mountain filled={st.environmentPanelOpen} />, active: st.environmentPanelOpen, onClick: st.toggleEnvironmentPanel },
+    { key: 'reproduction', label: 'Reproduction', hint: 'cycle, pregnancy, sexual response', icon: <Cycle filled={st.reproductionPanelOpen} />, active: st.reproductionPanelOpen, onClick: st.toggleReproductionPanel },
     { key: 'infection', label: 'Infection', hint: 'inoculate, watch and clear', icon: <Microbe filled={st.infectionPanelOpen} />, active: st.infectionPanelOpen, onClick: st.toggleInfectionPanel },
-    { key: 'endocrine', label: 'Hormones', hint: 'cortisol, ADH, glucagon and more', icon: <Flask filled={st.endocrinePanelOpen} />, active: st.endocrinePanelOpen, onClick: st.toggleEndocrinePanel },
+    { key: 'endocrine', label: 'Hormone levels', hint: 'cortisol, ADH, glucagon and more', icon: <Flask filled={st.endocrinePanelOpen} />, active: st.endocrinePanelOpen, onClick: st.toggleEndocrinePanel },
     { key: 'blood', label: 'In the blood', hint: 'what the vessels are carrying', icon: <BloodDrop filled={st.bloodPanelOpen} />, active: st.bloodPanelOpen, onClick: st.toggleBloodPanel },
     { key: 'lab', label: 'Laboratory', hint: 'blood gas and chemistry', icon: <Tube filled={st.labPanelOpen} />, active: st.labPanelOpen, onClick: st.toggleLabPanel },
     { key: 'receptors', label: 'Receptors', hint: 'what each drug is binding', icon: <Receptors />, active: st.receptorPanelOpen, onClick: st.toggleReceptorPanel },
@@ -391,7 +494,10 @@ export function ToolDock() {
           {/* Tapping anywhere outside the list closes it. */}
           <button className={styles.scrim} aria-label="Close panels menu" onClick={() => setMenuOpen(false)} />
           <ul className={styles.launcher} role="menu" aria-label="Panels">
-            {items.map((i) => (
+            <li role="none" className={styles.searchRow}>
+              <SearchBox query={query} onQuery={setQuery} onChosen={() => setMenuOpen(false)} />
+            </li>
+            {query.trim() === '' && items.map((i) => (
               <li key={i.key}>
                 <button
                   role="menuitemcheckbox"
@@ -410,7 +516,43 @@ export function ToolDock() {
                 </button>
               </li>
             ))}
-            <li className={styles.phoneOnly}>
+            {query.trim() === '' && (
+              <li>
+                <button
+                  role="menuitem"
+                  className={styles.item}
+                  onClick={() => {
+                    void copyViewLink().then((url) => {
+                      if (url === null) setMenuOpen(false);
+                      else setFallbackUrl(url);
+                    });
+                  }}
+                >
+                  <span className={styles.itemIcon} aria-hidden="true">
+                    <LinkGlyph />
+                  </span>
+                  <span className={styles.itemText}>
+                    <strong>Copy link to this view</strong>
+                    <small>this body, organ, layers and cut</small>
+                  </span>
+                </button>
+              </li>
+            )}
+            {fallbackUrl !== null && query.trim() === '' && (
+              <li className={styles.fallback}>
+                <label>
+                  <small>Copy this link by hand</small>
+                  <input
+                    className={styles.fallbackField}
+                    readOnly
+                    value={fallbackUrl}
+                    onFocus={(e) => e.currentTarget.select()}
+                    ref={(el) => el?.select()}
+                  />
+                </label>
+              </li>
+            )}
+            <li className={styles.phoneOnly} hidden={query.trim() !== ''}>
               <a className={styles.item} href="docs/MODEL_LIMITATIONS.md" target="_blank" rel="noreferrer">
                 <span className={styles.itemIcon} aria-hidden="true">
                   !

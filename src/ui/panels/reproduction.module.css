@@ -1,0 +1,513 @@
+/*
+ * REPRODUCTION PANEL.
+ *
+ * A sibling of the environment panel and styled from it: sliders and buttons, prose under
+ * each, readouts set apart from controls. The one addition is the collapsible section,
+ * because this panel holds more topics than the single floating sheet can show at once;
+ * a native <details> is styled to look like the group titles of the other panels so it
+ * does not read as a different kind of surface. Every interactive target is at least
+ * 44 px tall, which is the touch minimum the rest of the interface holds to.
+ */
+
+.panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--sheet-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+  pointer-events: auto;
+  min-width: 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.groupTitle {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* ------------------------------------------------------------- sections */
+
+.section {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-mid);
+  cursor: pointer;
+  list-style: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-right: 4px;
+  border-right: 2px solid var(--ink-dim);
+  border-bottom: 2px solid var(--ink-dim);
+  transform: rotate(45deg);
+  transition: transform var(--tween-state) var(--ease-out);
+}
+
+.section[open] > .summary::after {
+  transform: rotate(-135deg);
+}
+
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 12px;
+}
+
+/* --------------------------------------------------------------- controls */
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.label {
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.value {
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-mid);
+}
+
+.unit {
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
+}
+
+.slider {
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  accent-color: var(--accent-cool);
+  cursor: pointer;
+}
+
+.slider:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.hint {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+.phaseLine {
+  margin: 0;
+  font-size: var(--text-md);
+  color: var(--ink-mid);
+}
+
+.buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toggle,
+.toggleOn {
+  flex: 1 1 0;
+  min-height: 44px;
+  padding: 9px 12px;
+  font: inherit;
+  font-size: var(--text-md);
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+  text-align: center;
+}
+
+.toggle {
+  color: var(--ink);
+  background: var(--chip-bg);
+}
+
+.toggle:hover {
+  background: var(--accent-selected-soft);
+}
+
+/* Was pale blue (--accent-cool), the one panel family where "selected" was not red. */
+.toggleOn {
+  background: var(--accent-selected);
+  color: var(--ink-inverse);
+}
+
+.switchOn,
+.switchOff {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: var(--text-md);
+  font-weight: 600;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+}
+
+.switchOff {
+  color: var(--ink);
+  background: var(--chip-bg);
+}
+
+.switchOn {
+  color: var(--ink);
+  background: var(--accent-cool);
+}
+
+.switchLabel {
+  font-size: var(--text-md);
+}
+
+.switchState {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* -------------------------------------------------------------- read-backs */
+
+.readouts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--chip-bg);
+  border-radius: var(--radius-chip);
+}
+
+.readout {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: var(--text-sm);
+}
+
+.readoutLabel {
+  color: var(--ink-mid);
+}
+
+.readoutValue {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  text-align: right;
+}
+
+.subTitle {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.table th {
+  padding: 3px 0;
+  font-weight: 400;
+  text-align: left;
+  color: var(--ink-mid);
+}
+
+.table td {
+  padding: 3px 0;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.table tr + tr {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* -------------------------------------------------------------- hormones */
+
+.hormones {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hormone {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hbar {
+  position: relative;
+  height: 8px;
+  background: var(--chip-bg-strong);
+  border-radius: 4px;
+}
+
+.band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(56, 198, 244, 0.35);
+  border-radius: 4px;
+}
+
+.needle {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 3px;
+  margin-left: -1px;
+  background: var(--ink);
+  border-radius: 2px;
+}
+
+.badge {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+}
+
+.normal {
+  color: var(--severity-watch-ink);
+  background: var(--severity-watch-bg);
+}
+
+.low,
+.high {
+  color: var(--severity-warn-ink);
+  background: var(--severity-warn-bg);
+}
+
+/* ---------------------------------------------------------------- meters */
+
+.meters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meterRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 90px 36px;
+  align-items: center;
+  gap: 8px;
+}
+
+.meterLabel {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.meter {
+  height: 8px;
+  overflow: hidden;
+  background: var(--chip-bg-strong);
+  border-radius: 4px;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  background: var(--accent-cool);
+  border-radius: 4px;
+}
+
+.meterValue {
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--ink-mid);
+}
+
+/* ---------------------------------------------------------- cycle strip */
+
+.strip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stripSvg {
+  display: block;
+  width: 100%;
+  height: 64px;
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+}
+
+.stripBg {
+  fill: var(--chip-bg-strong);
+}
+
+.stripMens {
+  fill: var(--organ-active);
+  fill-opacity: 0.35;
+}
+
+.stripPeak {
+  stroke: var(--accent-violet);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.stripCursor {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.stripScale {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
+}
+
+.stripKey {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--text-xs);
+}
+
+.keyMens,
+.keyPeak {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.keyMens {
+  background: var(--organ-active);
+  opacity: 0.5;
+}
+
+.keyPeak {
+  margin-left: 4px;
+  background: var(--accent-violet);
+}
+
+/* ------------------------------------------------------ sexual response */
+
+.phases {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: phase;
+}
+
+.phase,
+.phaseOn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 2px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+  border-radius: var(--radius-chip);
+}
+
+.phase {
+  color: var(--ink-dim);
+  background: var(--chip-bg);
+}
+
+.phaseOn {
+  color: var(--ink);
+  background: var(--accent-cool);
+}
+
+.prolactin {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 32px;
+}
+
+.prolactin .meter {
+  flex: 1 1 auto;
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--ink-mid);
+}

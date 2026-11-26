@@ -1,0 +1,212 @@
+{
+  "atlas": "breasts",
+  "about": "The structure of the breast as an anatomy and physiology textbook presents it: glandular lobes and lobules, lactiferous ducts, nipple and areola, fat, suspensory ligaments, pectoral fascia and lymphatic drainage towards the axilla. Both sides are drawn in one view. Twelve lobes a side is a schematic count. Activity is a display index driven by the engine's oestradiol, progesterone, prolactin, oxytocin and pregnancy signals; it is not a measure of milk production, and lactation itself is not simulated.",
+  "sources": {
+    "GH14": { "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.", "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8" },
+    "GRAYS42": { "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.", "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0" }
+  },
+  "parts": [
+    {
+      "id": "glandular_lobes",
+      "label": "Glandular Lobes and Lobules",
+      "summary": "Milk-forming tissue arranged radially round the nipple",
+      "function": "The glandular tissue is arranged in lobes that radiate from the nipple, each made of many lobules whose small terminal units are the milk-forming alveoli. Oestrogen drives growth of the duct system and progesterone drives development of the lobules and alveoli, both rising through pregnancy. Prolactin then drives milk synthesis. The tissue brightens with these hormone signals.",
+      "color": "#d98a8a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "Oestrogen stimulates growth of the ductal system.", "source": "GH14" },
+        { "signal": "progesterone", "weight": 0.2, "note": "Progesterone stimulates lobule and alveolar development.", "source": "GH14" },
+        { "signal": "prolactin", "weight": 0.3, "note": "Prolactin stimulates milk synthesis by the alveolar cells.", "source": "GH14" },
+        { "signal": "pregnancy", "weight": 0.25, "note": "The glandular tissue enlarges through pregnancy.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lactiferous_ducts",
+      "label": "Lactiferous Ducts",
+      "summary": "Ducts that converge on the nipple",
+      "function": "Each lobe drains by a lactiferous duct, and the ducts converge on the nipple, widening into a sinus just behind it before they open on its surface. Oxytocin makes the contractile cells round the alveoli squeeze milk into them (the let-down reflex). The ducts brighten with the oxytocin signal and a pale stream runs towards the nipple.",
+      "color": "#f0dcc0",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "oxytocin", "weight": 0.6, "note": "Oxytocin contracts the myoepithelial cells that eject milk into the ducts.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "nipple",
+      "label": "Nipple",
+      "summary": "Raised tip where the ducts open",
+      "function": "The nipple is the raised tip of the breast on which the lactiferous ducts open. It contains smooth muscle and is rich in sensory nerve endings, and stimulation of it is the trigger for oxytocin and prolactin release. It brightens with those signals.",
+      "color": "#b86a5a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "oxytocin", "weight": 0.3, "note": "Nipple stimulation releases oxytocin from the pituitary.", "source": "GH14" },
+        { "signal": "prolactin", "weight": 0.2, "note": "Nipple stimulation also releases prolactin.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "areola",
+      "label": "Areola",
+      "summary": "Pigmented skin round the nipple",
+      "function": "The areola is the circle of pigmented skin round the nipple, containing small glands that lubricate it. It darkens during pregnancy. It brightens with the pregnancy signal.",
+      "color": "#a8645a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.3, "note": "The areola darkens during pregnancy.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "adipose_tissue",
+      "label": "Adipose Tissue",
+      "summary": "Fat that fills the breast round the gland",
+      "function": "Fat fills the space between and around the glandular lobes and gives the breast most of its volume and shape. It is drawn as glass so the gland and ducts show through. Oestrogen promotes its deposition at puberty.",
+      "color": "#f2d48a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "estradiol", "weight": 0.2, "note": "Oestrogen promotes breast fat deposition.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "suspensory_ligaments",
+      "label": "Suspensory Ligaments",
+      "summary": "Fibrous bands from chest wall to skin",
+      "function": "Fibrous bands (Cooper's ligaments) run from the fascia on the chest wall to the skin, crossing the gland and fat. They support the breast without restricting it.",
+      "color": "#d8d2c0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pectoral_fascia",
+      "label": "Pectoral Fascia",
+      "summary": "Sheet over the chest muscle behind the breast",
+      "function": "The pectoral fascia is a sheet of connective tissue over the pectoralis major muscle. It lies behind the breast and is the surface to which the suspensory ligaments attach. It is drawn as glass because it only lines the back of the space.",
+      "color": "#c9a58a",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lymphatics",
+      "label": "Lymphatic Vessels",
+      "summary": "Collecting vessels draining towards the axilla",
+      "function": "Lymph collects from the skin and the gland around the areola and drains outwards and upwards, mostly to the lymph nodes of the axilla. Lymph flow rises with muscular activity and with inflammation. A pale stream runs along them, faster when those signals rise.",
+      "color": "#e8e0a0",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "exertion", "weight": 0.2, "note": "Muscular activity increases lymph flow.", "source": "GH14" },
+        { "signal": "inflammation", "weight": 0.2, "note": "Inflammation increases fluid and lymph flow.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lymph_nodes",
+      "label": "Lymph Nodes towards the Axilla",
+      "summary": "Nodes at the upper outer edge of the breast",
+      "function": "Lymph passes through nodes on its way to the axilla, where they filter it and respond to what it carries. They are drawn at the upper outer edge of the breast, towards the armpit. They brighten with immune activation.",
+      "color": "#8fb08a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "immune", "weight": 0.4, "note": "Nodes respond to antigens carried in the lymph.", "source": "GH14" },
+        { "signal": "inflammation", "weight": 0.2, "note": "Inflammation draws nodes into activity.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lactiferous_sinuses",
+      "label": "Lactiferous Sinuses",
+      "summary": "The widened ends of the ducts just behind the nipple",
+      "function": "Each lactiferous duct widens into a sinus beneath the areola, where milk collects before it reaches the nipple. They are drawn as small swellings on the ducts.",
+      "color": "#f4e2c4",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "oxytocin", "weight": 0.3, "note": "The let-down reflex moves milk towards the nipple.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "areolar_glands",
+      "label": "Areolar Glands (Montgomery)",
+      "summary": "The small glands in the areola that raise little bumps on the skin",
+      "function": "The areolar glands are large sebaceous glands in the areola. Their secretion lubricates the nipple and areola. They enlarge in pregnancy and are drawn as small bumps.",
+      "color": "#c08070",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "pregnancy", "weight": 0.3, "note": "The glands enlarge in pregnancy.", "source": "GRAYS42" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "retromammary_space",
+      "label": "Retromammary Space",
+      "summary": "The loose layer behind the breast, in front of the pectoral fascia",
+      "function": "The retromammary space is a layer of loose fatty tissue between the breast and the fascia over the muscle, which lets the breast move a little on the chest wall. It is drawn as a thin glass sheet.",
+      "color": "#f0e8d0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "axillary_tail",
+      "label": "Axillary Tail",
+      "summary": "The extension of breast tissue towards the armpit",
+      "function": "The axillary tail (of Spence) is a tongue of glandular tissue that runs from the upper outer part of the breast towards the axilla, where the lymph nodes lie.",
+      "color": "#d98a8a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "breast_lobule",
+      "label": "Lobule",
+      "parent": "glandular_lobes",
+      "summary": "One small gland unit at the end of a lobe, with its own terminal duct",
+      "function": "A lobe ends in many lobules, each a cluster of tiny glands that make milk. One lobule is drawn here as a magnified glass sphere in each breast.",
+      "color": "#e8a0a0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "terminal_duct_lobular_unit",
+      "label": "Terminal Duct Lobular Unit",
+      "parent": "breast_lobule",
+      "summary": "The small duct and the lobule of glands that it serves",
+      "function": "The terminal duct lobular unit is the working unit of the breast: the last small duct and the group of alveoli that open into it. It is drawn as a small branching duct. In the textbook the alveoli are part of the unit; they are listed beside it here to keep the list shallow.",
+      "color": "#f0d0a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alveoli",
+      "label": "Alveoli",
+      "parent": "breast_lobule",
+      "summary": "The tiny sacs of milk-secreting cells",
+      "function": "The alveoli are small sacs lined by secretory cells that make milk under the influence of prolactin. They are drawn as tiny beads at the ends of the branching duct.",
+      "color": "#f2b8b0",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "prolactin", "weight": 0.3, "note": "Prolactin drives the secretory cells.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "myoepithelial_cells",
+      "label": "Myoepithelial Cells",
+      "parent": "breast_lobule",
+      "summary": "The contractile cells that surround each alveolus",
+      "function": "The myoepithelial cells lie round each alveolus and the small ducts, and oxytocin makes them contract and squeeze milk out. They are drawn as a fine basket round each alveolus.",
+      "color": "#c85a6a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "oxytocin", "weight": 0.3, "note": "Oxytocin makes the cells contract.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

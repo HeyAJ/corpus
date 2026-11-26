@@ -27,18 +27,9 @@
   gap: 5px;
 }
 
-.title {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-mid);
-}
-
 .sub {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.45;
   color: var(--ink-dim);
 }
@@ -53,11 +44,11 @@
 
 .groupTitle {
   margin: 0;
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
 .row {
@@ -74,13 +65,13 @@
 }
 
 .label {
-  font-size: 14px;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--ink);
 }
 
 .value {
-  font-size: 13px;
+  font-size: var(--text-md);
   font-variant-numeric: tabular-nums;
   color: var(--ink-mid);
 }
@@ -88,25 +79,25 @@
 /* What the body has actually reached, when it lags what was asked for. The gap between
    the two IS the physiology, so it gets its own colour rather than being hidden. */
 .actual {
-  color: var(--organ-active);
+  color: var(--ink-info);
   font-weight: 600;
 }
 
 /* Pain is the one row that is a genuine computation rather than a setting. */
 .felt {
-  color: var(--organ-active);
+  color: var(--ink-info);
   font-weight: 600;
 }
 
 .slider {
   width: 100%;
-  accent-color: var(--organ-active);
+  accent-color: var(--ink-info);
   cursor: pointer;
 }
 
 .hint {
   margin: 0;
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   line-height: 1.45;
   color: var(--ink-dim);
 }
@@ -120,7 +111,7 @@
   flex: 1;
   padding: 6px 8px;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 600;
   color: var(--ink);
   background: var(--chip-bg);
@@ -136,7 +127,7 @@
 .toggle {
   padding: 9px 12px;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--text-md);
   font-weight: 600;
   color: var(--ink);
   background: var(--chip-bg);
@@ -147,7 +138,7 @@
 }
 
 .toggleOn {
-  background: var(--organ-active);
+  background: var(--accent-selected);
   color: var(--ink-inverse);
 }
 
@@ -156,7 +147,7 @@
 .debt {
   margin: 0;
   padding: 5px 9px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-variant-numeric: tabular-nums;
   color: var(--ink);
   background: var(--chip-bg-strong);
@@ -169,10 +160,10 @@
 .alarm {
   margin: 0;
   padding: 6px 10px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #fff;
+  color: var(--ink-inverse);
   background: var(--severity-critical-bg);
   border-radius: var(--radius-chip);
 }
@@ -191,14 +182,14 @@
 }
 
 .signs dt {
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: 700;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
 .signs dd {
   margin: 2px 0 0;
-  font-size: 15px;
+  font-size: var(--text-lg);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
@@ -216,10 +207,10 @@
 
 .experience {
   padding: 3px 9px;
-  font-size: 12px;
+  font-size: var(--text-sm);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: var(--accent-violet);
+  color: var(--ink-info);
   background: rgba(139, 92, 246, 0.12);
   border-radius: var(--radius-pill);
 }

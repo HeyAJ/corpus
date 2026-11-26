@@ -1,0 +1,765 @@
+{
+  "atlas": "stomach",
+  "about": "The stomach drawn as its named regions (cardia, fundus, body, antrum, pylorus), the mucosal folds (rugae), the two curvatures and the acid- and enzyme-secreting glands, one of them enlarged to show its parietal and chief cells. Activity is a display index of how hard the engine's own digestive, autonomic and filling signals push each region; it is not a secretion rate or a pressure. It leaves out the layered wall, the enteric nervous system, gastric hormones and the stomach's contents, which the main view already shows as a fluid level. Its wall layers, the omenta, the arteries along the curvatures, the vagal trunks and the cell types of the gastric glands are drawn too; the gland and its cells are enlarged many times, and cell counts are schematic.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "cardia",
+      "label": "Cardia",
+      "summary": "The short entrance region where the oesophagus joins the stomach",
+      "function": "The cardia is the small zone around the opening of the oesophagus into the stomach. It guards against reflux of gastric contents together with the lower oesophageal sphincter, and it opens for a swallow and during vomiting. It brightens while something is being swallowed.",
+      "color": "#d98f8a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "swallowing",
+          "weight": 0.4,
+          "note": "The cardia opens to receive a swallowed bolus.",
+          "source": "GH14"
+        },
+        {
+          "signal": "vomiting",
+          "weight": 0.4,
+          "note": "The gastro-oesophageal junction opens when the stomach is emptied upwards.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fundus",
+      "label": "Fundus",
+      "summary": "The dome above the cardia that relaxes to receive a meal",
+      "function": "The fundus is the upper dome of the stomach and acts as a storage reservoir. It relaxes as food arrives so that the stomach can fill without a large rise in pressure. Its glow rises as the stomach fills.",
+      "color": "#e0a59b",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "gastricFill",
+          "weight": 0.45,
+          "note": "Receptive relaxation accommodates the meal as the stomach fills.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "body",
+      "label": "Body",
+      "summary": "The main part of the stomach, where food is stored and mixed",
+      "function": "The body is the large central part of the stomach. It stores food, secretes acid and enzymes from its glands, and begins the mixing waves that turn a meal into chyme. It glows more with food present, with filling and with gut motility.",
+      "color": "#d98070",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.35,
+          "note": "Mixing and secretion occur while food is in the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "gastricFill",
+          "weight": 0.2,
+          "note": "Stretch of the wall increases motility and secretion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.25,
+          "note": "Raised gut motility strengthens the mixing waves.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.2,
+          "note": "Reduced gut motility weakens the mixing waves.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.3,
+          "note": "Sympathetic outflow inhibits gastric motility, so in fright or exertion this part is drawn BELOW its resting level. Sign from the textbook; the weight is a display coupling, sized so that moderate sympathetic outflow (exertion) is visible against the 0.15 display threshold and within the 0.25 to 0.4 range this atlas uses for its other motility drives, not a measured effect size.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "antrum",
+      "label": "Antrum",
+      "summary": "The lower, muscular part that grinds food and pumps chyme onward",
+      "function": "The antrum has the thickest muscle of the stomach. Its strong contractions grind food against a mostly closed pylorus and push small amounts of chyme into the duodenum. It glows during digestion and when motility is raised.",
+      "color": "#c97067",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.4,
+          "note": "The antral pump works while there is food to process.",
+          "source": "GH14"
+        },
+        {
+          "signal": "gastricFill",
+          "weight": 0.15,
+          "note": "Distension of the stomach strengthens antral contraction.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.25,
+          "note": "Raised gut motility strengthens antral contractions.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.2,
+          "note": "Reduced gut motility weakens antral contractions.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.3,
+          "note": "Sympathetic outflow inhibits gastric motility, so in fright or exertion this part is drawn BELOW its resting level. Sign from the textbook; the weight is a display coupling, sized so that moderate sympathetic outflow (exertion) is visible against the 0.15 display threshold and within the 0.25 to 0.4 range this atlas uses for its other motility drives, not a measured effect size.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pylorus",
+      "label": "Pylorus",
+      "summary": "The thick ring of muscle at the outlet to the duodenum",
+      "function": "The pyloric sphincter is a thickened ring of circular muscle that controls how much chyme leaves the stomach and holds back larger particles. It opens briefly as each antral wave arrives, so chyme leaves in small squirts. It glows while the stomach is digesting.",
+      "color": "#b5504f",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.4,
+          "note": "The pylorus meters chyme into the duodenum while food is being processed.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rugae",
+      "label": "Rugae",
+      "summary": "Longitudinal mucosal folds that flatten as the stomach fills",
+      "function": "Rugae are the folds of the stomach's lining that run along its length. They allow the stomach to stretch and flatten as it fills. In this view they fade as the stomach fills.",
+      "color": "#e8b4a6",
+      "rest": 0.4,
+      "drives": [
+        {
+          "signal": "gastricFill",
+          "weight": -0.35,
+          "note": "Folds smooth out as the wall is stretched.",
+          "source": "GRAYS42"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gastric_glands",
+      "label": "Gastric Glands",
+      "summary": "Pits that secrete acid and enzymes; one is drawn enlarged",
+      "function": "Gastric glands open as pits in the lining of the body and fundus. Parietal cells secrete hydrochloric acid and intrinsic factor, and chief cells secrete pepsinogen, which the acid converts to pepsin. Secretion is stimulated by the vagus and by food and is reduced by sympathetic activity. Acid particles stream from the glands when the stomach is digesting.",
+      "color": "#f0d060",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.4,
+          "note": "Food in the stomach stimulates acid and enzyme secretion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal outflow stimulates parietal and chief cells.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.25,
+          "note": "Sympathetic activity reduces gastric secretion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "lesser_curvature",
+      "label": "Lesser Curvature",
+      "summary": "The short, concave right border of the stomach",
+      "function": "The lesser curvature is the concave border between the cardia and the pylorus, carrying the left and right gastric vessels in the lesser omentum. Blood flow through it rises with digestion.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Gastric blood flow rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "greater_curvature",
+      "label": "Greater Curvature",
+      "summary": "The long, convex left border of the stomach",
+      "function": "The greater curvature is the long convex border, from which the greater omentum hangs. It carries the gastro-epiploic vessels. Blood flow through it rises with digestion.",
+      "color": "#b8786e",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Gastric blood flow rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "angular_incisure",
+      "label": "Angular Incisure (Incisura Angularis)",
+      "summary": "The sharp notch on the lesser curvature where the body meets the pyloric part",
+      "function": "The angular incisure is the bend in the lesser curvature that marks where the body of the stomach turns toward the pylorus. It is a surface landmark; it is drawn here as a small wedge pointing into the lumen.",
+      "color": "#d9a07a",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pyloric_canal",
+      "label": "Pyloric Canal",
+      "summary": "The narrow channel that leads from the antrum to the pyloric sphincter",
+      "function": "The pyloric canal is the narrowed last part of the stomach before the duodenum. Chyme is squeezed through it in small amounts by the antral pump.",
+      "color": "#e0b080",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.35,
+          "note": "The antral pump drives chyme into the canal while there is food to process.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pyloric_sphincter",
+      "label": "Pyloric Sphincter",
+      "summary": "The thick ring of circular muscle at the outlet of the stomach",
+      "function": "The pyloric sphincter is a thickened ring of smooth muscle between the stomach and the duodenum. It lets chyme through a little at a time and keeps the contents of the duodenum from flowing back.",
+      "color": "#a8465c",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.4,
+          "note": "It meters chyme into the duodenum while food is being processed.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lesser_omentum",
+      "label": "Lesser Omentum",
+      "summary": "A double sheet of peritoneum from the lesser curvature to the liver",
+      "function": "The lesser omentum connects the lesser curvature of the stomach and the start of the duodenum to the liver. It carries vessels and nerves between them. It is drawn as a flat sheet, not the real folded membrane.",
+      "color": "#e8d8a8",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "greater_omentum",
+      "label": "Greater Omentum",
+      "summary": "The fat-laden apron of peritoneum hanging from the greater curvature",
+      "function": "The greater omentum hangs down from the greater curvature in front of the intestines like an apron. It holds fat and immune tissue and can wrap around inflamed areas. It is drawn as a flat sheet with an illustrative length.",
+      "color": "#f0dc94",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_gastric_artery",
+      "label": "Left Gastric Artery",
+      "summary": "Artery that runs along the upper lesser curvature",
+      "function": "The left gastric artery supplies the upper part of the lesser curvature and meets the right gastric artery along it.",
+      "color": "#c0392b",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Gastric blood flow rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "right_gastric_artery",
+      "label": "Right Gastric Artery",
+      "summary": "Artery that runs along the lower lesser curvature",
+      "function": "The right gastric artery supplies the lower part of the lesser curvature and joins the left gastric artery along it, so the lesser curvature has one continuous arterial arch.",
+      "color": "#c0392b",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Gastric blood flow rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "right_gastro_omental_artery",
+      "label": "Right Gastro-omental Artery",
+      "summary": "Artery that runs along the lower greater curvature",
+      "function": "The right gastro-omental artery runs along the greater curvature from the pyloric end and joins the left gastro-omental artery. It also feeds the greater omentum.",
+      "color": "#c0392b",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Gastric blood flow rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "left_gastro_omental_artery",
+      "label": "Left Gastro-omental Artery",
+      "summary": "Artery that runs along the upper greater curvature",
+      "function": "The left gastro-omental artery runs along the greater curvature from above and joins the right gastro-omental artery. It also feeds the greater omentum.",
+      "color": "#c0392b",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Gastric blood flow rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "short_gastric_arteries",
+      "label": "Short Gastric Arteries",
+      "summary": "Several small arteries to the fundus",
+      "function": "The short gastric arteries pass from the region of the spleen to the fundus of the stomach and supply its upper part. The number drawn is schematic.",
+      "color": "#c0392b",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.25,
+          "note": "Gastric blood flow rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_vagal_trunk",
+      "label": "Anterior Vagal Trunk",
+      "summary": "The front vagus nerve trunk on the stomach",
+      "function": "The anterior vagal trunk is the continuation of the vagus nerves on the front of the oesophagus. It sends branches to the stomach that stimulate its muscle and glands. Its branches to the liver are not drawn.",
+      "color": "#e8d060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.4,
+          "note": "The trunk carries the vagal outflow itself.",
+          "source": "GH14"
+        },
+        {
+          "signal": "swallowing",
+          "weight": 0.1,
+          "note": "Swallowing is coordinated by vagal signals.",
+          "source": "GH14"
+        },
+        {
+          "signal": "nausea",
+          "weight": 0.1,
+          "note": "Nausea is carried partly by vagal afferents.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_vagal_trunk",
+      "label": "Posterior Vagal Trunk",
+      "summary": "The back vagus nerve trunk on the stomach",
+      "function": "The posterior vagal trunk lies behind the oesophagus and stomach and sends branches to the stomach and, beyond it, to the coeliac region. Those onward branches are not drawn.",
+      "color": "#e8d060",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.4,
+          "note": "The trunk carries the vagal outflow itself.",
+          "source": "GH14"
+        },
+        {
+          "signal": "swallowing",
+          "weight": 0.1,
+          "note": "Swallowing is coordinated by vagal signals.",
+          "source": "GH14"
+        },
+        {
+          "signal": "nausea",
+          "weight": 0.1,
+          "note": "Nausea is carried partly by vagal afferents.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serosa",
+      "label": "Serosa",
+      "summary": "The smooth outer covering of the stomach, a layer of peritoneum",
+      "function": "The serosa is the visceral peritoneum covering the stomach. It is slippery, which lets the stomach move against its neighbours as it fills and mixes.",
+      "color": "#f0e4d0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscularis_externa",
+      "label": "Muscularis Externa",
+      "summary": "The muscle coat of the stomach, with three layers",
+      "function": "The muscle coat has three layers instead of the two found elsewhere in the gut. Together they churn the food and push it toward the outlet. It is drawn as a glass sleeve holding its layers.",
+      "color": "#b5555a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.3,
+          "note": "Mixing waves work while food is in the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.2,
+          "note": "Raised gut motility strengthens the contractions.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.2,
+          "note": "Reduced gut motility weakens them.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.3,
+          "note": "Sympathetic outflow inhibits gastric motility, so this part is drawn BELOW its resting level in fright or exertion. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "submucosa",
+      "label": "Submucosa",
+      "summary": "Loose connective-tissue layer under the mucosa, carrying vessels and nerves",
+      "function": "The submucosa lies between the lining and the muscle. It carries the larger blood vessels and a nerve plexus of the gut wall, and lets the folds of the lining stretch out as the stomach fills.",
+      "color": "#e6b9a8",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Blood flow through it rises while food is being digested.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "oblique_muscle_layer",
+      "label": "Oblique Muscle Layer",
+      "parent": "muscularis_externa",
+      "summary": "The innermost layer of the muscle coat, with fibres running at a slant",
+      "function": "The oblique fibres are found only in the stomach. They loop over the fundus and run down the body, and help to hold the food against the grinding action of the other layers.",
+      "color": "#c26a6a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.3,
+          "note": "Mixing waves work while food is in the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.2,
+          "note": "Raised gut motility strengthens the contractions.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.2,
+          "note": "Reduced gut motility weakens them.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.3,
+          "note": "Sympathetic outflow inhibits gastric motility, so this part is drawn BELOW its resting level in fright or exertion. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "circular_muscle_layer",
+      "label": "Circular Muscle Layer",
+      "parent": "muscularis_externa",
+      "summary": "The middle layer of the muscle coat, with fibres running round the stomach",
+      "function": "The circular fibres run round the stomach and are strongest in the antrum, where they drive the contractions that push chyme against the pylorus. They thicken into the pyloric sphincter.",
+      "color": "#b5555a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.3,
+          "note": "Mixing waves work while food is in the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.2,
+          "note": "Raised gut motility strengthens the contractions.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.2,
+          "note": "Reduced gut motility weakens them.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.3,
+          "note": "Sympathetic outflow inhibits gastric motility, so this part is drawn BELOW its resting level in fright or exertion. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "longitudinal_muscle_layer",
+      "label": "Longitudinal Muscle Layer",
+      "parent": "muscularis_externa",
+      "summary": "The outer layer of the muscle coat, with fibres running lengthwise",
+      "function": "The longitudinal fibres run along the stomach, continuing from the oesophagus toward the pylorus. They shorten the stomach as the antral waves pass.",
+      "color": "#9c4a52",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.3,
+          "note": "Mixing waves work while food is in the stomach.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityRise",
+          "weight": 0.2,
+          "note": "Raised gut motility strengthens the contractions.",
+          "source": "GH14"
+        },
+        {
+          "signal": "motilityFall",
+          "weight": -0.2,
+          "note": "Reduced gut motility weakens them.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.3,
+          "note": "Sympathetic outflow inhibits gastric motility, so this part is drawn BELOW its resting level in fright or exertion. Sign from the textbook; the weight is a display coupling on this atlas's own scale, not a measured effect size.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gastric_pits",
+      "label": "Gastric Pits",
+      "parent": "gastric_glands",
+      "summary": "Small dimples in the lining where the glands open",
+      "function": "Each pit is a shallow funnel in the surface of the stomach lining into which several gastric glands empty their secretions. It is drawn here as one enlarged funnel above the gland.",
+      "color": "#d8b04a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "surface_mucous_cells",
+      "label": "Surface Mucous Cells",
+      "parent": "gastric_glands",
+      "summary": "Cells lining the surface and the pits that make protective mucus",
+      "function": "These cells coat the lining of the stomach and pits with mucus rich in bicarbonate, which protects the wall from its own acid and enzymes.",
+      "color": "#f0e08a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "gastricFill",
+          "weight": 0.15,
+          "note": "Food in contact with the lining stimulates mucus release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mucous_neck_cells",
+      "label": "Mucous Neck Cells",
+      "parent": "gastric_glands",
+      "summary": "Mucus-making cells in the neck of the gland",
+      "function": "Mucous neck cells lie in the narrow neck of the gland and make a different, soluble mucus from the surface cells. They are also thought to be a source of new gland cells.",
+      "color": "#f4d86a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "parietal_cells",
+      "label": "Parietal Cells",
+      "parent": "gastric_glands",
+      "summary": "Large cells that secrete hydrochloric acid and intrinsic factor",
+      "function": "Parietal cells make the hydrochloric acid of gastric juice and also intrinsic factor, which is needed to absorb vitamin B12 further on. Gastrin, histamine and the vagus stimulate them.",
+      "color": "#c0486a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal outflow stimulates acid secretion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.3,
+          "note": "Food in the stomach stimulates acid secretion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": -0.2,
+          "note": "Sympathetic activity reduces gastric secretion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "chief_cells",
+      "label": "Chief Cells",
+      "parent": "gastric_glands",
+      "summary": "Cells at the base of the gland that secrete pepsinogen",
+      "function": "Chief cells release pepsinogen, the inactive precursor of the protein-digesting enzyme pepsin. Acid in the lumen converts it to pepsin.",
+      "color": "#6a7ac0",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.25,
+          "note": "Vagal outflow stimulates pepsinogen release.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.3,
+          "note": "Food in the stomach stimulates enzyme secretion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "g_cells",
+      "label": "G Cells",
+      "parent": "gastric_glands",
+      "summary": "Gastrin-secreting endocrine cells of the antral glands",
+      "function": "G cells are found mainly in the antrum. They release the hormone gastrin into the blood, which then stimulates the parietal cells to make acid. They are drawn in a second, smaller enlarged gland in the antrum.",
+      "color": "#e08a2a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "digestion",
+          "weight": 0.3,
+          "note": "Food, especially protein, stimulates gastrin release.",
+          "source": "GH14"
+        },
+        {
+          "signal": "gastricFill",
+          "weight": 0.15,
+          "note": "Stretch of the antrum stimulates gastrin release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ecl_cells",
+      "label": "ECL Cells (Enterochromaffin-like)",
+      "parent": "gastric_glands",
+      "summary": "Endocrine cells that release histamine near the parietal cells",
+      "function": "ECL cells lie in the body glands close to the parietal cells. Gastrin and the vagus make them release histamine, which acts on the parietal cells to increase acid secretion.",
+      "color": "#b06ad8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Vagal outflow stimulates histamine release.",
+          "source": "GH14"
+        },
+        {
+          "signal": "digestion",
+          "weight": 0.2,
+          "note": "Gastrin released after a meal stimulates them.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "d_cells",
+      "label": "D Cells",
+      "parent": "gastric_glands",
+      "summary": "Cells that release somatostatin and so hold back acid secretion",
+      "function": "D cells release somatostatin, which acts on neighbouring cells to reduce gastrin release and acid secretion. They provide a brake on the stimulating signals.",
+      "color": "#4aa88a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+/*
+ * THE FIRST-VISIT HINT PILL (CoachMark.tsx). It sits on the row just above the bottom bar,
+ * centred on a wide screen and, on a phone, to the right of the Layers chip, so it
+ * covers no control: not the Layers chip (bottom-left, about 120 px wide), not the
+ * dock under it, not the HUD at the top-left or the speed and condition tags at the top
+ * right. An earlier placement over the lower body landed under the legends column when a
+ * switch was on. Every offset is a display choice. It sits under the sheets and the panels
+ * menu (z-index 13 against their 24 and up) and only fades in (no transform to fight the
+ * centring).
+ */
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  transform: translateX(-50%);
+  z-index: 13;
+  max-width: calc(100% - 2 * var(--inset-hud));
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  background: var(--chip-darker);
+  color: var(--ink-inverse);
+  font-size: var(--text-md);
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  animation: hintIn 400ms var(--ease-out) both;
+}
+
+@media (max-width: 720px) {
+  .hint {
+    left: calc(var(--inset-hud) + 138px);
+    right: var(--inset-hud);
+    max-width: none;
+    transform: none;
+  }
+}
+
+@keyframes hintIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

@@ -1,0 +1,51 @@
+/*
+ * THE RESET VIEW PILL (ResetViewButton.tsx). One row above the bottom bar, above the first-visit
+ * hint's row (which sits at the bar plus 8 px), so the two can never overlap; every offset is
+ * a display choice. Wide screens: centred, where the right-hand sheet and the bottom-left corner
+ * switches are both out of the way. Phones: at the right, because the Layers chip takes the
+ * left (about 120 px) and the sheet, when open, hides the pill altogether (the component
+ * is not drawn then). 44 px tall for touch.
+ */
+.pill {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 56px);
+  transform: translateX(-50%);
+  z-index: 13;
+  min-height: 44px;
+  padding: 0 18px;
+  font: inherit;
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--ink-inverse);
+  background: var(--chip-darker);
+  border: none;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  pointer-events: auto;
+  animation: pillIn 200ms var(--ease-out, ease-out) both;
+}
+
+@media (max-width: 720px) {
+  .pill {
+    left: auto;
+    right: var(--inset-hud);
+    transform: none;
+  }
+
+  .pill[data-covered='true'] {
+    display: none;
+  }
+}
+
+@keyframes pillIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill {
+    animation: none;
+  }
+}

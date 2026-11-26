@@ -1,0 +1,209 @@
+/*
+ * THE LAYERS CHIP AND ITS POPOVER (LayersControl.tsx).
+ *
+ * Bottom-left corner of the stage, just above the dock, where the four corner switches were. The
+ * body is centred, so the corner is empty at every width; the bottom offset is the MEASURED bar
+ * height (the same number the drawer and the sheet use), so the chip can never sit under the dock.
+ * The popover opens UPWARD from the chip. Every offset and size here is a display choice.
+ */
+.layers {
+  position: absolute;
+  left: var(--inset-hud);
+  bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
+  z-index: 14;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-start;
+  gap: 8px;
+  /* The wrapper takes no taps of its own: only the chip and the popover do. */
+  pointer-events: none;
+}
+
+.layers > * {
+  pointer-events: auto;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  /* 44 px touch target. */
+  min-height: 44px;
+  padding: 4px 10px 4px 10px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: var(--chip-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 140ms ease;
+}
+
+.chip:hover,
+.chipOpen {
+  background: var(--chip-bg-strong);
+}
+
+/* The number of layers on. Plain when none are, the selected colour when some are. */
+.count {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--chip-bg-strong);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-align: center;
+  color: var(--ink-dim);
+}
+
+.countOn {
+  background: var(--accent-selected);
+  color: var(--ink-inverse);
+}
+
+.popover {
+  box-sizing: border-box;
+  /* 320 px on a wide screen; on a phone it never reaches past the screen's own gutters. */
+  width: min(320px, calc(100vw - 2 * var(--inset-hud)));
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-radius: var(--radius-card);
+  background: var(--sheet-bg);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  animation: popIn 140ms var(--ease-out, ease-out) both;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  /* 44 px touch target. */
+  min-height: 48px;
+  padding: 2px 8px 2px 10px;
+  border: none;
+  border-radius: var(--radius-chip);
+  background: transparent;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.row:hover {
+  background: var(--chip-bg);
+}
+
+.row:focus-visible,
+.chip:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.glyph {
+  flex: none;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.name {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.blurb {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  /* One line; never an ellipsis that would hide the meaning, the strings are short enough. */
+  white-space: nowrap;
+  color: var(--ink-dim);
+}
+
+/* The switch: a track and a knob, 44 x 26. ON is the selected colour, as everywhere else. */
+.track {
+  flex: none;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  background: var(--ink-faint);
+  transition: background 140ms ease;
+}
+
+.knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 140ms ease;
+}
+
+.rowOn .track {
+  background: var(--accent-selected);
+}
+
+.rowOn .knob {
+  transform: translateX(18px);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popover {
+    animation: none;
+  }
+  .track,
+  .knob,
+  .chip {
+    transition: none;
+  }
+}
+
+/*
+ * PHONE, A CARD IS OPEN: THE CHIP STEPS OUT OF THE WAY (as the four switches did). A bottom sheet
+ * or the resuscitation card covers the bottom-left corner, and a control a visitor cannot reach is
+ * better absent than present-but-dead. data-card is set on the shell from the same flags that fold
+ * the HUD (App.tsx sheetOpen). Desktop is not touched: its sheet is a right-hand column.
+ */
+@media (max-width: 720px) {
+  :global([data-card='open']) .layers {
+    display: none;
+  }
+}
+
+/* The panels menu is modal and opens upward over this corner, at every width. */
+:global([data-menu='open']) .layers {
+  display: none;
+}

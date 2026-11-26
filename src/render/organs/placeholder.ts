@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { PlaceholderRecipe } from '../../data/types';
+import { buildModel, type ModelParams } from '../anatomy/models';
 
 /**
  * PLACEHOLDER ORGAN GEOMETRY (spec 7.2).
@@ -221,8 +222,18 @@ function lobedLung(side: -1 | 1): THREE.BufferGeometry {
   return g;
 }
 
-export function buildPlaceholderGeometry(recipe: PlaceholderRecipe): THREE.BufferGeometry {
+/**
+ * Build an organ's geometry from its recipe in organs.json.
+ *
+ * The `model` kind is the authored anatomy in ../anatomy/models.ts, which is what every
+ * organ now uses. The older kinds below are the first-generation generators, kept
+ * because they are small, because a future organ may be a plain tube, and because they
+ * are the simplest possible inputs for the order-independence proof.
+ */
+export function buildPlaceholderGeometry(recipe: PlaceholderRecipe, params: ModelParams = {}): THREE.BufferGeometry {
   switch (recipe.kind) {
+    case 'model':
+      return buildModel(recipe.model, params);
     case 'ellipsoid':
       return ellipsoid(recipe.radii, recipe.detail ?? 3, recipe.noise ?? 0);
     case 'lathe':

@@ -1,0 +1,697 @@
+{
+  "atlas": "eyes",
+  "about": "The two eyes drawn as their main structures: the outer coat (sclera and cornea), the iris with its pupil, the lens, the retina and the optic nerve. The pupil is live: its diameter follows the simulation's own pupil, so opioids pin it and atropine-like drugs or fright widen it. The structures of the front and back of the eye, the eyelids and tear drainage, the eye muscles and the layers of the retina, lens and cornea are drawn as a diagram, not a traced atlas, and there is no image formation or accommodation; the model has no visual signal, so the retina and nerve show only how awake the body is.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "sclera",
+      "label": "Sclera",
+      "summary": "The tough white outer coat of the eyeball",
+      "function": "The sclera is the dense fibrous coat that gives the eyeball its shape and carries the pull of the eye muscles. It is continuous with the clear cornea at the front and with the sheath of the optic nerve at the back. It is structural and has no drive in this simulator, so it stays at a steady dim glow.",
+      "color": "#e8e4d8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cornea",
+      "label": "Cornea",
+      "summary": "The clear dome at the front that does most of the focusing",
+      "function": "The cornea is the transparent front window of the eye, and because light passes from air into it, its curved surface bends light more than the lens does. It has no blood vessels and is kept clear by the tear film. It has no drive in this simulator and glows steadily.",
+      "color": "#9fd6e8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "iris",
+      "label": "Iris",
+      "summary": "The coloured ring of muscle that sets the pupil's size",
+      "function": "The iris holds two smooth muscles: a ring (the sphincter) that narrows the pupil under parasympathetic control, and a radial one (the dilator) that widens it under sympathetic control. Both are active whenever the pupil is away from its resting size, in either direction. The iris brightens when a drug or fright moves the pupil from its resting diameter.",
+      "color": "#5b8fb9",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "mydriasis",
+          "weight": 0.4,
+          "note": "A wider pupil means the sympathetically driven dilator is working harder against the sphincter.",
+          "source": "GH14"
+        },
+        {
+          "signal": "miosis",
+          "weight": 0.4,
+          "note": "A narrower pupil means the parasympathetically driven sphincter is working harder against the dilator.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pupil_right",
+      "label": "Right Pupil",
+      "summary": "The opening in the right iris that admits light",
+      "function": "The pupil is the hole in the middle of the iris, and the iris muscles set its diameter: it narrows with parasympathetic drive and in bright light, and widens with sympathetic drive and in the dark. In this simulator the disc is drawn at the engine's live pupil diameter, so opioids pin it small and atropine-like drugs or fright open it wide. It glows when it is away from its resting size.",
+      "color": "#1b1f2a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "mydriasis",
+          "weight": 0.5,
+          "note": "The disc is scaled up with the engine's pupil, so a wide pupil is shown as an active change.",
+          "source": "GH14"
+        },
+        {
+          "signal": "miosis",
+          "weight": 0.5,
+          "note": "The disc is scaled down with the engine's pupil, so a pinned pupil is shown as an active change.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pupil_left",
+      "label": "Left Pupil",
+      "summary": "The opening in the left iris that admits light",
+      "function": "The pupil is the hole in the middle of the iris, and the iris muscles set its diameter: it narrows with parasympathetic drive and in bright light, and widens with sympathetic drive and in the dark. In this simulator the disc is drawn at the engine's live pupil diameter, so opioids pin it small and atropine-like drugs or fright open it wide. It glows when it is away from its resting size.",
+      "color": "#1b1f2a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "mydriasis",
+          "weight": 0.5,
+          "note": "The disc is scaled up with the engine's pupil, so a wide pupil is shown as an active change.",
+          "source": "GH14"
+        },
+        {
+          "signal": "miosis",
+          "weight": 0.5,
+          "note": "The disc is scaled down with the engine's pupil, so a pinned pupil is shown as an active change.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lens",
+      "label": "Lens",
+      "summary": "The clear biconvex disc that fine-tunes focus",
+      "function": "The lens sits just behind the iris and changes its curvature to bring near or far objects into focus. The model has no focusing demand, so the lens has no drive and glows steadily.",
+      "color": "#d9c88a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "retina",
+      "label": "Retina",
+      "summary": "The light-sensitive lining of the back of the eye",
+      "function": "The retina is a layer of nervous tissue lining the back of the eyeball, where photoreceptors turn light into nerve signals that leave by the optic nerve. It is part of the central nervous system and is metabolically very active. It dims as consciousness is lost, as a display of reduced neural activity rather than of vision.",
+      "color": "#d9784a",
+      "rest": 0.4,
+      "drives": [
+        {
+          "signal": "unconscious",
+          "weight": -0.2,
+          "note": "Neural activity of the central nervous system falls as consciousness is lost.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "optic_nerve",
+      "label": "Optic Nerve",
+      "summary": "The cable that carries retinal signals to the brain",
+      "function": "The optic nerve is made of the axons of the retinal ganglion cells and leaves each eye at the optic disc, which has no photoreceptors. It runs back and medially towards the brain. It dims with loss of consciousness, as a display of reduced neural activity.",
+      "color": "#f0c04a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "Neural traffic in central pathways falls as consciousness is lost.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "conjunctiva",
+      "label": "Conjunctiva",
+      "summary": "The thin clear membrane over the white of the eye and inside the lids",
+      "function": "It covers the front of the sclera and lines the inner surface of the eyelids, so the eye can move freely under the lids. It stops at the edge of the cornea.",
+      "color": "#f3c9c2",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "eyelids",
+      "label": "Eyelids",
+      "summary": "The folds of skin that cover and protect the front of the eye",
+      "function": "The lids spread tears over the eye as they blink and close to shield it. Each has a firm plate near its edge and a lining of conjunctiva.",
+      "color": "#e8b7a0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tarsal_plates",
+      "parent": "eyelids",
+      "label": "Tarsal Plates",
+      "summary": "The firm plates of dense tissue that give each lid its shape",
+      "function": "One lies in each lid near the edge and holds the lid in its curve. The tarsal glands are embedded in it.",
+      "color": "#dcc6a8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tarsal_glands",
+      "parent": "tarsal_plates",
+      "label": "Tarsal (Meibomian) Glands",
+      "summary": "Oil glands set in a row inside each lid",
+      "function": "They open along the lid edge and release an oily secretion onto the tear film, which slows the tears evaporating.",
+      "color": "#f0d890",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lacrimal_gland",
+      "label": "Lacrimal Gland",
+      "summary": "The tear-making gland above and to the outer side of each eye",
+      "function": "It secretes the watery part of the tears, which wash across the eye towards the inner corner. Its secretion is driven mainly by the parasympathetic nerves.",
+      "color": "#e0a8b8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.4,
+          "note": "Parasympathetic nerves are the main drive to tear secretion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lacrimal_puncta",
+      "label": "Lacrimal Puncta",
+      "summary": "The two tiny openings at the inner corner of each eye that drain tears",
+      "function": "One lies on the edge of each lid near the inner corner. Tears enter the drainage system through them.",
+      "color": "#d98ea0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lacrimal_canaliculi",
+      "label": "Lacrimal Canaliculi",
+      "summary": "The small channels that carry tears from the puncta to the lacrimal sac",
+      "function": "Each punctum leads into its own canaliculus, which runs towards the nose and empties into the sac.",
+      "color": "#e6a9b5",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lacrimal_sac",
+      "label": "Lacrimal Sac",
+      "summary": "The small pouch at the inner corner that collects the tears",
+      "function": "It receives the tears from both canaliculi and passes them down into the nasolacrimal duct.",
+      "color": "#d98ea0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "nasolacrimal_duct",
+      "label": "Nasolacrimal Duct",
+      "summary": "The duct that carries tears from the sac down into the nose",
+      "function": "It runs from the lacrimal sac down to the inside of the nose, which is why crying makes the nose run.",
+      "color": "#e6a9b5",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "extraocular_muscles",
+      "label": "Extraocular Muscles",
+      "summary": "The muscles that turn the eye and lift the upper lid",
+      "function": "Six move the eyeball and a seventh raises the upper lid. The four straight ones arise from a ring of tendon around the optic canal at the back of the socket. The ring is drawn here.",
+      "color": "#c9686a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_rectus",
+      "parent": "extraocular_muscles",
+      "label": "Superior Rectus",
+      "summary": "The straight muscle on top of the eye",
+      "function": "It turns the eye upward, with some inward turning.",
+      "color": "#c9686a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_rectus",
+      "parent": "extraocular_muscles",
+      "label": "Inferior Rectus",
+      "summary": "The straight muscle under the eye",
+      "function": "It turns the eye downward, with some inward turning.",
+      "color": "#c9686a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "medial_rectus",
+      "parent": "extraocular_muscles",
+      "label": "Medial Rectus",
+      "summary": "The straight muscle on the nose side of the eye",
+      "function": "It turns the eye inward, towards the nose.",
+      "color": "#c9686a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_rectus",
+      "parent": "extraocular_muscles",
+      "label": "Lateral Rectus",
+      "summary": "The straight muscle on the outer side of the eye",
+      "function": "It turns the eye outward, away from the nose.",
+      "color": "#c9686a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_oblique",
+      "parent": "extraocular_muscles",
+      "label": "Superior Oblique",
+      "summary": "The slanting muscle whose tendon passes through a pulley",
+      "function": "Its tendon runs through a small loop of tissue at the upper inner corner of the socket before it reaches the eye. It turns the eye downward and outward.",
+      "color": "#b85a64",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_oblique",
+      "parent": "extraocular_muscles",
+      "label": "Inferior Oblique",
+      "summary": "The slanting muscle that passes under the eye",
+      "function": "It arises from the floor of the socket near the nose and wraps below the eyeball. It turns the eye upward and outward.",
+      "color": "#b85a64",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "levator_palpebrae",
+      "parent": "extraocular_muscles",
+      "label": "Levator Palpebrae Superioris",
+      "summary": "The muscle that lifts the upper lid",
+      "function": "It arises at the back of the socket and runs forward over the top of the eye to the upper lid, which it raises.",
+      "color": "#d6797a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "choroid",
+      "label": "Choroid",
+      "summary": "The dark, blood-rich layer between the sclera and the retina",
+      "function": "It is a layer of blood vessels that nourishes the outer retina, and its pigment absorbs stray light inside the eye.",
+      "color": "#6b3a3a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ciliary_body",
+      "label": "Ciliary Body",
+      "summary": "The ring behind the iris that makes aqueous humour and moves the lens",
+      "function": "It makes the aqueous humour and holds the ciliary muscle, which changes the focus of the lens through the zonular fibres. The muscle is driven by the parasympathetic nerves.",
+      "color": "#a68b6a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "Parasympathetic nerves drive the ciliary muscle that changes the focus of the lens.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "zonular_fibres",
+      "label": "Zonular Fibres",
+      "summary": "The fine threads that hold the lens in place",
+      "function": "They run from the ciliary body to the edge of the lens. When the ciliary muscle relaxes or tightens they change the pull on the lens and so its shape.",
+      "color": "#e8e4d8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "aqueous_humour",
+      "label": "Aqueous Humour",
+      "summary": "The clear watery fluid in the front of the eye",
+      "function": "It is made by the ciliary body, passes through the pupil and drains at the angle between the iris and the cornea. It nourishes the lens and cornea, which have no blood supply.",
+      "color": "#bfe6f2",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "anterior_chamber",
+      "parent": "aqueous_humour",
+      "label": "Anterior Chamber",
+      "summary": "The fluid-filled space between the cornea and the iris",
+      "function": "The aqueous humour passes forward through the pupil into this space on its way to the drainage angle.",
+      "color": "#cdeaf5",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_chamber",
+      "parent": "aqueous_humour",
+      "label": "Posterior Chamber",
+      "summary": "The narrow space between the iris and the lens",
+      "function": "The aqueous humour is released into this space by the ciliary body and then passes through the pupil into the anterior chamber.",
+      "color": "#cdeaf5",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vitreous_body",
+      "label": "Vitreous Body",
+      "summary": "The clear jelly that fills the large space behind the lens",
+      "function": "It holds the retina against the back of the eye and helps the eyeball keep its shape.",
+      "color": "#d8f0f0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trabecular_meshwork",
+      "label": "Trabecular Meshwork",
+      "summary": "The sponge-like tissue at the angle through which the aqueous humour drains",
+      "function": "The aqueous humour filters through it on its way into the scleral venous sinus.",
+      "color": "#c9b88a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scleral_venous_sinus",
+      "label": "Scleral Venous Sinus (Schlemm)",
+      "summary": "The ring-shaped channel that carries the aqueous humour into the veins",
+      "function": "It runs round the edge of the cornea and collects the drained fluid, which then passes into the small veins of the sclera.",
+      "color": "#7aa6d6",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "macula",
+      "label": "Macula",
+      "summary": "The yellowish area of retina behind the centre of the lens",
+      "function": "It is the region used for sharp central vision, and it contains the fovea at its middle.",
+      "color": "#e6c34a",
+      "rest": 0.4,
+      "drives": [
+        {
+          "signal": "unconscious",
+          "weight": -0.2,
+          "note": "The retina display dims as consciousness falls.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "fovea",
+      "parent": "macula",
+      "label": "Fovea",
+      "summary": "The small pit at the centre of the macula where vision is sharpest",
+      "function": "It is a small depression packed with cones, where the layers above are pushed aside so light reaches the receptors almost directly.",
+      "color": "#d9a52e",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "optic_disc",
+      "label": "Optic Disc",
+      "summary": "The spot where the optic nerve leaves the eye",
+      "function": "It has no light receptors, which is why each eye has a blind spot. The retinal vessels enter and leave the eye at this point.",
+      "color": "#f4e2b0",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "unconscious",
+          "weight": -0.15,
+          "note": "The optic nerve display dims as consciousness falls.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "central_retinal_artery",
+      "label": "Central Retinal Artery",
+      "summary": "The artery that supplies the inner retina",
+      "function": "It enters the eye with the optic nerve and spreads over the inner surface of the retina in branches.",
+      "color": "#c8323a",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "central_retinal_vein",
+      "label": "Central Retinal Vein",
+      "summary": "The vein that drains blood from the retina",
+      "function": "It carries blood from the retina back along the optic nerve and out of the eye.",
+      "color": "#3a5fb0",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "retinal_pigment_epithelium",
+      "parent": "retina",
+      "label": "Pigment Epithelium",
+      "summary": "The dark layer of cells behind the light receptors",
+      "function": "It absorbs stray light and looks after the outer segments of the receptors that lie against it.",
+      "color": "#3d2b26",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rods",
+      "parent": "retina",
+      "label": "Rods",
+      "summary": "The light receptors for dim light",
+      "function": "Rods are very sensitive to light and give vision in dim conditions, but not colour. They are most numerous towards the edge of the retina.",
+      "color": "#8a96c8",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "cones",
+      "parent": "retina",
+      "label": "Cones",
+      "summary": "The light receptors for colour and fine detail",
+      "function": "Cones work in bright light and give colour vision and sharp detail. They are packed most densely at the fovea.",
+      "color": "#d6a8c8",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "outer_nuclear_layer",
+      "parent": "retina",
+      "label": "Outer Nuclear Layer",
+      "summary": "The layer holding the cell bodies of the rods and cones",
+      "function": "The nuclei of the light receptors lie in this layer.",
+      "color": "#a8a8b8",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "outer_plexiform_layer",
+      "parent": "retina",
+      "label": "Outer Plexiform Layer",
+      "summary": "The layer where receptors connect to the next cells",
+      "function": "The receptors pass their signals here to the bipolar and horizontal cells.",
+      "color": "#b9b0c4",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "horizontal_cells",
+      "parent": "retina",
+      "label": "Horizontal Cells",
+      "summary": "Cells that link neighbouring receptors sideways",
+      "function": "They carry signals sideways across the outer retina, which sharpens contrast.",
+      "color": "#c8a0d4",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bipolar_cells",
+      "parent": "retina",
+      "label": "Bipolar Cells",
+      "summary": "The cells that relay signals from receptors to ganglion cells",
+      "function": "They are the direct link in the chain from the light receptors to the ganglion cells.",
+      "color": "#7ec8b0",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "amacrine_cells",
+      "parent": "retina",
+      "label": "Amacrine Cells",
+      "summary": "Cells that link neighbouring cells in the inner retina",
+      "function": "They carry signals sideways in the inner retina and shape the signals the ganglion cells send on.",
+      "color": "#e0b078",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ganglion_cells",
+      "parent": "retina",
+      "label": "Ganglion Cells",
+      "summary": "The cells whose fibres form the optic nerve",
+      "function": "They gather the signals from the bipolar and amacrine cells and send them to the brain along their long fibres.",
+      "color": "#f0c050",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "nerve_fibre_layer",
+      "parent": "retina",
+      "label": "Nerve Fibre Layer",
+      "summary": "The innermost layer of fibres running to the optic disc",
+      "function": "The fibres of the ganglion cells run across the inner surface of the retina in this layer and gather at the optic disc.",
+      "color": "#f4dc8a",
+      "rest": 0.4,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lens_capsule",
+      "parent": "lens",
+      "label": "Lens Capsule",
+      "summary": "The thin clear elastic bag that holds the lens",
+      "function": "The lens is enclosed in this capsule, and the zonular fibres attach to it.",
+      "color": "#d4e6f0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lens_cortex",
+      "parent": "lens",
+      "label": "Lens Cortex",
+      "summary": "The softer outer part of the lens",
+      "function": "It is made of layers of lens fibres laid down around the nucleus.",
+      "color": "#d9ecf5",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lens_nucleus",
+      "parent": "lens",
+      "label": "Lens Nucleus",
+      "summary": "The denser central part of the lens",
+      "function": "It is the oldest part of the lens, made of fibres laid down earliest.",
+      "color": "#e8e0b0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corneal_epithelium",
+      "parent": "cornea",
+      "label": "Corneal Epithelium",
+      "summary": "The thin surface layer of the cornea",
+      "function": "It is a layer of cells that covers the front of the cornea and is kept moist by the tear film.",
+      "color": "#bfe4ee",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bowman_layer",
+      "parent": "cornea",
+      "label": "Bowman Layer",
+      "summary": "A thin tough layer beneath the epithelium",
+      "function": "It is a thin acellular layer just beneath the epithelium of the cornea.",
+      "color": "#a9d2de",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corneal_stroma",
+      "parent": "cornea",
+      "label": "Corneal Stroma",
+      "summary": "The thick middle layer that makes up most of the cornea",
+      "function": "It is made of orderly sheets of collagen, an arrangement that helps keep the cornea clear.",
+      "color": "#9fd6e8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "descemet_membrane",
+      "parent": "cornea",
+      "label": "Descemet Membrane",
+      "summary": "A thin elastic layer at the back of the stroma",
+      "function": "It is the basement membrane of the endothelium that lies behind it.",
+      "color": "#8ec4d6",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "corneal_endothelium",
+      "parent": "cornea",
+      "label": "Corneal Endothelium",
+      "summary": "The single layer of cells lining the back of the cornea",
+      "function": "It faces the aqueous humour and pumps fluid out of the cornea, which keeps it clear.",
+      "color": "#7cb2c4",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

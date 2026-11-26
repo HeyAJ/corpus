@@ -297,7 +297,13 @@ describe('organs.json', () => {
   });
 
   it('every organ names a panel that the UI implements', () => {
-    const panels = ['cardiac', 'neuro', 'respiratory', 'renal', 'gastric', 'hepatic', 'gi', 'bladder', 'generic'];
+    // Kept in step with `OrganPanel` in src/data/types.ts and the PANELS map in
+    // src/ui/panels/OrganPanels.tsx. A kind listed here with no layout of its own falls
+    // back to the generic panel (App.tsx), so a new organ can never blank the HUD.
+    const panels = [
+      'cardiac', 'neuro', 'respiratory', 'renal', 'gastric', 'hepatic', 'gi', 'bladder',
+      'pancreatic', 'endocrine', 'reproductive', 'fetal', 'ocular', 'spinal', 'headneck', 'skeletal', 'generic',
+    ];
     for (const o of ORGANS.organs) expect(panels, o.id).toContain(o.panel);
   });
 
@@ -320,6 +326,20 @@ describe('organs.json', () => {
     for (const o of ORGANS.organs) {
       expect(ORGANS.groupLayout[o.group], o.id).toBeTruthy();
     }
+  });
+
+  it('every organ belongs to a body system, and sex-specific organs say which sex', () => {
+    const systems = ['nervous', 'cardiovascular', 'respiratory', 'digestive', 'urinary', 'endocrine', 'lymphatic', 'reproductive', 'skeletal'];
+    for (const o of ORGANS.organs) {
+      expect(systems, o.id).toContain(o.system);
+      if (o.sex !== undefined) expect(['male', 'female'], o.id).toContain(o.sex);
+      // The fetus exists only in a pregnancy, and a pregnancy only in a female body.
+      if (o.pregnancyOnly) expect(o.sex, o.id).toBe('female');
+    }
+    // Both sexes get a reproductive system: a body with none is a data error, not a choice.
+    const reproductive = ORGANS.organs.filter((o) => o.system === 'reproductive');
+    expect(reproductive.some((o) => o.sex === 'male')).toBe(true);
+    expect(reproductive.some((o) => o.sex === 'female')).toBe(true);
   });
 });
 

@@ -21,56 +21,21 @@
   overflow: hidden;
 }
 
-.header {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-}
-
-.title {
-  margin: 0;
-  font-size: var(--size-tag);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-
-.clock {
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-dim);
-  padding: 1px 7px;
-  background: var(--chip-bg-strong);
-  border-radius: var(--radius-pill);
-}
-
-.close {
-  margin-left: auto;
-  border: none;
-  background: none;
-  font-size: 18px;
-  line-height: 1;
-  color: var(--ink-dim);
-  cursor: pointer;
-  padding: 0 2px;
-}
-
 .summary {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
   color: var(--ink-dim);
 }
 
 .empty {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--text-sm);
   line-height: 1.5;
   color: var(--ink-dim);
 }
 
 .empty code {
-  font-size: 11px;
+  font-size: var(--text-xs);
   background: var(--chip-bg);
   padding: 0 4px;
   border-radius: 4px;
@@ -110,15 +75,30 @@
 }
 
 .name {
-  font-size: 13px;
+  font-size: var(--text-md);
   font-weight: var(--weight-bold);
   color: var(--ink);
+  /* A long name is cut with an ellipsis (the full text is in the title attribute) rather
+     than being allowed to run under the value beside it. */
+  min-width: 0;
+  max-width: 11em;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/* A caveat about how to read the range, wrapped under its row so it cannot collide. */
+.note {
+  margin: 0;
+  font-size: var(--text-sm);
+  line-height: 1.4;
+  color: var(--ink-dim);
+  overflow-wrap: anywhere;
+}
+
 .gland {
-  font-size: 10px;
-  color: var(--ink-faint);
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
   text-transform: lowercase;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -126,20 +106,20 @@
 }
 
 .value {
-  font-size: 14px;
+  font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
 
 .unit {
-  font-size: 10px;
+  font-size: var(--text-xs);
   font-weight: 400;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
 .badge {
-  font-size: 10px;
+  font-size: var(--text-xs);
   padding: 1px 6px;
   border-radius: var(--radius-pill);
   white-space: nowrap;
@@ -147,7 +127,7 @@
 
 .normal {
   background: rgba(127, 214, 238, 0.3);
-  color: #29616f;
+  color: var(--ink-info);
 }
 
 .low,
@@ -209,8 +189,10 @@
 .rowFoot {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
-  color: var(--ink-faint);
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: var(--text-xs);
+  color: var(--ink-dim);
   font-variant-numeric: tabular-nums;
 }
 
@@ -218,9 +200,9 @@
   margin: 0;
   padding-top: 8px;
   border-top: 1px solid rgba(0, 0, 0, 0.08);
-  font-size: 10px;
+  font-size: var(--text-xs);
   line-height: 1.45;
-  color: var(--ink-faint);
+  color: var(--ink-dim);
 }
 
 .footnote code {

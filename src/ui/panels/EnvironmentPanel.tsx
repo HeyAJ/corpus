@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStore } from '../store';
 import styles from './environment.module.css';
+import { PanelHeader } from '../components/PanelHeader';
 
 /**
  * ENVIRONMENT PANEL — where the body is, and what it is breathing.
@@ -93,12 +94,7 @@ export function EnvironmentPanel() {
 
   return (
     <section className={styles.panel} role="region" aria-label="Environment" data-panel="environment">
-      <header className={styles.header}>
-        <h2 className={styles.title}>Environment</h2>
-        <button className={styles.close} onClick={() => toggle()} aria-label="Close environment panel">
-          {'×'}
-        </button>
-      </header>
+      <PanelHeader title="Environment" onClose={() => toggle()} />
 
       <div className={styles.group}>
         <h3 className={styles.groupTitle}>Air</h3>

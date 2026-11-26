@@ -1,0 +1,211 @@
+{
+  "atlas": "bladder",
+  "about": "The interior of the bladder: the muscular wall, the smooth trigone on its base, the two ureteric openings, the sphincter ring at the neck, the first part of the urethra and the folded lining. The urine itself is not drawn, since the selected bladder already shows its fluid level. The layers of the wall, the nerves and the anatomy beyond the first of the urethra are left out, and the sizes are chosen to read clearly rather than measured. Finer structures (marked as children in the Structures list) appear when their parent is selected or the camera is close; they are schematic drawings, and counts, sizes and layout are illustrative, not measured.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "detrusor",
+      "label": "Detrusor Muscle",
+      "summary": "The smooth muscle wall that stretches to store urine and squeezes to empty it",
+      "function": "The detrusor is a thick coat of smooth muscle that relaxes and stretches as urine collects, so the pressure inside rises very little. When the bladder is emptied, parasympathetic nerves make the whole wall contract. It brightens as the bladder fills and when parasympathetic drive rises; as the bladder fills the wall is drawn thinner.",
+      "color": "#c9a227",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "bladderFill",
+          "weight": 0.4,
+          "note": "Stretch of the wall rises with filling, and the urge to void rises with it.",
+          "source": "GH14"
+        },
+        {
+          "signal": "parasympathetic",
+          "weight": 0.3,
+          "note": "The detrusor contracts under parasympathetic drive.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trigone",
+      "label": "Trigone",
+      "summary": "The smooth triangle on the floor between the two ureters and the neck",
+      "function": "The trigone is the triangle on the base of the bladder whose corners are the two ureteric openings and the opening of the urethra. Unlike the rest of the lining it does not fold, and it stays the same shape as the bladder fills.",
+      "color": "#e0c875",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "ureteric_orifices",
+      "label": "Ureteric Orifices",
+      "summary": "Where the two ureters open into the bladder",
+      "function": "Each ureter ends in a small slit-like opening at an upper corner of the trigone. Urine enters in spurts as the waves of contraction in the ureter arrive, which you can see as brief jets of urine into the bladder.",
+      "color": "#d98a4a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "urineFlow",
+          "weight": 0.3,
+          "note": "More urine from the kidneys means more frequent jets from the openings.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_sphincter",
+      "label": "Internal Sphincter",
+      "summary": "The ring of muscle at the bladder neck that keeps it closed",
+      "function": "The internal sphincter is a ring of smooth muscle at the neck, where the bladder joins the urethra. Sympathetic nerves hold it closed while urine is stored, and it relaxes as the bladder is emptied. It brightens with sympathetic drive.",
+      "color": "#b04a5a",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "sympathetic",
+          "weight": 0.4,
+          "note": "Sympathetic tone keeps the bladder neck closed during storage.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "urethra",
+      "label": "Urethra (first part)",
+      "summary": "The tube that leads urine out of the bladder neck",
+      "function": "The urethra carries urine from the bladder neck out of the body. Only its first part is drawn here. It is kept shut between voidings by the sphincters.",
+      "color": "#e0a06a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mucosa",
+      "label": "Mucosa (Rugae)",
+      "summary": "The folded lining; the folds flatten as the bladder fills",
+      "function": "The inner lining of the bladder is a membrane that is thrown into folds, called rugae, when the bladder is empty. As the bladder fills the folds flatten out, which is how the wall can stretch without tearing. In this view the folds fade as the bladder fills.",
+      "color": "#d98f9a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "bladderFill",
+          "weight": 0.3,
+          "note": "The lining is stretched and flattened as the bladder fills.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bladder_apex",
+      "label": "Apex",
+      "summary": "The tip of the bladder that points toward the navel",
+      "function": "The apex is the forward and upper point of the empty bladder. The median umbilical ligament leaves from it. It rises above the pubic bone as the bladder fills.",
+      "color": "#d9b84a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "bladderFill",
+          "weight": 0.3,
+          "note": "A fuller bladder lifts its apex.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bladder_fundus",
+      "label": "Fundus (Base)",
+      "summary": "The back and lower wall of the bladder, facing the rectum",
+      "function": "The fundus, also called the base, is the posterior wall of the bladder. The ureters enter it and the trigone is drawn on its inner face. It is the part that changes least as the bladder fills.",
+      "color": "#c9a24a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "bladder_neck",
+      "label": "Neck",
+      "summary": "The lowest part, where the bladder opens into the urethra",
+      "function": "The neck is the narrow lowest part of the bladder, where the muscle of the wall circles the start of the urethra. The internal sphincter lies here.",
+      "color": "#b88a4a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "sympathetic",
+          "weight": 0.25,
+          "note": "Sympathetic outflow keeps the neck closed during filling.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "median_umbilical_ligament",
+      "label": "Median Umbilical Ligament",
+      "summary": "A fibrous cord from the apex to the navel, left from the fetal urachus",
+      "function": "The median umbilical ligament is the remnant of the urachus, a channel that joins the fetal bladder to the umbilical cord. In the adult it is a fibrous cord that runs from the apex up the back of the abdominal wall.",
+      "color": "#e8e0c8",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "urothelium",
+      "parent": "mucosa",
+      "label": "Urothelium",
+      "summary": "The waterproof lining of the bladder",
+      "function": "The urothelium is a layered, stretchable lining that stands between the urine and the wall. It flattens as the bladder fills and keeps the urine from leaking into the tissue.",
+      "color": "#f0c0c8",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "bladderFill",
+          "weight": 0.3,
+          "note": "A fuller bladder stretches the lining flat.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "umbrella_cells",
+      "parent": "urothelium",
+      "label": "Umbrella Cells",
+      "summary": "The large surface cells of the urothelium",
+      "function": "Umbrella cells are the large, flat cells at the surface of the urothelium. They are joined by tight junctions and have a plaque-covered surface that is a barrier to the urine. They are drawn magnified.",
+      "color": "#f8d0d8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscle_bundles",
+      "parent": "detrusor",
+      "label": "Interlacing Muscle Bundles",
+      "summary": "The bundles of smooth muscle that form the wall",
+      "function": "The detrusor is built of bundles of smooth muscle that cross and interlace in all directions rather than lying in neat layers. When they all contract together the bladder squeezes down evenly to empty. Here a few bundles are drawn schematically.",
+      "color": "#b88a2a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "parasympathetic",
+          "weight": 0.4,
+          "note": "Parasympathetic nerves drive the detrusor to contract when the bladder empties.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    }
+  ]
+}

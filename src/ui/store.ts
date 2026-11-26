@@ -16,6 +16,8 @@ import type { SimSnapshot, SimIntent, Route } from '../bridge/types';
  */
 
 export type ToolMode = 'none' | 'body' | 'procedure' | 'drugs' | 'defib' | 'circulation';
+/** Which side of the open organ a section removes; mirrors the viewer's SliceAxis. */
+export type CutAxis = 'front' | 'side' | 'top';
 export type DrawerTab = 'drugs' | 'food' | 'biologics';
 
 export type EventKind = 'drug' | 'food' | 'procedure' | 'state';
@@ -94,6 +96,67 @@ interface UiState {
   /** "What is happening": the plain-language status of the body. */
   statusPanelOpen: boolean;
   toggleStatusPanel: () => void;
+  /**
+   * "Structures": the parts of the selected organ, with what each does and how active
+   * it is. Opens by itself when an organ is selected (unless the user has closed it for
+   * this session - `anatomyAuto`), because seeing inside is the reason to tap an organ.
+   */
+  anatomyPanelOpen: boolean;
+  toggleAnatomyPanel: () => void;
+  setAnatomyPanel: (open: boolean) => void;
+  anatomyAuto: boolean;
+  setAnatomyAuto: (auto: boolean) => void;
+  /** The part of the selected organ the user has picked, by its id within the organ. */
+  selectedPart: string | null;
+  setSelectedPart: (id: string | null) => void;
+  /** Screen anchors of the selected organ's parts, from the viewer. */
+  partLabels: { id: string; x: number; y: number; visible: boolean }[];
+  setPartLabels: (l: { id: string; x: number; y: number; visible: boolean }[]) => void;
+  /** Reproduction: sex, the menstrual cycle, pregnancy and the sexual response. */
+  reproductionPanelOpen: boolean;
+  toggleReproductionPanel: () => void;
+  /**
+   * The skeleton layer ("Bones" in the Layers control). Off at start; while off no bone geometry is
+   * even built (OrganSet builds a layer organ on first need). Selecting a bone organ does NOT change
+   * this flag: a selected organ is drawn because it is selected, not because its layer is on.
+   */
+  bonesVisible: boolean;
+  toggleBones: () => void;
+  /**
+   * The Layers popover (ToolDock.tsx). It is NOT a panel and takes no part in `openOnly`: it is a
+   * small anchored menu that closes on an outside tap, Escape, or the opening of any panel.
+   */
+  layersOpen: boolean;
+  setLayersOpen: (open: boolean) => void;
+  /** Body-wide overlays, like the vessels: the nerves, and hormones leaving their glands. */
+  nervesVisible: boolean;
+  toggleNerves: () => void;
+  hormonesVisible: boolean;
+  toggleHormones: () => void;
+  /** Recolour every unselected organ by how far it is above its own rest (the Activity switch). */
+  activityVisible: boolean;
+  toggleActivity: () => void;
+  /**
+   * The section through the selected organ (Structures panel "Cut"). The viewer owns the real
+   * state and clears it whenever the selection changes; this mirror exists so the panel, a
+   * shared link and the viewer agree, and it is cleared by `setSelected` for the same reason.
+   */
+  cutAxis: CutAxis | null;
+  cutDepth: number;
+  setCut: (axis: CutAxis | null, depth?: number) => void;
+  /**
+   * A part the camera should fly to as soon as the selected organ's interior is built (the
+   * interior takes a moment, and `Viewer.focusPart` does nothing before it exists). Set by
+   * the search box and by a shared link; consumed (and cleared) by App.tsx.
+   */
+  pendingFocusPart: string | null;
+  requestFocusPart: (id: string | null) => void;
+  /** False once the visitor has moved the camera away from the home view (the Reset view pill). */
+  viewAtHome: boolean;
+  setViewAtHome: (atHome: boolean) => void;
+  /** Keep the brain scan inset on screen when the brain is not the selected organ. */
+  scanPinned: boolean;
+  toggleScanPinned: () => void;
   /** The launcher that lists every panel behind the dock's menu button. */
   menuOpen: boolean;
   setMenuOpen: (open: boolean) => void;
@@ -153,6 +216,33 @@ export const LOG_LIFETIME_MS = 2000;
 let eventId = 1;
 
 /** The longest history worth keeping; older entries fall off the front. */
+/**
+ * THE WELCOME DIALOG IS ASKED ONCE PER BROWSER, NOT ONCE PER LOAD. `firstRunAccepted` used to
+ * start false on every page load, so a returning visitor met the same dialog every time.
+ * The acceptance is remembered under a VERSIONED key, so that a future change to what the
+ * dialog says can ask again by bumping the suffix. Storage is wrapped in try/catch because a
+ * private window, blocked site data or a sandboxed frame makes even reading it throw; in
+ * that case the visitor is simply asked again, which is the safe direction to fail. The
+ * permanent NOT FOR CLINICAL USE banner is a separate element and does not depend on this.
+ */
+const FIRST_RUN_KEY = 'corpus.firstRunAccepted.v1';
+
+function readFirstRunAccepted(): boolean {
+  try {
+    return window.localStorage.getItem(FIRST_RUN_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function writeFirstRunAccepted(): void {
+  try {
+    window.localStorage.setItem(FIRST_RUN_KEY, 'true');
+  } catch {
+    /* Not persisted; the dialog will be shown again next visit. */
+  }
+}
+
 const MAX_EVENTS = 300;
 
 const CLOSED = {
@@ -165,6 +255,8 @@ const CLOSED = {
   infectionPanelOpen: false,
   statusPanelOpen: false,
   bloodPanelOpen: false,
+  anatomyPanelOpen: false,
+  reproductionPanelOpen: false,
   drawerOpen: false,
   menuOpen: false,
 } as const;
@@ -208,7 +300,25 @@ export const useStore = create<UiState>((set, get) => ({
   selectedOrgan: null,
   hoveredOrgan: null,
   labels: [],
-  setSelected: (id) => set({ selectedOrgan: id }),
+  // Selecting an organ clears the part picked in the previous one, and brings up its
+  // structures unless the user has dismissed that panel; deselecting closes it.
+  setSelected: (id) =>
+    set((s) => {
+      if (id === s.selectedOrgan) return {};
+      // A section belongs to the organ it was made in (the viewer clears its own on every
+      // selection change), so the mirror is cleared with it.
+      if (id === null) return { selectedOrgan: null, selectedPart: null, partLabels: [], anatomyPanelOpen: false, cutAxis: null, cutDepth: 0.5 };
+      if (!s.anatomyAuto) return { selectedOrgan: id, selectedPart: null, cutAxis: null, cutDepth: 0.5 };
+      return {
+        ...CLOSED,
+        tool: s.tool === 'body' || s.tool === 'drugs' ? ('none' as ToolMode) : s.tool,
+        selectedOrgan: id,
+        selectedPart: null,
+        cutAxis: null,
+        cutDepth: 0.5,
+        anatomyPanelOpen: true,
+      };
+    }),
   setHovered: (id) => set({ hoveredOrgan: id }),
   setLabels: (l) => set({ labels: l }),
 
@@ -240,6 +350,36 @@ export const useStore = create<UiState>((set, get) => ({
   toggleBloodPanel: () => set((s) => openOnly(s, 'bloodPanelOpen')),
   statusPanelOpen: false,
   toggleStatusPanel: () => set((s) => openOnly(s, 'statusPanelOpen')),
+  anatomyPanelOpen: false,
+  toggleAnatomyPanel: () => set((s) => openOnly(s, 'anatomyPanelOpen')),
+  setAnatomyPanel: (open) => set((s) => (open ? { ...openOnly({ ...s, anatomyPanelOpen: false }, 'anatomyPanelOpen') } : { anatomyPanelOpen: false })),
+  anatomyAuto: true,
+  setAnatomyAuto: (auto) => set({ anatomyAuto: auto }),
+  selectedPart: null,
+  setSelectedPart: (id) => set({ selectedPart: id }),
+  partLabels: [],
+  setPartLabels: (l) => set({ partLabels: l }),
+  reproductionPanelOpen: false,
+  toggleReproductionPanel: () => set((s) => openOnly(s, 'reproductionPanelOpen')),
+  bonesVisible: false,
+  toggleBones: () => set((s) => ({ bonesVisible: !s.bonesVisible })),
+  layersOpen: false,
+  setLayersOpen: (open) => set({ layersOpen: open }),
+  nervesVisible: false,
+  toggleNerves: () => set((s) => ({ nervesVisible: !s.nervesVisible })),
+  hormonesVisible: false,
+  toggleHormones: () => set((s) => ({ hormonesVisible: !s.hormonesVisible })),
+  activityVisible: false,
+  toggleActivity: () => set((s) => ({ activityVisible: !s.activityVisible })),
+  cutAxis: null,
+  cutDepth: 0.5,
+  setCut: (axis, depth) => set((s) => ({ cutAxis: axis, cutDepth: depth === undefined ? s.cutDepth : Math.max(0, Math.min(1, Number.isFinite(depth) ? depth : 0.5)) })),
+  pendingFocusPart: null,
+  requestFocusPart: (id) => set({ pendingFocusPart: id }),
+  viewAtHome: true,
+  setViewAtHome: (atHome) => set({ viewAtHome: atHome }),
+  scanPinned: false,
+  toggleScanPinned: () => set((s) => ({ scanPinned: !s.scanPinned })),
   menuOpen: false,
   setMenuOpen: (open) => set({ menuOpen: open }),
   closePanels: () => set((s) => ({ ...CLOSED, tool: s.tool === 'body' || s.tool === 'drugs' ? 'none' : s.tool })),
@@ -261,8 +401,11 @@ export const useStore = create<UiState>((set, get) => ({
     ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
     : false,
   setReducedMotion: (v) => set({ reducedMotion: v }),
-  firstRunAccepted: false,
-  acceptFirstRun: () => set({ firstRunAccepted: true }),
+  firstRunAccepted: readFirstRunAccepted(),
+  acceptFirstRun: () => {
+    writeFirstRunAccepted();
+    set({ firstRunAccepted: true });
+  },
   showProvenance: null,
   setProvenance: (key) => set({ showProvenance: key }),
 

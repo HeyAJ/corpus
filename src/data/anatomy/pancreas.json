@@ -1,0 +1,271 @@
+{
+  "atlas": "pancreas",
+  "about": "The inside of the pancreas, drawn as anatomy: its five regions (head, uncinate process, neck, body and tail), the main and accessory ducts, the exocrine acinar tissue, the islets of Langerhans and the splenic artery and vein that run along its back. Juice runs down the main duct towards the duodenum, quicker when the model reports digestion, and insulin (blue) and glucagon (amber) leave the islets into the splenic vein at rates that follow the engine's own secretion of each. The islets are drawn as beads about a thousand times larger than life and only tens of them are shown, denser towards the tail; the region boundaries, the duct and vessel sizes and the stream rates are drawing choices, not measurements. The bile duct, the duodenum, the portal vein and the nerves are left out, and no enzyme or hormone concentration is shown.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "head",
+      "label": "Head of the Pancreas",
+      "summary": "The broad right end, set in the curve of the duodenum",
+      "function": "The head is the widest part of the gland and lies in the curve of the duodenum, which it shares a blood supply with. The main duct reaches the duodenum through it, and the common bile duct passes behind or through it. Its tissue is mostly exocrine, so it brightens when digestion is under way.",
+      "color": "#d9a84e",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "digestion", "weight": 0.35, "note": "Enzyme secretion from the exocrine tissue is stimulated by food in the stomach and bowel.", "source": "GH14" },
+        { "signal": "fatLoad", "weight": 0.2, "note": "Fat in the duodenum is a strong stimulus to enzyme secretion.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "uncinate_process",
+      "label": "Uncinate Process",
+      "summary": "The hook of the head that passes behind the mesenteric vessels",
+      "function": "The uncinate process is a hook-shaped extension of the lower part of the head, reaching to the left behind the superior mesenteric vessels. It is made of the same exocrine and islet tissue as the head. It brightens with the rest of the exocrine gland in digestion.",
+      "color": "#c99440",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "digestion", "weight": 0.3, "note": "Its exocrine tissue is stimulated by food in the gut.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "neck",
+      "label": "Neck of the Pancreas",
+      "summary": "The short constricted part in front of the portal vein",
+      "function": "The neck joins the head to the body and lies in front of the confluence of the superior mesenteric and splenic veins, where they form the portal vein. The main duct and the splenic vessels pass through or beside it. It brightens with digestion.",
+      "color": "#e0b360",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "digestion", "weight": 0.3, "note": "Its exocrine tissue is stimulated by food in the gut.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "body",
+      "label": "Body of the Pancreas",
+      "summary": "The long middle part crossing behind the stomach",
+      "function": "The body runs to the left across the back wall of the abdomen behind the stomach. The splenic vein runs along its back and the splenic artery along its upper border. Both exocrine tissue and islets lie in it, so it responds to a meal and to the blood sugar.",
+      "color": "#d4a247",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "digestion", "weight": 0.3, "note": "Its exocrine tissue is stimulated by food in the gut.", "source": "GH14" },
+        { "signal": "hyperglycaemia", "weight": 0.15, "note": "Its islets secrete more insulin as blood glucose rises.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tail",
+      "label": "Tail of the Pancreas",
+      "summary": "The narrow left end that reaches the hilum of the spleen",
+      "function": "The tail is the narrow left end of the gland and reaches the hilum of the spleen. The islets are most numerous here, so it is the part that responds most to the blood sugar. It brightens when glucose is high or low.",
+      "color": "#c9973f",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "hyperglycaemia", "weight": 0.25, "note": "Islet beta cells secrete insulin when blood glucose is high.", "source": "GH14" },
+        { "signal": "hypoglycaemia", "weight": 0.25, "note": "Islet alpha cells secrete glucagon when blood glucose is low.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "main_duct",
+      "label": "Main Pancreatic Duct (of Wirsung)",
+      "summary": "The duct that runs the length of the gland to the duodenum",
+      "function": "The main duct collects the juice from the small ducts of the lobules and runs the length of the gland from tail to head, widening as it goes. It joins the bile duct at the ampulla and opens into the duodenum. Juice runs along it faster when digestion is under way.",
+      "color": "#f0d98a",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "digestion", "weight": 0.4, "note": "Secretion into the duct rises with food in the gut.", "source": "GH14" },
+        { "signal": "fatLoad", "weight": 0.2, "note": "Fat in the duodenum stimulates the flow of juice.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "accessory_duct",
+      "label": "Accessory Pancreatic Duct (of Santorini)",
+      "summary": "The smaller duct that opens higher up in the duodenum",
+      "function": "The accessory duct drains part of the head and usually joins the main duct, and in many people it also opens separately into the duodenum a little above the main opening. It is drawn as a thin solid cord so that it can be picked.",
+      "color": "#c9b96a",
+      "rest": 0.15,
+      "drives": [
+        { "signal": "digestion", "weight": 0.25, "note": "It carries a share of the juice that food stimulates.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "acinar_tissue",
+      "label": "Acinar Tissue",
+      "summary": "The exocrine lobules that make the digestive juice",
+      "function": "Most of the gland is made of acini, clusters of cells that secrete digestive enzymes and, through the duct cells, a bicarbonate-rich fluid that neutralises acid from the stomach. Secretion is stimulated by the vagus nerve and by gut hormones released when food and acid reach the duodenum. It is drawn as glass lobules and brightens during digestion.",
+      "color": "#e9c277",
+      "rest": 0.2,
+      "drives": [
+        { "signal": "digestion", "weight": 0.4, "note": "Food in the stomach and bowel stimulates enzyme and fluid secretion.", "source": "GH14" },
+        { "signal": "fatLoad", "weight": 0.2, "note": "Fat in the duodenum is a strong stimulus for enzyme secretion.", "source": "GH14" },
+        { "signal": "parasympathetic", "weight": 0.15, "note": "Vagal outflow stimulates acinar secretion.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "islets",
+      "label": "Islets of Langerhans",
+      "summary": "Scattered clusters of endocrine cells, densest in the tail",
+      "function": "The islets are small clusters of endocrine cells scattered through the exocrine tissue. Beta cells secrete insulin when blood glucose is high, alpha cells secrete glucagon when it is low, and both hormones go straight into the blood. Here they are drawn as large beads and brighten when either hormone is called for; the blue and amber streams show which one is flowing.",
+      "color": "#d96a5a",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "hyperglycaemia", "weight": 0.35, "note": "A high blood glucose drives insulin secretion.", "source": "GH14" },
+        { "signal": "hypoglycaemia", "weight": 0.35, "note": "A low blood glucose drives glucagon secretion.", "source": "GH14" },
+        { "signal": "absorption", "weight": 0.2, "note": "Glucose arriving from the gut stimulates insulin secretion.", "source": "GH14" },
+        { "signal": "sympathetic", "weight": 0.1, "note": "Sympathetic outflow promotes glucagon release.", "source": "GH14" }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "splenic_vessels",
+      "label": "Splenic Artery and Vein",
+      "summary": "The vessels along the back and upper border of the body and tail",
+      "function": "The splenic artery runs along the upper border of the gland towards the spleen and gives branches to it. The splenic vein runs on its back, carrying blood from the spleen, and joins the superior mesenteric vein behind the neck to form the portal vein. The islet hormones enter the blood that drains by this route. Arterial blood is drawn in the arterial colour and the vein in the venous colour.",
+      "color": "#b24a58",
+      "rest": 0.25,
+      "drives": [
+        { "signal": "digestion", "weight": 0.15, "note": "Blood flow through the gut and its glands rises after a meal.", "source": "GH14" },
+        { "signal": "hypovolaemia", "weight": -0.1, "note": "When blood volume is low the splanchnic vessels constrict.", "source": "GH14" }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "acinar_cells",
+      "parent": "acinar_tissue",
+      "label": "Acinar Cells",
+      "summary": "The enzyme-making cells of the pancreas, shown in one enlarged acinus",
+      "function": "Acinar cells make the digestive enzymes of pancreatic juice and release them into the lumen of the acinus. This acinus is drawn far larger than life and is a schematic example.",
+      "color": "#e0b360",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "zymogen_granules",
+      "parent": "acinar_cells",
+      "label": "Zymogen Granules",
+      "summary": "The packets of inactive enzymes stored in acinar cells",
+      "function": "Acinar cells store their enzymes as inactive precursors in granules at the end facing the lumen. They are released when the cell is stimulated, and are activated only in the gut.",
+      "color": "#b86a3a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "centroacinar_cells",
+      "parent": "acinar_tissue",
+      "label": "Centroacinar Cells",
+      "summary": "Small cells at the mouth of an acinus",
+      "function": "Centroacinar cells lie at the start of the duct system, inside the acinus. They add a watery, bicarbonate-rich fluid that washes the enzymes along.",
+      "color": "#f0d98a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intercalated_ducts",
+      "parent": "acinar_tissue",
+      "label": "Intercalated Ducts",
+      "summary": "The smallest ducts, leading from the acini",
+      "function": "Intercalated ducts begin at the acini and join into larger ducts, which in turn drain into the main pancreatic duct.",
+      "color": "#d9c07a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "beta_cells",
+      "parent": "islets",
+      "label": "Beta Cells (Insulin)",
+      "summary": "The islet cells that make insulin",
+      "function": "Beta cells release insulin when blood glucose rises. Insulin lets the body take up and store glucose. They are shown as beads in one enlarged schematic islet.",
+      "color": "#4aa3e0",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "hyperglycaemia",
+          "weight": 0.35,
+          "note": "A high blood glucose drives insulin secretion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "absorption",
+          "weight": 0.2,
+          "note": "Glucose arriving from the gut stimulates insulin secretion.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "alpha_cells",
+      "parent": "islets",
+      "label": "Alpha Cells (Glucagon)",
+      "summary": "The islet cells that make glucagon",
+      "function": "Alpha cells release glucagon when blood glucose falls. Glucagon makes the liver release glucose into the blood.",
+      "color": "#e8a838",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "hypoglycaemia",
+          "weight": 0.35,
+          "note": "A low blood glucose drives glucagon secretion.",
+          "source": "GH14"
+        },
+        {
+          "signal": "sympathetic",
+          "weight": 0.1,
+          "note": "Sympathetic outflow promotes glucagon release.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "delta_cells",
+      "parent": "islets",
+      "label": "Delta Cells (Somatostatin)",
+      "summary": "The islet cells that make somatostatin",
+      "function": "Delta cells release somatostatin, a hormone that restrains the release of both insulin and glucagon.",
+      "color": "#8a6ad0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pp_cells",
+      "parent": "islets",
+      "label": "PP Cells (Pancreatic Polypeptide)",
+      "summary": "The islet cells that make pancreatic polypeptide",
+      "function": "PP cells release pancreatic polypeptide, a hormone that is thought to help regulate pancreatic secretion and appetite.",
+      "color": "#6ab07a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epsilon_cells",
+      "parent": "islets",
+      "label": "Epsilon Cells (Ghrelin)",
+      "summary": "A scarce islet cell that makes ghrelin",
+      "function": "Epsilon cells release ghrelin, a hormone better known for being made in the stomach. They are the least common of the five islet cell types.",
+      "color": "#d06a9a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

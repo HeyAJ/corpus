@@ -1,0 +1,1359 @@
+{
+  "version": 1,
+  "about": "Constants and tables for the reproductive subsystem (src/sim/systems/reproductive.ts): the male testosterone readout, the menstrual cycle, pregnancy and the sexual response. Same rule as every other data file in this directory: no number reaches the engine without a source. Shape follows src/data/behaviour.json - a source table, then constants each naming an entry in it with sourceUrl, unit and confidence. Generated from a script that writes each URL once; edit the constants through that script or by hand, but keep value, unit, source, sourceUrl, confidence and note on every entry. Entries marked CALIBRATED are gains chosen with the probes in .cache/probes/repro_*.ts so that the model's OWN outputs land on the cited outcomes; their notes say what they were calibrated to.",
+  "citationPolicy": "Every journal reference is a DOI that was read from the abstract or full text of the paper and recorded in the research notes for this work, never typed from memory. Textbooks cite the publisher. A figure the task fixed by convention is attributed to BRIEF, a pacing or engineering choice to ENGINEERING, and both are marked assumed. A figure that could not be read is left out, not guessed: the size of the post-orgasm prolactin rise, the mean menstrual blood loss, male LH and FSH medians, fetal heart rate and endometrial thickness by phase are all absent for that reason.",
+  "sources": {
+    "STRICKER2006": {
+      "label": "Stricker R et al. Establishment of detailed reference values for luteinizing hormone, follicle stimulating hormone, estradiol, and progesterone during different phases of the menstrual cycle on the Abbott ARCHITECT analyzer. Clin Chem Lab Med 2006;44(7):883-887. PMID 16776638. n=20 women aged 20-36 y, daily samples synchronised to the LH peak (day 0).",
+      "url": "https://doi.org/10.1515/CCLM.2006.160"
+    },
+    "BULL2019": {
+      "label": "Bull JR et al. Real-world menstrual cycle characteristics of more than 600,000 menstrual cycles. NPJ Digit Med 2019;2:83. 612,613 ovulatory cycles: mean length 29.3 d.",
+      "url": "https://doi.org/10.1038/s41746-019-0152-7"
+    },
+    "BAKER2020": {
+      "label": "Baker FC, Siboza F, Fuller A. Temperature regulation in women: effects of the menstrual cycle. Temperature (Austin) 2020;7(3):226-262.",
+      "url": "https://doi.org/10.1080/23328940.2020.1735927"
+    },
+    "SHILAIH2017": {
+      "label": "Shilaih M et al. Modern fertility awareness methods: wrist wearables capture the changes in temperature associated with the menstrual cycle. Sci Rep 2017;7:1294. 91 women, 274 cycles (mean 27.3 +/- 2.7 d); sleeping pulse rate.",
+      "url": "https://doi.org/10.1038/s41598-017-01433-9"
+    },
+    "HALLBERG1966": {
+      "label": "Hallberg L et al. Menstrual blood loss - a population study. Acta Obstet Gynecol Scand 1966;45:320-351. Read through the secondary source QUINN2016, not at first hand.",
+      "url": "https://doi.org/10.3109/00016346609158455"
+    },
+    "QUINN2016": {
+      "label": "Quinn SD, Higham J. Heavy menstrual bleeding. Womens Health (Lond) 2016;12(1):21-26 (PMC5779559). Heavy loss is \"scientifically defined as greater than 80 ml of blood loss each period\" (Hallberg 1966).",
+      "url": "https://doi.org/10.2217/whe.15.85"
+    },
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021. Ch. 82 \"Female Physiology Before Pregnancy and Female Hormones\": about 40 mL of blood lost in a normal period, bleeding stopping within 4 to 7 days. (The figures were supplied in the task brief and were not re-read from the book by the implementer.)",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "SLATKOVSKA2006": {
+      "label": "Slatkovska L et al. Effect of menstrual cycle on chemoreflex responsiveness and breathing pattern. Respir Physiol Neurobiol 2006;154:379-388. 14 women: luteal-phase PaCO2 lower and minute ventilation about 1 L/min greater than early follicular; chemoreflex threshold and sensitivity unchanged.",
+      "url": "https://doi.org/10.1016/j.resp.2006.01.011"
+    },
+    "TRAVISON2017": {
+      "label": "Travison TG et al. Harmonized reference ranges for circulating testosterone levels in men of four cohort studies in the United States and Europe. J Clin Endocrinol Metab 2017;102:1161-1173. Healthy non-obese men 19-39 y: total testosterone 2.5/5/50/95/97.5th percentiles 264/303/531/852/916 ng/dL.",
+      "url": "https://doi.org/10.1210/jc.2016-2935"
+    },
+    "BRAMBILLA2009": {
+      "label": "Brambilla DJ et al. The effect of diurnal variation on clinical measurement of serum testosterone and other sex hormone levels in men. J Clin Endocrinol Metab 2009;94:907-913. Men 30-40 y: testosterone 20-25 % lower at 16:00 than at 08:00.",
+      "url": "https://doi.org/10.1210/jc.2008-1902"
+    },
+    "SOMAPILLAY2016": {
+      "label": "Soma-Pillay P, Nelson-Piercy C, Tolppanen H, Mebazaa A. Physiological changes in pregnancy. Cardiovasc J Afr 2016;27(2):89-94 (PMC4928162).",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/"
+    },
+    "HYTTEN1985": {
+      "label": "Hytten F. Blood volume changes in normal pregnancy. Clin Haematol 1985;14:601-612. Plasma volume about +1250 mL (a little under 50 % of 2600 mL), little rise in the first trimester, maximum at 34-36 wk then flat; red-cell mass about +250 mL (18 %) without iron, linear from the end of the first trimester to term.",
+      "url": "https://doi.org/10.1016/s0308-2261(21)00496-3"
+    },
+    "ROBSON1989": {
+      "label": "Robson SC et al. Serial study of factors influencing changes in cardiac output during human pregnancy. Am J Physiol 1989;256:H1060-H1065. 13 women: CO 4.88 L/min pre-conception to 7.21 L/min at 32 wk; heart rate rises in the first trimester and further in the second; total peripheral resistance falls over the first 20 wk.",
+      "url": "https://doi.org/10.1152/ajpheart.1989.256.4.h1060"
+    },
+    "KOREVAAR2015": {
+      "label": "Korevaar TIM et al. Reference ranges and determinants of total hCG levels during pregnancy: the Generation R Study. Eur J Epidemiol 2015;30:1057-1066 (PMC4584104). Ultrasound-dated, n=8065, medians.",
+      "url": "https://doi.org/10.1007/s10654-015-0039-0"
+    },
+    "SCHOCK2016": {
+      "label": "Schock H et al. Hormone concentrations throughout uncomplicated pregnancies: a longitudinal study. BMC Pregnancy Childbirth 2016;16:146 (PMC4932669). n=50; medians and 10th-90th percentiles in windows wk 10-12, 20-22, 35-37.",
+      "url": "https://doi.org/10.1186/s12884-016-0937-5"
+    },
+    "HADLOCK1991": {
+      "label": "Hadlock FP, Harrist RB, Martinez-Poyer J. In utero analysis of fetal growth: a sonographic weight standard. Radiology 1991;181:129-133. Fetal weight 35 g at 10 wk to 3,619 g at 40 wk.",
+      "url": "https://doi.org/10.1148/radiology.181.1.1887021"
+    },
+    "BRACE1989": {
+      "label": "Brace RA, Wolf EJ. Normal amniotic fluid volume changes throughout pregnancy. Am J Obstet Gynecol 1989;161:382-388. Mean 777 mL, flat from 22 to 39 wk.",
+      "url": "https://doi.org/10.1016/0002-9378(89)90527-9"
+    },
+    "CATALANO1991": {
+      "label": "Catalano PM et al. Longitudinal changes in glucose metabolism during pregnancy in obese women with normal glucose tolerance and gestational diabetes mellitus. Am J Obstet Gynecol 1991;165:1667-1672. Clamp studies, 6 women: insulin sensitivity -56 % through 36 wk; first and second phase insulin release x3.0-3.5.",
+      "url": "https://doi.org/10.1016/0002-9378(91)90012-g"
+    },
+    "NEMEC1976": {
+      "label": "Nemec ED, Mansfield L, Kennedy JW. Heart rate and blood pressure responses during sexual activity in normal males. Am Heart J 1976;92:274-277. 8 men, 35 episodes: mean maximum heart rate at orgasm 114 (male on top) / 117 (male on bottom) bpm; blood pressure at orgasm 163/81 and 161/77 mmHg.",
+      "url": "https://doi.org/10.1016/s0002-8703(76)80106-8"
+    },
+    "XUERUI2008": {
+      "label": "Xue-Rui T et al. Blood pressure and heart rate during sexual response. Blood Press Monit 2008;13:211-217. 22 men, 27 women: peak pressure at the start of plateau (men 141.4/91.1 vs 120.1/72.9 baseline; women 121.7/77.4 vs 109.4/67.2); peak heart rate at the start of orgasm (men 96.4 vs 75.4; women 90.2 vs 71.4); baseline 10-20 min after orgasm.",
+      "url": "https://doi.org/10.1097/mbp.0b013e3283057a71"
+    },
+    "EXTON1999": {
+      "label": "Exton MS et al. Coitus-induced orgasm stimulates prolactin secretion in healthy subjects. Psychosom Med 1999;61:280-289. 10 women: orgasm raised heart rate, pressure, adrenaline, noradrenaline; prolactin raised after orgasm and still raised at 60 min; the female pattern concurs with the male.",
+      "url": "https://doi.org/10.1097/00006842-199905000-00005"
+    },
+    "KRUGER1998": {
+      "label": "Kruger T et al. Orgasm-induced prolactin secretion: feedback control of sexual drive? Psychoneuroendocrinology 1998;23:401-411. 10 men: prolactin raised during orgasm and still raised 30 min after.",
+      "url": "https://doi.org/10.1016/s0306-4530(98)00007-9"
+    },
+    "KRUGER2003": {
+      "label": "Krueger TH et al. Specificity of the neuroendocrine response to orgasm during sexual arousal in men. J Endocrinol 2003;177:57-64. Prolactin up immediately after orgasm and stays up throughout the sampling.",
+      "url": "https://doi.org/10.1677/joe.0.1770057"
+    },
+    "EXTON2001": {
+      "label": "Exton MS et al. Orgasm-induced prolactin secretion in couples. Psychoneuroendocrinology 2001;26:287-294. Marked prolactin rise in both sexes, still raised 1 h after orgasm.",
+      "url": "https://doi.org/10.1016/s0306-4530(00)00053-6"
+    },
+    "MURPHY1987": {
+      "label": "Murphy MR et al. Changes in oxytocin and vasopressin secretion during sexual activity in men. J Clin Endocrinol Metab 1987;65:738-741. 13 men: oxytocin 1.4 +/- 0.3 pmol/L basal, 7.3 +/- 0.6 pmol/L at ejaculation, basal again in 30 min.",
+      "url": "https://doi.org/10.1210/jcem-65-4-738"
+    },
+    "WHIPPLE1985": {
+      "label": "Whipple B, Komisaruk BR. Elevation of pain threshold by vaginal stimulation in women. Pain 1985;21:357-367. Pleasurable vaginal stimulation: pain detection threshold +53 %; at orgasm +106.7 %; tactile threshold unchanged.",
+      "url": "https://doi.org/10.1016/0304-3959(85)90164-2"
+    },
+    "AVERSA2000": {
+      "label": "Aversa A et al. Effects of sildenafil on the post-ejaculatory refractory time. Hum Reprod 2000;15:131-134. 20 healthy men aged 32 y: refractory time 10.8 +/- 0.9 min on placebo.",
+      "url": "https://doi.org/10.1093/humrep/15.1.131"
+    },
+    "ENGINEERING": {
+      "label": "An engineering or pacing choice made for this simulation. It is not a measurement and is not claimed to be one; the literature gives ranges, not a constant.",
+      "url": "https://github.com/"
+    },
+    "BRIEF": {
+      "label": "A figure fixed by the task brief for this subsystem (a convention or a landmark chosen by the author of the brief), not read by the implementer from a primary source.",
+      "url": "https://github.com/"
+    },
+    "HYETT1996": {
+      "label": "Hyett JA, Noble PL, Snijders RJ, Montenegro N, Nicolaides KH. Fetal heart rate in trisomy 21 and other chromosomal abnormalities at 10-14 weeks of gestation. Ultrasound Obstet Gynecol 1996;7(4):239-244. PMID 8726874. n = 6903 normal singleton pregnancies. Abstract: \"In 6903 normal singleton pregnancies the fetal heart rate decreased from a mean of 171 bpm at 10 weeks of gestation to 156 bpm at 14 weeks (r = 0.413, p < 0.0001).\"",
+      "url": "https://europepmc.org/article/MED/8726874"
+    },
+    "URSEM1999": {
+      "label": "Ursem NTC, Clark EB, Keller BB, Hop WCJ, Wladimiroff JW. Assessment of fetal heart rate variability and velocity variability by Doppler velocimetry of the descending aorta at 10-20 weeks of gestation. Ultrasound Obstet Gynecol 1999;14:397-401. PMID 10658278. 55 healthy women with normal singleton pregnancies at 10-20 weeks. Full text: \"the instantaneous fetal heart rate decreased (slope = −2.52, r = 0.71, p < 0.001)\".",
+      "url": "https://repub.eur.nl/pub/72957/"
+    },
+    "PILDNER2013": {
+      "label": "Pildner von Steinburg S, et al. What is the \"normal\" fetal heart rate? PeerJ 2013;1:e82. doi 10.7717/peerj.82. Computerised cardiotocography, 13,015 tracings with a known gestational age collected between 20 and 42 weeks. Table 4 prints the 95% confidence interval of the MEAN baseline rate, not the mean itself.",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3678114/"
+    }
+  },
+  "constants": {
+    "male.testosteroneAt0800_ng_dL": {
+      "value": 531,
+      "unit": "ng/dL",
+      "source": "TRAVISON2017",
+      "sourceUrl": "https://doi.org/10.1210/jc.2016-2935",
+      "confidence": "measured",
+      "note": "Median total testosterone of healthy non-obese men 19-39 y. Taken as the 08:00 value, the daily peak."
+    },
+    "male.testosteroneFallBy1600": {
+      "value": 0.225,
+      "unit": "fraction",
+      "source": "BRAMBILLA2009",
+      "sourceUrl": "https://doi.org/10.1210/jc.2008-1902",
+      "confidence": "derived",
+      "note": "Midpoint of the published 20-25 % fall between 08:00 and 16:00 in men 30-40 y. The 24 h cosine amplitude is derived from it in code (A/M = f/(1.5 - f)) so that 16:00 is exactly this far below 08:00."
+    },
+    "male.testosteroneRefLow_ng_dL": {
+      "value": 264,
+      "unit": "ng/dL",
+      "source": "TRAVISON2017",
+      "sourceUrl": "https://doi.org/10.1210/jc.2016-2935",
+      "confidence": "measured",
+      "note": "2.5th percentile of healthy non-obese men 19-39 y."
+    },
+    "male.testosteroneRefHigh_ng_dL": {
+      "value": 916,
+      "unit": "ng/dL",
+      "source": "TRAVISON2017",
+      "sourceUrl": "https://doi.org/10.1210/jc.2016-2935",
+      "confidence": "measured",
+      "note": "97.5th percentile of healthy non-obese men 19-39 y."
+    },
+    "male.refractoryPeriod_min": {
+      "value": 10.8,
+      "unit": "min",
+      "source": "AVERSA2000",
+      "sourceUrl": "https://doi.org/10.1093/humrep/15.1.131",
+      "confidence": "measured",
+      "note": "Post-ejaculatory refractory time on placebo, 20 men aged 32 y. During it stimulation cannot raise arousal or vasocongestion. No equivalent is applied to the female body."
+    },
+    "cycle.length_days": {
+      "value": 29,
+      "unit": "days",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "derived",
+      "note": "The span of Stricker's daily table, day -14 to +14 about the LH peak, is 29 days. Bull 2019 reports a mean cycle of 29.3 d over 612,613 ovulatory cycles, which agrees."
+    },
+    "cycle.meanLengthBull2019_days": {
+      "value": 29.3,
+      "unit": "days",
+      "source": "BULL2019",
+      "sourceUrl": "https://doi.org/10.1038/s41746-019-0152-7",
+      "confidence": "measured",
+      "note": "Recorded for comparison only; the engine uses cycle.length_days."
+    },
+    "cycle.lhPeakCycleDay": {
+      "value": 15,
+      "unit": "cycle day",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "derived",
+      "note": "Cycle day 1 (first day of menstruation) is taken as LH-day -14, so the LH peak (LH-day 0) falls on cycle day 15."
+    },
+    "cycle.menstruationDuration_days": {
+      "value": 5,
+      "unit": "days",
+      "source": "GH14",
+      "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+      "confidence": "derived",
+      "note": "Guyton and Hall state that bleeding stops within 4 to 7 days; 5 d is the rounded midpoint. A choice inside a published range, not a measurement."
+    },
+    "cycle.menstrualBloodLoss_mL": {
+      "value": 40,
+      "unit": "mL",
+      "source": "GH14",
+      "sourceUrl": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8",
+      "confidence": "measured",
+      "note": "About 40 mL lost in a normal period (Guyton and Hall). Spread evenly over the modelled duration. A readout only: it is NOT removed from the circulation (see systems/reproductive.ts)."
+    },
+    "cycle.heavyLossThreshold_mL": {
+      "value": 80,
+      "unit": "mL",
+      "source": "HALLBERG1966",
+      "sourceUrl": "https://doi.org/10.3109/00016346609158455",
+      "confidence": "measured",
+      "note": "Hallberg 1966, quoted by Quinn and Higham 2016: heavy menstrual loss is more than 80 mL per period. For the interface to label a heavy period; the engine does not act on it. The commonly quoted MEAN loss was not verified from any text read and is not used."
+    },
+    "cycle.progesteroneEarlyFollicular_nmol_L": {
+      "value": 0.64,
+      "unit": "nmol/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Early follicular (LH-day -15..-6) median progesterone. The zero of the luteal effects: progesterone above this is what the body responds to."
+    },
+    "cycle.progesteroneMidLuteal_nmol_L": {
+      "value": 36.25,
+      "unit": "nmol/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Mid-luteal (LH-day +5..+9) median progesterone. The \"full\" progesterone the temperature, ventilation and corpus-luteum indices are scaled against."
+    },
+    "cycle.lutealTempShift_C": {
+      "value": 0.5,
+      "unit": "C",
+      "source": "BAKER2020",
+      "sourceUrl": "https://doi.org/10.1080/23328940.2020.1735927",
+      "confidence": "derived",
+      "note": "Core temperature is 0.3-0.7 C higher in the luteal phase; 0.5 C is the midpoint. Applied to the defended set point scaled by progesterone's fraction of its mid-luteal level."
+    },
+    "cycle.pulseFertileWindow_bpm": {
+      "value": 2.1,
+      "unit": "bpm",
+      "source": "SHILAIH2017",
+      "sourceUrl": "https://doi.org/10.1038/s41598-017-01433-9",
+      "confidence": "measured",
+      "note": "Sleeping pulse rate in the fertile window versus menses, 91 women, 274 cycles."
+    },
+    "cycle.pulseMidLuteal_bpm": {
+      "value": 3.8,
+      "unit": "bpm",
+      "source": "SHILAIH2017",
+      "sourceUrl": "https://doi.org/10.1038/s41598-017-01433-9",
+      "confidence": "measured",
+      "note": "Sleeping pulse rate mid-luteal versus menses (1.8 above the fertile window, 3.8 above menses)."
+    },
+    "cycle.pulseFertileAnchorLhDay": {
+      "value": 0,
+      "unit": "LH-day",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Where on the cycle the fertile-window mean is attached: the LH peak. The paper gives phase means, not a day-by-day curve, so the position of each mean on the axis is a choice; the shape between them is piecewise linear."
+    },
+    "cycle.pulseMidLutealAnchorLhDay": {
+      "value": 7,
+      "unit": "LH-day",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Where the mid-luteal mean is attached: the centre of LH-day +5..+9. See cycle.pulseFertileAnchorLhDay."
+    },
+    "cycle.ventilationRise_L_min": {
+      "value": 1,
+      "unit": "L/min",
+      "source": "SLATKOVSKA2006",
+      "sourceUrl": "https://doi.org/10.1016/j.resp.2006.01.011",
+      "confidence": "measured",
+      "note": "Mid-luteal minute ventilation is about 1 L/min greater than early follicular, with a lower PaCO2. The target the gain below is calibrated to; it is \"about 1\" in the paper."
+    },
+    "cycle.ventilationDriveGain": {
+      "value": 0.25,
+      "unit": "fraction of resp.drive",
+      "source": "SLATKOVSKA2006",
+      "sourceUrl": "https://doi.org/10.1016/j.resp.2006.01.011",
+      "confidence": "derived",
+      "note": "CALIBRATED: the push on resp.drive at full mid-luteal progesterone, chosen with .cache/probes/repro_cycle.ts so that the model's own minute ventilation rises by about 1 L/min in the mid-luteal phase. The chemoreflex gives part of any push back, so the gain is larger than 1 L/min over the resting ventilation would suggest."
+    },
+    "cycle.lhRefLow_IU_L": {
+      "value": 0.51,
+      "unit": "IU/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Whole-cycle 5th percentile envelope (lowest phase 5th percentile), for the interface."
+    },
+    "cycle.lhRefHigh_IU_L": {
+      "value": 73.63,
+      "unit": "IU/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Whole-cycle 95th percentile envelope (LH-peak phase)."
+    },
+    "cycle.fshRefLow_IU_L": {
+      "value": 1.14,
+      "unit": "IU/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Whole-cycle 5th percentile envelope."
+    },
+    "cycle.fshRefHigh_IU_L": {
+      "value": 15.07,
+      "unit": "IU/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Whole-cycle 95th percentile envelope."
+    },
+    "cycle.estradiolRefLow_pmol_L": {
+      "value": 77.99,
+      "unit": "pmol/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Whole-cycle 5th percentile envelope."
+    },
+    "cycle.estradiolRefHigh_pmol_L": {
+      "value": 1425.39,
+      "unit": "pmol/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Whole-cycle 95th percentile envelope."
+    },
+    "cycle.progesteroneRefLow_nmol_L": {
+      "value": 0.32,
+      "unit": "nmol/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Whole-cycle 5th percentile envelope."
+    },
+    "cycle.progesteroneRefHigh_nmol_L": {
+      "value": 54.28,
+      "unit": "nmol/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Whole-cycle 95th percentile envelope."
+    },
+    "cycle.lhPeak_p5_IU_L": {
+      "value": 21.16,
+      "unit": "IU/L",
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "note": "Not used by the engine; kept so the table is self-documenting."
+    },
+    "pregnancy.defaultWeeks": {
+      "value": 4,
+      "unit": "weeks",
+      "source": "BRIEF",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Gestational age used when SET_PREGNANCY gives none."
+    },
+    "pregnancy.maxWeeks": {
+      "value": 42,
+      "unit": "weeks",
+      "source": "BRIEF",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Gestational age stops advancing here. Labour and the puerperium are not modelled."
+    },
+    "pregnancy.trimester2Start_weeks": {
+      "value": 14,
+      "unit": "weeks",
+      "source": "BRIEF",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Convention: trimester 1 is before 14 weeks. Also the \"end of the first trimester\" the red-cell and plasma curves start from."
+    },
+    "pregnancy.trimester3Start_weeks": {
+      "value": 28,
+      "unit": "weeks",
+      "source": "BRIEF",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Convention: trimester 3 begins at 28 weeks."
+    },
+    "pregnancy.hadlockIntercept": {
+      "value": 0.578,
+      "unit": "ln g",
+      "source": "HADLOCK1991",
+      "sourceUrl": "https://doi.org/10.1148/radiology.181.1.1887021",
+      "confidence": "measured",
+      "note": "ln W = 0.578 + 0.332 GA - 0.00354 GA^2 (W in g, GA in weeks). Recalled form; both printed endpoints (35 g at 10 wk, 3619 g at 40 wk) were checked against it."
+    },
+    "pregnancy.hadlockLinear": {
+      "value": 0.332,
+      "unit": "ln g / wk",
+      "source": "HADLOCK1991",
+      "sourceUrl": "https://doi.org/10.1148/radiology.181.1.1887021",
+      "confidence": "measured",
+      "note": "See pregnancy.hadlockIntercept."
+    },
+    "pregnancy.hadlockQuadratic": {
+      "value": -0.00354,
+      "unit": "ln g / wk^2",
+      "source": "HADLOCK1991",
+      "sourceUrl": "https://doi.org/10.1148/radiology.181.1.1887021",
+      "confidence": "measured",
+      "note": "See pregnancy.hadlockIntercept."
+    },
+    "pregnancy.fetalWeightFirstWeek": {
+      "value": 10,
+      "unit": "weeks",
+      "source": "HADLOCK1991",
+      "sourceUrl": "https://doi.org/10.1148/radiology.181.1.1887021",
+      "confidence": "measured",
+      "note": "The regression is valid 10-40 wk; before 10 weeks the readout is null."
+    },
+    "pregnancy.fetalWeightLastWeek": {
+      "value": 40,
+      "unit": "weeks",
+      "source": "HADLOCK1991",
+      "sourceUrl": "https://doi.org/10.1148/radiology.181.1.1887021",
+      "confidence": "measured",
+      "note": "Upper end of the validity range; beyond it the curve is held at its 40-week value rather than extrapolated."
+    },
+    "pregnancy.amnioticFluid_mL": {
+      "value": 777,
+      "unit": "mL",
+      "source": "BRACE1989",
+      "sourceUrl": "https://doi.org/10.1016/0002-9378(89)90527-9",
+      "confidence": "measured",
+      "note": "Mean amniotic fluid volume, flat from 22 to 39 wk (95 % CI 302-1997 mL)."
+    },
+    "pregnancy.amnioticFirstWeek": {
+      "value": 22,
+      "unit": "weeks",
+      "source": "BRACE1989",
+      "sourceUrl": "https://doi.org/10.1016/0002-9378(89)90527-9",
+      "confidence": "measured",
+      "note": "First week of the cited plateau; null outside 22-39."
+    },
+    "pregnancy.amnioticLastWeek": {
+      "value": 39,
+      "unit": "weeks",
+      "source": "BRACE1989",
+      "sourceUrl": "https://doi.org/10.1016/0002-9378(89)90527-9",
+      "confidence": "measured",
+      "note": "Last week of the cited plateau."
+    },
+    "pregnancy.hcgFloor_IU_L": {
+      "value": 5,
+      "unit": "IU/L",
+      "source": "BRIEF",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Start of the pre-week-9 ramp at week 3: the conventional detection threshold for a pregnancy test. Not read from a source by the implementer; the ramp before week 9 is therefore labelled derived, and its shape is log-linear because hCG roughly doubles every 2-3 days early on (a qualitative statement, no number is taken from it)."
+    },
+    "pregnancy.hcgLogLinearFromWeek": {
+      "value": 3,
+      "unit": "weeks",
+      "source": "BRIEF",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "First week of the log-linear ramp."
+    },
+    "pregnancy.hcgLogLinearToWeek": {
+      "value": 8,
+      "unit": "weeks",
+      "source": "KOREVAAR2015",
+      "sourceUrl": "https://doi.org/10.1007/s10654-015-0039-0",
+      "confidence": "derived",
+      "note": "Last week of the ramp; the \"<9 wk\" median is attached here."
+    },
+    "pregnancy.hcgDisplayMax_IU_L": {
+      "value": 75494,
+      "unit": "IU/L",
+      "source": "KOREVAAR2015",
+      "sourceUrl": "https://doi.org/10.1007/s10654-015-0039-0",
+      "confidence": "measured",
+      "note": "Week-9 median, the highest weekly median (the paper: \"peak in the 9th and 10th week\"). Used as the display maximum and as the top of the label range; no percentile range was read for hCG."
+    },
+    "pregnancy.hormoneToSI_progesterone": {
+      "value": 3.18,
+      "unit": "nmol/L per ng/mL",
+      "source": "SCHOCK2016",
+      "sourceUrl": "https://doi.org/10.1186/s12884-016-0937-5",
+      "confidence": "derived",
+      "note": "Molar conversion, MW 314.5 (1 / 0.3145)."
+    },
+    "pregnancy.hormoneToSI_estradiol": {
+      "value": 3671,
+      "unit": "pmol/L per ng/mL",
+      "source": "SCHOCK2016",
+      "sourceUrl": "https://doi.org/10.1186/s12884-016-0937-5",
+      "confidence": "derived",
+      "note": "Molar conversion, MW 272.4."
+    },
+    "pregnancy.testosteroneToNgDl": {
+      "value": 100,
+      "unit": "ng/dL per ng/mL",
+      "source": "SCHOCK2016",
+      "sourceUrl": "https://doi.org/10.1186/s12884-016-0937-5",
+      "confidence": "derived",
+      "note": "Unit conversion: 1 ng/mL = 100 ng/dL (the brief's stated factor), applied to SCHOCK2016 testosterone."
+    },
+    "pregnancy.plasmaVolume.maxGain": {
+      "value": 0.48,
+      "unit": "fraction",
+      "source": "HYTTEN1985",
+      "sourceUrl": "https://doi.org/10.1016/s0308-2261(21)00496-3",
+      "confidence": "derived",
+      "note": "About +1250 mL on a non-pregnant 2600 mL: +48 %. Applied as a fraction of the model's own reference plasma volume."
+    },
+    "pregnancy.plasmaVolume.peakWeek": {
+      "value": 35,
+      "unit": "weeks",
+      "source": "HYTTEN1985",
+      "sourceUrl": "https://doi.org/10.1016/s0308-2261(21)00496-3",
+      "confidence": "derived",
+      "note": "Midpoint of the published maximum at 34-36 wk; flat afterwards."
+    },
+    "pregnancy.redCellMass.maxGain": {
+      "value": 0.18,
+      "unit": "fraction",
+      "source": "HYTTEN1985",
+      "sourceUrl": "https://doi.org/10.1016/s0308-2261(21)00496-3",
+      "confidence": "measured",
+      "note": "About +250 mL, 18 %, without iron supplementation, linear from the end of the first trimester to term."
+    },
+    "pregnancy.redCellMass.termWeek": {
+      "value": 40,
+      "unit": "weeks",
+      "source": "HYTTEN1985",
+      "sourceUrl": "https://doi.org/10.1016/s0308-2261(21)00496-3",
+      "confidence": "derived",
+      "note": "Term, at which the linear rise reaches its full value."
+    },
+    "pregnancy.systemicResistance.landmarkFall": {
+      "value": -0.275,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "Systemic vascular resistance falls 25-30 %; the midpoint. The landmark, NOT the bus value: the engine calibrates the bus gain below so the model's own cardiac output lands on the cited rise."
+    },
+    "pregnancy.systemicResistance.gain": {
+      "value": -0.346,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full effect (cardio.systemicResistance). See .cache/probes/repro_preg.ts."
+    },
+    "pregnancy.venousTone.gain": {
+      "value": 0.117,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full plasma expansion (cardio.venousTone, negative = more venous capacity): fitted jointly with the three other cardiovascular gains by .cache/probes/repro_fitcv.ts (Nelder-Mead on cardiac output +20 % at 8 wk and about +40 % at 24 and 36 wk, heart rate about +15 bpm from 28 wk, mean pressure 0-6 mmHg below non-pregnant, CVP within 2 mmHg of it; SOMAPILLAY2016, ROBSON1989). The fit settled on a small POSITIVE value here (slightly less venous capacity early, while the arterial dilation shifts blood centrally) and the volume term below carries the capacity."
+    },
+    "pregnancy.venousTone.volumeGain": {
+      "value": -0.681,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full plasma expansion (cardio.venousTone), following the plasma-volume curve: the extra venous capacity that accommodates the added volume. See pregnancy.venousTone.gain, which follows the systemic-resistance curve instead (the arterial vasodilation of early pregnancy also opens the veins)."
+    },
+    "pregnancy.heartRate.landmarkRise_bpm": {
+      "value": 15,
+      "unit": "bpm",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "Heart rate +10-20 bpm, maintained; the midpoint. The landmark the bus gain below is calibrated to."
+    },
+    "pregnancy.heartRate.gain": {
+      "value": 0.125,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full effect (cardio.heartRate), fitted with the other cardiovascular gains (see pregnancy.venousTone.gain) so the model's own heart rate is about 15 bpm above the non-pregnant body from about 28 wk; the baroreflex answers the larger blood volume and lower resistance, so the bus value is not the heart-rate rise; the measured outcome of the model is."
+    },
+    "pregnancy.resp.drive.gain": {
+      "value": 0.42,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full effect (resp.drive), chosen so PaCO2 settles at 28-32 mmHg from about 20 wk (cited: PaCO2 <= 30 mmHg, 27-32) and minute ventilation rises 40-50 %."
+    },
+    "pregnancy.heatProduction.gain": {
+      "value": 0.15,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "measured",
+      "note": "Metabolic rate +15 % at term. thermal.heatProduction scales oxygen consumption, CO2 production and heat together, so this one figure moves all three."
+    },
+    "pregnancy.renalVascularResistance.gain": {
+      "value": -0.3,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full effect (renal.vascularResistance), chosen so the model's GFR rises about 50 % (cited +50-85 %) and then falls toward the cited creatinine of about 0.5 mg/dL by itself."
+    },
+    "pregnancy.renalSodiumReabsorption.gain": {
+      "value": 0.45,
+      "unit": "fraction",
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full effect (renal.sodiumReabsorption), chosen so urine output stays within 30 % of the non-pregnant body: the kidney retains what it filters (aldosterone rises 3- to 10-fold)."
+    },
+    "pregnancy.glucoseUptake.gain": {
+      "value": -0.56,
+      "unit": "fraction",
+      "source": "CATALANO1991",
+      "sourceUrl": "https://doi.org/10.1016/0002-9378(91)90012-g",
+      "confidence": "measured",
+      "note": "Insulin sensitivity -56 % through 36 wk, applied to metabolic.glucoseUptake."
+    },
+    "pregnancy.insulinSecretion.gain": {
+      "value": 2.25,
+      "unit": "fraction",
+      "source": "CATALANO1991",
+      "sourceUrl": "https://doi.org/10.1016/0002-9378(91)90012-g",
+      "confidence": "derived",
+      "note": "CALIBRATED bus value at full effect (metabolic.insulinSecretion). Cited insulin release x3.0-3.5, i.e. +2.0 to +2.5; set so fasting glucose stays between 70 and 100 mg/dL."
+    },
+    "pregnancy.plasmaPacingTau_s": {
+      "value": 8,
+      "unit": "s",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "How fast the achieved plasma volume and red-cell mass chase their moving targets. The targets themselves move with gestational age over weeks; this only keeps the volume change smooth within a tick-by-tick simulation and has no physiological meaning."
+    },
+    "sexual.arousalRiseTau_s": {
+      "value": 60,
+      "unit": "s",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "First-order time constant of arousal rising toward stimulation x consciousness. A pacing choice: the literature gives ranges of time to plateau, not a constant."
+    },
+    "sexual.plateauThreshold": {
+      "value": 0.6,
+      "unit": "arousal",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Arousal below this is excitement, above it plateau. A display and logic boundary of the model, not a physiological constant."
+    },
+    "sexual.plateauHold_s": {
+      "value": 60,
+      "unit": "s",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "How long plateau, with stimulation still above the plateau threshold, is sustained before the orgasmic phase runs. A pacing choice."
+    },
+    "sexual.orgasmDuration_s": {
+      "value": 15,
+      "unit": "s",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Duration of the orgasmic phase and of its half-sine envelope. A pacing choice: reported durations are ranges."
+    },
+    "sexual.resolutionTau_s": {
+      "value": 300,
+      "unit": "s",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "Arousal and the cardiovascular response fall with this time constant in resolution. Derived from \"baseline 10-20 min after orgasm\": the midpoint 15 min is taken as 3 time constants (95 % recovered), so tau = 900 s / 3."
+    },
+    "sexual.postOrgasmArousal": {
+      "value": 0.6,
+      "unit": "arousal",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "Arousal the body is left at when the orgasmic phase ends: the plateau threshold, from which resolution (or, in a female body with continuing stimulation, a new rise) begins."
+    },
+    "sexual.setpointShift_male": {
+      "value": 0.217,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "Fractional upward reset of the baroreflex defended pressure at full cardiovascular arousal (arm = 1, reached at the plateau threshold, where XUERUI2008 found the pressure peak). DERIVED from the cited rise in mean arterial pressure, start of orgasm versus baseline, in men: MAP = DBP + (SBP - DBP)/3, 72.9 + (120.1 - 72.9)/3 = 88.63 rising to 91.1 + (141.4 - 91.1)/3 = 107.87 mmHg, a fraction of 0.217. `arm` is already normalised to full value at plateau, so the cited fraction is used unscaled. The reflex has finite gain, so the realised MAP rise in the simulation is about 21 % (20.9 %) at the start of orgasm rather than the full 21.7 %; the shortfall is left as the model's own result rather than inflated with a larger shift."
+    },
+    "sexual.setpointShift_female": {
+      "value": 0.1341,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "Same derivation as sexual.setpointShift_male, from the women of XUERUI2008: MAP 67.2 + (109.4 - 67.2)/3 = 81.27 rising to 77.4 + (121.7 - 77.4)/3 = 92.17 mmHg, a fraction of 0.134. Used unscaled because `arm` is full at the plateau threshold. The realised MAP rise at the start of orgasm is now about 12.8 % against the cited 13.4 %; the shift is unchanged."
+    },
+    "sexual.hr_arousal_male_bpm": {
+      "value": 20.3,
+      "unit": "bpm",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm per unit arousal), fitted so the heart rate at the start of orgasm in a man rises by about 21 bpm over baseline (XUERUI2008: 75.4 to 96.4). RE-FITTED 43 to 20 bpm when sexual.resistance_arousal_male went negative: the fall in resistance makes the baroreflex raise the rate itself, so the direct push that used to fight the reflex (and overshoot mean pressure into the diastolic) is no longer needed. Fitted jointly with the resistance, venous-tone and contractility gains by .cache/probes/sexsearch.ts. The set-point reset also supplies part of the rise."
+    },
+    "sexual.hr_arousal_female_bpm": {
+      "value": 19.3,
+      "unit": "bpm",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm per unit arousal), fitted so the heart rate at the start of orgasm in a woman rises by about 19 bpm over baseline (XUERUI2008: 71.4 to 90.2, +18.8). RE-FITTED 36 to 19 bpm for the reason given at sexual.hr_arousal_male_bpm and sexual.resistance_arousal_female; fitted jointly by .cache/probes/sexsearch.ts."
+    },
+    "sexual.hr_orgasm_bpm": {
+      "value": 25.4,
+      "unit": "bpm",
+      "source": "NEMEC1976",
+      "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
+      "confidence": "derived",
+      "note": "CALIBRATED bus gain (cardio.heartRate, bpm) per unit orgasm envelope, on top of the arousal term: fitted so the male heart rate at the orgasmic peak lands inside the 114-117 bpm of NEMEC1976 (men during coitus). RE-FITTED 60 to 25 bpm together with the orgasmic resistance (-0.37), venous-tone (0.36) and contractility (0.21) gains by .cache/probes/sexsearch.ts (STAGE=orgasm): the orgasmic vasodilation now lets the reflex carry most of the rate. Male peak about 115 bpm."
+    },
+    "sexual.contractility_arousal_male": {
+      "value": 0.55,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "FITTED (not measured), confidence as for the neighbouring calibrated gains. XUERUI2008 gives no stroke-volume or contractility measurement, so the magnitude is fitted: with resistance falling, the contractility and venous return keep the stroke volume up so that the pulse pressure widens (systolic rise exceeds diastolic) as XUERUI2008 found. 0.2 to 0.55 in the joint refit of sexual.resistance_arousal_male, sexual.hr_arousal_male_bpm and sexual.venousTone_arousal_male by .cache/probes/sexsearch.ts."
+    },
+    "sexual.contractility_arousal_female": {
+      "value": 0.07,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "FITTED (not measured), same reasoning as sexual.contractility_arousal_male. 0.7 to 0.07: the earlier large value existed to widen a pulse pressure that the direct heart-rate drive had narrowed; with falling resistance (sexual.resistance_arousal_female) the pulse pressure widens without it. Fitted jointly by .cache/probes/sexsearch.ts against the XUERUI2008 women."
+    },
+    "sexual.resistance_arousal_male": {
+      "value": -0.23,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "FITTED (not measured), confidence as for the neighbouring calibrated gains; XUERUI2008 reports no resistance. NEGATIVE on purpose, and it is the term that fixed the diastolic overshoot. The earlier zero left the heart-rate gain (43 bpm) fighting a baroreflex that wanted to slow the heart, which pushed mean pressure above the shifted set point and the excess landed in diastolic (+24 against the cited +18.2). In the body the tachycardia of sexual activity comes with falling resistance (muscle and skin vasodilation, as in exertion): output rises, pulse pressure widens, diastolic rises little. With -0.23 the reflex holds mean pressure at the shifted set point and supplies much of the tachycardia itself, so the direct heart-rate gain fell from 43 to 20 bpm. The earlier trials that ran away used vasodilation alone with a large direct heart-rate drive and no venous push; here it is paired with venous tone (sexual.venousTone_arousal_male) and a lower heart-rate gain. Fitted jointly (resistance, heart rate, venous tone, contractility together, never one at a time) by .cache/probes/sexsearch.ts, a random search plus shrinking refinement scored on the XUERUI2008 deltas with a small penalty on gain size, so the smallest set that fits was preferred. Realised at the start of orgasm: +21.1 systolic, +18.0 diastolic, +21.2 bpm, mean pressure +20.9 % (cited +21.3, +18.2, +21.0, +21.7 %)."
+    },
+    "sexual.resistance_arousal_female": {
+      "value": -0.24,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "FITTED (not measured), same reasoning and same sign as sexual.resistance_arousal_male: vasodilation lets the reflex hold the shifted mean pressure and supply the tachycardia, so far less direct heart-rate drive is needed (36 to 19 bpm). Fitted jointly (resistance, heart rate, venous tone, contractility together, never one at a time) by .cache/probes/sexsearch.ts, a random search plus shrinking refinement scored on the XUERUI2008 deltas with a small penalty on gain size, so the smallest set that fits was preferred. Realised at the start of orgasm: +11.6 systolic, +11.3 diastolic, +19.6 bpm, mean pressure +12.8 % (cited +12.3, +10.2, +18.8, +13.4 %)."
+    },
+    "sexual.contractility_orgasm": {
+      "value": 0.21,
+      "unit": "fraction",
+      "source": "NEMEC1976",
+      "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
+      "confidence": "derived",
+      "note": "CALIBRATED bus gain (cardio.contractility) per unit orgasm envelope, toward the NEMEC1976 pressure of about 162/79 at orgasm. RE-FITTED 0.5 to 0.21 with the orgasmic resistance, venous tone and heart-rate gains (.cache/probes/sexsearch.ts, STAGE=orgasm). The male orgasmic peak is now about 161/91 at 115 bpm: systolic and heart rate reach the cited values (162, 114-117); diastolic is about 12 mmHg above the cited 79. The remainder is not bought with a larger gain: a more negative resistance or larger venous push lowers diastolic further only by dragging heart rate out of the cited band."
+    },
+    "sexual.resistance_orgasm": {
+      "value": -0.37,
+      "unit": "fraction",
+      "source": "NEMEC1976",
+      "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
+      "confidence": "derived",
+      "note": "CALIBRATED bus gain (cardio.systemicResistance) per unit orgasm envelope. RE-FITTED -0.3 to -0.37 jointly with sexual.hr_orgasm_bpm, sexual.venousTone_orgasm and sexual.contractility_orgasm by .cache/probes/sexsearch.ts (STAGE=orgasm). The earlier run-away to heart rates above 200 happened with a strongly negative value ON ITS OWN, because the reflex answers vasodilation with rate; paired with the venous push and a lower direct heart-rate gain (25 bpm) it holds the cited 114-117 bpm."
+    },
+    "sexual.venousTone_arousal_male": {
+      "value": 0.11,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "FITTED (not measured), jointly with sexual.resistance_arousal_male, sexual.hr_arousal_male_bpm and sexual.contractility_arousal_male by .cache/probes/sexsearch.ts against XUERUI2008 (start of orgasm). Venous return keeps the stroke volume up while resistance falls, so the pulse pressure widens and the diastolic rises little. Realised start of orgasm: +21.1 / +18.0 mmHg, +21.2 bpm. The earlier diastolic residual (+24 men, +16 women) is gone: it came from a large direct heart-rate drive fighting the reflex, not from the set-point shift. For scale, exercise writes 0.28 at full exertion. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses."
+    },
+    "sexual.venousTone_arousal_female": {
+      "value": 0.12,
+      "unit": "fraction",
+      "source": "XUERUI2008",
+      "sourceUrl": "https://doi.org/10.1097/mbp.0b013e3283057a71",
+      "confidence": "derived",
+      "note": "FITTED (not measured), jointly with sexual.resistance_arousal_female, sexual.hr_arousal_female_bpm and sexual.contractility_arousal_female by .cache/probes/sexsearch.ts against XUERUI2008 (start of orgasm). Venous return keeps the stroke volume up while resistance falls, so the pulse pressure widens and the diastolic rises little. Realised start of orgasm: +11.6 / +11.3 mmHg, +19.6 bpm. The earlier diastolic residual (+24 men, +16 women) is gone: it came from a large direct heart-rate drive fighting the reflex, not from the set-point shift. For scale, exercise writes 0.28 at full exertion. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and the same sign convention (positive = smaller unstressed volume) that exercise already uses."
+    },
+    "sexual.venousTone_orgasm": {
+      "value": 0.36,
+      "unit": "fraction",
+      "source": "NEMEC1976",
+      "sourceUrl": "https://doi.org/10.1016/s0002-8703(76)80106-8",
+      "confidence": "derived",
+      "note": "FITTED (not measured) jointly with sexual.hr_orgasm_bpm, sexual.resistance_orgasm and sexual.contractility_orgasm by .cache/probes/sexsearch.ts (STAGE=orgasm) toward the NEMEC1976 orgasm of about 162/79 at 114-117 bpm. Re-fitted 0.2 to 0.36 because it is the venous return that keeps the stroke volume up while resistance falls. Best fit: about 161/91 at 115 bpm. For scale, exercise writes 0.28 at full exertion, so this is above exercise for the few seconds of the orgasm envelope; it is the largest gain in the set and the one a later source should be allowed to challenge. MECHANISM (GH14, Guyton and Hall, the cardiac-output and venous-return chapters; the same teaching exercise.venousReturnRise cites in behaviour.json): sympathetic venoconstriction converts unstressed venous volume to stressed volume, raising mean systemic filling pressure and venous return without any change in total blood volume. Written to cardio.venousTone, the same bus target and sign convention (positive = smaller unstressed volume) that exercise uses."
+    },
+    "sexual.painThresholdRise_stimulation": {
+      "value": 0.53,
+      "unit": "fraction",
+      "source": "WHIPPLE1985",
+      "sourceUrl": "https://doi.org/10.1016/0304-3959(85)90164-2",
+      "confidence": "measured",
+      "note": "Pain detection threshold +53 % with pleasurable stimulation."
+    },
+    "sexual.painThresholdRise_orgasm": {
+      "value": 1.067,
+      "unit": "fraction",
+      "source": "WHIPPLE1985",
+      "sourceUrl": "https://doi.org/10.1016/0304-3959(85)90164-2",
+      "confidence": "measured",
+      "note": "Pain detection threshold +106.7 % at orgasm."
+    },
+    "sexual.oxytocinBasal_pmol_L": {
+      "value": 1.4,
+      "unit": "pmol/L",
+      "source": "MURPHY1987",
+      "sourceUrl": "https://doi.org/10.1210/jcem-65-4-738",
+      "confidence": "measured",
+      "note": "Basal plasma oxytocin, 13 men. The only measured basal read; used for both sexes because no female basal figure was available (CARMICHAEL1987 reports a rise in both sexes without a value in the text read)."
+    },
+    "sexual.oxytocinPeak_pmol_L": {
+      "value": 7.3,
+      "unit": "pmol/L",
+      "source": "MURPHY1987",
+      "sourceUrl": "https://doi.org/10.1210/jcem-65-4-738",
+      "confidence": "measured",
+      "note": "Plasma oxytocin at ejaculation, 13 men."
+    },
+    "sexual.oxytocinReturn_min": {
+      "value": 30,
+      "unit": "min",
+      "source": "MURPHY1987",
+      "sourceUrl": "https://doi.org/10.1210/jcem-65-4-738",
+      "confidence": "measured",
+      "note": "Basal again 30 min after ejaculation."
+    },
+    "sexual.oxytocinHalfLivesToBasal": {
+      "value": 6,
+      "unit": "half-lives",
+      "source": "MURPHY1987",
+      "sourceUrl": "https://doi.org/10.1210/jcem-65-4-738",
+      "confidence": "derived",
+      "note": "Interprets \"basal in 30 min\" as six half-lives (1/64 of the excess left), giving a half-life of 5 min. A reading of the paper, not a figure in it."
+    },
+    "sexual.prolactinPlateau_min": {
+      "value": 60,
+      "unit": "min",
+      "source": "EXTON1999",
+      "sourceUrl": "https://doi.org/10.1097/00006842-199905000-00005",
+      "confidence": "measured",
+      "note": "Prolactin is raised immediately after orgasm and still raised at 60 min (EXTON1999 women, EXTON2001 both sexes; KRUGER1998 and KRUGER2003 men, sampled for 30 min). Only a duration was read; the size of the rise in ng/mL was not, so none is invented and the state is a 0..1 \"raised\" flag."
+    },
+    "sexual.prolactinDecayTau_min": {
+      "value": 30,
+      "unit": "min",
+      "source": "ENGINEERING",
+      "sourceUrl": "https://github.com/",
+      "confidence": "assumed",
+      "note": "How the raised state falls after its 60 min plateau. No decay time was read; this only ends the flag smoothly."
+    },
+    "fetus.heartRateAt10Weeks_bpm": {
+      "value": 171,
+      "unit": "beats/min",
+      "source": "HYETT1996",
+      "sourceUrl": "https://europepmc.org/article/MED/8726874",
+      "confidence": "measured",
+      "note": "Mean fetal heart rate at 10 weeks of gestation in 6903 normal singleton pregnancies (abstract). Read 2026-11-16."
+    },
+    "fetus.heartRateAt14Weeks_bpm": {
+      "value": 156,
+      "unit": "beats/min",
+      "source": "HYETT1996",
+      "sourceUrl": "https://europepmc.org/article/MED/8726874",
+      "confidence": "measured",
+      "note": "Mean fetal heart rate at 14 weeks of gestation, same 6903 pregnancies (abstract). Read 2026-11-16."
+    },
+    "fetus.heartRateSlope10to20Weeks_bpm_per_week": {
+      "value": -2.52,
+      "unit": "beats/min per week",
+      "source": "URSEM1999",
+      "sourceUrl": "https://repub.eur.nl/pub/72957/",
+      "confidence": "measured",
+      "note": "Slope of instantaneous fetal heart rate against gestational age, 55 healthy women at 10-20 weeks (r = 0.71). The paper does not print the slope's unit; gestational age is in weeks throughout the paper and a per-day reading would be physiologically impossible, so it is read as beats/min per week."
+    }
+  },
+  "tables": {
+    "pildnerFetalHeartRate": {
+      "source": "PILDNER2013",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3678114/",
+      "confidence": "measured",
+      "unit": "beats/min (ci); weeks (bands); tracings (n)",
+      "note": "Table 4 of PILDNER2013: the 95% confidence interval of the MEAN baseline fetal heart rate by gestational-age band, computerised cardiotocography, 13,015 tracings with a known gestational age (20-42 weeks; the first band, '<28 weeks', starts at 20). The paper prints the interval and NOT the mean. The model uses the midpoint, which is the sample mean for a symmetric interval. Band k covers fromWeek[k] <= w < toWeek[k]; the last band (week 42) is carried on past 42 weeks.",
+      "fromWeek": [20, 28, 32, 37, 38, 39, 40, 41, 42],
+      "toWeek": [28, 32, 37, 38, 39, 40, 41, 42, 43],
+      "n": [1230, 1059, 2248, 1090, 1793, 1962, 2325, 1199, 109],
+      "ciLow_bpm": [140.7538, 139.1587, 138.1575, 136.7176, 135.5575, 135.9786, 135.2181, 135.9135, 133.2492],
+      "ciHigh_bpm": [141.9422, 140.3843, 138.9322, 137.8588, 136.472, 136.8404, 136.0158, 137.0438, 137.8009]
+    },
+    "strickerDaily": {
+      "source": "STRICKER2006",
+      "sourceUrl": "https://doi.org/10.1515/CCLM.2006.160",
+      "confidence": "measured",
+      "unit": "LH IU/L; FSH IU/L; estradiol pmol/L; progesterone nmol/L",
+      "note": "Daily MEDIANS of 20 women, days relative to the LH peak (day 0), read from the full text. Day 14 is followed by day -14 of the next cycle, so the table is circular and the cycle is 29 days long. Day -15 is not used.",
+      "days": [
+        -14,
+        -13,
+        -12,
+        -11,
+        -10,
+        -9,
+        -8,
+        -7,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2,
+        -1,
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14
+      ],
+      "lh_IU_L": [
+        3.39,
+        3.47,
+        3.59,
+        3.82,
+        3.82,
+        4.26,
+        4.96,
+        4.54,
+        4.47,
+        4.18,
+        4.58,
+        5.12,
+        7.02,
+        12.36,
+        41.19,
+        14.92,
+        7.75,
+        6.26,
+        6.46,
+        4.32,
+        4.5,
+        4.29,
+        3.89,
+        3.07,
+        1.75,
+        2.52,
+        3.42,
+        2.55,
+        3.23
+      ],
+      "fsh_IU_L": [
+        6.45,
+        6.34,
+        6.26,
+        6.61,
+        6.88,
+        6.65,
+        6.46,
+        6.63,
+        5.65,
+        5.45,
+        4.59,
+        4.35,
+        4.32,
+        5.15,
+        12.82,
+        8.01,
+        5.19,
+        4.73,
+        4.36,
+        3.88,
+        3.34,
+        3.31,
+        2.97,
+        2.73,
+        2.55,
+        2.54,
+        3.08,
+        3.73,
+        3.81
+      ],
+      "estradiol_pmol_L": [
+        149,
+        137.63,
+        128.45,
+        130.29,
+        145.15,
+        154.14,
+        162.76,
+        196.16,
+        215.06,
+        262.22,
+        363.15,
+        485.72,
+        651.06,
+        939.34,
+        671.06,
+        312.87,
+        260.57,
+        322.96,
+        403.52,
+        450.68,
+        486.64,
+        551.78,
+        491.23,
+        503.52,
+        495.45,
+        340.41,
+        314.52,
+        170.1,
+        151.2
+      ],
+      "progesterone_nmol_L": [
+        1.27,
+        0.95,
+        0.64,
+        0.64,
+        0.64,
+        0.64,
+        0.48,
+        0.64,
+        0.32,
+        0.48,
+        0.64,
+        0.32,
+        0.64,
+        0.95,
+        2.54,
+        4.93,
+        12.72,
+        20.51,
+        30.85,
+        34.03,
+        35.3,
+        42.45,
+        37.05,
+        32.44,
+        32.75,
+        14.47,
+        13.04,
+        5.25,
+        4.13
+      ]
+    },
+    "hcgWeeklyMedian": {
+      "source": "KOREVAAR2015",
+      "sourceUrl": "https://doi.org/10.1007/s10654-015-0039-0",
+      "confidence": "measured",
+      "unit": "IU/L",
+      "note": "Total hCG median by completed week of ultrasound-dated gestation (n=8065). Week 8 carries the \"<9 wk\" median (59,973). Before week 8 the engine ramps log-linearly from pregnancy.hcgFloor_IU_L at week 3 (derived, see that constant); after week 25 the \">25 wk\" median is held.",
+      "weeks": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "median_IU_L": [
+        59973,
+        75494,
+        74655,
+        62493,
+        56004,
+        52367,
+        47267,
+        37303,
+        29614,
+        24426,
+        20693,
+        17609,
+        17354,
+        15088,
+        16174,
+        12415,
+        13739,
+        14749,
+        13852
+      ]
+    },
+    "schockPregnancy": {
+      "source": "SCHOCK2016",
+      "sourceUrl": "https://doi.org/10.1186/s12884-016-0937-5",
+      "confidence": "measured",
+      "unit": "ng/mL as published (conversion factors in constants)",
+      "note": "Median and 10th-90th percentile in the sampling windows week 10-12, 20-22 and 35-37, attached to weeks 11, 21 and 36. Linear interpolation between them, held beyond the last. Before week 11 progesterone and estradiol interpolate from the STRICKER2006 mid-luteal median (and its 5th-95th percentiles) attached to week 3 (an assumption: a pregnancy begins from the luteal-phase level); prolactin and testosterone are held at their week-11 values, since no earlier figure was read.",
+      "weeks": [
+        11,
+        21,
+        36
+      ],
+      "estradiol_ng_mL": {
+        "p50": [
+          2.18,
+          9.71,
+          20.4
+        ],
+        "p10": [
+          1.16,
+          5.33,
+          12.8
+        ],
+        "p90": [
+          3.59,
+          15.1,
+          32.9
+        ]
+      },
+      "progesterone_ng_mL": {
+        "p50": [
+          25.6,
+          48.1,
+          130
+        ],
+        "p10": [
+          16.6,
+          31.6,
+          72.6
+        ],
+        "p90": [
+          40.7,
+          78.5,
+          200
+        ]
+      },
+      "testosterone_ng_mL": {
+        "p50": [
+          0.96,
+          1.19,
+          1.32
+        ],
+        "p10": [
+          0.42,
+          0.55,
+          0.5
+        ],
+        "p90": [
+          1.98,
+          3.35,
+          4.07
+        ]
+      },
+      "prolactin_ng_mL": {
+        "p50": [
+          28.8,
+          126,
+          216
+        ],
+        "p10": [
+          16.3,
+          54.9,
+          124
+        ],
+        "p90": [
+          57.6,
+          206,
+          318
+        ]
+      },
+      "week3Anchor": {
+        "source": "STRICKER2006",
+        "estradiol_pmol_L": {
+          "p50": 495.82,
+          "p10": 275.95,
+          "p90": 761.67
+        },
+        "progesterone_nmol_L": {
+          "p50": 36.25,
+          "p10": 21.21,
+          "p90": 54.28
+        }
+      }
+    },
+    "shapes": {
+      "source": "SOMAPILLAY2016",
+      "sourceUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4928162/",
+      "confidence": "derived",
+      "unit": "fraction of full effect",
+      "note": "The SHAPE of each maternal adaptation, piecewise linear in weeks of gestation. Each point honours a cited landmark where one exists; where the sources give only an endpoint, the intermediate points are choices and are said to be. The GAINS multiplying them are calibrated in the constants.",
+      "curves": {
+        "systemicResistance": {
+          "points": [
+            [
+              2,
+              0
+            ],
+            [
+              6,
+              0.5
+            ],
+            [
+              20,
+              1
+            ],
+            [
+              42,
+              1
+            ]
+          ],
+          "note": "SOMAPILLAY2016: \"marked fall in SVR by week six\"; ROBSON1989: total peripheral resistance falls over the first 20 weeks. 0 at week 2 (conception), full at 20 weeks are the cited landmarks; the value 0.5 at week 6 is an ASSUMED reading of \"marked\"."
+        },
+        "heartRate": {
+          "points": [
+            [
+              2,
+              0
+            ],
+            [
+              14,
+              0.6
+            ],
+            [
+              28,
+              1
+            ],
+            [
+              42,
+              1
+            ]
+          ],
+          "note": "ROBSON1989: heart rate rises in the first trimester and further in the second; SOMAPILLAY2016: +10-20 bpm from mid-pregnancy, maintained. The value 0.6 at week 14 is an ASSUMED reading of \"rises in the first trimester\"; 1 at week 28 follows the calibration target."
+        },
+        "plasmaVolume": {
+          "points": [
+            [
+              14,
+              0
+            ],
+            [
+              35,
+              1
+            ],
+            [
+              42,
+              1
+            ]
+          ],
+          "note": "HYTTEN1985: little rise in the first trimester, progressive to a maximum at 34-36 weeks (35 used), then flat."
+        },
+        "redCellMass": {
+          "points": [
+            [
+              14,
+              0
+            ],
+            [
+              40,
+              1
+            ],
+            [
+              42,
+              1
+            ]
+          ],
+          "note": "HYTTEN1985: linear from the end of the first trimester to term."
+        },
+        "ventilation": {
+          "points": [
+            [
+              2,
+              0
+            ],
+            [
+              20,
+              1
+            ],
+            [
+              42,
+              1
+            ]
+          ],
+          "note": "SOMAPILLAY2016 report hyperventilation from early pregnancy and PaCO2 <= 30 mmHg; the calibration target is PaCO2 28-32 from about 20 weeks. Full effect at 20 weeks follows that target; the rise before it is an ASSUMED straight line."
+        },
+        "metabolicRate": {
+          "points": [
+            [
+              2,
+              0
+            ],
+            [
+              40,
+              1
+            ],
+            [
+              42,
+              1
+            ]
+          ],
+          "note": "SOMAPILLAY2016: metabolic rate +15 %. The time course was not read; a straight line from conception to term is ASSUMED."
+        },
+        "insulinResistance": {
+          "points": [
+            [
+              14,
+              0
+            ],
+            [
+              36,
+              1
+            ],
+            [
+              42,
+              1
+            ]
+          ],
+          "note": "SOMAPILLAY2016: insulin resistance begins in the second trimester and peaks in the third; CATALANO1991: -56 % sensitivity through 36 weeks. Starts at 14 weeks, full at 36."
+        }
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 import { P } from './constants';
 import type { RhythmMode } from '../../bridge/types';
+import { createReproductiveState, type ReproductiveState } from '../systems/reproductive';
 
 /**
  * THE STATE VECTOR.
@@ -171,6 +172,15 @@ export interface FluidState {
   interstitial: number;
   /** Running net balance since the run began, mL. Positive is a gain. */
   balance_mL: number;
+  /**
+   * Plasma volume added to the circulation by the `blood.plasmaVolume` bus target, mL:
+   * the ACHIEVED expansion (pregnancy), which chases its moving target in fluids.ts.
+   * Raises the plasma level the transcapillary refill defends so the refill does not
+   * drain it away. Zero in a body that has no such effect.
+   */
+  plasmaExpansion_mL: number;
+  /** Red-cell volume added by the `blood.redCellMass` bus target, mL (achieved). */
+  redCellExpansion_mL: number;
 }
 
 /** Convenience top-level scratch the fluid system owns; declared here for the type. */
@@ -656,6 +666,14 @@ export interface SimState {
   mind: MindState;
   coagulation: CoagulationState;
   airway: AirwayState;
+  /**
+   * The gonadal axis, the menstrual cycle, pregnancy and the sexual response. Its shape
+   * is owned by systems/reproductive.ts and imported here, rather than declared in this
+   * file like the others, because it is the one block whose contents depend on which
+   * body this is; keeping the interface beside the code that gives it meaning means the
+   * two cannot drift.
+   */
+  reproductive: ReproductiveState;
 
   /** Non-urine fluid loss right now (diarrhoea + sweat), mL/min. Readout. */
   fluidLossRate_mL_per_min: number;
@@ -810,6 +828,8 @@ export function createInitialState(seed: number): SimState {
   const fluids: FluidState = {
     interstitial: P('fluid.interstitialVolume_mL'),
     balance_mL: 0,
+    plasmaExpansion_mL: 0,
+    redCellExpansion_mL: 0,
   };
 
   const gi: GiState = {
@@ -951,6 +971,7 @@ export function createInitialState(seed: number): SimState {
       haemostasis: 0,
     },
     airway: { asthma: 0, histamine: 0, constriction: 0, releaseRemaining: 0 },
+    reproductive: createReproductiveState(),
 
     fluidLossRate_mL_per_min: 0,
 
