@@ -4,7 +4,7 @@ import { ellipsoid, halfSpace, intersect, mergeParts, polygonise, smoothUnion, t
 import { mulberry32 } from '../noise';
 import { bead, beads, cord, fibonacciSphere } from './gland_shared';
 import { blob } from './gi_shared';
-import { PAROTID, parotidField } from '../shells/salivary_glands';
+import { PAROTID, parotidField, SUBLINGUAL, SUBMANDIBULAR, tiltedAboutY } from '../shells/salivary_glands';
 
 /**
  * THE INSIDE OF THE SALIVARY GLANDS.
@@ -65,16 +65,20 @@ function lobulated(c: V3, r: V3, n: number, bump: number, k: number): Sdf {
   }
   return smoothUnion(k, ...fields);
 }
-const SUBMAND_C = (s: number): V3 => [s * 0.034, -0.03, 0.01];
-const SUBMAND_R: V3 = [0.0105, 0.0068, 0.014];
-const SUBLING_C = (s: number): V3 => [s * 0.012, -0.0215, 0.025];
-const SUBLING_R: V3 = [0.005, 0.0038, 0.0105];
+// Centres and radii live in the shell (shells/salivary_glands.ts, which says why they moved in
+// from x 34 mm and 12 mm to lie against the inner surface of the mandible's body).
+const SUBMAND_C = (s: number): V3 => [s * SUBMANDIBULAR.c[0], SUBMANDIBULAR.c[1], SUBMANDIBULAR.c[2]];
+const SUBMAND_R: V3 = SUBMANDIBULAR.r;
+const SUBLING_C = (s: number): V3 => [s * SUBLINGUAL.c[0], SUBLINGUAL.c[1], SUBLINGUAL.c[2]];
+const SUBLING_R: V3 = SUBLINGUAL.r;
 
 function bothSides(make: (s: number) => THREE.BufferGeometry): THREE.BufferGeometry {
   return merge([make(1), make(-1)]);
 }
-function gland(c: V3, r: V3, n: number, bump: number, cell: number): THREE.BufferGeometry {
-  const f = lobulated(c, r, n, bump, 0.0022);
+function gland(c: V3, r: V3, n: number, bump: number, cell: number, tilt = 0, side = 1): THREE.BufferGeometry {
+  // A turned gland is built in a frame centred on itself and turned by `tiltedAboutY`, so the
+  // lobules turn with it; the box is the sphere that holds the gland whatever its turn.
+  const f = tilt === 0 ? lobulated(c, r, n, bump, 0.0022) : tiltedAboutY(lobulated([0, 0, 0], r, n, bump, 0.0022), c, tilt, side);
   const pad = Math.max(r[0], r[1], r[2]) + bump + 0.002;
   return polygonise(f, [c[0] - pad, c[1] - pad, c[2] - pad], [c[0] + pad, c[1] + pad, c[2] + pad], { cell, maxCells: 60000 });
 }
@@ -237,7 +241,7 @@ export const parts: PartBuilder = () => {
   add('parotid_superficial_part', bothSides((s) => parotidHalf(s, true)));
   add('parotid_deep_part', bothSides((s) => parotidHalf(s, false)));
   add('parotid_duct', merge([1, -1].map((s) => duct(PAROTID_DUCT, s, 0.0006))));
-  add('submandibular_glands', bothSides((s) => gland(SUBMAND_C(s), SUBMAND_R, 7, 0.0028, 0.0014)));
+  add('submandibular_glands', bothSides((s) => gland(SUBMAND_C(s), SUBMAND_R, 7, 0.0028, 0.0014, SUBMANDIBULAR.tilt, s)));
   add('submandibular_duct', merge([1, -1].map((s) => duct(SUBMANDIBULAR_DUCT, s, 0.0006))));
   add('sublingual_glands', bothSides((s) => gland(SUBLING_C(s), SUBLING_R, 6, 0.0018, 0.0011)));
   add('sublingual_ducts', sublingualDucts());
