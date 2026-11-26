@@ -57,13 +57,30 @@ import type { Sdf, V3 } from '../sdf';
  * probe .cache/probes/brain_parts.ts measures the depth of every vertex to catch that.
  */
 function hemisphereBase(s: number): Sdf {
-  return smoothUnion(
-    0.014,
-    ellipsoid([s * 0.0335, 0.008, -0.004], [0.0325, 0.047, 0.076]),
-    ellipsoid([s * 0.03, 0.006, 0.042], [0.029, 0.038, 0.036]), // frontal lobe
-    ellipsoid([s * 0.03, 0.01, -0.05], [0.028, 0.036, 0.03]), // occipital lobe
-    ellipsoid([s * 0.047, -0.026, 0.012], [0.0185, 0.019, 0.044]), // temporal lobe
+  return smoothSubtract(
+    0.006,
+    smoothUnion(
+      0.014,
+      ellipsoid([s * 0.0335, 0.008, -0.004], [0.0325, 0.047, 0.076]),
+      ellipsoid([s * 0.03, 0.006, 0.042], [0.029, 0.038, 0.036]), // frontal lobe
+      ellipsoid([s * 0.03, 0.01, -0.05], [0.028, 0.036, 0.03]), // occipital lobe
+      ellipsoid([s * 0.047, -0.026, 0.012], [0.0185, 0.019, 0.044]), // temporal lobe
+    ),
+    orbitalRoofCutter(s),
   );
+}
+
+/**
+ * The hollow over each orbit, copied from `orbitalRoofCutter` in models.ts (read the long note
+ * there: the frontal lobes rest on the orbital plates, so the shell is cut away over the
+ * orbit cone grown by the skull's floor margin and a thin plate of bone). The slabs of the
+ * cortical lobes and the meninges are built from `hemisphereBase`, so they take the hollow
+ * with the shell; WHAT WENT WRONG if this copy is left out: the prefrontal slab and the
+ * pia hung 20 mm below the new shell, in front of the eyes' roofs.
+ */
+const ORBIT_ROOF_GROW = 0.0015 + 0.005 + 0.0025;
+function orbitalRoofCutter(s: number): Sdf {
+  return capsule([s * 0.031, -0.034, 0.044], [s * 0.031, -0.034, 0.098], 0.0152 + ORBIT_ROOF_GROW, 0.0195 + ORBIT_ROOF_GROW);
 }
 
 /** The hemisphere after the two named grooves are cut, still smooth. Used for the inner surface. */
@@ -519,7 +536,13 @@ function brainHull(bridge: boolean): Sdf {
     ellipsoid([0, -0.045, -0.008], [0.0165, 0.0135, 0.014]),
     capsule([0, -0.056, -0.018], [0, -0.086, -0.026], 0.0095, 0.007),
   );
-  const cerebrum = union(hemisphereBase(1), hemisphereBase(-1), ellipsoid([0, -0.012, -0.004], [0.02, 0.024, 0.05]));
+  // The diencephalic ellipsoid is hollowed over the orbits too, as in models.ts, where the cutter
+  // is applied to the whole cerebrum; its own reach is small, so this changes it by well under 1 mm.
+  const cerebrum = smoothSubtract(
+    0.006,
+    union(hemisphereBase(1), hemisphereBase(-1), ellipsoid([0, -0.012, -0.004], [0.02, 0.024, 0.05])),
+    union(orbitalRoofCutter(1), orbitalRoofCutter(-1)),
+  );
   // The dura bridges the cleft between the hemispheres as the falx cerebri; the pia and arachnoid do not
   // need it (the pia follows the cortex into the cleft), so the bridge is optional.
   const body = smoothUnion(0.005, cerebrum, cer, stem);

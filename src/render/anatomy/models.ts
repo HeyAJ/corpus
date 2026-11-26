@@ -88,6 +88,30 @@ const merge = mergeParts;
  * sulci everybody can name), cerebellum with its folia and vermis, and a brainstem
  * that is visibly midbrain, pons and medulla.
  */
+/**
+ * THE ROOF OF EACH ORBIT, AS A CUTTER (lv1). The frontal lobes rest on the orbital plates of
+ * the frontal bone, which are the roofs of the orbits (Gray's), so the underside of the
+ * cerebrum is hollowed over each orbit. WHAT WENT WRONG BEFORE: the brain was a set of whole
+ * ellipsoids with no such hollow, and its lowest frontal surface (scene y about 0.448) lay
+ * 5.8 mm inside the top of the eyeball, with the skull's cranial cavity cut to it, so the
+ * orbit had no roof. The eyes anchor the Frankfort plane, the nasolacrimal duct and the optic
+ * pathway and are not moved; the brain gives way instead.
+ *
+ * The cutter is the skull's orbit cone (SKULL_LANDMARKS.orbitRim and the 0.0152/0.0195 m radii
+ * of orbitCavity in shells/skull.ts, copied here because skull.ts imports nothing from this
+ * file's atlas) grown by ORBIT_ROOF_GROW: the cone's own 1.5 mm skin, the 5 mm margin the
+ * skull's cranial floor keeps under the brain (3 mm lowering plus 2 mm), and 2.5 mm of bone.
+ * 2.5 mm is a drawing choice for how thin an orbital plate may be drawn. Its rear end is a
+ * rounded cap at z 0.056, so the hollow shallows backwards instead of ending in a cliff, and
+ * so it stops short of the optic chiasm, the pituitary and the temporal pole.
+ * The same cutter is copied into atlas/brain.parts.ts, which rebuilds the shell for the slabs.
+ */
+const ORBIT_ROOF_GROW = 0.0015 + 0.005 + 0.0025;
+function orbitalRoofCutter(): Sdf {
+  const side = (s: number): Sdf => capsule([s * 0.031, -0.034, 0.044], [s * 0.031, -0.034, 0.098], 0.0152 + ORBIT_ROOF_GROW, 0.0195 + ORBIT_ROOF_GROW);
+  return union(side(1), side(-1));
+}
+
 function brain(): THREE.BufferGeometry {
   const hemisphere = (s: number): Sdf =>
     smoothUnion(
@@ -109,6 +133,9 @@ function brain(): THREE.BufferGeometry {
     // Central sulcus: the boundary between frontal (motor) and parietal (sensory) cortex.
     cerebrum = smoothSubtract(0.003, cerebrum, capsule([s * 0.008, 0.056, -0.004], [s * 0.058, 0.02, 0.006], 0.003));
   }
+
+  // The orbital surface of the frontal lobes is hollowed over each orbit (see above).
+  cerebrum = smoothSubtract(0.006, cerebrum, orbitalRoofCutter());
 
   // Gyri and sulci. Positive displacement moves the surface INWARD, so the ridge lines
   // of the noise become grooves. Two scales: the named folds and the texture on them.
@@ -171,16 +198,31 @@ export { SPINAL_CORD_PATH };
 /**
  * Cord radius at a body height. Two enlargements - cervical for the arms, lumbar for
  * the legs - because that is where the extra motor neurons are; a taper to the conus
- * medullaris at about L1-L2; and below it the cauda equina, drawn as one tapering
- * bundle rather than as its individual roots.
+ * medullaris, whose tip is at the L1-L2 intervertebral disc (Gray's: the adult cord ends
+ * there); and below it the cauda equina, drawn as one tapering bundle rather than as its
+ * individual roots.
+ *
+ * THE TIP HEIGHT (lv2, 2026-11). The taper used to start at body y 0.045, inside T12 (0.040 to
+ * 0.060), so the cord ended a whole vertebra and more too high. The disc between L1 and L2 is at
+ * y 0.0130 in the column's own levels (the midpoint of L1's lower face 0.0159 and L2's upper face
+ * 0.0101, `COLUMN_LEVELS` in shells/vertebral_column.ts); `CONUS_TIP_Y` in paths.ts holds the same
+ * number and the atlas reads it from there. It is written out here because this function may not
+ * grow an import line of its own, so the two numbers must be kept equal by hand (the vertebral
+ * column's own levels decide both).
+ * The lumbar enlargement's bump (centre 0.085, the T11 level, which is where Gray's puts the
+ * enlargement against the vertebrae) is unchanged and is already negligible at the new tip, so the
+ * radius is continuous there: 0.0036 on both sides.
  */
 export function spinalCordRadius(y: number): number {
   const bump = (centre: number, width: number) => Math.exp(-Math.pow((y - centre) / width, 2));
-  if (y < 0.045) {
-    const f = Math.max(0, Math.min(1, (0.045 - y) / 0.145));
+  const tip = 0.013;
+  if (y < tip) {
+    // Below the conus: the bundle of the cauda equina, falling to 1.6 mm at the end of the path
+    // (y -0.1) as it did before, only over the longer distance the lower tip leaves.
+    const f = Math.max(0, Math.min(1, (tip - y) / (tip + 0.1)));
     return 0.0036 * (1 - f) + 0.0016 * f;
   }
-  const conus = Math.max(0, Math.min(1, (y - 0.045) / 0.03));
+  const conus = Math.max(0, Math.min(1, (y - tip) / 0.03));
   return (0.0048 + 0.0019 * bump(0.315, 0.03) + 0.0014 * bump(0.085, 0.028)) * (0.75 + 0.25 * conus);
 }
 

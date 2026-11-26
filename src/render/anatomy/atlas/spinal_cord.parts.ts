@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
-import { warpGeometry } from '../layout';
+import { warpGeometry, warpOffsetY, warpPoint } from '../layout';
 import { SPINAL_CORD_PATH, spinalCordRadius } from '../models';
+import { CONUS_TIP_Y } from '../paths';
+import { SACRUM_BOTTOM, SACRUM_TOP, axisZ } from '../shells/vertebral_column';
 import { mulberry32 } from '../noise';
 import { mergeParts, tubeAlong, type V3 } from '../sdf';
 
@@ -18,7 +20,8 @@ import { mergeParts, tubeAlong, type V3 } from '../sdf';
  *
  * LEVELS. The shell has no vertebral levels, so three lengths of cord are cut at heights
  * in the same units as the path: cervical above y = 0.24, thoracic between 0.24 and 0.11,
- * lumbar from 0.11 down to the conus at 0.045. These cut heights are a drawing choice
+ * lumbar from 0.11 down to the conus at 0.013 (the L1-L2 disc; it was 0.045, inside T12, until
+ * lv2 lowered it to Gray's level). These cut heights are a drawing choice
  * (they put the two enlargements in the cervical and lumbar lengths where they belong);
  * they are not measured vertebral levels and the model does not claim them to be.
  *
@@ -61,7 +64,8 @@ import { mergeParts, tubeAlong, type V3 } from '../sdf';
 const CORD_FRACTION = 0.9; // the cord proper is drawn slightly thinner than the shell
 const CUT_CERVICAL = 0.24;
 const CUT_LUMBAR = 0.11;
-const CONUS_Y = 0.045;
+/** The tip of the conus: the L1-L2 intervertebral disc, from paths.ts so the shell and the parts cannot disagree. */
+const CONUS_Y = CONUS_TIP_Y;
 const TOP_Y = 0.39;
 const BOTTOM_Y = -0.1;
 
@@ -190,6 +194,15 @@ function bean(c: V3, rx: number, ry: number, rz: number): THREE.BufferGeometry {
   return g;
 }
 
+/**
+ * Where the filum terminale ends: the midline dorsal surface of the first coccygeal segment, in the
+ * coccyx's own frame (body y -0.1793, i.e. SACRUM_BOTTOM - 0.004, the first segment's centre; the
+ * back surface at z -0.0520 was read from `coccyxField` along x = 0 at that height). The coccyx is
+ * then moved by the rigid pelvic shift, which the caller adds. Drawing positions, not measurements.
+ */
+const COCCYX_FILUM_Y = SACRUM_BOTTOM - 0.004;
+const COCCYX_FILUM_Z = -0.052;
+
 const NERVE_TOP = TOP_Y - 0.004;
 const NERVE_BOTTOM = CONUS_Y + 0.004;
 
@@ -283,9 +296,24 @@ export const parts: PartBuilder = () => {
   const lumbarEnl = col(0.135, CONUS_Y, 0, 0, 0.98, 24, 8);
   // THE CONUS: the last of the cord, closing to a point. A drawing choice for how much of
   // the lower cord to call the cone.
-  const conus = lineTube(0.075, CONUS_Y - 0.002, 0, 0, 0.98, 0.7, 16);
-  // THE FILUM: a single thread down the middle of the cauda equina, beyond the conus.
-  const filum = tubeAlong(cordLine(CONUS_Y - 0.002, BOTTOM_Y + 0.003, 16, 0, 0), () => 0.00022, { tubular: 40, radial: 4 });
+  const conus = lineTube(CONUS_Y + 0.03, CONUS_Y - 0.002, 0, 0, 0.98, 0.7, 16);
+  // THE FILUM: a single thread down the middle of the cauda equina, beyond the conus. THE FILUM
+  // TERMINALE RUNS ON TO THE COCCYX (Gray's: the filum externum is fixed to the back of the first
+  // coccygeal segment); it used to stop with the sac at y -0.1, a hand's breadth short. The upper
+  // part follows the cord and is warped with it, like every other part here. The lower part is
+  // drawn in WORLD coordinates, down the sacral canal and across to the coccyx, because the
+  // sacrum and the coccyx are moved RIGIDLY by the exploded stack (shifts -0.025 and -0.045) while
+  // the continuous warp would carry a point at body y -0.15 by about -0.035: warping the lower
+  // thread would put it up to 10 mm out of the sacral canal, whose radius at its lower end is
+  // only 3 mm. The tip is the dorsal surface of the first coccygeal segment on the midline, found
+  // from the coccyx's own field (see the probe in the agent notes), not typed.
+  const filumUpper = tubeAlong(cordLine(CONUS_Y - 0.002, BOTTOM_Y, 16, 0, 0), () => 0.00022, { tubular: 40, radial: 4 });
+  const shS = warpOffsetY((SACRUM_TOP + SACRUM_BOTTOM) / 2);
+  const shC = warpOffsetY(SACRUM_BOTTOM - 0.01);
+  const lower: V3[] = [warpPoint([0, BOTTOM_Y, axisZ(BOTTOM_Y)])];
+  for (let yb = BOTTOM_Y - 0.01; yb >= SACRUM_BOTTOM + 0.004; yb -= 0.01) lower.push([0, yb + shS, axisZ(yb)]);
+  lower.push([0, COCCYX_FILUM_Y + shC, COCCYX_FILUM_Z]);
+  const filumLower = tubeAlong(lower, () => 0.00022, { tubular: 60, radial: 4 });
 
   // THE MEMBRANES. The dura is the outer sac, the arachnoid lies just inside it, the pia
   // clings to the cord. They are sleeves along the whole length including the sac round the
@@ -383,7 +411,7 @@ export const parts: PartBuilder = () => {
     { id: 'cervical_enlargement', geometry: w(cervicalEnl) },
     { id: 'lumbar_enlargement', geometry: w(lumbarEnl) },
     { id: 'conus_medullaris', geometry: w(conus) },
-    { id: 'filum_terminale', geometry: w(filum) },
+    { id: 'filum_terminale', geometry: mergeParts([w(filumUpper), filumLower]) },
     { id: 'meninges', geometry: w(meninges) },
     { id: 'dura_mater', geometry: w(dura) },
     { id: 'arachnoid_mater', geometry: w(arachnoid) },

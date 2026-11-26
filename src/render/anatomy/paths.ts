@@ -49,3 +49,14 @@ export const SPINAL_CORD_PATH: [number, number, number][] = [
   [0, -0.03, -0.066],
   [0, -0.1, -0.078],
 ];
+
+/**
+ * Height of the tip of the conus medullaris, body y: the intervertebral disc between L1 and L2,
+ * which is where Gray's puts the end of the adult spinal cord. It is the midpoint of L1's lower
+ * face (0.0159) and L2's upper face (0.0101) in the vertebral column's own levels
+ * (`COLUMN_LEVELS` in shells/vertebral_column.ts); that file imports this one, so the number is
+ * written here rather than derived, and a probe compares them. Below it the cord is drawn as the
+ * cauda equina and the filum terminale, which carry on to the coccyx. `spinalCordRadius` in
+ * models.ts holds the same number.
+ */
+export const CONUS_TIP_Y = 0.013;
