@@ -3,6 +3,10 @@ import type { PartBuilder, PartGeometry } from '../parts';
 import {
   SKULL_BOUNDS,
   SKULL_LANDMARKS,
+  DISC_HALF_THICKNESS,
+  DISC_Y,
+  FOSSA_RADII,
+  FOSSA_WALL,
   cranialCavity,
   hyoidField,
   mandibleField,
@@ -477,36 +481,39 @@ export const parts: PartBuilder = () => {
 
   /* ---- the jaw joint: both sides, a glass capsule round condyle, disc and fossa --------- */
   {
+    // The stack is derived in shells/skull.ts (CONDYLE_*, DISC_Y, FOSSA_Y): the condyle's head, the disc
+    // resting on it, the fossa's roof resting on the disc, the eminence in front, the capsule round all.
     const [cx, cy, cz] = SKULL_LANDMARKS.fossa;
-    const b = box([cx, -0.0545, cz], [0.012, 0.012, 0.014]);
+    const b = box([cx, DISC_Y, cz], [0.012, 0.012, 0.014]);
     const ell = (c: V3, r: V3): Sdf => ellipsoid(c, r);
-    addPair('temporomandibular_joint', ell([cx, -0.0545, cz], [0.0088, 0.0072, 0.0088]), [cx, -0.0545, cz], 0.0026, b);
-    addPair('articular_disc', ell([cx, -0.0553, cz + 0.0015], [0.0058, 0.0011, 0.0056]), [cx, -0.0553, cz], 0.0012, b);
-    // The fossa: a shallow bowl of bone, only the lower half of an ellipsoid shell.
-    const bowl = ell([cx, cy - 0.0005, cz], [0.0072, 0.0034, 0.0072]);
-    addPair('mandibular_fossa', (x, y, z) => Math.max(Math.abs(bowl(x, y, z)) - 0.0009, y - (cy - 0.0004)), [cx, cy, cz], 0.0016, b);
+    addPair('temporomandibular_joint', ell([cx, DISC_Y, cz], [0.0088, 0.0072, 0.0088]), [cx, DISC_Y, cz], 0.0026, b);
+    addPair('articular_disc', ell([cx, DISC_Y, cz + 0.0015], [0.0052, DISC_HALF_THICKNESS, 0.0052]), [cx, DISC_Y, cz], 0.0012, b);
+    // The fossa: a shallow dome of bone over the condyle, only the upper half of an ellipsoid shell
+    // (it was the lower half, a cup under the condyle, until the joint was re-stacked).
+    const bowl = ell([cx, cy, cz], FOSSA_RADII);
+    addPair('mandibular_fossa', (x, y, z) => Math.max(Math.abs(bowl(x, y, z)) - FOSSA_WALL, cy - y), [cx, cy, cz], 0.0016, b);
     addPair('articular_eminence', capsule([0.0545, cy + 0.0004, cz + 0.0095], [0.0665, cy + 0.0004, cz + 0.0095], 0.0026), [cx, cy, cz + 0.0095], 0.0016, box([cx, cy, cz + 0.0095], [0.012, 0.007, 0.007]));
-    const shell = ell([cx, -0.0545, cz], [0.0102, 0.0094, 0.0102]);
-    addPair('joint_capsule', (x, y, z) => Math.abs(shell(x, y, z)) - 0.0005, [cx, -0.0545, cz], 0.003, b);
+    const shell = ell([cx, DISC_Y, cz], [0.0102, 0.0094, 0.0102]);
+    addPair('joint_capsule', (x, y, z) => Math.abs(shell(x, y, z)) - 0.0005, [cx, DISC_Y, cz], 0.003, b);
   }
 
   /* ---- the mandible's parts, cut from the mandible field ------------------------------------------- */
   {
     const mc = partition([
       { id: 'body', seeds: pair(seg([0, -0.1155, 0.0645], [0.0215, -0.1155, 0.019]), seg([0.0295, -0.1148, 0.004])) },
-      { id: 'ramus', seeds: pair(seg([0.0545, -0.098, -0.016], [0.0545, -0.06, -0.013])) },
+      { id: 'ramus', seeds: pair(seg([0.0545, -0.1, -0.004], [0.0545, -0.078, 0.003])) },
       { id: 'angle', seeds: pair(seg([0.05, -0.1135, -0.021])), reach: 0.0105 },
-      { id: 'condyle', seeds: pair(seg([0.0565, -0.07, -0.0165], SKULL_LANDMARKS.condyle)) },
-      { id: 'coronoid', seeds: pair(seg([0.0525, -0.0715, 0.0035], [0.0525, -0.0575, 0.0035])) },
+      { id: 'condyle', seeds: pair(seg([0.0565, -0.07, SKULL_LANDMARKS.condyle[2] - 0.001], SKULL_LANDMARKS.condyle)) },
+      { id: 'coronoid', seeds: pair(seg([0.0525, -0.0725, 0.016], [0.0525, -0.0595, 0.016])) },
     ]);
     const m = proud(mand);
     // Everything but the body is away from the midline: build the right half and mirror it.
     const rightOnly = (f: Sdf): Sdf => (x, y, z) => f(Math.abs(x), y, z);
     add('mandibular_body', intersect(m, mc.body), [0, -0.115, 0.06], SM);
-    addPair('mandibular_ramus', rightOnly(intersect(m, mc.ramus)), [0.054, -0.083, -0.0155], SM, box([0.054, -0.083, -0.0155], [0.011, 0.034, 0.024]));
+    addPair('mandibular_ramus', rightOnly(intersect(m, mc.ramus)), [0.0545, -0.0905, 0.003], SM, box([0.0545, -0.0895, 0.0], [0.011, 0.035, 0.0265]));
     addPair('mandibular_angle', rightOnly(intersect(m, mc.angle)), [0.05, -0.1135, -0.021], SM, box([0.05, -0.1135, -0.021], [0.014, 0.014, 0.014]));
-    addPair('condylar_process', rightOnly(intersect(m, mc.condyle)), SKULL_LANDMARKS.condyle, 0.0026, box([0.059, -0.063, -0.016], [0.011, 0.014, 0.012]));
-    addPair('coronoid_process', rightOnly(intersect(m, mc.coronoid)), [0.0525, -0.0675, 0.0035], 0.0026, box([0.0525, -0.0665, 0.0035], [0.01, 0.016, 0.012]));
+    addPair('condylar_process', rightOnly(intersect(m, mc.condyle)), SKULL_LANDMARKS.condyle, 0.0026, box([0.059, -0.063, SKULL_LANDMARKS.condyle[2]], [0.011, 0.014, 0.012]));
+    addPair('coronoid_process', rightOnly(intersect(m, mc.coronoid)), [0.0525, -0.0695, 0.016], 0.0026, box([0.0525, -0.0685, 0.016], [0.01, 0.016, 0.012]));
     // The alveolar part: the top of the body, where the lower tooth sockets are carved.
     add('mandibular_alveolar_part', intersect(intersect(m, (_x, y) => y + 0.1115), mc.body), [0, -0.109, 0.06], 0.0036);
     // The mental foramen: the opening on the outside of the body below the second premolar, a small ring.

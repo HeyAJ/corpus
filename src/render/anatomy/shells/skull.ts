@@ -99,6 +99,34 @@ function floorAt(x: number, z: number): number {
   return (a * (1 - tx) + b * tx) * 0.001;
 }
 
+/**
+ * THE JAW JOINT'S STACK, right side (x mirrored). Gray's 42nd: the head of the mandible
+ * articulates in the mandibular fossa of the temporal bone, which lies immediately in front of
+ * the external acoustic meatus and is separated from it by the tympanic plate; the articular
+ * disc lies between the condyle and the fossa; the articular eminence is in front of the fossa.
+ * Everything below is stacked from the condyle upward so that no layer can drift off the others:
+ * the disc's underside rests on the top of the condyle head, the fossa's roof rests on the top of
+ * the disc, and the fossa landmark is the rim of the dome that makes that roof.
+ *
+ * HISTORY. The joint was first drawn where the ear canal used to be (z -0.0155, the ears'
+ * old depth). When the ears were moved down to the Frankfort plane the canal ran through the
+ * condyle and the ramus (measured by agent ea). The joint was then moved forward of the canal's
+ * anterior wall, past the front of the temporal bone drawn round the canal, so a bony plate
+ * lies between canal and joint. The fossa was also drawn as the lower half of an ellipsoid shell,
+ * a cup that holds a condyle from BELOW; it is the upper half now, a roof over the condyle.
+ * The radii, the disc's thickness and the wall are DRAWING choices (no measured joint is used).
+ */
+export const CONDYLE_Y = -0.0585;
+export const CONDYLE_Z = 0.0055;
+export const CONDYLE_RADII: V3 = [0.0055, 0.0032, 0.0038];
+export const DISC_HALF_THICKNESS = 0.0011;
+export const FOSSA_RADII: V3 = [0.0072, 0.0034, 0.0072];
+export const FOSSA_WALL = 0.0009;
+/** Centre height of the articular disc: its underside rests on the top of the condyle head (0.1 mm overlap so the two meet). */
+export const DISC_Y = CONDYLE_Y + CONDYLE_RADII[1] + DISC_HALF_THICKNESS - 0.0001;
+/** Height of the fossa dome's rim: the underside of its apex (rim + radius - wall) rests on the top of the disc. */
+export const FOSSA_Y = DISC_Y + DISC_HALF_THICKNESS - (FOSSA_RADII[1] - FOSSA_WALL);
+
 /** Where the skull's named landmarks are, local frame. Shared with the atlas so parts agree with the shell. */
 export const SKULL_LANDMARKS = {
   /** Eye globe centres, from the eyes shell: x = +-0.031, y -0.034, z 0.062. */
@@ -127,16 +155,23 @@ export const SKULL_LANDMARKS = {
    */
   meatusOuter: [0.0795, -0.057, -0.0127] as V3,
   meatusInner: [0.0505, -0.0595, -0.0106] as V3,
-  /** The jaw joint (right side): condyle head, and the fossa on the temporal bone above it. */
-  condyle: [0.0605, -0.0585, -0.0155] as V3,
-  fossa: [0.0605, -0.0505, -0.0125] as V3,
+  /** The jaw joint (right side): condyle head, and the rim of the fossa on the temporal bone over it (see the stack above). */
+  condyle: [0.0605, CONDYLE_Y, CONDYLE_Z] as V3,
+  fossa: [0.0605, FOSSA_Y, CONDYLE_Z] as V3,
   /** Mouth: lower and upper alveolar ridges, from the mouth atlas's teeth (y -0.107..-0.093). */
   mandibleRidgeY: -0.1065,
   maxillaRidgeY: -0.0925,
 };
 
 /** The temporal bone round the ears' canal, right side (x mirrored): centre and radii, a drawing choice reaching the canal's lateral end. */
-const TEMPORAL_EAR_MASS = { c: [0.0585, -0.0565, -0.0125] as V3, r: [0.0152, 0.0125, 0.0165] as V3 };
+const TEMPORAL_EAR_MASS = { c: [0.0585, -0.0565, -0.015] as V3, r: [0.0152, 0.0125, 0.0135] as V3 };
+/*
+ * The mass used to be centred on the canal (z -0.0125) with a 16.5 mm radius in depth, which put
+ * its front lip 4 mm forward of z 0, exactly where the condyle must sit once it is in front of
+ * the canal (the jaw-joint fix). It is now centred 2.5 mm behind the canal with a 13.5 mm radius:
+ * the front is at z -0.0015, 5.4 mm in front of the canal's bony hole (its front wall at
+ * z -0.0069), which is the tympanic plate, and the mastoid side is unchanged to within 1 mm.
+ */
 
 /** A superellipsoid: exponent 2 is an ellipsoid, larger is boxier. Approximate distance (scaled by the smallest radius). */
 function superEllipsoid(c: V3, r: V3, p: number): Sdf {
@@ -279,6 +314,7 @@ export function outerEnvelope(): Sdf {
     mirroredX(ellipsoid([gx + 0.016, gy - 0.014, 0.055], [0.012, 0.0125, 0.0135])), // zygomatic body (cheekbone)
     mirroredX(capsule([0.0585, -0.045, 0.043], [0.0665, -0.0425, 0.01], 0.0042)), // zygomatic arch, front
     mirroredX(capsule([0.0665, -0.0425, 0.01], [0.0645, -0.0405, -0.012], 0.0042)), // zygomatic arch, back
+    mirroredX(ellipsoid([SKULL_LANDMARKS.fossa[0], FOSSA_Y + FOSSA_RADII[1] + FOSSA_WALL + 0.0035, CONDYLE_Z], [0.0095, 0.0045, 0.0115])), // the glenoid part of the temporal bone: fills between the arch above and the fossa's roof (the atlas's dome) so the roof is not floating
     mirroredX(ellipsoid(TEMPORAL_EAR_MASS.c, TEMPORAL_EAR_MASS.r)), // the bone round the ear canal (tympanic ring, lateral petrous)
     mirroredX(ellipsoid([0.06, -0.058, -0.03], [0.0095, 0.0145, 0.011])), // mastoid process
     mirroredX(capsule([0.049, -0.06, -0.0125], [0.044, -0.084, 0.001], 0.0023)), // styloid process
@@ -331,13 +367,21 @@ export function mandibleField(): Sdf {
     [0.0475, -0.1145, -0.02],
   ];
   const body = mirroredX(bar(half, 0.0043, 0.56));
-  const ramus = mirroredX(ellipsoid([0.0545, -0.083, -0.0155], [0.0036, 0.0305, 0.0185]));
+  // The ramus is a thin plate in x. Its ellipsoid is long in z (centre z 0.003, the condyle's
+  // depth less 2.5 mm) so that it carries the condyle at its back-top corner and the coronoid
+  // at its front-top corner, with the mandibular notch (a dip in its top edge) between them.
+  const ramus = mirroredX(ellipsoid([0.0545, -0.0905, 0.003], [0.0036, 0.0275, 0.0165]));
+  // The back border runs from under the condylar neck down and back to the angle (Gray's:
+  // the posterior border descends from the condyle to the angle). A capsule along it makes
+  // the border slope; the ellipsoid alone is vertical and left the angle hanging off the body.
+  const border = mirroredX(capsule([0.0555, -0.068, 0.001], [0.0505, -0.111, -0.0215], 0.0034));
   const angle = mirroredX(ellipsoid([0.05, -0.1135, -0.021], [0.006, 0.0075, 0.007]));
   const [cx, cy, cz] = SKULL_LANDMARKS.condyle;
-  const condyle = mirroredX(union(capsule([0.0565, -0.07, -0.0165], [cx, cy, cz], 0.004), ellipsoid([cx, cy, cz], [0.0055, 0.0032, 0.0038])));
-  const coronoid = mirroredX(ellipsoid([0.0525, -0.0675, 0.0035], [0.0028, 0.0105, 0.0075]));
+  const condyle = mirroredX(union(capsule([0.0565, -0.07, cz - 0.001], [cx, cy, cz], 0.004), ellipsoid([cx, cy, cz], CONDYLE_RADII)));
+  // The coronoid process lies in front of the condyle (Gray's), 10.5 mm of drawing in front of it.
+  const coronoid = mirroredX(ellipsoid([0.0525, -0.0695, cz + 0.0105], [0.0028, 0.0105, 0.0075]));
   const chin = ellipsoid([0, -0.1195, 0.0625], [0.0105, 0.0055, 0.004]);
-  const solid = smoothUnion(0.002, body, ramus, angle, condyle, coronoid, chin);
+  const solid = smoothUnion(0.002, body, ramus, border, angle, condyle, coronoid, chin);
   const sockets = toothSockets(false);
   return (x, y, z) => {
     const d = solid(x, y, z);

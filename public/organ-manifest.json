@@ -1,7 +1,7 @@
 {
   "generatedBy": "tools/placeholder-organs.ts",
   "note": "Bounding spheres and centroids of the authored organ shells, in the BODY frame (+x = the patient's right; the renderer mirrors x). Anything that replaces a shell must match these within a few millimetres, or the camera focus animation and the sim-driven pulse scaling will be framed on the wrong point.",
-  "totalTriangles": 233256,
+  "totalTriangles": 233476,
   "organs": [
     {
       "id": "brain",
@@ -137,7 +137,7 @@
     },
     {
       "id": "skull",
-      "triangles": 7268,
+      "triangles": 7304,
       "budget": 8000,
       "boundingRadius_m": 0.11534,
       "worldCentre_m": [
@@ -456,13 +456,13 @@
     },
     {
       "id": "salivary_glands",
-      "triangles": 908,
+      "triangles": 1128,
       "budget": 8000,
-      "boundingRadius_m": 0.07577,
+      "boundingRadius_m": 0.07697,
       "worldCentre_m": [
-        0,
-        0.3918,
-        0.0233
+        -0.0001,
+        0.385,
+        0.0135
       ]
     }
   ]
