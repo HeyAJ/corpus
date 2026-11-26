@@ -958,10 +958,13 @@ nothing about bone itself.
   52.4 and 42.0) because the brain atlas's brainstem sits far forward.
 - The femoral neck is steep and short, because the glass thigh is narrow. The humerus and femur end at the
   glass arm and leg fade (about body y 0.129 and -0.312), and this body ends at the knee.
-- The mandible's condyle and fossa landmarks sit at the ear canal's depth, so the canal passes
-  through the condyle and ramus, and the parotid was left at the old ear height about 24 mm above
-  the ear. This was open when these notes were written and was being fixed separately; check the
-  code before relying on it.
+- The jaw and parotid were fixed to follow the ears: the condyle is 9.2 mm from the canal surface
+  and 16.7 mm anterior to the meatus, and the canal clears the mandible by 2.9 mm. The parotid top
+  is 3.7 mm below the canal axis by design (higher would cut the canal wall), so it does not quite
+  reach the meatus. The submandibular and sublingual glands overlap the mandible shell by up to
+  3.15 mm and the submandibular ganglion cord by 1.6 mm. The styloid root sits at canal level, so
+  the stylomastoid foramen is only 4.6 mm from each bone. The mouth atlas's parotid papilla is 1.2
+  mm behind the molar crown.
 
 **Budget headroom.** The default load is at 233,256 of its 240,000-triangle budget, about 6,700
 triangles of headroom, and the bones layer at 46,812 of 60,000. Both budgets are load and

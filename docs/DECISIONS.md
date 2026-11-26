@@ -1240,8 +1240,11 @@ or a panel opening. It is deliberately outside `openOnly` (a layer is not a pane
 must be able to leave Vessels on while a sheet is open). Each row keeps its old accessible name
 and `aria-pressed`. The popover is 320 px wide (display).
 
-**What went wrong on the way.** The first bone density, `BONE_DENSITY` 0.42, left the organs
-behind the ribs hard to read; it is now 0.62, checked against front and profile renders.
+**What went wrong on the way.** `BONE_DENSITY` 0.42 was set on the stub bones to keep organs
+legible. Once the real skeleton existed, its thin rib tubes and single limb shafts read as faint
+ivory lines at 0.42 (pelvis and arms barely visible), so it is now 0.62, which keeps lungs, heart,
+liver and bowel legible through the rib cage while the skeleton reads at a glance (front and side
+views checked).
 
 **Rejected.** Building the skeleton at start like every other organ (it would have spent the load
 budget on something most visitors do not open). A fifth corner switch (it covered the body). A
@@ -1354,6 +1357,16 @@ the skull's meatus is a bony canal on the canal axis with a temporal-bone mass r
 Measured: the inner ear is outside the brain shell (worst +1.25 mm, the vestibular apparatus),
 porion within 1.3 mm of orbitale, the tube opening level with the posterior end of the inferior
 concha.
+
+**The jaw and parotid had to follow.** Moving the ears put the canal through the mandible's
+condyle and ramus, and left the parotid about 24 mm above the ear. Gray's puts the condyle in the
+fossa in front of the meatus with the tympanic plate between, so the joint was rebuilt as a stack
+(condyle, disc, fossa roof; the fossa had been a cup under the condyle) and the condyle moved from
+z -15.5 to +5.5 mm (`CONDYLE_Z`; condyle 16.7 mm anterior to the meatus, canal clearing the mandible
+by 2.9 mm). The parotid (superficial, deep and bridge lobes) lies below the meatus wrapping the
+ramus; its top is 3.7 mm below the canal axis on purpose, because any higher cuts the canal's lower
+wall. Its duct ends opposite the upper second molar crown, and the facial nerve leaves through
+`STYLOMASTOID_FORAMEN`, 4.6 mm from styloid and mastoid.
 
 **Rejected.** Pushing the brain shell up (it is the reference for the cranial cavity and the
 skull). Shrinking the inner ear to fit (the vestibular envelope was reduced only where the
