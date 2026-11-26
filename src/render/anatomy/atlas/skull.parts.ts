@@ -204,8 +204,8 @@ function mainCells(): Cell[] {
       // -0.019, z 0.066), not the nasal cavity's roof.
       seeds: [
         seg([0, -0.036, 0.058]),
-        seg([0, -0.052, 0.05], [0, -0.072, 0.048]),
-        ...pair(seg([0.013, -0.04, 0.053], [0.012, -0.03, 0.06]), seg([0.011, -0.03, 0.064])),
+        seg([0, -0.048, 0.046], [0, -0.072, 0.04]),
+        ...pair(seg([0.013, -0.04, 0.053], [0.012, -0.03, 0.06]), seg([0.011, -0.03, 0.064]), seg([0.0125, -0.058, 0.052], [0.0125, -0.05, 0.057])),
       ],
       bias: 0.003,
     },
@@ -567,8 +567,8 @@ export const parts: PartBuilder = () => {
     add('cribriform_plate', intersect(intersect(et, floorLayer), plateBox), [0, fy, 0.0605], 0.0024);
     // The crista galli: a small blade of bone standing up from the cribriform plate in the midline.
     add('crista_galli', roundBox([0, fy + 0.0035, 0.0575], [0.0011, 0.0055, 0.0052], 0.0009), [0, fy + 0.0035, 0.0575], 0.0013, box([0, fy + 0.0035, 0.0575], [0.005, 0.009, 0.009]));
-    add('perpendicular_plate', intersect(et, roundBox([0, -0.0645, 0.05], [0.0048, 0.0125, 0.0105], 0.001)), [0, -0.0645, 0.05], 0.0024);
-    add('ethmoidal_labyrinth', intersect(et, mirroredX(roundBox([0.0165, -0.0435, 0.053], [0.0125, 0.0105, 0.0135], 0.003))), [0.0165, -0.0435, 0.053], 0.0034);
+    add('perpendicular_plate', intersect(et, roundBox([0, -0.061, 0.0445], [0.0048, 0.0125, 0.016], 0.001)), [0, -0.061, 0.0445], 0.0024);
+    add('ethmoidal_labyrinth', intersect(et, mirroredX(roundBox([0.0165, -0.0555, 0.0525], [0.0125, 0.0105, 0.0135], 0.003))), [0.0165, -0.0555, 0.0525], 0.0034);
 
     const mx = proud(own('maxilla'));
     // The alveolar process: the arch that carries the teeth, with the eight sockets a side cut in it.

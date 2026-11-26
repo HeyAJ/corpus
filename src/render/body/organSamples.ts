@@ -27,6 +27,25 @@ export const SAMPLES_PER_ORGAN = 500;
 /** Organs outside the pelvic floor: the outline gives them their own blob and ends the trunk above them. */
 const EXTERNAL_ORGANS = new Set<string>(['testes', 'penis', 'vagina']);
 
+/**
+ * SKELETAL LANDMARKS THE GLASS MUST CONTAIN, carried by the organ they sit beside.
+ *
+ * WHY THIS EXISTS. The bones are LAYER organs and are left out of the fit on purpose: they are
+ * built lazily, only while the Bones layer is on, and a figure fitted to lazily built meshes
+ * would change shape when a visitor switched a layer. The skull's occipital base nevertheless
+ * reaches behind everything that is fitted: 95 skull vertices (20 after the neck was moved) (the nuchal ridge and the external occipital
+ * protuberance, y 0.40 to 0.42, z to -0.092) stood up to 14 mm outside the glass head, which
+ * is fitted to the brain, whose back is at about z -0.086. One cheap sample is added instead
+ * of fitting to the bone: the centre of that outlier set, measured from the skull shell's
+ * vertices that the figure did not contain (centroid x -0.0007, y 0.4086, z -0.0871), with a
+ * radius that carries the slice's back edge to the bone's furthest vertex (z -0.0916) and a
+ * little beyond. `r` is a DISPLAY choice, not an anatomical size. It rides with the brain
+ * because the brain is in every body and the skull encloses it.
+ */
+const SKELETAL_LANDMARKS: Readonly<Record<string, readonly (readonly [number, number, number, number])[]>> = {
+  brain: [[0, 0.4086, -0.0871, 0.009]],
+};
+
 export function organSamples(def: OrganDef, geometry: THREE.BufferGeometry): Float32Array {
   const pos = geometry.getAttribute('position');
   if (!pos || pos.count === 0) return new Float32Array(0);
@@ -57,7 +76,8 @@ export function organSamples(def: OrganDef, geometry: THREE.BufferGeometry): Flo
   if (rot) m.makeRotationFromEuler(new THREE.Euler(rot[0], rot[1], rot[2], 'XYZ'));
   const v = new THREE.Vector3();
 
-  const out = new Float32Array(picked.length * SAMPLE_STRIDE);
+  const landmarks = SKELETAL_LANDMARKS[def.id] ?? [];
+  const out = new Float32Array((picked.length + landmarks.length) * SAMPLE_STRIDE);
   for (let n = 0; n < picked.length; n++) {
     v.fromBufferAttribute(pos, picked[n]);
     if (rot) v.applyMatrix4(m);
@@ -65,6 +85,14 @@ export function organSamples(def: OrganDef, geometry: THREE.BufferGeometry): Flo
     out[n * SAMPLE_STRIDE + 1] = v.y + origin.y;
     out[n * SAMPLE_STRIDE + 2] = v.z + origin.z;
     out[n * SAMPLE_STRIDE + 3] = EXTERNAL_ORGANS.has(def.id) ? EXTERNAL_FLAG : 0;
+  }
+  // The landmarks are in the body frame already (not the organ's own), so they bypass the transform.
+  for (let k = 0; k < landmarks.length; k++) {
+    const o = (picked.length + k) * SAMPLE_STRIDE;
+    out[o] = landmarks[k][0];
+    out[o + 1] = landmarks[k][1];
+    out[o + 2] = landmarks[k][2];
+    out[o + 3] = landmarks[k][3];
   }
   return out;
 }

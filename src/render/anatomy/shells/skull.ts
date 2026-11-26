@@ -215,7 +215,17 @@ export function orbitCavity(grow = 0.0015): Sdf {
 
 /** The nasal passages, a pair of chambers with a median bony septum between them. */
 export function nasalPassage(): Sdf {
-  return mirroredX(ellipsoid([0.0105, -0.068, 0.052], [0.0088, 0.0225, 0.0365]));
+  // THE OLFACTORY CLEFT (nk). The nasal cavity's roof was raised by hn2 to sit 1 mm under the
+  // brain's olfactory bulbs (scene y about 0.4695, skull-local -0.0105), so the air space the
+  // nasal atlas draws reaches 4 cm above where the bony passage ended (scene 0.4345), and its
+  // olfactory region, septum top and ethmoidal cells were inside solid bone. The slit below is
+  // the narrow upward extension of each chamber, from the chamber's roof to just under the
+  // floor of the cranial cavity (the cribriform plate is what is left between them). Its
+  // half-width (5.5 mm) and length are drawing choices fitted to the nasal atlas's olfactory
+  // region (x +-0.016, z 0.0615 to 0.0795), not a measurement.
+  const chamber = mirroredX(ellipsoid([0.0105, -0.068, 0.052], [0.0088, 0.0225, 0.0365]));
+  const cleft = mirroredX(ellipsoid([0.0085, -0.039, 0.0685], [0.0055, 0.0225, 0.0115]));
+  return union(chamber, cleft);
 }
 
 /** The maxillary sinuses, hollow inside the maxilla (the nasal atlas owns the sinus itself; this is its bony wall). */
