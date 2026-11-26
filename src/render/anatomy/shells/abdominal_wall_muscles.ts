@@ -142,13 +142,13 @@ const MIDLINE_HALF = 0.0035;
 
 /* Depths of the layers below the trunk surface, metres: [inner face outward offset, thickness]. Drawing choices; the order is Gray's. */
 const LAYER = {
-  // `lift` is how much further OUT the layer stands where the ribs are (y above 0): the external oblique lies on the OUTER surfaces of the ribs and the rectus and its sheath on the outer surfaces of the costal cartilages, so there they are carried out past the cage's centre-line ellipse by a rib's radius and a clearance; the deeper layers stay inside the costal margin.
-  externalOblique: { off: -0.0055, t: 0.0035, lift: 0.0097 },
-  anteriorSheath: { off: -0.0032, t: 0.0012, lift: 0.0115 },
-  rectus: { off: -0.0084, t: 0.005, lift: 0.0118 },
-  internalOblique: { off: -0.0089, t: 0.0032, lift: 0 },
-  posteriorSheath: { off: -0.0096, t: 0.0012, lift: 0 },
-  transversus: { off: -0.0119, t: 0.003, lift: 0 },
+  // `lift` is how much further OUT the layer stands where the ribs or cartilages are: the external oblique lies on the OUTER surfaces of the ribs (from y 0 up) and the rectus and its sheath on the outer surfaces of the costal cartilages (from y 0.085 up), so there they are carried out past the cage's centre-line ellipse by a rib's radius and a clearance; the deeper layers stay inside the costal margin. The layers are thin (2 to 5 mm) so that all of them fit between the trunk's ellipse and the bowel, which reaches 13 mm inside it at the flank.
+  externalOblique: { off: -0.0045, t: 0.003, lift: 0.0087, from: 0, to: 0.05 },
+  anteriorSheath: { off: -0.0026, t: 0.001, lift: 0.0096, from: 0.085, to: 0.115 },
+  rectus: { off: -0.0072, t: 0.0046, lift: 0.0104, from: 0.085, to: 0.115 },
+  internalOblique: { off: -0.0072, t: 0.0025, lift: 0, from: 0, to: 0.05 },
+  posteriorSheath: { off: -0.0082, t: 0.001, lift: 0, from: 0, to: 0.05 },
+  transversus: { off: -0.0096, t: 0.0022, lift: 0, from: 0, to: 0.05 },
 } as const;
 type LayerName = keyof typeof LAYER;
 
@@ -223,7 +223,7 @@ function layerSheet(side: number, name: LayerName, rows: readonly (readonly RowP
       // A point of 3 numbers is already in this frame (a bone landmark, right side); a (y, angle) pair is a place on the trunk surface at this layer's depth.
       if (q.length === 3) return onSide(q, side);
       const [y, a] = q as readonly [number, number];
-      return onSide(W(trunkPoint(y, a, L.off - extra + L.lift * smooth(0, 0.05, y))), side);
+      return onSide(W(trunkPoint(y, a, L.off - extra + L.lift * smooth(L.from, L.to, y))), side);
     }),
   );
   const first = pts[0][0];
@@ -378,7 +378,7 @@ spec.inguinal_ligament = {
     const a = asis();
     const b = pubicTubercle();
     const m: V3 = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, Math.min(trunkRing(-0.11, Math.PI - 0.5)[1], (a[2] + b[2]) / 2 + 0.002)];
-    return [tendon(routed(bones, [a, m, b].map((p) => onSide(p, s)), 0.0022, 3), 0.0021, k, 12)];
+    return [tendon(routed(bones, [a, m, b].map((p) => onSide(p, s)), 0.0023, 9), 0.0021, k, 16)];
   },
 };
 

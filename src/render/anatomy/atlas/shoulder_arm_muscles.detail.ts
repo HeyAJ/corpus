@@ -12,15 +12,14 @@ import type { OrganDetailSpec } from '../detail/types';
  *
  * WHAT MOVES, from those signals only:
  *
- *  - THE SARCOMERE. Its filaments slide as the sarcomere's own activity rises: the Z discs, the
- *    I band, the thin filaments (with the troponin and tropomyosin that ride on them) and titin
- *    close in towards the middle along the muscle's axis, so the overlap of thin and thick
- *    filaments grows, the I band narrows and the H zone closes; the A band and the thick
- *    filaments stay put, as in the sliding-filament account. Under paralysis the activity falls
- *    below rest and the filaments lie a little further apart than at rest (relaxed). A DISPLAY
- *    SIMPLIFICATION, stated plainly: the drawn thin filaments are scaled along the axis, so they
- *    look a little shorter when the sarcomere shortens, whereas a real thin filament keeps its
- *    length and only slides.
+ *  - THE SARCOMERE (sliding-filament account, Guyton and Hall: filaments keep their length and
+ *    slide). With activity each Z disc moves towards the M line and carries its thin filaments
+ *    (actin, with troponin and tropomyosin) with it as a RIGID TRANSLATION, so their length is
+ *    unchanged; the thick filaments and the A band do not move or change length; the I band and
+ *    titin (Z disc to thick filament) are compressed and the H zone narrows because the thin
+ *    filament tips advance. Under paralysis activity falls below rest and the discs move a little
+ *    outward (relaxed). Done by moving the vertices of those parts' own meshes, because one
+ *    part has one transform and the two halves must move in opposite directions.
  *  - THE NEUROMUSCULAR JUNCTION. The synaptic vesicles in the nerve terminal move towards the
  *    cleft and back at a rate that follows the junction's activity, and they stop when it falls
  *    to nothing, as it does under paralysis. A block of the receptor does not stop the vesicles
@@ -37,8 +36,12 @@ import type { OrganDetailSpec } from '../detail/types';
 
 /** The activity the atlas gives a resting muscle (its `rest`): the sarcomere is at its resting length here. A display anchor that matches the data file. */
 const REST_ACTIVITY = 0.2;
-/** Fraction of its length the drawn sarcomere closes by at full activity. A display choice. */
-const SHORTEN = 0.22;
+/** DISPLAY CONSTANT: how far each Z disc travels towards the M line at full activity, as a fraction of the half sarcomere. A display choice, not a measured shortening. */
+const SHORTEN = 0.18;
+/** Half the A band, half the sarcomere and half the H zone as the parts file draws them (SARC_A, SARC_L, SARC_TIP there; keep in step). */
+const SARC_A = 0.003;
+const SARC_L = 0.0052;
+const SARC_TIP = 0.0012;
 /** How far the lengthened (relaxed, paralysed) sarcomere is drawn past rest, as a fraction of full closure. */
 const RELAX_LIMIT = 0.25;
 /** How far a vesicle is drawn travelling towards the cleft at full activity, metres of scene. A display choice. */
@@ -46,7 +49,18 @@ const RELEASE_TRAVEL_M = 0.0006;
 /** Cycles per second of the drawn vesicle movement at full activity. A display choice. */
 const RELEASE_HZ = 0.8;
 
-const SLIDING = ['z_discs', 'i_band', 'thin_filaments', 'titin'];
+type Kind = 'rigid' | 'stretch' | 'h';
+const SLIDING: Record<string, Kind> = { z_discs: 'rigid', thin_filaments: 'rigid', troponin: 'rigid', tropomyosin: 'rigid', i_band: 'stretch', titin: 'stretch', h_zone: 'h' };
+
+/** New height (relative to the sarcomere centre) of a vertex at height y when each Z disc has moved in by d. Pure; the probe uses it. */
+export function slideY(kind: Kind, y: number, d: number): number {
+  const a = Math.abs(y);
+  const sgn = y < 0 ? -1 : 1;
+  if (kind === 'rigid') return y - sgn * d;
+  if (kind === 'h') return (y * (SARC_TIP - d)) / SARC_TIP;
+  return a <= SARC_A ? y : sgn * (SARC_A + ((a - SARC_A) * (SARC_L - d - SARC_A)) / (SARC_L - SARC_A));
+}
+const originals = new WeakMap<object, { y: Float32Array; yc: number; d: number }>();
 
 /** Opacities of the panes, so that what lies inside them can be seen. Display choices. */
 const PANES: Record<string, number> = {
@@ -82,9 +96,28 @@ export const detail: OrganDetailSpec = {
     // The sarcomere: filaments slide with its own activity.
     const act = ctx.activity('sarcomere');
     const c = still ? 0 : Math.max(-RELAX_LIMIT, Math.min(1, (act - REST_ACTIVITY) / (1 - REST_ACTIVITY)));
-    const along = 1 - SHORTEN * c;
-    for (const id of SLIDING) ctx.part(id)?.setScale([1, along, 1]);
-    ctx.part('h_zone')?.setScale([1, Math.max(0.1, 1 - 0.9 * c), 1]);
+    const d = SHORTEN * SARC_L * c;
+    for (const [id, kind] of Object.entries(SLIDING)) {
+      const pos = ctx.part(id)?.mesh.geometry.getAttribute('position');
+      if (!pos) continue;
+      let o = originals.get(pos);
+      if (!o) {
+        const ys = new Float32Array(pos.count);
+        let lo = Infinity;
+        let hi = -Infinity;
+        for (let i = 0; i < pos.count; i++) {
+          ys[i] = pos.getY(i);
+          lo = Math.min(lo, ys[i]);
+          hi = Math.max(hi, ys[i]);
+        }
+        o = { y: ys, yc: (lo + hi) / 2, d: NaN };
+        originals.set(pos, o);
+      }
+      if (o.d === d) continue;
+      o.d = d;
+      for (let i = 0; i < pos.count; i++) pos.setY(i, o.yc + slideY(kind, o.y[i] - o.yc, d));
+      pos.needsUpdate = true;
+    }
 
     // The junction: vesicles shuttle to the cleft face at a rate that follows its activity, and stop when it is gone.
     const junction = ctx.activity('neuromuscular_junction');

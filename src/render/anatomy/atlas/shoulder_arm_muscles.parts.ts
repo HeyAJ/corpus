@@ -87,6 +87,8 @@ export type SchematicId = keyof typeof SCHEMATIC_Y;
 /** Sarcomere proportions: half the A band, half the whole sarcomere, drawing choices that keep a visible I band and H zone. */
 const SARC_A = 0.003;
 const SARC_L = 0.0052;
+/** Half the H zone: where the tips of the thin filaments stand at rest. The animation (detail file) repeats SARC_A, SARC_L and SARC_TIP and moves the Z discs, thin filaments, I band, H zone and titin from them; keep the three in step. */
+export const SARC_TIP = 0.0012;
 
 /** The geometry of one schematic's parts, each in the schematic's own frame centred on its origin. */
 function schematic(id: SchematicId): Record<string, THREE.BufferGeometry[]> {
@@ -148,8 +150,8 @@ function schematic(id: SchematicId): Record<string, THREE.BufferGeometry[]> {
       const troponin: THREE.BufferGeometry[] = [];
       for (const side of [-1, 1]) {
         for (const [x, z] of thinAt) {
-          thin.push(along(x, z, side * SARC_L, side * 0.0012, 0.00017, 4));
-          tropomyosin.push(along(x * 1.07, z * 1.07, side * (SARC_L - 0.0003), side * 0.0014, 0.00008, 3));
+          thin.push(along(x, z, side * SARC_L, side * SARC_TIP, 0.00017, 4));
+          tropomyosin.push(along(x * 1.07, z * 1.07, side * (SARC_L - 0.0003), side * (SARC_TIP + 0.0002), 0.00008, 3));
           for (const y of [0.0044, 0.0034]) troponin.push(blob([x * 1.1, side * y, z * 1.1], [0.00026, 0.00026, 0.00026], 4, 3));
         }
       }
@@ -174,7 +176,7 @@ function schematic(id: SchematicId): Record<string, THREE.BufferGeometry[]> {
         z_discs: [-1, 1].map((s) => cyl([0, s * SARC_L, 0], 0.0034, 0.0002, false, 14)),
         i_band: [-1, 1].map((s) => cyl([0, (s * (SARC_L + SARC_A)) / 2, 0], 0.0032, (SARC_L - SARC_A) / 2, false, 12)),
         a_band: [cyl([0, 0, 0], 0.0032, SARC_A, false, 12)],
-        h_zone: [cyl([0, 0, 0], 0.0029, 0.0009, false, 12)],
+        h_zone: [cyl([0, 0, 0], 0.0029, SARC_TIP, false, 12)],
         m_line: [cyl([0, 0, 0], 0.0029, 0.00013, false, 12)],
         thin_filaments: thin,
         troponin,
