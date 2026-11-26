@@ -36,10 +36,11 @@ import { bodyFrontAt } from './vertebral_column';
  */
 
 /** Body-frame heights of the shell's two ends. */
-export const BODY_Y0 = 0.37;
+export const BODY_Y0 = 0.35;
 export const BODY_Y1 = 0.4;
 /** The old centreline, kept for the part of the tube that must still meet the oesophagus. */
 const OLD: readonly (readonly [number, number, number])[] = [
+  [0.002, 0.35, -0.02],
   [0.002, 0.37, -0.0185],
   [0.002, 0.381, -0.012],
   [0.001, 0.392, -0.01],
@@ -52,10 +53,10 @@ const BLEND_TO = 0.388;
 export const FRONT_Z = 0.0135;
 /**
  * Retropharyngeal space between the vertebral bodies and the back wall, metres. A DRAWING
- * choice: 2.5 mm keeps a 2 mm clearance to the bone after the shell's 18 sides are
+ * choice: 4 mm keeps a 2 mm clearance to the bone after the shell's 18 sides are
  * faceted, and is of the order of the thin prevertebral layer in the textbook picture.
  */
-const RETRO_GAP = 0.0025;
+const RETRO_GAP = 0.004;
 /**
  * Where the back wall lies from the skull base up, scene z: -0.001, the value it always had
  * above the atlas (the old rule put it 1 mm in front of the C1 face, which was at z -0.002).
@@ -103,7 +104,9 @@ export interface Ring {
 
 /** The pharynx's cross-section at body height y (BODY_Y0 to BODY_Y1). */
 export function ringAt(y: number): Ring {
-  const u = Math.max(0, Math.min(1, (y - BODY_Y0) / (BODY_Y1 - BODY_Y0)));
+  // The radius profile keeps its original reference (0.37 to 0.4): the tube now starts 12 mm lower,
+  // and re-basing u would have narrowed the doorway the mouth reads at y 0.385.
+  const u = Math.max(0, Math.min(1, (y - 0.37) / (BODY_Y1 - 0.37)));
   // The old circle: its radius profile is the shell's original one.
   const r0 = 0.0075 + 0.0045 * Math.sin(Math.min(1, u * 1.6) * Math.PI * 0.5);
   const cx = lerp(0.002, 0, u);
@@ -114,7 +117,7 @@ export function ringAt(y: number): Ring {
   // Never behind the bone's face plus the gap, whatever the blend says: that is the clearance.
   const back = Math.max(lerp(z0 - r0, anchored, s), vback);
   const front = lerp(z0 + r0, FRONT_Z, s);
-  return { y, cx, cz: (front + back) / 2, rx: r0, dz: Math.max(0.0035, (front - back) / 2) };
+  return { y, cx, cz: (front + back) / 2, rx: r0, dz: Math.max(0.002, (front - back) / 2) };
 }
 
 /**

@@ -80,12 +80,12 @@ function axisSlope(y: number): number {
  * rotated by that whole slope (45 degrees) swings its front face forward at the top and puts
  * the atlas, axis and C3 back inside the pharynx, the very overlap the path move was meant to
  * remove, and a 45 degree cervical vertebra looks wrong besides: real cervical bodies are
- * close to horizontal. The tilt is therefore capped at 0.35 (about 19 degrees); the canal
+ * close to horizontal. The tilt is therefore capped at 0.5 (about 27 degrees); the canal
  * then deviates from the cord's own line by a few millimetres across one body's height, which
  * the probe checks against the canal radius (the cord still has at least 1 mm of room). The
  * thoracic and lumbar slopes are all below the cap and are unchanged.
  */
-const MAX_TILT_SLOPE = 0.35;
+const MAX_TILT_SLOPE = 0.5;
 function tiltSlope(y: number): number {
   return Math.max(-MAX_TILT_SLOPE, Math.min(MAX_TILT_SLOPE, axisSlope(y)));
 }

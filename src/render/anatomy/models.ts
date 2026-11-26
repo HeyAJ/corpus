@@ -411,11 +411,14 @@ function diaphragm(): THREE.BufferGeometry {
 /* ------------------------------------------------------------- oesophagus */
 
 function oesophagus(): THREE.BufferGeometry {
-  // The top point was z -0.014, which tipped the top 6 mm of the tube forward until its front wall
-  // lay 3 mm INSIDE the trachea's back wall (five oesophagus vertices inside the trachea, six
-  // trachea vertices inside the oesophagus, measured at y 0.364 to 0.368). -0.0185 continues the
-  // line the data's own first point (z -0.02 at y 0.352) already sets and clears the trachea.
-  const points: [number, number, number][] = [[0.002, 0.37, -0.0185], ...giSegment('oesophagus')];
+  // THE TOP WAS AN EXTRA POINT, [0.002, 0.37, -0.014], AND IS GONE. It had two faults. It tipped
+  // the top 6 mm of the tube forward until its front wall lay 3 mm inside the trachea's back wall
+  // (five oesophagus vertices inside the trachea and six trachea vertices inside the oesophagus,
+  // measured at y 0.364 to 0.368). And it carried the tube up beside C2, where the cervical
+  // bodies, now back at their real depth (paths.ts), leave no room: the tube starts at the data's
+  // own first point (y 0.352, z -0.02) and the pharynx, which has a front-to-back span that can
+  // follow the bone, takes over above it (shells/pharynx.ts).
+  const points: [number, number, number][] = [...giSegment('oesophagus')];
   const g = tubeAlong(
     points,
     // Narrowed at each end by its sphincters; the lower one is what reflux gets past.
