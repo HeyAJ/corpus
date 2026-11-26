@@ -4,8 +4,8 @@ import { mergeParts, tubeAlong, type V3 } from '../sdf';
 /**
  * EARS, SHELL AND SHARED LAYOUT. Both ears in one organ, the pattern the eyes use.
  *
- * Frame: origin at organs.json [0, 0.363, -0.012]; the cranial group's 0.06 lift makes that
- * scene y 0.423. WHERE IT LIES, AND WHY IT WAS MOVED DOWN 23 mm (agent ea). The scaffold put
+ * Frame: origin at organs.json [0, 0.362, -0.012]; the cranial group's 0.06 lift makes that
+ * scene y 0.422. WHERE IT LIES, AND WHY IT WAS MOVED DOWN 24 mm (agent ea). The scaffold put
  * the ears at the EYES' height (0.386, scene 0.446), which is the height of the globes, not of
  * the ears. At that height the whole inner ear was inside the brain shell (cochlea 4.8 mm deep,
  * canals 10.8 to 14.5 mm, vestibular apparatus 19.4 mm, the shell as a whole 15.2 mm): the
@@ -14,7 +14,7 @@ import { mergeParts, tubeAlong, type V3 } from '../sdf';
  * landmarks from Gray's fix the height: the Frankfort horizontal plane (the porion, the top of
  * the external acoustic meatus, level with the orbitale, the lowest point of the infraorbital
  * margin; the skull shell's orbitale is scene y 0.4274, so the canal's lateral opening, axis
- * 0.424 plus the 3.1 mm canal radius, tops out at 0.4271), and the pharyngotympanic tube,
+ * 0.423 plus the 3.1 mm canal radius, tops out at 0.4261), and the pharyngotympanic tube,
  * which runs from the front of the tympanic cavity forward, medially and DOWN to the
  * nasopharynx, whose opening lies level with the back end of the inferior nasal concha (scene
  * y 0.4035, read from the nasal atlas). Every position below is written for the RIGHT ear (+x)
@@ -36,10 +36,13 @@ import { mergeParts, tubeAlong, type V3 } from '../sdf';
  * three-quarter turns), drawn as a tapering helix.
  *
  * THE PHARYNGOTYMPANIC TUBE runs from the front wall of the tympanic cavity forward, medially
- * and down to the nasopharynx. Its end (X 0.0126, y -0.0195, z 0.0166 here, which is scene
- * x 0.0126, y 0.4035, z 0.0046) is the point on the pharynx's side wall at the height of the
+ * and down to the nasopharynx. Its end (X 0.012, y -0.0185, z 0.0166 here, which is scene
+ * x 0.012, y 0.4035, z 0.0046) is the point on the pharynx's side wall at the height of the
  * inferior concha's back end; atlas/pharynx.parts.ts reads this very end (TUBE below plus the
  * organ's position) and draws the tubal opening there, so the two cannot drift apart again.
+ * The pharynx's lumen is 0.6 mm off the midline (its centreline starts at x 0.002 in the old
+ * circle and has not quite reached 0 at this height), so its right wall is at x 0.0126 and its
+ * left at -0.0114; the ears are an exact mirror pair, so each tube ends 0.6 mm from its wall.
  */
 
 export const at = (s: number, p: V3): V3 => [s * p[0], p[1], p[2]];
@@ -74,10 +77,10 @@ export const SACCULE_C: V3 = [0.0372, -0.0016, -0.0008];
 /** Pharyngotympanic tube, tympanic end first. */
 export const TUBE: readonly V3[] = [
   [0.043, -0.0035, 0.006],
-  [0.036, -0.007, 0.0085],
-  [0.027, -0.0105, 0.011],
-  [0.0185, -0.015, 0.014],
-  [0.0126, -0.0195, 0.0166],
+  [0.036, -0.0068, 0.0085],
+  [0.027, -0.01, 0.011],
+  [0.0185, -0.0143, 0.014],
+  [0.012, -0.0185, 0.0166],
 ];
 /** Internal acoustic meatus, medial (brain) end first. */
 export const IAM: readonly V3[] = [
@@ -97,11 +100,11 @@ export const FACIAL: readonly V3[] = [
 ];
 /** Endolymphatic duct (from the vestibule) and the sac on the back of the petrous bone. */
 export const ENDO_DUCT: readonly V3[] = [
-  [0.035, 0.002, -0.006],
-  [0.0325, 0.0035, -0.009],
-  [0.03, 0.003, -0.0125],
+  [0.035, 0.0015, -0.0055],
+  [0.0332, 0.0005, -0.0075],
+  [0.0315, -0.0005, -0.0092],
 ];
-export const ENDO_SAC_C: V3 = [0.029, 0.0028, -0.0135];
+export const ENDO_SAC_C: V3 = [0.0305, -0.0012, -0.0105];
 
 /* ----------------------------------------------------------------- the cochlea */
 
@@ -224,7 +227,7 @@ export const CANALS: Record<CanalName, CanalLoop> = {
     ampullaAtStart: false,
   },
   lateral: {
-    centre: [0.0382, 0.0013, -0.009],
+    centre: [0.0382, 0.0013, -0.0075],
     p: [1, 0, 0],
     q: [0, 0, 1],
     radius: 0.0022,

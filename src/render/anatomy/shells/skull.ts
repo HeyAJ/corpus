@@ -48,7 +48,7 @@ import {
  * and tympanic bone below the cavity, so the external canal is a dimple that runs in to the
  * drum end of the ears' canal.)
  *
- * THE TEMPORAL BONE AT THE EAR. At the height of the ears (scene y 0.424) the skull's outer
+ * THE TEMPORAL BONE AT THE EAR. At the height of the ears (scene y 0.423) the skull's outer
  * surface used to be only 52 mm from the midline, 22 mm short of the ears' canal opening
  * (74.5 mm), because the vault is an ellipsoid that has already narrowed to the base there.
  * A temporal-bone mass (`TEMPORAL_EAR_MASS`, the bone round the canal: tympanic ring and the
@@ -118,15 +118,15 @@ export const SKULL_LANDMARKS = {
   sella: [0, -0.0262, 0.0095] as V3,
   /**
    * Right-hand external acoustic meatus: lateral opening and inner end, ON THE EARS' OWN CANAL
-   * AXIS (shells/ears.ts CANAL plus the organ's scene position (0, 0.423, -0.012), less this
-   * frame's 0.48): the canal runs from scene (0.0745, 0.424, -0.0125) to its drum end
-   * (0.0485, 0.421, -0.0105). It used to be at y -0.035, z -0.011, which was the eyes' height
+   * AXIS (shells/ears.ts CANAL plus the organ's scene position (0, 0.422, -0.012), less this
+   * frame's 0.48): the canal runs from scene (0.0745, 0.423, -0.0125) to its drum end
+   * (0.0485, 0.420, -0.0105). It used to be at y -0.035, z -0.011, which was the eyes' height
    * where the ears had been drawn; the ears were moved down to the Frankfort plane (porion level
    * with the orbitale) and the dimple moved with them. Now it is a real bony canal that runs in
    * to the drum, because the cranial cavity is 14 mm above it, not 1 mm.
    */
-  meatusOuter: [0.0795, -0.056, -0.0127] as V3,
-  meatusInner: [0.0505, -0.0585, -0.0106] as V3,
+  meatusOuter: [0.0795, -0.057, -0.0127] as V3,
+  meatusInner: [0.0505, -0.0595, -0.0106] as V3,
   /** The jaw joint (right side): condyle head, and the fossa on the temporal bone above it. */
   condyle: [0.0605, -0.0585, -0.0155] as V3,
   fossa: [0.0605, -0.0505, -0.0125] as V3,
@@ -136,7 +136,7 @@ export const SKULL_LANDMARKS = {
 };
 
 /** The temporal bone round the ears' canal, right side (x mirrored): centre and radii, a drawing choice reaching the canal's lateral end. */
-const TEMPORAL_EAR_MASS = { c: [0.0585, -0.0555, -0.0125] as V3, r: [0.0152, 0.0125, 0.0165] as V3 };
+const TEMPORAL_EAR_MASS = { c: [0.0585, -0.0565, -0.0125] as V3, r: [0.0152, 0.0125, 0.0165] as V3 };
 
 /** A superellipsoid: exponent 2 is an ellipsoid, larger is boxier. Approximate distance (scaled by the smallest radius). */
 function superEllipsoid(c: V3, r: V3, p: number): Sdf {

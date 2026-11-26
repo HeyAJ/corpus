@@ -174,7 +174,7 @@ function mainCells(): Cell[] {
         seg([0.06, -0.058, -0.03]),
         seg([0.0665, -0.041, 0.012], [0.0645, -0.0405, -0.012]),
         // The ring of bone round the ear canal, at the canal's own height (shells/ears.ts).
-        seg([0.0585, -0.0572, -0.0115], [0.0635, -0.0572, -0.0115]),
+        seg([0.0585, -0.0582, -0.0115], [0.0635, -0.0582, -0.0115]),
       ],
     },
     {
@@ -184,7 +184,7 @@ function mainCells(): Cell[] {
         flip(seg([0.05, -0.048, -0.02], [0.034, -0.052, -0.004])),
         flip(seg([0.06, -0.058, -0.03])),
         flip(seg([0.0665, -0.041, 0.012], [0.0645, -0.0405, -0.012])),
-        flip(seg([0.0585, -0.0572, -0.0115], [0.0635, -0.0572, -0.0115])),
+        flip(seg([0.0585, -0.0582, -0.0115], [0.0635, -0.0582, -0.0115])),
       ],
     },
     {
@@ -544,7 +544,7 @@ export const parts: PartBuilder = () => {
       const tc = partition([
         { id: 'squamous', seeds: [f(seg([0.063, -0.012, 0.0], [0.0675, -0.032, -0.012]))] },
         { id: 'petrous', seeds: [f(seg([0.05, -0.05, -0.02], [0.034, -0.053, -0.004]))] },
-        { id: 'tympanic', seeds: [f(seg([0.0585, -0.0572, -0.0115], [0.0635, -0.0572, -0.0115]))], bias: 0.0006 },
+        { id: 'tympanic', seeds: [f(seg([0.0585, -0.0582, -0.0115], [0.0635, -0.0582, -0.0115]))], bias: 0.0006 },
         { id: 'mastoid', seeds: [f(seg([0.06, -0.058, -0.03]))] },
         { id: 'styloid', seeds: [f(seg([0.049, -0.06, -0.0125], [0.044, -0.084, 0.001]))], reach: 0.006 },
         { id: 'zygomatic', seeds: [f(seg([0.0665, -0.041, 0.012], [0.0645, -0.0405, -0.012]))] },
@@ -552,7 +552,7 @@ export const parts: PartBuilder = () => {
       const sgn = r ? 1 : -1;
       add(`temporal_squamous_part_${side}`, intersect(tp, tc.squamous), [sgn * 0.066, -0.012, 0.0], SM);
       add(`petrous_part_${side}`, intersect(tp, tc.petrous), [sgn * 0.04, -0.052, -0.01], SM);
-      add(`tympanic_part_${side}`, intersect(tp, tc.tympanic), [sgn * 0.061, -0.0572, -0.0115], 0.0026);
+      add(`tympanic_part_${side}`, intersect(tp, tc.tympanic), [sgn * 0.061, -0.0582, -0.0115], 0.0026);
       add(`temporal_mastoid_part_${side}`, intersect(tp, tc.mastoid), [sgn * 0.06, -0.058, -0.03], SM);
       add(`styloid_process_${side}`, intersect(tp, tc.styloid), [sgn * 0.046, -0.072, -0.006], 0.0021);
       add(`temporal_zygomatic_process_${side}`, intersect(tp, tc.zygomatic), [sgn * 0.0655, -0.041, 0.0], SM);

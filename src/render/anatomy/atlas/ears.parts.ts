@@ -167,7 +167,7 @@ export const parts: PartBuilder = () => {
   void MASTOID_C;
 
   /* ---- the vestibule ---------------------------------------------------------- */
-  out.push(P('vestibular_apparatus', both((s) => [ellipse(at(s, [0.0366, 0.0035, -0.0052]), [0.0052, 0.0092, 0.0095], [0, 0, 0], 14, 10)])));
+  out.push(P('vestibular_apparatus', both((s) => [ellipse(at(s, [0.0372, 0.0018, -0.0038]), [0.0052, 0.0066, 0.0058], [0, 0, 0], 14, 10)])));
   out.push(P('vestibule', both((s) => [ellipse(at(s, VEST_C), VEST_R)])));
   out.push(P('utricle', both((s) => [ellipse(at(s, UTRICLE_C), [0.0016, 0.0013, 0.0021])])));
   out.push(P('saccule', both((s) => [ellipse(at(s, SACCULE_C), [0.0013, 0.0014, 0.0013])])));

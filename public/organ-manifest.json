@@ -137,7 +137,7 @@
     },
     {
       "id": "skull",
-      "triangles": 7256,
+      "triangles": 7268,
       "budget": 8000,
       "boundingRadius_m": 0.11534,
       "worldCentre_m": [
@@ -282,11 +282,11 @@
       "id": "ears",
       "triangles": 4888,
       "budget": 8000,
-      "boundingRadius_m": 0.0751,
+      "boundingRadius_m": 0.07527,
       "worldCentre_m": [
         0,
-        0.4434,
-        -0.0135
+        0.4158,
+        -0.0116
       ]
     },
     {

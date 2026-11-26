@@ -645,7 +645,7 @@
         "kind": "model",
         "model": "ears"
       },
-      "position": [0, 0.363, -0.012],
+      "position": [0, 0.362, -0.012],
       "layoutOffset": [0, 0, 0],
       "volume_mL": null,
       "labelBias": [0.9, 0]
