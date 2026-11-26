@@ -4,6 +4,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { buildCentrelines, type Centreline } from '../vascular/centrelines';
 import { organDef, warpPoint } from '../anatomy/layout';
 import { SPINAL_CORD_PATH, spinalCordRadius } from '../anatomy/models';
+import { bodyFrontAt } from '../anatomy/shells/vertebral_column';
 
 /**
  * THE NERVOUS-SYSTEM OVERLAY.
@@ -418,11 +419,16 @@ export class NervousSystem {
         chain[k].push(p);
         this.bead(G.sympathetic, rad, p);
       };
-      // Superior, middle and inferior (stellate) cervical ganglia: placed in front of the
-      // cervical column at their usual heights (C2-C3, C6, C7-T1).
-      put('SCG', v3(s * 0.021, 0.372, cordZ(0.372) + 0.036), 0.0042);
-      put('MCG', v3(s * 0.021, 0.322, cordZ(0.322) + 0.032), 0.0028);
-      put('STG', v3(s * 0.024, 0.286, cordZ(0.286) + 0.028), 0.0036);
+      // Superior, middle and inferior (stellate) cervical ganglia. They sit on the
+      // prevertebral muscles in front of the transverse processes, beside the vertebral
+      // bodies, so they are anchored to the bone's front surface (bodyFrontAt) and not to
+      // the cord. Anchoring to the cord was a real failure: when the cord path moved back
+      // to make room for the bodies behind the pharynx, the ganglia moved with it and the
+      // superior ganglion landed inside the pharynx. Each sits 4 mm behind the pharynx's
+      // back wall (bodyFrontAt + 4 mm) at its usual height (C2-C3, C6, C7-T1).
+      put('SCG', v3(s * 0.021, 0.372, bodyFrontAt(0.372) - 0.004), 0.0042);
+      put('MCG', v3(s * 0.021, 0.322, bodyFrontAt(0.322) - 0.004), 0.0028);
+      put('STG', v3(s * 0.024, 0.286, bodyFrontAt(0.286) - 0.004), 0.0036);
       for (let i = 1; i <= 12; i++) put(`T${i}`, end(`T${i}`, s).clone(), 0.0024);
       for (let i = 1; i <= 5; i++) put(`L${i}`, end(`L${i}`, s).clone(), 0.0024);
       for (let i = 1; i <= 4; i++) put(`S${i}`, end(`S${i}`, s).clone().add(v3(-s * 0.008, 0, 0.004)), 0.002);
