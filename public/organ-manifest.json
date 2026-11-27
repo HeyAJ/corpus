@@ -95,7 +95,7 @@
       "id": "pelvic_floor_muscles_female",
       "triangles": 9588,
       "budget": 10000,
-      "boundingRadius_m": 0.10441,
+      "boundingRadius_m": 0.10442,
       "worldCentre_m": [
         0,
         -0.2581,
@@ -172,11 +172,11 @@
       "id": "intestine_large",
       "triangles": 7480,
       "budget": 9000,
-      "boundingRadius_m": 0.16222,
+      "boundingRadius_m": 0.16344,
       "worldCentre_m": [
-        0.0017,
-        -0.1429,
-        0.002
+        0.0007,
+        -0.1436,
+        0.0109
       ]
     },
     {
