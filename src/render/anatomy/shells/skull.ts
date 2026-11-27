@@ -282,7 +282,10 @@ export function nasalPassage(): Sdf {
   // floor of the cranial cavity (the cribriform plate is what is left between them). Its
   // half-width (5.5 mm) and length are drawing choices fitted to the nasal atlas's olfactory
   // region (x +-0.016, z 0.0615 to 0.0795), not a measurement.
-  const chamber = mirroredX(ellipsoid([0.0105, -0.068, 0.052], [0.0088, 0.0225, 0.0365]));
+  // The chambers' floor is the palate's upper surface. It was scene y 0.3895, under the mouth
+  // roof, so the palate was cut away; it is raised to 0.393 with the nasal cavity's own floor
+  // (shells/nasal_cavity.ts FLOOR_LIFT_M, gx2), keeping the top at local -0.0455.
+  const chamber = mirroredX(ellipsoid([0.0105, -0.06625, 0.052], [0.0088, 0.02075, 0.0365]));
   const cleft = mirroredX(ellipsoid([0.0085, -0.039, 0.0685], [0.0055, 0.0225, 0.0115]));
   return union(chamber, cleft);
 }

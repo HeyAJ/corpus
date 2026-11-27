@@ -12,32 +12,34 @@
  * the base positions and rewrites the live ones), so the organs' shape files are untouched and a
  * non-pregnant body is bit-for-bit what it was.
  *
- * THE RULE, in the uterus's own ellipsoid coordinates q = (p - centre) / radii, rho = |q|. The
- * gravid body is the ellipsoid `gravidShape(weeks)`. A point is moved along a direction n by
+ * THE RULE. The gravid body is the ellipsoid `gravidShape(weeks)`. A point moves along its own ray
+ * from a SOURCE point low inside the uterus (SOURCE_HEIGHT; see the function), rho -> G(rho), where rho
+ * is the point's distance along its ray as a fraction of the distance at which the ray leaves
+ * the uterus (rho = 1 is the uterine surface), with
  *
- *     t = A * Rn * (1 - smootherstep((rho - rhoS) / (rhoE - rhoS)))        rho > rhoS
- *     t = A * Rn                                                          rho <= rhoS
+ *     G(rho) = rho0 + (rhoE - rho0) * (rho / rhoE)^m,      m = rhoE / (rhoE - rho0),   rho < rhoE
+ *     G(rho) = rho                                         rho >= rhoE
  *
- * where Rn is the ellipsoid's radius along n, A = rho0 - rhoS and rho0 puts the inflated surface
- * (the uterus plus `DISPLAY_MARGIN_M`) at 1. Two properties make it safe. (1) CLEARANCE: every
- * point that was at rho >= rhoS ends outside the inflated ellipsoid along a radial direction,
- * because it moves by at least the gap between rhoS and rho0 in rho; nothing in a displaced organ
- * lies deeper than rhoS (the deepest organ vertex measured was rho 0.62), so rhoS = 0.3 is
- * unreachable by data and is only the floor of the formula. (2) NO FOLDING: the radial map
- * rho -> rho + s(rho) has slope 1 + s'(rho) >= 1 - A * 1.875 / (rhoE - rhoS), and rhoE is chosen as
- * rhoS + 2.2 A, so the slope never falls below 0.15: the map is a diffeomorphism and a shell cannot
- * tear or turn inside out. The deep part is a SHIFT, not a squash, so an organ keeps its thickness
- * and its shape, and the push dies out smoothly with distance, so a displaced organ stays joined to
- * the part of the body that did not move. The unit test checks both on a grid (Jacobian > 0).
+ * where rho0 puts the inflated surface (the uterus plus `DISPLAY_MARGIN_M`) at 1 and rhoE is the
+ * reach of the push. Three properties make it safe, and the unit test checks each. (1) CLEARANCE:
+ * G(rho) >= rho0 for every rho, so a vertex anywhere inside the uterus ends on or outside the
+ * inflated surface; it cannot be missed by an organ that is deeper than anyone expected.
+ * (2) NO FOLDING: G'(rho) = (rho / rhoE)^(m - 1) is positive and reaches 1 at rhoE where G meets
+ * the identity, so the radial map is a monotone, C1 join with the unmoved body: a shell cannot tear
+ * or turn inside out, and the push dies out smoothly with distance. (3) HONEST COMPRESSION. Where
+ * an organ lay deep inside the uterus's footprint it is not slid out whole (the model's abdomen is
+ * only 15 cm from front to back and the term uterus is 16 cm across, so there is nowhere to slide
+ * it to); it is draped round the uterus, thinner than before, which is what the bowel does at
+ * term. G' is the thinning factor: 0.2 to 0.3 at rho 0.5, 1 at the edge of the reach.
  *
- * DIRECTIONS (what the obstetric texts describe). The bowel, stomach, liver, gallbladder and
- * diaphragm are moved up and out: below the centre of the uterus a point is moved sideways and
- * forward, never down (the pelvic floor is there), and never backward into the spine. The
- * abdominal wall is carried forward, and sideways at the flanks, over the uterus. The bladder is
- * carried up and forward (Williams Obstetrics 25e, ch. 4: the bladder is displaced upward and
- * anteriorly as the uterus rises out of the pelvis). The appendix is part of the large-intestine
- * shell here, so it is carried up and laterally with the caecum, which is what Baer, JAMA 1932
- * 98:1359 describes (the appendix rises and rotates as the uterus enlarges).
+ * DIRECTIONS (what the obstetric texts describe). Moving every point along its own ray from the
+ * centre carries the bowel, stomach, liver, gallbladder and diaphragm up and out, the wall forward
+ * and sideways, and a point behind the uterus backward; the bladder is a special case: it lies
+ * below the uterus, where a radial push would drive it into the pelvic floor, so it is carried up
+ * and forward along a fixed direction instead (Williams Obstetrics 25e, ch. 4: the bladder is
+ * displaced upward and anteriorly as the uterus rises out of the pelvis). The appendix is part of
+ * the large-intestine shell here, so it is carried up and laterally with the caecum, which is what
+ * Baer, JAMA 1932 98:1359 describes (the appendix rises and rotates as the uterus enlarges).
  *
  * WHAT IS CITED AND WHAT IS NOT. The SIZE of every push comes from the model's own uterus
  * (the push-out-of-the-uterus rule), not from a textbook number: no source was found that gives a
@@ -48,7 +50,7 @@
  * pushes the model's diaphragm by whatever its uterus needs (a few cm at term; see the DOCS NOTE
  * for the measured value), which is the same order, and it is not tuned to either figure. The
  * Williams Obstetrics statement of the diaphragm's rise was not retrieved and is not quoted.
- * `DISPLAY_MARGIN_M`, `RHO_FLOOR` and `FALLOFF` are DISPLAY choices.
+ * `DISPLAY_MARGIN_M` and `REACH` are DISPLAY choices.
  */
 
 type V3 = readonly [number, number, number];
@@ -69,6 +71,7 @@ export const DISPLACED_ORGANS: Readonly<Record<string, DisplacedKind>> = {
   stomach: 'stomach',
   liver: 'liver',
   gallbladder: 'gallbladder',
+  pancreas: 'stomach',
   diaphragm: 'diaphragm',
   bladder: 'bladder',
   abdominal_wall_muscles: 'wall',
@@ -76,18 +79,17 @@ export const DISPLACED_ORGANS: Readonly<Record<string, DisplacedKind>> = {
 
 /** Gap left between a displaced organ and the uterus, metres. A DISPLAY choice. */
 export const DISPLAY_MARGIN_M = 0.004;
-/** Normalised radius inside which the push is its full size. A DISPLAY choice (see the header: no organ reaches it). */
-export const RHO_FLOOR = 0.3;
-/** The push has died out at RHO_FLOOR + FALLOFF * A. A DISPLAY choice; 2.2 keeps the radial map's slope above 0.15. */
-export const FALLOFF = 2.2;
+/**
+ * Reach of the push, in uterus radii: beyond this normalised distance from the centre nothing
+ * moves. A DISPLAY choice. Larger reaches thin a deep organ less and move distant organs a little
+ * more; 2.4 puts the edge of the push about 1.4 uterus radii (15 cm at term) beyond the surface.
+ */
+export const REACH = 2.4;
+/** Where the rays start, as a fraction of the ellipsoid's vertical semi-axis below its centre. A DISPLAY choice; see `pregnancyDisplacement`. */
+export const SOURCE_HEIGHT = 0.6;
 /** The uterus leaves the true pelvis, and so starts to push, between these weeks. */
 export const PUSH_FROM_WEEK = 6;
 export const PUSH_FULL_WEEK = 10;
-
-function smoother(t: number): number {
-  const c = Math.max(0, Math.min(1, t));
-  return c * c * c * (c * (c * 6 - 15) + 10);
-}
 
 /** How much of the push is applied at a week: 0 before the uterus is a gravid body, 1 once it is. */
 export function pushFraction(weeks: number): number {
@@ -107,53 +109,46 @@ export function pregnancyDisplacement(weeks: number, body: UterusBody, kind: Dis
   if (fraction <= 0) return;
   const [cx, cy, cz] = body.centre;
   const [rx, ry, rz] = body.radii;
-  const qx = (x - cx) / rx;
-  const qy = (y - cy) / ry;
-  const qz = (z - cz) / rz;
-  const rho = Math.hypot(qx, qy, qz);
-
-  // The direction, as an ellipsoid-gradient-like vector g (normalised below).
-  let gx: number;
-  let gy: number;
-  let gz: number;
-  switch (kind) {
-    case 'wall':
-      // Forward over the uterus; sideways at the flanks; a little up at the top. Never back.
-      gx = qx / rx;
-      gy = (0.25 * qy) / ry;
-      gz = (Math.max(qz, 0) + 0.35 * rho) / rz;
-      break;
-    case 'bladder':
-      // Up and forward, whatever side of the uterus's centre the bladder is on.
-      gx = 0;
-      gy = 1 / ry;
-      gz = 0.6 / rz;
-      break;
-    default:
-      // Up and out: never down, never back.
-      gx = qx / rx;
-      gy = Math.max(qy, 0) / ry;
-      gz = Math.max(qz, 0) / rz;
+  // The source of the rays is not the ellipsoid's centre but a point low in it (SOURCE_HEIGHT of
+  // the way from the centre to the bottom). From the centre, everything below the middle of the
+  // uterus would be driven DOWN into the pelvis, where the bladder, the pelvic floor and the
+  // sacrum are; from a low source only what lies below the uterus's bottom goes down, and that
+  // is hardly pushed because it is outside the ellipsoid.
+  const sx = cx;
+  const sy = cy - SOURCE_HEIGHT * ry;
+  const sz = cz;
+  const dx = x - sx;
+  const dy = y - sy;
+  const dz = z - sz;
+  const d = Math.hypot(dx, dy, dz);
+  if (d < 1e-9) return;
+  const ux = dx / d;
+  const uy = dy / d;
+  const uz = dz / d;
+  // Distance along the ray from the source to the ellipsoid: positive root of |s + t u - c| = 1 in q.
+  const ox = (sx - cx) / rx;
+  const oy = (sy - cy) / ry;
+  const oz = (sz - cz) / rz;
+  const vx = ux / rx;
+  const vy = uy / ry;
+  const vz = uz / rz;
+  const qa = vx * vx + vy * vy + vz * vz;
+  const qb = 2 * (vx * ox + vy * oy + vz * oz);
+  const qc = ox * ox + oy * oy + oz * oz - 1;
+  const t = (-qb + Math.sqrt(qb * qb - 4 * qa * qc)) / (2 * qa);
+  const rho = d / t;
+  if (rho >= REACH) return;
+  const rho0 = 1 + DISPLAY_MARGIN_M / t;
+  const m = REACH / (REACH - rho0);
+  const g = rho0 + (REACH - rho0) * Math.pow(rho / REACH, m);
+  const move = fraction * (g - rho) * t;
+  if (kind === 'bladder') {
+    // Up and forward by the distance the radial rule asks, along a fixed direction.
+    out[1] = 0.85 * move;
+    out[2] = 0.53 * move;
+    return;
   }
-  let gl = Math.hypot(gx, gy, gz);
-  if (gl < 1e-9) {
-    gx = 0;
-    gy = 1 / ry;
-    gz = 0;
-    gl = gy;
-  }
-  const nx = gx / gl;
-  const ny = gy / gl;
-  const nz = gz / gl;
-  const rn = 1 / Math.sqrt((nx / rx) ** 2 + (ny / ry) ** 2 + (nz / rz) ** 2);
-
-  const rho0 = 1 + DISPLAY_MARGIN_M / rn;
-  const a = rho0 - RHO_FLOOR;
-  const rhoE = RHO_FLOOR + FALLOFF * a;
-  if (rho >= rhoE) return;
-  const s = rho <= RHO_FLOOR ? a : a * (1 - smoother((rho - RHO_FLOOR) / (rhoE - RHO_FLOOR)));
-  const t = fraction * s * rn;
-  out[0] = nx * t;
-  out[1] = ny * t;
-  out[2] = nz * t;
+  out[0] = ux * move;
+  out[1] = uy * move;
+  out[2] = uz * move;
 }

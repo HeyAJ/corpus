@@ -33,11 +33,22 @@ import { ellipsoid, polygonise, smoothUnion } from '../sdf';
  * orbit and the cavity, and the sphenoidal sinus behind. All sizes are drawing choices that
  * keep the parts in the atlas inside; none is a measurement.
  */
+/**
+ * THE FLOOR WAS RAISED 3 MM (gx2). The chambers' lowest point was scene y 0.390 and the mouth
+ * shell's roof is 0.3919 at the centre of the palate (shells/mouth.ts is not changed: its doorway
+ * and teeth were fitted), so the two cavities crossed and there was no room for the hard palate
+ * between them (Gray's 42nd: the hard palate, the palatine process of the maxilla and the
+ * horizontal plate of the palatine bone, is the floor of the nose AND the roof of the mouth). The
+ * chambers, the median column and the vestibule are shortened from below by this much and keep
+ * their tops, so the roof, the olfactory cleft and everything above are where they were. A
+ * drawing choice: it leaves 1.1 mm of bone at the pinch and more elsewhere.
+ */
+export const FLOOR_LIFT_M = 0.003;
 export function nasalCavity(): THREE.BufferGeometry {
-  const chamber = (s: number) => ellipsoid([s * 0.0085, 0, 0], [0.0085, 0.022, 0.032]);
+  const chamber = (s: number) => ellipsoid([s * 0.0085, FLOOR_LIFT_M / 2, 0], [0.0085, 0.022 - FLOOR_LIFT_M / 2, 0.032]);
   const side = (s: number) => [
     chamber(s),
-    ellipsoid([s * 0.0085, -0.012, 0.03], [0.007, 0.008, 0.006]), // vestibule, the flare of the nostril
+    ellipsoid([s * 0.0085, -0.012 + FLOOR_LIFT_M / 2, 0.03], [0.007, 0.008 - FLOOR_LIFT_M / 2, 0.006]), // vestibule, the flare of the nostril
     ellipsoid([s * 0.028, -0.012, -0.002], [0.0115, 0.0115, 0.0145]), // maxillary sinus
     ellipsoid([s * 0.0205, 0.0535, 0.005], [0.0075, 0.0065, 0.008]), // frontal sinus, above the orbit's medial part
     ellipsoid([s * 0.011, 0.0385, 0.0205], [0.0058, 0.027, 0.0095]), // olfactory cleft, up to the underside of the olfactory bulb
@@ -46,7 +57,7 @@ export function nasalCavity(): THREE.BufferGeometry {
   ];
   const field = smoothUnion(
     0.003,
-    ellipsoid([0, 0, 0], [0.0035, 0.021, 0.031]), // the median column
+    ellipsoid([0, FLOOR_LIFT_M / 2, 0], [0.0035, 0.021 - FLOOR_LIFT_M / 2, 0.031]), // the median column
     ...side(1),
     ...side(-1),
   );

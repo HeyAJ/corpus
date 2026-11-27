@@ -178,7 +178,7 @@ export const parts: PartBuilder = () => {
 
   /* ---- roof, floor, back, front ----------------------------------------------- */
   out.push(P('cribriform_plate', cribriform()));
-  out.push(P('nasal_floor', both((s) => [plate(m(s, [0.0085, -0.0185, 0.0]), [0.0052, 0.0012, 0.0125])])));
+  out.push(P('nasal_floor', both((s) => [plate(m(s, [0.0085, -0.0165, 0.0]), [0.0052, 0.0012, 0.0125])])));
   out.push(
     P('choanae', both((s) => {
       // Each choana is an oval opening in the plane of the back wall, drawn as a thin ring.

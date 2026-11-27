@@ -102,6 +102,12 @@ const BODY_WALL_MUSCLE_ROWS: readonly WallRow[] = [
   // descending colon and sigmoid had been holding the male glass out here, and once they moved the back
   // muscles stood 0.24 mm inside it against the 1 mm the containment test needs.
   [0.083, -0.15, -0.082, 'z', -1, 'trunk'],
+  // The point of the shoulder (the outermost vertex of the shoulder and arm muscles, deltoid). Added by gx1 when
+  // the lungs were cut to the heart's own shape (paths.ts `heartCavity`): the lung samples that had been holding
+  // the glass out here moved, and this muscle went from 1.62 mm inside the glass to 0.93 mm, short of the
+  // 1 mm the containment test needs. The glass is a smooth fit, so removing lung material in the middle of
+  // the chest moved the shoulder; the landmark makes the shoulder independent of the lungs.
+  [0.176, 0.269, -0.015, 'x', 1, 'trunk'],
   // The iliotibial tract and the gluteal region at the hip: the widest vertex of the thigh shell.
   [0.127, -0.216, 0.0, 'x', 1, 'trunk'],
   [0.125, -0.240, -0.005, 'x', 1, 'trunk'],

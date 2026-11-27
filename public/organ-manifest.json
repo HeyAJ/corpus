@@ -1,7 +1,7 @@
 {
   "generatedBy": "tools/placeholder-organs.ts",
   "note": "Bounding spheres and centroids of the authored organ shells, in the BODY frame (+x = the patient's right; the renderer mirrors x). Anything that replaces a shell must match these within a few millimetres, or the camera focus animation and the sim-driven pulse scaling will be framed on the wrong point.",
-  "totalTriangles": 234780,
+  "totalTriangles": 234640,
   "organs": [
     {
       "id": "brain",
@@ -115,7 +115,7 @@
     },
     {
       "id": "liver",
-      "triangles": 8972,
+      "triangles": 8980,
       "budget": 11000,
       "boundingRadius_m": 0.095,
       "worldCentre_m": [
@@ -183,11 +183,11 @@
       "id": "intestine_large",
       "triangles": 7480,
       "budget": 9000,
-      "boundingRadius_m": 0.15455,
+      "boundingRadius_m": 0.15912,
       "worldCentre_m": [
-        -0.0019,
-        -0.1515,
-        0.0076
+        -0.0021,
+        -0.1496,
+        0.0084
       ]
     },
     {
@@ -214,7 +214,7 @@
     },
     {
       "id": "skull",
-      "triangles": 7072,
+      "triangles": 7108,
       "budget": 8000,
       "boundingRadius_m": 0.11534,
       "worldCentre_m": [
@@ -368,12 +368,12 @@
     },
     {
       "id": "pancreas",
-      "triangles": 4692,
+      "triangles": 4592,
       "budget": 8000,
-      "boundingRadius_m": 0.06673,
+      "boundingRadius_m": 0.06643,
       "worldCentre_m": [
-        -0.0221,
-        -0.0303,
+        -0.0222,
+        -0.0298,
         -0.0115
       ]
     },
@@ -456,13 +456,13 @@
     },
     {
       "id": "nasal_cavity",
-      "triangles": 2512,
+      "triangles": 2464,
       "budget": 8000,
-      "boundingRadius_m": 0.05402,
+      "boundingRadius_m": 0.05401,
       "worldCentre_m": [
         0,
         0.4319,
-        0.052
+        0.0519
       ]
     },
     {

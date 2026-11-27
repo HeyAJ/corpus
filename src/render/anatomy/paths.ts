@@ -149,14 +149,14 @@ export function heartCavity(lung: 'lung_l' | 'lung_r'): Sdf {
  * bronchi leave it above the left atrium and pass behind the heart's base to the hila, the left
  * one crossing in front of the oesophagus and under the arch. So the lower trachea is drawn
  * inclining backwards below y 0.30, which is how it gets behind the aortic root; the front wall
- * clears the aortic root's back wall by 1.4 mm at the carina (centre z -0.017, radius 9.8 mm,
+ * clears the aortic root's back wall at the carina (centre z -0.0185, radius 9.8 mm,
  * heart back wall -0.0058). ABOVE y 0.30 NOTHING MOVED: the points at y 0.352, 0.32 and the
  * straight run to y 0.30 are the old ones (the neck was reconciled in ADR-051), so the larynx,
  * cricoid and the neck's neighbours are as they were.
  *
  * The bend is a chain of straight capsules (models.ts `trachea()` and the atlas use these same
- * points), so the steepest stretch is about 23 degrees from the vertical; the stretch of
- * 20 degrees is a DISPLAY consequence of the clearances above, not a measured inclination.
+ * points), so the steepest stretch (y 0.28 to 0.268) is about 30 degrees from the vertical; that
+ * inclination is a DISPLAY consequence of the clearances above, not a measured one.
  */
 export const TRACHEA_CENTRELINE: readonly V3[] = [
   [0, 0.352, 0],
