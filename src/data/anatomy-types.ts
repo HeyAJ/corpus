@@ -62,6 +62,7 @@ export type AnatomySignal =
   | 'nausea'
   | 'vomiting' // 0 or 1
   | 'vertigo'
+  | 'cough' // the cough drive on the bus (infections push it up, an antitussive pulls it down; display only)
   | 'seizure' // 0 or 1
   | 'rigidity' // raised skeletal muscle tone
   | 'paralysis' // lost skeletal muscle tone
@@ -210,7 +211,7 @@ export interface AnatomyFile {
 export const ANATOMY_SIGNALS: readonly AnatomySignal[] = [
   'awake', 'sleep', 'consciousness', 'unconscious', 'sedation', 'night', 'fright', 'stress', 'depression',
   'anxiety', 'euphoria', 'psychedelia', 'reward', 'pain', 'nociception', 'analgesia', 'nausea', 'vomiting',
-  'vertigo', 'seizure', 'rigidity', 'paralysis', 'mydriasis', 'miosis',
+  'vertigo', 'cough', 'seizure', 'rigidity', 'paralysis', 'mydriasis', 'miosis',
   'exertion', 'shivering',
   'sympathetic', 'parasympathetic', 'baroreflex',
   'beat', 'heartRate', 'bradycardia', 'inotropy', 'pumpFailure', 'outputRise', 'outputFall', 'hypertension',

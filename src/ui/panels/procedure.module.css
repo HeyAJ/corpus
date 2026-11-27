@@ -91,10 +91,10 @@
     left: auto;
     right: 16px;
     transform: none;
-    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    top: var(--card-top);
     bottom: auto;
     width: min(380px, 38vw);
-    max-height: calc(100% - env(safe-area-inset-top, 0px) - 16px - var(--corpus-bar-actual, var(--corpus-bar-h)) - 8px);
+    max-height: calc(100% - var(--card-top) - var(--corpus-bar-actual, var(--corpus-bar-h)) - 8px);
   }
 }
 

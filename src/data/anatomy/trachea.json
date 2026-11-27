@@ -1,6 +1,6 @@
 {
   "atlas": "trachea",
-  "about": "The interior of the trachea: the larynx with its vocal folds and cricoid, the C-shaped rings, the trachealis, the air column, the carina and the two main bronchi. The cartilages are drawn as simple shapes, the larynx is shown without its epiglottis or hyoid, and nothing here models voice or cough; activity is a display index of the engine's breathing signals and of swallowing.",
+  "about": "The interior of the trachea: the larynx with its vocal folds and cricoid, the C-shaped rings, the trachealis, the air column, the carina and the two main bronchi. The cartilages are drawn as simple shapes, the larynx is shown without its epiglottis or hyoid, and nothing here models voice, and a cough is shown only as a display index of the engine's cough drive (no airway clearance is simulated); activity is a display index of the engine's breathing signals, of swallowing and of that cough drive.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -30,6 +30,12 @@
           "weight": 0.5,
           "note": "The larynx is drawn up and the airway closed during the pharyngeal phase of a swallow.",
           "source": "GRAYS42"
+        },
+        {
+          "signal": "cough",
+          "weight": 0.5,
+          "note": "A cough begins with the glottis closed and the larynx braced, and the larynx is the first place the reflex is felt. The weight is a display choice, not a measured quantity; GH14 describes the cough reflex itself.",
+          "source": "GH14"
         }
       ]
     },
@@ -299,6 +305,12 @@
           "weight": 0.2,
           "note": "More air passes over the lining as ventilation rises.",
           "source": "WEST10"
+        },
+        {
+          "signal": "cough",
+          "weight": 0.4,
+          "note": "The irritant receptors that provoke a cough lie in the airway lining, so the lining is shown engaged while the cough drive is raised. The weight is a display choice, not a measured quantity; GH14 describes the cough reflex itself.",
+          "source": "GH14"
         }
       ],
       "source": "GRAYS42"

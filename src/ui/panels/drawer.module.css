@@ -783,7 +783,7 @@
 @media (min-width: 721px) {
   .sheet,
   .sheetFull {
-    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    top: var(--card-top);
     right: 16px;
     left: auto;
     bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);

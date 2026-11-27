@@ -243,6 +243,13 @@ function signal(name: AnatomySignal, s: SimState, rep: ReturnType<typeof reprodu
     case 'nausea': return clamp01(s.mind.nausea);
     case 'vomiting': return s.mind.vomiting ? 1 : 0;
     case 'vertigo': return clamp01(s.pathology.vertigo);
+    // THE COUGH DRIVE, display only. `resp.cough` was written by three pathogens (positive) and
+    // by codeine's antitussive action (negative) and read by nothing, so a drug that "suppresses
+    // cough" and an infection that causes it were both inert. Nothing in the engine coughs: no
+    // airway clearance, no glottis closure, no pressure spike, and the target is a readout, as the
+    // data notes on it say. The clamp keeps the sign convention honest: only a positive drive is
+    // shown, and an antitussive on a body with no cough reads zero rather than a negative.
+    case 'cough': return clamp01(eff(s, 'resp.cough'));
     case 'seizure': return s.mind.seizing ? 1 : 0;
     case 'rigidity': return clamp01(s.mind.muscleTone);
     case 'paralysis': return clamp01(-s.mind.muscleTone);

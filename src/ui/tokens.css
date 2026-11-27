@@ -91,6 +91,16 @@
      was painted over the "Simulation speed" chip (measured). A layout choice, not a
      measured value. */
   --sheet-top-clear: calc(env(safe-area-inset-top, 0px) + 74px);
+  /* Where a right-hand docked card (the panel sheet, the drug sheet, the resuscitation card)
+     starts at the top on a wide screen. The speed pill is centred at 22 px from the top and
+     is up to 52 px tall (44 px buttons on a touch screen), and a card 38vw wide reaches left
+     past the centre of the screen at any width below about 1030 px, so on a tablet or a
+     landscape phone the card was painted over the pill's 300x button (3 of 5 probe points
+     covered in about 44 states at 768 x 1024 and 844 x 390; the measurement is in the FU1
+     audit). The card therefore starts below the pill in that range (redefined in the media
+     query that follows) and at the usual 16 px inset above it, where the pill is clear.
+     The 1100 px bound is a display choice with margin over the measured crossover. */
+  --card-top: calc(env(safe-area-inset-top, 0px) + 16px);
 
   /* --- type ----------------------------------------------------------- */
   --font-ui: 'Nunito Variable', 'Nunito', 'Varela Round', 'M PLUS Rounded 1c', ui-rounded,
@@ -174,5 +184,11 @@ button {
   * {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1100px) {
+  :root {
+    --card-top: var(--sheet-top-clear);
   }
 }

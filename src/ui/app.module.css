@@ -180,7 +180,7 @@
  */
 .sheet {
   position: absolute;
-  top: calc(env(safe-area-inset-top, 0px) + 16px);
+  top: var(--card-top);
   right: 16px;
   bottom: calc(var(--corpus-bar-actual, var(--corpus-bar-h)) + 8px);
   width: min(380px, 38vw);

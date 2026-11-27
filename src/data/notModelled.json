@@ -1,0 +1,52 @@
+{
+  "targets": {
+    "metabolic.lipidSynthesis": {
+      "label": "cholesterol and lipid synthesis",
+      "reason": "This model has no cholesterol or lipid pool, so lowering its synthesis changes nothing it shows."
+    },
+    "metabolic.urateProduction": {
+      "label": "uric acid production",
+      "reason": "This model has no uric acid pool, so lowering its production changes nothing it shows."
+    },
+    "metabolic.basalRate": {
+      "label": "basal metabolic rate",
+      "reason": "Nothing in this model reads a thyroid-driven change in resting metabolic rate, so this effect is not shown."
+    },
+    "metabolic.ketogenesis": {
+      "label": "ketone production",
+      "reason": "This model has no ketone-body pool, so a change in ketone production changes nothing it shows."
+    },
+    "metabolic.proteinCatabolism": {
+      "label": "protein breakdown",
+      "reason": "This model has no muscle protein store, so a change in protein breakdown changes nothing it shows."
+    },
+    "metabolic.lipolysis": {
+      "label": "fat breakdown",
+      "reason": "This model has no fat store, and nothing in it writes or reads fat breakdown."
+    },
+    "renal.reninRelease": {
+      "label": "renin release",
+      "reason": "This model has no renin and angiotensin system, so a change in renin release changes nothing it shows."
+    },
+    "renal.erythropoiesis": {
+      "label": "red blood cell production by the kidney signal",
+      "reason": "Nothing in this model reads the kidney's erythropoietin drive, so red cell mass does not respond to it."
+    },
+    "blood.erythropoiesis": {
+      "label": "red blood cell production",
+      "reason": "This model does not change red cell production over time, so nothing writes or reads this effect."
+    },
+    "bone.resorption": {
+      "label": "bone breakdown",
+      "reason": "This model has no bone remodelling, so nothing writes or reads this effect."
+    },
+    "immune.histamineRelease": {
+      "label": "histamine release",
+      "reason": "Histamine is carried here by its own effects on blood vessels and airways, so this separate release label is only a record and changes nothing."
+    },
+    "vascular.tone": {
+      "label": "general vascular tone",
+      "reason": "Blood vessel tone is carried here by systemic resistance, so this separate label is only a record; the drug's effect on resistance is still modelled."
+    }
+  }
+}
