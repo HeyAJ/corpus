@@ -66,14 +66,23 @@ export function stepFluids(s: SimState, dt: number): void {
 
   f.interstitial -= shift;
   s.cardio.veins.V += shift;
-  // The fluid that crosses the capillary wall is plasma ultrafiltrate: it takes its
-  // sodium, potassium and chloride with it. Left untagged, `rebalanceElectrolytes` read
-  // the return of an infused litre to the interstitium as plasma WATER being lost and
-  // concentrated the serum sodium by about 4 mEq/L on top of the infusion itself (a litre
-  // of normal saline read 146.8 instead of the ~142.8 mass balance gives). It is tagged
-  // so the electrolytes ignore it while the haematocrit and albumin, which the fluid does
-  // not carry, still dilute by it (haemodilution after a bleed is preserved).
-  s.cardio.solutedShift_mL += shift;
+  // PLASMA LEAVING THE VESSELS CARRIES ITS ELECTROLYTES. When the circulation is over-full
+  // (after an infusion) the surplus crosses the capillary wall as plasma ultrafiltrate,
+  // taking its sodium, potassium and chloride with it. Left untagged,
+  // `rebalanceElectrolytes` read that outflow as plasma WATER being lost and concentrated
+  // the serum sodium by about 4 mEq/L on top of the infusion itself (a litre of normal
+  // saline read 146.8 instead of the ~142.8 mass balance gives). It is tagged so the
+  // electrolytes ignore it, while the haematocrit and albumin, which the fluid does not
+  // carry, still move with it.
+  //
+  // ONLY THE OUTWARD DIRECTION IS TAGGED, and that asymmetry is a stated model choice, not
+  // physiology. The model has no renal sodium excretion, so the resting kidney's urine
+  // is, to the electrolytes, a loss of free water, and it is the INWARD refill from the
+  // interstitium that exactly offsets it. Tagging the inward refill as well removed that
+  // balance and a resting body drifted from 142 to 157 mEq/L sodium in 24 hours (this
+  // change was tried and measured, and failed the 24 h homeostasis test). Until the kidney
+  // excretes solute, the inward refill must keep diluting as it always did.
+  if (shift < 0) s.cardio.solutedShift_mL += shift;
 
   // --- capillary leak ------------------------------------------------------
   //
