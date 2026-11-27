@@ -227,5 +227,9 @@
   .layers {
     left: calc(var(--inset-hud) + 46px + 10px);
     bottom: var(--corpus-dock-bottom, 8px);
+    /* Above the bottom bar (z-index 45, app.module.css): the chip now stands inside the bar's
+       box, and the full-width dock nav, though it takes no pointer events, is painted over a
+       chip beneath it (the checker's COVERED, 5 of 5 points, 844 x 390). */
+    z-index: 46;
   }
 }

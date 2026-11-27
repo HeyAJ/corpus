@@ -260,11 +260,11 @@
       "id": "intestine_small",
       "triangles": 6840,
       "budget": 9000,
-      "boundingRadius_m": 0.0981,
+      "boundingRadius_m": 0.08786,
       "worldCentre_m": [
-        0.0002,
-        -0.086,
-        0.0007
+        -0.0003,
+        -0.0839,
+        0.0026
       ]
     },
     {
