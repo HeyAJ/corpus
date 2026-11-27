@@ -129,7 +129,7 @@ describe('glass body outline', () => {
     const layered = ORGAN_DEFS.filter((d) => d.layer);
     expect(layered.filter((d) => d.layer === 'muscles').map((d) => d.id).sort()).toEqual([
       'abdominal_wall_muscles', 'back_muscles', 'chest_wall_muscles', 'head_neck_muscles',
-      'hip_thigh_muscles', 'pelvic_floor_muscles', 'shoulder_arm_muscles',
+      'hip_thigh_muscles', 'pelvic_floor_muscles', 'pelvic_floor_muscles_female', 'shoulder_arm_muscles',
     ]);
     for (const d of layered) expect(fitted.has(d.id), d.id).toBe(false);
   });
@@ -142,7 +142,8 @@ describe('glass body outline', () => {
     // claim, in the three bodies the layer can be shown on, and the worst margin of each is the message.
     for (const body of [BODIES[0], BODIES[1], BODIES[3]]) {
       const model = outlineModel(samplesOf(body.body), body.body);
-      for (const def of ORGAN_DEFS.filter((d) => d.layer === 'muscles')) {
+      // An organ of the other sex is never drawn in this body (OrganSet applies `sex` to a layer organ too), so it has no glass to be inside of.
+      for (const def of ORGAN_DEFS.filter((d) => d.layer === 'muscles' && (!d.sex || d.sex === body.body.sex))) {
         let worst = -Infinity;
         for (const v of worldVertices(def, shell(def, 0))) worst = Math.max(worst, model.field(v.x, v.y, v.z));
         expect(worst, `${body.name}: ${def.id} worst vertex relative to the glass (m, negative is inside)`).toBeLessThanOrEqual(-MUSCLE_SKIN_M);

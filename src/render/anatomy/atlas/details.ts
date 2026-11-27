@@ -45,6 +45,7 @@ import { detail as backMuscles } from './back_muscles.detail';
 import { detail as shoulderArmMuscles } from './shoulder_arm_muscles.detail';
 import { detail as hipThighMuscles } from './hip_thigh_muscles.detail';
 import { detail as pelvicFloorMuscles } from './pelvic_floor_muscles.detail';
+import { detail as pelvicFloorMusclesFemale } from './pelvic_floor_muscles_female.detail';
 import { detail as lowerLimbBones } from './lower_limb_bones.detail';
 
 /**
@@ -99,4 +100,5 @@ export const DETAIL_SPECS: Record<string, OrganDetailSpec> = {
   shoulder_arm_muscles: shoulderArmMuscles,
   hip_thigh_muscles: hipThighMuscles,
   pelvic_floor_muscles: pelvicFloorMuscles,
+  pelvic_floor_muscles_female: pelvicFloorMusclesFemale,
 };

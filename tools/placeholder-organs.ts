@@ -66,6 +66,10 @@ const BUDGET: Record<string, number> = {
   back_muscles: 10000,
   shoulder_arm_muscles: 10000,
   hip_thigh_muscles: 12000,
+  // The female pelvic floor is perforated: its perineal membrane is a closed slab cut by openings for the urethra and the vagina, and it
+  // is 4,800 of the 9,588 triangles measured. A LOAD AND PERFORMANCE CHOICE (a little above what is drawn), not an anatomical number. The
+  // male twin is a quarter of this and keeps the default.
+  pelvic_floor_muscles_female: 10000,
 };
 const DEFAULT_BUDGET = 8000;
 const TOTAL_BUDGET = 240000;

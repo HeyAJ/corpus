@@ -11,7 +11,7 @@ import { activityColour, activityColourBelow } from './activityRamp';
 import { ALARM_HEX } from './alarmOrgans';
 import { amnioticSacRadii } from '../anatomy/atlas/uterus.parts';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
-import { LAYER_LOOK, layerBuildNeeded, layerOrganVisible, noLayers, type LayerFlags, type LayerId } from './layers';
+import { LAYER_LOOK, layerBuildNeeded, layerOrganInBody, layerOrganVisible, noLayers, type LayerFlags, type LayerId } from './layers';
 
 /**
  * THE ORGAN SET.
@@ -517,9 +517,14 @@ export class OrganSet {
     for (const h of this.organs.values()) {
       const layer = h.def.layer;
       if (!layer) continue;
-      const selected = this.selectedId === h.id;
-      this.setDrawn(h, layerOrganVisible(layer, this.layers, selected));
-      if (layerBuildNeeded(layer, this.layers, selected, h.built, h.building)) this.build(h, 0);
+      // An organ of the other sex is neither drawn, picked nor built, whatever the layer says, and it
+      // cannot stay the selected organ: switching the body's sex while the male pelvic floor is open
+      // would otherwise leave a selection that names an organ this body does not have.
+      const inBody = layerOrganInBody(h.def.sex, this.body.sex);
+      if (!inBody && this.selectedId === h.id) this.selectedId = null;
+      const selected = inBody && this.selectedId === h.id;
+      this.setDrawn(h, inBody && layerOrganVisible(layer, this.layers, selected));
+      if (inBody && layerBuildNeeded(layer, this.layers, selected, h.built, h.building)) this.build(h, 0);
     }
     this.refreshPickTargets();
   }

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
-import { giPath, giSegment, warpGeometry } from '../layout';
-import { APPENDIX_PATH } from '../models';
+import { warpGeometry } from '../layout';
+import { APPENDIX_PATH, colonPath, colonSegment } from '../models';
 import { mulberry32 } from '../noise';
 import { mergeParts, tubeAlong } from '../sdf';
 import type { V3 } from '../sdf';
@@ -83,12 +83,12 @@ function setup(): { curve: THREE.CatmullRomCurve3; calibre: number[] } {
   if (cached !== null) return cached;
   const calibre: number[] = [];
   for (const s of SEGMENTS) {
-    const n = giSegment(s).length;
+    const n = colonSegment(s).length;
     for (let i = calibre.length === 0 ? 0 : 1; i < n; i++) calibre.push(CALIBRE[s]);
   }
   calibre[calibre.length - 1] = 0.008; // anal canal
   const curve = new THREE.CatmullRomCurve3(
-    giPath([...SEGMENTS]).map((p) => new THREE.Vector3(p[0], p[1], p[2])),
+    colonPath([...SEGMENTS]).map((p) => new THREE.Vector3(p[0], p[1], p[2])),
     false,
     'catmullrom',
     TENSION,
@@ -140,7 +140,7 @@ export function segmentEnds(): number[] {
   const curve = setup().curve;
   return SEGMENTS.map((s, i) => {
     if (i === SEGMENTS.length - 1) return 1;
-    const pts = giSegment(s);
+    const pts = colonSegment(s);
     return nearestU(curve, pts[pts.length - 1]);
   });
 }

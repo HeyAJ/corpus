@@ -830,6 +830,7 @@
       "id": "pelvic_floor_muscles",
       "displayName": "Pelvic Floor Muscles",
       "system": "muscular",
+      "sex": "male",
       "group": "pelvic",
       "layer": "muscles",
       "panel": "muscular",
@@ -837,6 +838,23 @@
       "placeholder": {
         "kind": "model",
         "model": "pelvic_floor_muscles"
+      },
+      "position": [0, -0.2, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "pelvic_floor_muscles_female",
+      "displayName": "Pelvic Floor Muscles",
+      "system": "muscular",
+      "sex": "female",
+      "group": "pelvic",
+      "layer": "muscles",
+      "panel": "muscular",
+      "selectedColor": "#C26A60",
+      "placeholder": {
+        "kind": "model",
+        "model": "pelvic_floor_muscles_female"
       },
       "position": [0, -0.2, 0],
       "layoutOffset": [0, 0, 0],

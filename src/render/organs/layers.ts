@@ -45,6 +45,18 @@ export function layerOrganVisible(layer: LayerId | undefined, flags: LayerFlags,
 }
 
 /**
+ * Does this body have this layer organ at all? A layer organ may belong to one sex only (the female
+ * pelvic floor has a urogenital hiatus, a female urethra and vagina to be placed on; the male one
+ * does not, and the two are separate organs for that reason). The ordinary body rule that hides an
+ * organ of the other sex lives in OrganSet.wants, which a layer organ never reaches, so without this
+ * a female pelvic floor would be drawn in a male body whenever Muscles was on, or whenever it was
+ * the selected organ when the sex was switched. An organ with no sex belongs to every body.
+ */
+export function layerOrganInBody(organSex: 'male' | 'female' | undefined, bodySex: 'male' | 'female'): boolean {
+  return organSex === undefined || organSex === bodySex;
+}
+
+/**
  * Should a build be requested now? Only for a layer organ that is wanted (visible by the rule
  * above), has not been built, and is not already being built. An organ with no layer is built
  * by the body rule instead, so this answers false for it.

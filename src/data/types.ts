@@ -32,7 +32,7 @@ export type OrganId =
   | 'skull' | 'vertebral_column' | 'thoracic_cage' | 'upper_limb_bones' | 'lower_limb_bones'
   /* muscles (layer organs) */
   | 'head_neck_muscles' | 'chest_wall_muscles' | 'abdominal_wall_muscles' | 'back_muscles'
-  | 'shoulder_arm_muscles' | 'hip_thigh_muscles' | 'pelvic_floor_muscles';
+  | 'shoulder_arm_muscles' | 'hip_thigh_muscles' | 'pelvic_floor_muscles' | 'pelvic_floor_muscles_female';
 
 /**
  * Body regions of the exploded stack. `axial` is for structures that run through more

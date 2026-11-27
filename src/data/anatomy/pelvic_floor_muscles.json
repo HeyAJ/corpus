@@ -1,6 +1,6 @@
 {
   "atlas": "pelvic_floor_muscles",
-  "about": "The muscles that close the bottom of the pelvis: the levator ani (its puborectalis, pubococcygeus and iliococcygeus parts), the coccygeus, the tendinous arch they arise from, and the perineal muscles that no other atlas draws: the perineal membrane, the deep and superficial transverse perineal muscles and the external urethral sphincter. The levator ani is drawn as a bowl hung from the pubis, the tendinous arch and the coccyx with an open middle for the urethra, vagina and rectum. It is one geometry for a male and a female body. The external anal sphincter, the bulbospongiosus and ischiocavernosus and the perineal body belong to the large intestine, penis and vagina atlases. The model's pelvic organs hang lower than its pelvic bones, so the floor hangs lower than its bony rim. The drives are the whole-body ones the engine has: muscle tone, paralysis, a seizure, and orgasm for the perineal muscles. Continence, bladder and bowel control and the effort of the pelvic floor are not simulated. Outlines and thicknesses are drawing choices.",
+  "about": "The muscles that close the bottom of the pelvis: the levator ani (its puborectalis, pubococcygeus and iliococcygeus parts), the coccygeus, the tendinous arch they arise from, and the perineal muscles that no other atlas draws: the perineal membrane, the deep and superficial transverse perineal muscles and the external urethral sphincter. The levator ani is drawn as a bowl hung from the pubis, the tendinous arch and the coccyx with an open middle for the urethra, vagina and rectum. It is the male pelvic floor and is drawn only in a male body; a female body has its own twin, pelvic_floor_muscles_female. The external anal sphincter, the bulbospongiosus and ischiocavernosus and the perineal body belong to the large intestine, penis and vagina atlases. The model's pelvic organs hang lower than its pelvic bones, so the floor hangs lower than its bony rim. The drives are the whole-body ones the engine has: muscle tone, paralysis, a seizure, and orgasm for the perineal muscles. Continence, bladder and bowel control and the effort of the pelvic floor are not simulated. Outlines and thicknesses are drawing choices.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -140,7 +140,7 @@
       "id": "perineal_membrane",
       "label": "Perineal membrane",
       "parent": "perineal_muscles",
-      "summary": "The tough triangular sheet of fascia that spans the pubic arch below the pelvic floor, with the urethra (and, in a woman, the vagina) passing through it.",
+      "summary": "The tough triangular sheet of fascia that spans the pubic arch below the pelvic floor, with the urethra passing through it.",
       "function": "It anchors the muscles and the root of the genitals to the pubic arch. In this model the pelvic organs hang lower than the bones, so the membrane is drawn as two wings that leave the midline open.",
       "color": "#d8c3a5",
       "rest": 0.1,
@@ -174,7 +174,7 @@
       "label": "External urethral sphincter",
       "parent": "perineal_muscles",
       "summary": "The ring of skeletal muscle that surrounds the urethra in the deep perineal pouch, below the bladder neck.",
-      "function": "It closes the urethra at will and so holds urine in. It is drawn at the position of the male membranous urethra; a woman's urethra lies further forward, so in a female body the one ring does not surround it.",
+      "function": "It closes the urethra at will and so holds urine in. It is drawn round the male membranous urethra, just below the prostate's apex.",
       "color": "#9a4a44",
       "rest": 0.3,
       "drives": [],

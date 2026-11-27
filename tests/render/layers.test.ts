@@ -7,6 +7,7 @@ import {
   MUSCLE_DENSITY,
   MUSCLE_TINT,
   layerBuildNeeded,
+  layerOrganInBody,
   layerOrganVisible,
   noLayers,
 } from '../../src/render/organs/layers';
@@ -92,5 +93,23 @@ describe('muscle look', () => {
     const b = MUSCLE_TINT & 255;
     expect(r).toBeGreaterThan(g);
     expect(r).toBeGreaterThan(b);
+  });
+});
+
+describe('a layer organ of one sex', () => {
+  it('is drawn only in its own body, whatever the layer or the selection says', () => {
+    const on = { ...noLayers(), muscles: true };
+    // The rule OrganSet applies: in the body AND (layer on OR selected).
+    const drawn = (organSex: 'male' | 'female' | undefined, bodySex: 'male' | 'female', flags: typeof on, selected: boolean): boolean =>
+      layerOrganInBody(organSex, bodySex) && layerOrganVisible('muscles', flags, selected);
+    expect(drawn('female', 'female', on, false)).toBe(true);
+    expect(drawn('female', 'male', on, false)).toBe(false);
+    expect(drawn('female', 'male', noLayers(), true)).toBe(false);
+    expect(drawn('male', 'female', on, true)).toBe(false);
+    expect(drawn('male', 'male', noLayers(), true)).toBe(true);
+    expect(drawn('male', 'male', noLayers(), false)).toBe(false);
+    // An organ with no sex belongs to every body.
+    expect(layerOrganInBody(undefined, 'male')).toBe(true);
+    expect(layerOrganInBody(undefined, 'female')).toBe(true);
   });
 });

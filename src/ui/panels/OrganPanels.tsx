@@ -543,6 +543,7 @@ function telemetryFor(id: string, s: SimSnapshot): Telemetry | null {
     case 'shoulder_arm_muscles':
     case 'hip_thigh_muscles':
     case 'pelvic_floor_muscles':
+    case 'pelvic_floor_muscles_female':
       // ONE honest set of readings for every muscle group, because the engine has no per-muscle
       // state: only whole-body skeletal muscle tone, the exertion the body is performing, and the
       // somatic motor outflow (which the engine raises for voluntary effort, shivering and a

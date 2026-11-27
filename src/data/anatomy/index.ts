@@ -45,6 +45,7 @@ import backMuscles from './back_muscles.json';
 import shoulderArmMuscles from './shoulder_arm_muscles.json';
 import hipThighMuscles from './hip_thigh_muscles.json';
 import pelvicFloorMuscles from './pelvic_floor_muscles.json';
+import pelvicFloorMusclesFemale from './pelvic_floor_muscles_female.json';
 import lowerLimbBones from './lower_limb_bones.json';
 
 /**
@@ -100,6 +101,7 @@ export const ANATOMY: Record<string, AnatomyFile> = {
   shoulder_arm_muscles: shoulderArmMuscles as unknown as AnatomyFile,
   hip_thigh_muscles: hipThighMuscles as unknown as AnatomyFile,
   pelvic_floor_muscles: pelvicFloorMuscles as unknown as AnatomyFile,
+  pelvic_floor_muscles_female: pelvicFloorMusclesFemale as unknown as AnatomyFile,
 };
 
 export const ANATOMY_ATLASES: readonly string[] = Object.keys(ANATOMY);

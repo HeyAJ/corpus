@@ -38,6 +38,7 @@ import { backMuscles } from './shells/back_muscles';
 import { shoulderArmMuscles } from './shells/shoulder_arm_muscles';
 import { hipThighMuscles } from './shells/hip_thigh_muscles';
 import { pelvicFloorMuscles } from './shells/pelvic_floor_muscles';
+import { pelvicFloorMusclesFemale } from './shells/pelvic_floor_muscles_female';
 import { lowerLimbBones } from './shells/lower_limb_bones';
 
 /**
@@ -638,16 +639,72 @@ function intestineSmall(): THREE.BufferGeometry {
   );
 }
 
+/**
+ * The four segments of the large bowel whose centrelines are drawn HERE and not read from
+ * organs.json, body coordinates (unexploded, before the axial warp). The authored
+ * organs.json lines put the caecum and the lower ascending colon straight through the plate of
+ * the right ilium and the descending colon and the start of the sigmoid through the left one
+ * (the first measurement found the shell 5.5 mm inside the hip bone and the iliacus 12.2 mm
+ * inside the bowel), because the iliac fossa is a bowed plate that curves medially below the
+ * level of the crest and the authored points were written without the bone to hand. The
+ * transverse colon and the rectum are untouched and still come from organs.json, and the
+ * first point of the caecum and the last of the sigmoid are the same points, so the joints
+ * with the ileum side, the transverse colon and the rectum do not move.
+ */
+export const COLON_CENTRELINES: Record<string, [number, number, number][]> = {
+  caecum: [
+    [0.046, -0.093, 0.008],
+    [0.054, -0.081, 0.012],
+    [0.062, -0.069, 0.01],
+  ],
+  colon_ascending: [
+    [0.062, -0.069, 0.01],
+    [0.074, -0.041, 0.0],
+    [0.08, -0.016, -0.012],
+  ],
+  colon_descending: [
+    [-0.082, -0.0, -0.01],
+    [-0.079, -0.045, -0.012],
+    [-0.068, -0.081, -0.004],
+  ],
+  colon_sigmoid: [
+    [-0.068, -0.081, -0.004],
+    [-0.05, -0.1, 0.004],
+    [-0.046, -0.125, 0.008],
+    [-0.03, -0.15, 0.012],
+    [-0.005, -0.14, 0.0],
+    [0.0, -0.1579, -0.02],
+  ],
+};
+
+/** One large-bowel segment's centreline: ours where we drew it, else the authored one. */
+export function colonSegment(segment: string): [number, number, number][] {
+  return COLON_CENTRELINES[segment] ?? giSegment(segment);
+}
+
+/** Several large-bowel segments joined end to end, the shared joint written once (as `giPath` does). */
+export function colonPath(segments: readonly string[]): [number, number, number][] {
+  const out: [number, number, number][] = [];
+  for (const s of segments) {
+    const pts = colonSegment(s);
+    for (let i = 0; i < pts.length; i++) {
+      if (i === 0 && out.length > 0) continue;
+      out.push(pts[i]);
+    }
+  }
+  return out;
+}
+
 /** The appendix, body coordinates, off the base of the caecum. */
 export const APPENDIX_PATH: [number, number, number][] = [
-  [0.074, -0.134, -0.012],
-  [0.064, -0.15, -0.006],
-  [0.058, -0.168, -0.002],
+  [0.044, -0.107, 0.0],
+  [0.04, -0.125, -0.002],
+  [0.034, -0.1397, -0.006],
 ];
 
 function intestineLarge(): THREE.BufferGeometry {
   const segments = ['caecum', 'colon_ascending', 'colon_transverse', 'colon_descending', 'colon_sigmoid', 'rectum'];
-  const path = giPath(segments);
+  const path = colonPath(segments);
 
   // Calibre at each authored point: widest at the caecum, narrowing round the frame,
   // widening again at the rectal ampulla and closing at the anal canal.
@@ -661,7 +718,7 @@ function intestineLarge(): THREE.BufferGeometry {
     rectum: 0.018,
   };
   for (const s of segments) {
-    const n = giSegment(s).length;
+    const n = colonSegment(s).length;
     for (let i = calibreAt.length === 0 ? 0 : 1; i < n; i++) calibreAt.push(table[s]);
   }
   calibreAt[calibreAt.length - 1] = 0.008; // anal canal
@@ -1115,6 +1172,7 @@ const BUILDERS: Record<string, (params: ModelParams) => THREE.BufferGeometry> = 
   shoulder_arm_muscles: shoulderArmMuscles,
   hip_thigh_muscles: hipThighMuscles,
   pelvic_floor_muscles: pelvicFloorMuscles,
+  pelvic_floor_muscles_female: pelvicFloorMusclesFemale,
 };
 
 export function modelNames(): string[] {
