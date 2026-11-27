@@ -62,11 +62,11 @@ const CRYPT_H = 0.0055;
 const CRYPT_AT = { u: 0.12, angle: 1.9 } as const;
 const SEGMENTS = ['caecum', 'colon_ascending', 'colon_transverse', 'colon_descending', 'colon_sigmoid', 'rectum'] as const;
 const CALIBRE: Record<string, number> = {
-  caecum: 0.0235,
-  colon_ascending: 0.021,
+  caecum: 0.0205,
+  colon_ascending: 0.0185,
   colon_transverse: 0.019,
-  colon_descending: 0.0165,
-  colon_sigmoid: 0.0145,
+  colon_descending: 0.0145,
+  colon_sigmoid: 0.013,
   rectum: 0.018,
 };
 /** Number of haustral half-waves in the shell's ripple, copied from models.ts (sin^2(t * pi * 58)). */

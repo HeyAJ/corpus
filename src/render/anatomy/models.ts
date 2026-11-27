@@ -653,26 +653,26 @@ function intestineSmall(): THREE.BufferGeometry {
  */
 export const COLON_CENTRELINES: Record<string, [number, number, number][]> = {
   caecum: [
-    [0.0548, -0.087, 0.0384],
-    [0.0634, -0.0651, 0.0376],
-    [0.0664, -0.0464, 0.0284],
+    [0.0499, -0.0848, 0.0387],
+    [0.0501, -0.0657, 0.0361],
+    [0.0585, -0.0444, 0.0363],
   ],
   colon_ascending: [
-    [0.0664, -0.0464, 0.0284],
-    [0.0705, -0.0264, 0.0052],
+    [0.0585, -0.0444, 0.0363],
+    [0.0718, -0.0299, 0.0041],
     [0.08, -0.016, -0.012],
   ],
   colon_descending: [
     [-0.082, -0.0, -0.01],
-    [-0.0749, -0.0575, -0.016],
-    [-0.0786, -0.0618, 0.0014],
+    [-0.0685, -0.0658, -0.0262],
+    [-0.0726, -0.0672, -0.014],
   ],
   colon_sigmoid: [
-    [-0.0786, -0.0618, 0.0014],
-    [-0.0813, -0.0738, 0.0361],
-    [-0.0619, -0.1079, 0.0426],
-    [-0.0471, -0.1304, 0.0419],
-    [-0.0159, -0.1573, 0.0154],
+    [-0.0726, -0.0672, -0.014],
+    [-0.0837, -0.076, 0.0332],
+    [-0.0472, -0.1031, 0.0449],
+    [-0.0372, -0.1178, 0.0453],
+    [0.0005, -0.161, 0.0239],
     [-0.005, -0.14, 0],
     [0, -0.158, -0.02],
   ],
@@ -698,9 +698,9 @@ export function colonPath(segments: readonly string[]): [number, number, number]
 
 /** The appendix, body coordinates, off the base of the caecum. */
 export const APPENDIX_PATH: [number, number, number][] = [
-  [0.052, -0.087, 0.026],
-  [0.044, -0.101, 0.018],
-  [0.036, -0.117, 0.012],
+  [0.0469, -0.0848, 0.0267],
+  [0.0389, -0.0988, 0.0187],
+  [0.0309, -0.1148, 0.0127],
 ];
 
 function intestineLarge(): THREE.BufferGeometry {
@@ -711,11 +711,11 @@ function intestineLarge(): THREE.BufferGeometry {
   // widening again at the rectal ampulla and closing at the anal canal.
   const calibreAt: number[] = [];
   const table: Record<string, number> = {
-    caecum: 0.0235,
-    colon_ascending: 0.021,
+    caecum: 0.0205,
+    colon_ascending: 0.0185,
     colon_transverse: 0.019,
-    colon_descending: 0.0165,
-    colon_sigmoid: 0.0145,
+    colon_descending: 0.0145,
+    colon_sigmoid: 0.013,
     rectum: 0.018,
   };
   for (const s of segments) {
