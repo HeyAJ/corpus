@@ -436,6 +436,14 @@ spec.psoas_minor = {
     return [wallBelly([a, lumbarSide('l3', s, -0.001), onSide(b, s)], 0.0022, k, { ends: 0.3, shape: 0.5, tubular: 12, radial: 5 })];
   },
 };
+/**
+ * The iliacus sheet's thickness, a display choice (no thickness is cited here): 3.0 mm, up from 1.8 mm, so the muscle
+ * reads as a muscle lining the fossa and not as a film. It is bounded above by the room the bowel leaves: the colon
+ * (COLON_CENTRELINES in models.ts) is held at least 4.3 mm from the hip bone on the left and more on the right, and
+ * the sheet stands 0.6 mm off the bone, so 3.0 mm leaves the colon at least 0.7 mm clear of the muscle. The first
+ * version of this sheet was thin because the stylised colon lay in the bone and no thickness could have cleared it.
+ */
+const ILIACUS_T = 0.003;
 // ILIACUS: from the iliac fossa (the smooth inner face of the plate) to the tendon of the psoas major and the lesser trochanter.
 spec.iliacus = {
   parent: 'posterior_abdominal_wall',
@@ -446,7 +454,7 @@ spec.iliacus = {
     const rowsY = ys.map((y) => [0.09, 0.07, 0.05].map((sv): V3 => onSide(P(wingPoint(sv, y, -0.0062)), s)));
     const T: V3[] = [0, 1, 2].map((i): V3 => [target[0] + (i - 1) * 0.0015, target[1] + 0.0015, target[2] + (i - 1) * 0.0025]);
     // Gray's: the iliacus is a flat fan that lines the iliac fossa; the caecum and the sigmoid colon rest on it, so it must lie between bone and bowel. Its inner face is the fossa (0.7 mm clear of the bone) and it is thin, standing medially from the bone: `away` is a point beyond the plate's outer face so the thickness is on the bowel side.
-    return [ruled(clearRows([...rowsY, T], 0.0006), 0.0018, 3, 6, onSide(P(wingPoint(0.07, -0.07, 0.05)), s), k)];
+    return [ruled([...clearRows(rowsY, 0.0006), ...clearRows([T], ILIACUS_T / 2 + 0.0006)], ILIACUS_T, 3, 6, onSide(P(wingPoint(0.07, -0.07, 0.05)), s), k)];
   },
 };
 // QUADRATUS LUMBORUM: from the iliac crest (and the iliolumbar ligament) up to the lower border of the twelfth rib and the tips of the transverse processes of the upper four lumbar vertebrae, behind the kidney. Its path is carried back past the kidney's posterior face (scene z -0.071 at its back wall) so it lies behind the organ and not through it.
