@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { ORGAN_DEFS, organPosition, warpPoint } from '../../src/render/anatomy/layout';
 import { buildModel } from '../../src/render/anatomy/models';
 import { buildCentrelines } from '../../src/render/vascular/centrelines';
-import { organSamples } from '../../src/render/body/organSamples';
+import { MUSCLE_SKIN_M, organSamples } from '../../src/render/body/organSamples';
 import { outlineModel, SAMPLE_STRIDE, type OutlineBody } from '../../src/render/body/outlineModel';
 import { buildOutline, OUTLINE_MAX_TRIANGLES } from '../../src/render/body/outlineMesh';
 import type { OrganDef } from '../../src/data/types';
@@ -134,20 +134,19 @@ describe('glass body outline', () => {
     for (const d of layered) expect(fitted.has(d.id), d.id).toBe(false);
   });
 
-  it('the stub muscle shells stay close to the glass figure (a regression bound, not a containment claim)', { timeout: 60000 }, () => {
-    // The figure is fitted to the organs the body always has, and the muscles are drawn OUTSIDE
-    // the ribs and the viscera, so a muscle sheet over the chest or the abdominal wall can stand
-    // a few millimetres beyond the glass. Unlike the bones (kept inside by a landmark sample in
-    // organSamples.ts) the muscles are NOT contained: this test pins how far they stand out, so
-    // that a content agent who thickens a muscle sees the number move. The bound is the worst
-    // measured excess for the stubs (6.3 mm, the chest wall) rounded up; 0.008 m is a regression
-    // bound and not an anatomical figure. The head, back, arm and pelvic floor are inside it.
-    const body: OutlineBody = { sex: 'male', weeks: 0 };
-    const model = outlineModel(samplesOf(body), body);
-    for (const def of ORGAN_DEFS.filter((d) => d.layer === 'muscles')) {
-      let worst = -Infinity;
-      for (const v of worldVertices(def, shell(def, 0))) worst = Math.max(worst, model.field(v.x, v.y, v.z));
-      expect(worst, `${def.id} stands out of the glass by`).toBeLessThan(0.008);
+  it('the skin covers the muscles: every vertex of all seven muscle shells is inside the glass by the skin margin', { timeout: 120000 }, () => {
+    // The glass is the skin, and skin covers the muscles whether or not the Muscles layer is shown. The
+    // muscles are layer organs, built lazily and left out of the fit, so the figure meets them through the
+    // body-wall landmark samples in organSamples.ts. This replaced a regression bound of 8 mm that had
+    // been a confession (the iliotibial tract stood 13.3 mm outside the glass); it is now a containment
+    // claim, in the three bodies the layer can be shown on, and the worst margin of each is the message.
+    for (const body of [BODIES[0], BODIES[1], BODIES[3]]) {
+      const model = outlineModel(samplesOf(body.body), body.body);
+      for (const def of ORGAN_DEFS.filter((d) => d.layer === 'muscles')) {
+        let worst = -Infinity;
+        for (const v of worldVertices(def, shell(def, 0))) worst = Math.max(worst, model.field(v.x, v.y, v.z));
+        expect(worst, `${body.name}: ${def.id} worst vertex relative to the glass (m, negative is inside)`).toBeLessThanOrEqual(-MUSCLE_SKIN_M);
+      }
     }
   });
 

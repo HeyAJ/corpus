@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { organPosition } from '../anatomy/layout';
 import type { OrganDef } from '../../data/types';
-import { EXTERNAL_FLAG, SAMPLE_STRIDE } from './outlineModel';
+import { EXTERNAL_FLAG, HEAD_MARGIN_M, SAMPLE_STRIDE, SKIN_MARGIN_M } from './outlineModel';
 
 /**
  * THE POINTS A GLASS FIGURE IS FITTED TO: a thinned copy of an organ's vertices, moved
@@ -46,6 +46,80 @@ const SKELETAL_LANDMARKS: Readonly<Record<string, readonly (readonly [number, nu
   brain: [[0, 0.4086, -0.0871, 0.009]],
 };
 
+/**
+ * THE SKIN COVERS THE MUSCLES, WHETHER OR NOT THE MUSCLES ARE SHOWN.
+ *
+ * Every muscle vertex must lie at least this far inside the glass, metres. A DISPLAY choice: the
+ * thickness of the skin drawn over the outermost muscle, a millimetre so the muscle never grazes
+ * the surface. `tests/render/body-outline.test.ts` pins it for all seven muscle organs in the male,
+ * the non-pregnant female and the 28-week bodies.
+ */
+export const MUSCLE_SKIN_M = 0.001;
+
+/**
+ * What went wrong first: the glass was fitted to the viscera (about 4 mm over the ribs) and the
+ * seven muscle layer organs, which are excluded from the fit like every layer organ, stood outside
+ * it by up to 13.3 mm (the iliotibial tract), 7.5 mm (trapezius and the erector columns), 5.5 mm
+ * (the rectus sheath) and 4.8 mm (pectoralis major). A real body wall is muscle and then skin, so
+ * the skin has to be drawn round the muscles even when only the skin is on screen. The muscles
+ * are built lazily (CLAUDE.md), so the figure cannot be fitted to their meshes; a handful of
+ * landmark samples carry the outermost muscle surface into the fit instead.
+ *
+ * HOW THE TABLE WAS DERIVED. Each row is the outermost vertex of a muscle shell that the glass did
+ * not contain, found by building the seven shells and taking, per 24 mm band of height and per
+ * side (front or back of the trunk, outer side of the hip), the vertex furthest outside the figure:
+ * [x, y, z, axis, direction]. Rows are mirrored across the midline in code. The fit adds the skin
+ * margin to every sample, so each row is moved INWARD along its axis by that margin less
+ * MUSCLE_SKIN_M; the surface of the figure then lands MUSCLE_SKIN_M outside the muscle. Rows
+ * exist only where a muscle was outside, so nothing else bulges: the arms and legs still fade
+ * at the elbow and knee, and the thighs follow the hip's width through the fit's own rule (a
+ * thigh's outer edge is the hip's), which is why the hip rows sit at the pelvic floor and not
+ * down the thigh. The test proves the result against the real meshes; if a muscle builder is
+ * thickened, rerun the probe and extend the table.
+ */
+type WallRow = readonly [number, number, number, 'x' | 'z', 1 | -1, 'trunk' | 'head'];
+const BODY_WALL_MUSCLE_ROWS: readonly WallRow[] = [
+  // Pectoralis major and the chest wall, front.
+  [0.067, 0.096, 0.099, 'z', 1, 'trunk'],
+  [0.047, 0.120, 0.099, 'z', 1, 'trunk'],
+  [0.038, 0.144, 0.101, 'z', 1, 'trunk'],
+  [0.067, 0.168, 0.102, 'z', 1, 'trunk'],
+  [0.067, 0.192, 0.101, 'z', 1, 'trunk'],
+  [0.067, 0.216, 0.097, 'z', 1, 'trunk'],
+  // Rectus sheath and the abdominal wall, front.
+  [0.071, 0.072, 0.098, 'z', 1, 'trunk'],
+  [0.071, 0.096, 0.100, 'z', 1, 'trunk'],
+  [0.004, -0.096, 0.076, 'z', 1, 'trunk'],
+  [0.004, -0.120, 0.076, 'z', 1, 'trunk'],
+  // Trapezius, latissimus and the erector columns, back.
+  [0.016, -0.069, -0.116, 'z', -1, 'trunk'],
+  [0.043, 0.072, -0.119, 'z', -1, 'trunk'],
+  [0.014, 0.144, -0.128, 'z', -1, 'trunk'],
+  [0.044, 0.168, -0.127, 'z', -1, 'trunk'],
+  [0.016, 0.192, -0.127, 'z', -1, 'trunk'],
+  [0.048, 0.216, -0.122, 'z', -1, 'trunk'],
+  // The iliotibial tract and the gluteal region at the hip: the widest vertex of the thigh shell.
+  [0.127, -0.216, 0.0, 'x', 1, 'trunk'],
+  [0.125, -0.240, -0.005, 'x', 1, 'trunk'],
+  [0.125, -0.262, -0.005, 'x', 1, 'trunk'],
+  // The neck muscles, a fraction of a millimetre proud of the thinner head margin.
+  [0.084, 0.480, -0.031, 'x', 1, 'head'],
+  [0.084, 0.504, -0.024, 'x', 1, 'head'],
+];
+
+/** The rows as samples (x, y, z, 0), mirrored across the midline, moved inward by the margin less the skin. */
+function bodyWallSamples(): number[][] {
+  const out: number[][] = [];
+  for (const [x, y, z, axis, dir, kind] of BODY_WALL_MUSCLE_ROWS) {
+    const inset = (kind === 'head' ? HEAD_MARGIN_M : SKIN_MARGIN_M) - MUSCLE_SKIN_M;
+    for (const side of [1, -1]) {
+      if (axis === 'x') out.push([side * (x - inset * dir), y, z, 0]);
+      else out.push([side * x, y, z - inset * dir, 0]);
+    }
+  }
+  return out;
+}
+
 export function organSamples(def: OrganDef, geometry: THREE.BufferGeometry): Float32Array {
   const pos = geometry.getAttribute('position');
   if (!pos || pos.count === 0) return new Float32Array(0);
@@ -76,7 +150,9 @@ export function organSamples(def: OrganDef, geometry: THREE.BufferGeometry): Flo
   if (rot) m.makeRotationFromEuler(new THREE.Euler(rot[0], rot[1], rot[2], 'XYZ'));
   const v = new THREE.Vector3();
 
-  const landmarks = SKELETAL_LANDMARKS[def.id] ?? [];
+  const landmarks: (readonly number[])[] = [...(SKELETAL_LANDMARKS[def.id] ?? [])];
+  // The body wall rides with the diaphragm: it is in every body and is itself a muscle sheet of the trunk.
+  if (def.id === 'diaphragm') landmarks.push(...bodyWallSamples());
   const out = new Float32Array((picked.length + landmarks.length) * SAMPLE_STRIDE);
   for (let n = 0; n < picked.length; n++) {
     v.fromBufferAttribute(pos, picked[n]);
