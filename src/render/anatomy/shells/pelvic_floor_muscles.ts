@@ -76,7 +76,7 @@ function bowl(rim: THREE.CatmullRomCurve3, u: number, v: number): V3 {
 }
 
 /** A sector of the bowl as a sheet: u from u0 to u1, v from v0 to v1 (right half; the left is its mirror). */
-function sector(u0: number, u1: number, v0: number, v1: number, thick: number, nu: number, nv = 4): THREE.BufferGeometry {
+function sector(u0: number, u1: number, v0: number, v1: number, thick: number, nu: number, nv = 6): THREE.BufferGeometry {
   const rim = rimCurve();
   const rails: V3[][] = [];
   for (let i = 0; i <= nu; i++) {
@@ -96,11 +96,11 @@ export function pelvicFloorLeaves(): Record<string, THREE.BufferGeometry[]> {
   const out: Record<string, THREE.BufferGeometry[]> = {};
   const T = 0.004;
   // Puborectalis: the innermost ring, in a sling from the pubis round behind the anorectal junction.
-  out.puborectalis = pair(sector(0.0, 1.0, 0.0, 0.3, T, 8));
+  out.puborectalis = pair(sector(0.0, 1.0, 0.0, 0.3, T, 16));
   // Pubococcygeus: the front half of the outer bowl, from the pubis.
-  out.pubococcygeus = pair(sector(0.0, 0.45, 0.3, 1.0, T, 5));
+  out.pubococcygeus = pair(sector(0.0, 0.45, 0.3, 1.0, T, 8));
   // Iliococcygeus: the back half, from the tendinous arch to the coccyx.
-  out.iliococcygeus = pair(sector(0.45, 1.0, 0.3, 1.0, T, 6));
+  out.iliococcygeus = pair(sector(0.45, 1.0, 0.3, 1.0, T, 10));
 
   // Coccygeus: from the ischial spine to the side of the coccyx, along the back edge of the bowl.
   const spine = snap([SPINE_TIP[0] - 0.001, SPINE_TIP[1] - 0.003, SPINE_TIP[2] - 0.003], 0.0003);
