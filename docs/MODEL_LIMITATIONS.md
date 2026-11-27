@@ -976,3 +976,63 @@ nothing about bone itself.
 triangles of headroom, and the bones layer at 47,160 of 60,000. Both budgets are load and
 performance choices; the next organ added to the default body will need one of them raised or
 something else made smaller.
+
+---
+
+## 21. Muscles (2026-11-27)
+
+These are limits of the seven muscle organs and the Muscles layer (ADR-054 to ADR-056). None of
+them changes a number the simulation computes. Routes are illustrative, sizes are drawing choices,
+and the magnified schematics are not at true size or place.
+
+**What is and is not simulated.** The only muscle signals are the anatomy deriver's `rigidity`,
+`paralysis`, `seizure`, `exertion`, `shivering` (and `orgasm` on the perineal muscles). There is no
+per-muscle force, no fatigue and no muscle metabolism. There is no shiver tremor: `shivering`
+drives colour only, and the macroscopic muscles never move. The only display motions are the
+intercostals with the breath and the hyoid group with the swallow, both display amplitudes.
+
+**Where the muscles stop.** The skeleton has no radius, ulna or lower leg, so the arm muscles end
+in a short tendon at the elbow and the thigh muscles just below the knee. Gluteus maximus is drawn
+to the femur only, not to the iliotibial tract. The pectoralis major's abdominal part ends on the
+rectus sheath and not on bone, by design. The intercostal spaces are schematic strips with no fibre
+direction; the aponeuroses and the rectus sheath are thin glass; the inguinal canal is empty; the
+platysma is schematic.
+
+**Pelvic floor.** The geometry is the same in both bodies. The pelvic organs hang lower than the
+pelvic bones (a quirk of the model), so the levator bowl hangs `BOWL_DROP` 0.093 below its rim and
+the perineal membrane is two wings leaving the midline open. The external urethral sphincter ring
+sits at the male membranous-urethra position and does not surround a female urethra. In a male body the pelvic floor overlaps the testes and penis by 1.9 mm (none in a female body).
+
+**Overlaps with organs that could not be removed.**
+
+- The iliacus overlaps the large intestine by 12.2 mm (17.3 mm in the first pass). The cause is not
+  the muscle: the stylised colon itself lies on the iliac bone, with its vertices about 2 mm from
+  the hip surface, so no muscle can lie between them. The skeleton's clearance check covered the
+  uterus, ovaries and bladder and not the colon.
+- The psoas minor overlaps the large intestine by 9.1 mm after its move, and the psoas major the
+  pancreas by 1.5 mm.
+- Smaller contacts remain: the rotatores 0.6 mm into the diaphragm, gluteus minimus 1.4 mm into the
+  large intestine, adductor longus up to 4.4 mm into the testes (measured before a guide move and not
+  re-measured), gluteus maximus 2.7 mm into the uterus (female), the sternothyroid and thyrohyoid
+  2.7 and 2.8 mm into the salivary-glands organ, and the pharynx 0.6 mm.
+- The lung apex reaches y 0.326, so the scalenes and omohyoid are routed over it; the hyoid lies
+  within 6 mm of the mandible; the anterior superior iliac spine lies outside the trunk ellipse.
+  These are conflicts of the stylised model that were stated, not cleared.
+
+**Bone clearance is by vertex.** Every vertex is out of bone (at least -0.2 mm), but the centroids
+of large sheet triangles dip into bone: up to 5.44 mm for latissimus dorsi, 5.92 mm for gluteus
+maximus and 0.21 mm for the pelvic floor. Bone penetration by vertex remains 0.89 mm in the head
+and neck, 1.68 mm in the chest wall and 1.77 mm in the abdominal wall (the ligaments). The
+trapezius and latissimus leave only a 3 to 4 mm layer for the muscles on the back of the scapula.
+Attachments are within about 3.6 mm of the bone at worst.
+
+**Magnified schematics.** The fascicle, muscle fibre, sarcomere, neuromuscular junction, muscle
+spindle and Golgi tendon organ are drawn inside the right biceps only, at many times life size.
+The sarcomere shift between rest and exercise is subtle because exertion reached only 0.27
+activity in the render. The junction shows mechanisms of the blockers and the cholinesterase
+inhibitor, not doses.
+
+**The glass.** The skin is held outside the muscles by a 21-row landmark table, not by a fit to
+the muscle meshes. A thickened muscle can poke through until the table is extended; the
+containment test (worst margin from -1.4 mm to -12.0 mm across three bodies) is what catches it.
+The default silhouette is slightly fuller than before the muscles were added.
