@@ -5,11 +5,12 @@ import { createOrganAbsorptionMaterial, assertOrderIndependent } from '../materi
 import { createOrganRimMaterial, assertRimOrderIndependent } from '../materials/OrganRim';
 import { createOrganSolidMaterial, createFluidMaterial } from '../materials/OrganSolid';
 import { GeometryFactory } from '../anatomy/GeometryFactory';
-import { GI_CENTRELINES, ORGAN_DEFS, groupOffset as layoutGroupOffset, organPosition } from '../anatomy/layout';
+import { GI_CENTRELINES, ORGAN_DEFS, groupOffset as layoutGroupOffset, organDef as organDefOf, organPosition } from '../anatomy/layout';
 import { fetalFit, gravidBody, type FetalFit } from '../anatomy/models';
 import { activityColour, activityColourBelow } from './activityRamp';
 import { ALARM_HEX } from './alarmOrgans';
 import { amnioticSacRadii } from '../anatomy/atlas/uterus.parts';
+import { DISPLACED_ORGANS, pregnancyDisplacement, pushFraction, type UterusBody } from '../anatomy/pregnancyDisplacement';
 import { ANATOMY, atlasOf } from '../../data/anatomy';
 import { LAYER_LOOK, layerBuildNeeded, layerOrganInBody, layerOrganVisible, noLayers, type LayerFlags, type LayerId } from './layers';
 
@@ -276,6 +277,14 @@ export interface OrganHandle {
   fitWeek: number;
   rawCentre: THREE.Vector3;
   rawRadius: number;
+  /**
+   * PREGNANCY DISPLACEMENT (see pregnancyDisplacement.ts). For an organ the uterus pushes aside:
+   * the positions exactly as the geometry factory built them, kept so that every week's
+   * displacement is computed from the BASE shape (never from the last week's displaced one, which
+   * would accumulate), and the week the live positions were last written for (-1: never).
+   */
+  basePositions: Float32Array | null;
+  displacedWeek: number;
 }
 
 export class OrganSet {
@@ -289,6 +298,13 @@ export class OrganSet {
   totalTriangles = 0;
 
   private body: BodyKind = { sex: 'male', pregnant: false, gestationWeeks: 0 };
+  /**
+   * Organs whose displaced positions are out of date because the week changed. They are rewritten
+   * a few per frame in `update` (a time-lapse changes the week every few frames and a rewrite of
+   * all eight organs, with normals, is several milliseconds), except that an organ that has just
+   * arrived is displaced at once so it is never drawn through the uterus.
+   */
+  private readonly displaceQueue = new Set<OrganHandle>();
   /** Which layers are switched on, and the selected organ: together they decide what a layer organ does. */
   private layers: LayerFlags = noLayers();
   private selectedId: OrganId | null = null;
@@ -450,6 +466,8 @@ export class OrganSet {
       fitWeek: -1,
       rawCentre: new THREE.Vector3(),
       rawRadius: 0.05,
+      basePositions: null,
+      displacedWeek: -1,
     };
   }
 
@@ -464,7 +482,10 @@ export class OrganSet {
     const previousWeek = this.body.pregnant ? Math.max(0, Math.round(this.body.gestationWeeks)) : 0;
     const changed = body.sex !== this.body.sex || body.pregnant !== this.body.pregnant || week !== previousWeek;
     this.body = { ...body };
-    if (changed) this.applyBody();
+    if (changed) {
+      this.applyBody();
+      this.queueDisplacement();
+    }
   }
 
   private wants(def: OrganDef): boolean {
@@ -592,6 +613,14 @@ export class OrganSet {
     h.solid.geometry = geometry;
     if (h.fluid) h.fluid.geometry = geometry;
     this.totalTriangles += triangleCount(geometry);
+    // A displaced organ keeps its base positions and is shown displaced for the current week.
+    h.basePositions = null;
+    h.displacedWeek = -1;
+    if (DISPLACED_ORGANS[h.id]) {
+      const position = geometry.getAttribute('position');
+      h.basePositions = Float32Array.from(position.array as ArrayLike<number>);
+      this.displace(h);
+    }
 
     const sphere = geometry.boundingSphere ?? new THREE.Sphere(new THREE.Vector3(), 0.05);
     h.centroid.copy(h.basePosition).add(sphere.center);
@@ -604,6 +633,69 @@ export class OrganSet {
     if (firstTime) h.appear = 0;
     this.setMeshVisibility(h);
     this.refreshPickTargets();
+  }
+
+  /** The gestational week the uterus is drawn at: 0 unless the body is pregnant. */
+  private currentWeek(): number {
+    return this.body.pregnant ? Math.max(0, Math.round(this.body.gestationWeeks)) : 0;
+  }
+
+  /** The uterus's ellipsoid in the world, or null when this body is not drawn with a gravid uterus. */
+  private uterusBody(week: number): UterusBody | null {
+    if (week < 6 || this.body.sex !== 'female') return null;
+    const { centre, radii } = gravidBody(week);
+    const o = organPosition(organDefOf('uterus'));
+    return { centre: [o.x + centre[0], o.y + centre[1], o.z + centre[2]], radii };
+  }
+
+  /**
+   * Write the displaced positions of one organ for the current week from its base positions, then
+   * refresh normals, bounds and the numbers the camera and labels read. The organs concerned
+   * have no rotation in organs.json, so the world point is the local one plus the organ's base
+   * position.
+   */
+  private displace(h: OrganHandle): void {
+    const base = h.basePositions;
+    const kind = DISPLACED_ORGANS[h.id];
+    if (!base || !kind) return;
+    const week = this.currentWeek();
+    const body = this.uterusBody(week);
+    const position = h.geometry.getAttribute('position') as THREE.BufferAttribute;
+    const live = position.array as Float32Array;
+    if (live.length !== base.length) return;
+    if (!body || pushFraction(week) <= 0) {
+      if (h.displacedWeek !== -1 && h.displacedWeek !== 0) live.set(base);
+      else if (h.displacedWeek === -1) live.set(base);
+    } else {
+      const o = h.basePosition;
+      const d: [number, number, number] = [0, 0, 0];
+      for (let i = 0; i < base.length; i += 3) {
+        pregnancyDisplacement(week, body, kind, base[i] + o.x, base[i + 1] + o.y, base[i + 2] + o.z, d);
+        live[i] = base[i] + d[0];
+        live[i + 1] = base[i + 1] + d[1];
+        live[i + 2] = base[i + 2] + d[2];
+      }
+    }
+    h.displacedWeek = week;
+    position.needsUpdate = true;
+    if (h.geometry.index) h.geometry.computeVertexNormals();
+    h.geometry.computeBoundingSphere();
+    h.geometry.computeBoundingBox();
+    const sphere = h.geometry.boundingSphere;
+    if (sphere) {
+      h.centroid.copy(h.basePosition).add(sphere.center);
+      h.boundingRadius = sphere.radius;
+      h.rawCentre.copy(sphere.center);
+      h.rawRadius = sphere.radius;
+    }
+  }
+
+  /** Mark every built, displaced organ for a rewrite at the current week. */
+  private queueDisplacement(): void {
+    const week = this.currentWeek();
+    for (const h of this.organs.values()) {
+      if (h.basePositions && h.built && h.displacedWeek !== week) this.displaceQueue.add(h);
+    }
   }
 
   private setMeshVisibility(h: OrganHandle): void {
@@ -675,6 +767,13 @@ export class OrganSet {
 
   /** Advance the state tweens, the fade-in and the activity tint. `dtMs` is real time. */
   update(dtMs: number): void {
+    // At most two displaced organs per frame: see `displaceQueue`.
+    let budget = 2;
+    for (const h of this.displaceQueue) {
+      this.displaceQueue.delete(h);
+      if (h.displacedWeek !== this.currentWeek()) this.displace(h);
+      if (--budget <= 0) break;
+    }
     const activityBlend = 1 - Math.exp(-dtMs / ACTIVITY_TAU_MS);
 
     // See RECEDE_DENSITY: 1 while some organ is open, eased so nothing pops.

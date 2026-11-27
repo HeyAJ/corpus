@@ -1,7 +1,7 @@
 {
   "generatedBy": "tools/placeholder-organs.ts",
   "note": "Bounding spheres and centroids of the authored organ shells, in the BODY frame (+x = the patient's right; the renderer mirrors x). Anything that replaces a shell must match these within a few millimetres, or the camera focus animation and the sim-driven pulse scaling will be framed on the wrong point.",
-  "totalTriangles": 233184,
+  "totalTriangles": 234780,
   "organs": [
     {
       "id": "brain",
@@ -37,6 +37,17 @@
       ]
     },
     {
+      "id": "lung_r",
+      "triangles": 14284,
+      "budget": 16000,
+      "boundingRadius_m": 0.11424,
+      "worldCentre_m": [
+        0.0822,
+        0.2153,
+        0
+      ]
+    },
+    {
       "id": "heart",
       "triangles": 14260,
       "budget": 16000,
@@ -48,23 +59,12 @@
       ]
     },
     {
-      "id": "lung_r",
-      "triangles": 14180,
-      "budget": 16000,
-      "boundingRadius_m": 0.11424,
-      "worldCentre_m": [
-        0.0822,
-        0.2153,
-        0
-      ]
-    },
-    {
       "id": "lung_l",
-      "triangles": 13412,
+      "triangles": 13944,
       "budget": 16000,
-      "boundingRadius_m": 0.11424,
+      "boundingRadius_m": 0.11422,
       "worldCentre_m": [
-        -0.0783,
+        -0.0785,
         0.2103,
         0
       ]
@@ -78,6 +78,17 @@
         -0.0001,
         0.2109,
         -0.0283
+      ]
+    },
+    {
+      "id": "trachea",
+      "triangles": 10560,
+      "budget": 11000,
+      "boundingRadius_m": 0.09804,
+      "worldCentre_m": [
+        -0.0176,
+        0.297,
+        -0.011
       ]
     },
     {
@@ -103,25 +114,14 @@
       ]
     },
     {
-      "id": "trachea",
-      "triangles": 9484,
-      "budget": 11000,
-      "boundingRadius_m": 0.08707,
-      "worldCentre_m": [
-        0.0004,
-        0.297,
-        0.0032
-      ]
-    },
-    {
       "id": "liver",
-      "triangles": 9352,
+      "triangles": 8972,
       "budget": 11000,
-      "boundingRadius_m": 0.09872,
+      "boundingRadius_m": 0.095,
       "worldCentre_m": [
-        0.0301,
+        0.04,
         0.0443,
-        0.0011
+        0.0014
       ]
     },
     {
@@ -133,6 +133,17 @@
         0,
         -0.2302,
         -0.0087
+      ]
+    },
+    {
+      "id": "uterus",
+      "triangles": 8236,
+      "budget": 16000,
+      "boundingRadius_m": 0.0741,
+      "worldCentre_m": [
+        0,
+        -0.2118,
+        -0.0082
       ]
     },
     {
@@ -172,33 +183,11 @@
       "id": "intestine_large",
       "triangles": 7480,
       "budget": 9000,
-      "boundingRadius_m": 0.16135,
+      "boundingRadius_m": 0.15455,
       "worldCentre_m": [
-        0.0001,
-        -0.1422,
-        0.0087
-      ]
-    },
-    {
-      "id": "stomach",
-      "triangles": 7332,
-      "budget": 8500,
-      "boundingRadius_m": 0.07924,
-      "worldCentre_m": [
-        -0.0416,
-        0.0286,
-        0.0049
-      ]
-    },
-    {
-      "id": "skull",
-      "triangles": 7292,
-      "budget": 8000,
-      "boundingRadius_m": 0.11534,
-      "worldCentre_m": [
-        0,
-        0.4501,
-        -0.002
+        -0.0019,
+        -0.1515,
+        0.0076
       ]
     },
     {
@@ -213,14 +202,25 @@
       ]
     },
     {
-      "id": "uterus",
-      "triangles": 7096,
-      "budget": 16000,
-      "boundingRadius_m": 0.07925,
+      "id": "stomach",
+      "triangles": 7180,
+      "budget": 8500,
+      "boundingRadius_m": 0.08293,
+      "worldCentre_m": [
+        -0.0416,
+        0.0325,
+        0.0124
+      ]
+    },
+    {
+      "id": "skull",
+      "triangles": 7072,
+      "budget": 8000,
+      "boundingRadius_m": 0.11534,
       "worldCentre_m": [
         0,
-        -0.2241,
-        -0.0051
+        0.4501,
+        -0.002
       ]
     },
     {
@@ -238,11 +238,11 @@
       "id": "breasts",
       "triangles": 6968,
       "budget": 8000,
-      "boundingRadius_m": 0.1226,
+      "boundingRadius_m": 0.12782,
       "worldCentre_m": [
         0,
         0.184,
-        0.0811
+        0.1154
       ]
     },
     {
@@ -298,17 +298,6 @@
         0,
         -0.3041,
         0.012
-      ]
-    },
-    {
-      "id": "pancreas",
-      "triangles": 5328,
-      "budget": 8000,
-      "boundingRadius_m": 0.06929,
-      "worldCentre_m": [
-        -0.0209,
-        -0.0323,
-        -0.0235
       ]
     },
     {
@@ -378,14 +367,25 @@
       ]
     },
     {
-      "id": "spleen",
-      "triangles": 4540,
+      "id": "pancreas",
+      "triangles": 4692,
       "budget": 8000,
-      "boundingRadius_m": 0.05005,
+      "boundingRadius_m": 0.06673,
       "worldCentre_m": [
-        -0.0949,
+        -0.0221,
+        -0.0303,
+        -0.0115
+      ]
+    },
+    {
+      "id": "spleen",
+      "triangles": 4440,
+      "budget": 8000,
+      "boundingRadius_m": 0.05008,
+      "worldCentre_m": [
+        -0.0954,
         0.03,
-        -0.03
+        -0.0304
       ]
     },
     {
@@ -408,6 +408,17 @@
         0,
         -0.072,
         -0.0012
+      ]
+    },
+    {
+      "id": "pelvic_floor_muscles",
+      "triangles": 4144,
+      "budget": 8000,
+      "boundingRadius_m": 0.10308,
+      "worldCentre_m": [
+        0,
+        -0.2566,
+        -0.0052
       ]
     },
     {
@@ -444,17 +455,6 @@
       ]
     },
     {
-      "id": "pelvic_floor_muscles",
-      "triangles": 3208,
-      "budget": 8000,
-      "boundingRadius_m": 0.10308,
-      "worldCentre_m": [
-        0,
-        -0.2566,
-        -0.0052
-      ]
-    },
-    {
       "id": "nasal_cavity",
       "triangles": 2512,
       "budget": 8000,
@@ -472,7 +472,7 @@
       "boundingRadius_m": 0.01704,
       "worldCentre_m": [
         -0.05,
-        0.0469,
+        0.0509,
         -0.046
       ]
     },
@@ -494,7 +494,7 @@
       "boundingRadius_m": 0.01494,
       "worldCentre_m": [
         0.05,
-        0.036,
+        0.041,
         -0.046
       ]
     },
@@ -502,21 +502,21 @@
       "id": "oesophagus",
       "triangles": 2160,
       "budget": 8000,
-      "boundingRadius_m": 0.13764,
+      "boundingRadius_m": 0.13864,
       "worldCentre_m": [
-        -0.0039,
-        0.2153,
-        -0.0151
+        -0.003,
+        0.214,
+        -0.0221
       ]
     },
     {
       "id": "pharynx",
       "triangles": 2016,
       "budget": 8000,
-      "boundingRadius_m": 0.05436,
+      "boundingRadius_m": 0.04038,
       "worldCentre_m": [
-        0.0004,
-        0.4003,
+        0.0006,
+        0.3848,
         -0.007
       ]
     },
@@ -544,13 +544,13 @@
     },
     {
       "id": "salivary_glands",
-      "triangles": 888,
+      "triangles": 900,
       "budget": 8000,
-      "boundingRadius_m": 0.07781,
+      "boundingRadius_m": 0.07676,
       "worldCentre_m": [
         -0.0001,
-        0.382,
-        0.0124
+        0.3846,
+        0.0125
       ]
     }
   ]

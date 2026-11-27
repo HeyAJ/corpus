@@ -115,7 +115,7 @@ function sublingualDucts(): THREE.BufferGeometry {
       const seg = t < 0.5 ? 0 : 1;
       const u = t < 0.5 ? t * 2 : (t - 0.5) * 2;
       const f: V3 = [fold[seg][0] + u * (fold[seg + 1][0] - fold[seg][0]), fold[seg][1] + u * (fold[seg + 1][1] - fold[seg][1]), fold[seg][2] + u * (fold[seg + 1][2] - fold[seg][2])];
-      parts.push(cord([[s * 0.0095, -0.0192, f[2]], [s * f[0], f[1], f[2]]], 0.0003, 3, 4));
+      parts.push(cord([[s * 0.0095, -0.0212, f[2]], [s * f[0], f[1], f[2]]], 0.0003, 3, 4));
     }
   }
   return merge(parts);

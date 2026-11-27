@@ -135,7 +135,9 @@ function lumen(): THREE.BufferGeometry {
 function carina(): THREE.BufferGeometry {
   // A sagittal keel at the fork, the ridge the first breath of a bronchoscope meets.
   const f = ellipsoid([CARINA[0], CARINA[1] + 0.0045, CARINA[2]], [0.0012, 0.0035, 0.007]);
-  return polygonise(f, [-0.005, CARINA[1] - 0.002, -0.006], [0.005, CARINA[1] + 0.012, 0.016], { cell: 0.0007 });
+  // The box is relative to the carina's own depth: the carina moved back to z -0.0185 (paths.ts) and a box
+  // fixed at z -0.006 to 0.016 left it empty, which the part-geometry probe reported as a missing part.
+  return polygonise(f, [-0.005, CARINA[1] - 0.002, CARINA[2] - 0.006], [0.005, CARINA[1] + 0.012, CARINA[2] + 0.016], { cell: 0.0007 });
 }
 
 function bronchus(end: V3, r0: number, r1: number): THREE.BufferGeometry {

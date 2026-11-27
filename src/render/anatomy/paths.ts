@@ -211,8 +211,8 @@ export const OESOPHAGUS_PATH: readonly V3[] = [
   [0.002, 0.352, -0.02],
   [0.003, 0.3, -0.0215],
   [0.003, 0.28, -0.025],
-  [0.003, 0.27, -0.0268],
-  [0.003, 0.254, -0.0358],
+  [0.003, 0.27, -0.0264],
+  [0.003, 0.254, -0.0353],
   [0.003, 0.24, -0.0345],
   [0.002, 0.22, -0.0352],
   [0.001, 0.2, -0.0368],
@@ -232,8 +232,8 @@ export const OESOPHAGUS_PATH: readonly V3[] = [
  */
 export const OESOPHAGUS_FLATTEN: readonly (readonly [number, number])[] = [
   [0.28, 1],
-  [0.27, 0.72],
-  [0.254, 0.62],
+  [0.27, 0.68],
+  [0.254, 0.6],
   [0.24, 0.87],
   [0.22, 0.78],
   [0.2, 0.55],
@@ -278,4 +278,78 @@ export function bronchusCorridor(lung: 'lung_l' | 'lung_r'): Sdf {
     r0 + g,
     r1 + g,
   );
+}
+
+/**
+ * THE FRONT OF THE CHEST WALL, and the breast draped on it.
+ *
+ * WHAT WAS WRONG. The breast is authored in its own frame as a dome of semi-axes 50 x 52 x 36 mm
+ * cut flat at local z = -0.03, which is WORLD z 0.052 (the organ sits at z 0.082). The chest wall
+ * in front of the lungs is much further forward than that: the pectoral muscles and ribs reach
+ * z 0.088 to 0.106 under the breast, so the flat back of the breast lay up to 24.8 mm inside the rib
+ * cage and 24.4 mm inside the chest-wall muscles, and 13.9 mm of each lung lay inside the breast.
+ *
+ * WHAT GRAY'S SAYS. The breast lies in the superficial fascia on the pectoral fascia over
+ * pectoralis major (and, laterally, serratus anterior): its deep surface rests ON the muscle, in
+ * front of the muscle and the ribs, never in them; and it follows the curve of the wall
+ * rather than being flat.
+ *
+ * THE FIX. The whole breast (the shell, every atlas part, the duct and lymph streams) is a
+ * rigid vertical SHEAR: each point moves forward by the distance between the flat back plane and
+ * the front of the wall at that point's height and sideways position (`breastDrape`). The shear keeps
+ * every thickness along z, so the 54 mm from back plane to nipple is unchanged and nothing inside
+ * the breast moves relative to anything else in it, which is why the atlas stays coherent.
+ *
+ * THE TABLE is a measurement of THIS model, not of a body: the largest z of any vertex of the
+ * chest-wall muscles or the rib cage in a 21 mm window (+-10.5 mm) round each node, taken over both
+ * sides folded onto x >= 0 (nodes every 10 mm in |x| from 0.01 and in y from 0.12 to 0.25). Taking
+ * the window maximum makes the surface a conservative envelope (a vertex 10 mm from a node is inside
+ * that node's window), so a bilinear read of it is at or in front of every wall vertex. It is a
+ * hand-held table in the way `FLOOR_MM` in shells/skull.ts is: REGENERATE it if the chest-wall muscles
+ * or the rib cage are redrawn, and rerun the breast overlap probe (the muscle containment test will not
+ * notice a breast that sinks back into the wall). Values are z in millimetres, body frame.
+ */
+const CHEST_WALL_X0 = 0.01;
+const CHEST_WALL_Y0 = 0.12;
+const CHEST_WALL_STEP = 0.01;
+const CHEST_WALL_FRONT_MM: readonly (readonly number[])[] = [
+  [90.7, 90.7, 90.7, 88.4, 88.4, 98.1, 98.1, 98.1, 96.0, 91.7, 86.2, 68.1, 60.2, 50.9, 40.0],
+  [94.1, 94.1, 89.4, 89.4, 88.4, 98.1, 98.1, 98.1, 96.0, 86.4, 81.9, 81.9, 59.6, 48.3, 40.5],
+  [95.2, 95.2, 89.4, 89.4, 88.8, 88.8, 88.0, 93.3, 93.3, 92.5, 87.6, 81.9, 59.6, 48.9, 40.5],
+  [95.3, 95.3, 101.4, 101.4, 89.7, 89.7, 95.6, 95.6, 94.5, 92.5, 87.6, 81.9, 53.0, 48.9, 37.1],
+  [95.3, 95.3, 101.4, 101.4, 89.7, 102.4, 102.4, 96.6, 94.5, 81.7, 74.5, 73.0, 69.2, 57.0, 38.6],
+  [93.3, 93.3, 101.1, 101.1, 90.3, 102.4, 102.4, 97.2, 85.2, 80.9, 73.0, 73.0, 69.2, 57.0, 40.8],
+  [88.6, 88.6, 100.0, 100.0, 90.3, 101.8, 101.8, 97.2, 85.8, 85.8, 70.9, 70.6, 61.0, 50.0, 45.3],
+  [86.5, 86.5, 97.1, 97.1, 91.8, 100.8, 100.8, 87.1, 85.8, 85.8, 73.7, 61.4, 61.0, 49.3, 45.3],
+  [84.3, 84.3, 95.6, 95.6, 91.8, 100.3, 100.3, 87.1, 85.0, 85.0, 73.7, 64.5, 62.5, 44.6, 44.6],
+  [82.4, 82.4, 91.7, 91.7, 88.2, 98.5, 98.5, 80.9, 83.2, 83.2, 73.7, 64.5, 62.5, 46.9, 44.6],
+  [77.2, 79.1, 89.4, 89.4, 88.2, 94.8, 94.8, 74.9, 79.7, 79.7, 61.4, 60.3, 60.3, 46.9, 36.9],
+  [73.7, 79.1, 84.1, 86.9, 86.9, 88.5, 88.5, 74.9, 75.1, 75.1, 57.0, 54.0, 54.0, 46.7, 36.9],
+  [70.2, 72.2, 81.4, 81.4, 86.9, 88.5, 74.8, 74.8, 68.9, 61.3, 57.0, 46.4, 46.4, 32.6, 36.9],
+  [64.0, 64.0, 81.4, 81.4, 86.9, 88.5, 74.8, 74.8, 53.0, 55.1, 55.1, 46.0, 46.0, 31.9, 36.9],
+];
+
+/** The front of the chest wall at |x| and y (body frame), metres, bilinear in the table. */
+export function chestWallFront(x: number, y: number): number {
+  const rows = CHEST_WALL_FRONT_MM;
+  const fx = Math.min(rows[0].length - 1, Math.max(0, (Math.abs(x) - CHEST_WALL_X0) / CHEST_WALL_STEP));
+  const fy = Math.min(rows.length - 1, Math.max(0, (y - CHEST_WALL_Y0) / CHEST_WALL_STEP));
+  const i = Math.min(rows[0].length - 2, Math.floor(fx));
+  const j = Math.min(rows.length - 2, Math.floor(fy));
+  const tx = fx - i;
+  const ty = fy - j;
+  const a = rows[j][i] * (1 - tx) + rows[j][i + 1] * tx;
+  const b = rows[j + 1][i] * (1 - tx) + rows[j + 1][i + 1] * tx;
+  return (a * (1 - ty) + b * ty) / 1000;
+}
+
+/** Breast organ origin in the body frame (organs.json), and the local z of its flat back plane (models.ts ). */
+const BREAST_ORIGIN: V3 = (organsFile.organs.find((o) => o.id === 'breasts')!.position as unknown as V3);
+const BREAST_BACK_PLANE_Z = -0.03;
+/** Clearance left between the breast's back and the wall's front, metres. A display choice, above the polygonisation error of the 4.5 mm breast grid's flat cut. */
+const BREAST_WALL_MARGIN_M = 0.0008;
+
+/** How far forward a point of the breast frame at (x, y) is moved so the back lies on the wall, metres. */
+export function breastDrape(x: number, y: number): number {
+  return chestWallFront(x, y + BREAST_ORIGIN[1]) + BREAST_WALL_MARGIN_M - (BREAST_ORIGIN[2] + BREAST_BACK_PLANE_Z);
 }

@@ -1,5 +1,5 @@
 import type { FlowSpec, OrganDetailSpec } from '../detail/types';
-import { breastPaths } from './breasts.parts';
+import { breastPaths, drapedPoint } from './breasts.parts';
 
 /**
  * STREAMS AND GLASS FOR THE BREAST.
@@ -29,7 +29,9 @@ export const detail: OrganDetailSpec = {
   flows: () => {
     const out: FlowSpec[] = [];
     for (const [k, s] of SIDES) {
-      const p = breastPaths(s);
+      // The streams follow the draped breast (breasts.parts.ts), so the paths are carried by the same shear.
+      const raw = breastPaths(s);
+      const p = { ducts: raw.ducts.map((d) => d.map(drapedPoint)), lymph: raw.lymph.map((d) => d.map(drapedPoint)) };
       p.lymph.forEach((path, i) => out.push({ id: `lymph_${k}${i}`, path, count: 30, size: 0.0009, color: 0xe8e0a0, speed: 0.008, spread: 0.0002 }));
       // Duct streams run towards the nipple; every second duct carries one to keep the count low.
       p.ducts.forEach((path, i) => {

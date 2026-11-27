@@ -304,7 +304,7 @@
         "kind": "model",
         "model": "adrenal_l"
       },
-      "position": [-0.05, 0.071, -0.046],
+      "position": [-0.05, 0.075, -0.046],
       "layoutOffset": [0, 0, 0],
       "volume_mL": 4,
       "volumeSource": "Each adrenal gland weighs about 4 grams; Guyton & Hall 14e ch.78. Volume taken as the mass at tissue density ~1 g/mL.",
@@ -322,7 +322,7 @@
         "kind": "model",
         "model": "adrenal_r"
       },
-      "position": [0.05, 0.059, -0.046],
+      "position": [0.05, 0.064, -0.046],
       "layoutOffset": [0, 0, 0],
       "volume_mL": 4,
       "volumeSource": "Each adrenal gland weighs about 4 grams; Guyton & Hall 14e ch.78. Volume taken as the mass at tissue density ~1 g/mL.",

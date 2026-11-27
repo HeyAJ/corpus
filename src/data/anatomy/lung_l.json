@@ -238,8 +238,8 @@
     {
       "id": "cardiac_notch",
       "label": "Cardiac Notch",
-      "summary": "Notch in the front border of the left upper lobe",
-      "function": "The front border of the left lung is indented where the heart lies close to the chest wall. This leaves part of the heart covered by pleura but not by lung.",
+      "summary": "The hollow the heart makes in the left lung, and the notch in its front border",
+      "function": "The medial surface of the left lung is deeply hollowed by the heart (the cardiac impression), and its front border is indented where the heart lies close to the chest wall (the cardiac notch). This leaves part of the heart covered by pleura but not by lung. In this drawing the hollow is cut from the heart's own shape, with the pericardial sac the heart view draws between them, and this part is that whole cut surface.",
       "color": "#e8b7a8",
       "rest": 0.15,
       "drives": [],

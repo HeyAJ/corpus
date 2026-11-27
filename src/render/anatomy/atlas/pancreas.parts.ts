@@ -6,15 +6,13 @@ import {
   intersect,
   mergeParts,
   polygonise,
-  smoothUnion,
   subtract,
   tubeAlong,
-  chain,
   type Sdf,
   type V3,
 } from '../sdf';
 import { fbm, mulberry32 } from '../noise';
-import { PANCREAS_PATH } from '../models';
+import { PANCREAS_PATH, pancreasField } from '../models';
 
 /**
  * THE INSIDE OF THE PANCREAS: the five regions of the gland, the two ducts, the exocrine
@@ -46,8 +44,6 @@ import { PANCREAS_PATH } from '../models';
 
 /** The shell's chain radii, one per path point (models.ts). */
 const RADII = [0.008, 0.011, 0.0125, 0.0115, 0.019];
-const UNCINATE_C: V3 = [0.01, -0.036, -0.027];
-const UNCINATE_R: V3 = [0.012, 0.009, 0.008];
 
 /** Plane positions along x that divide tail, body, neck and head. Drawing choices. */
 const X_TAIL = -0.045;
@@ -58,7 +54,10 @@ const X_NECK = 0.01;
 const MARGIN = 0.0018;
 
 function gland(): Sdf {
-  return smoothUnion(0.006, chain(PANCREAS_PATH, RADII), ellipsoid(UNCINATE_C, UNCINATE_R));
+  // The shell's gland with its contacts pressed in (models.ts `pancreasField`): the stomach,
+  // the left kidney, the splenic hilum and the duodenum no longer overlap the gland, and
+  // the regions, acini and islets are drawn inside what is left.
+  return pancreasField();
 }
 
 function inward(f: Sdf, d: number): Sdf {
@@ -90,14 +89,18 @@ export const DUCT_PATH: V3[] = [
   [-0.025, 0.011, -0.03],
   [0.0, -0.003, -0.0285],
   [0.016, -0.0145, -0.0265],
-  [0.034, -0.027, -0.026],
+  // The ampulla. This end was [0.034, -0.027, -0.026], where the head used to reach. The head is now pressed back from the
+  // duodenum (models.ts `pancreasCutters`), so that point lay 6.8 mm outside the gland; the duct now ends at the head's surface,
+  // which is where it meets the duodenal wall (GRAYS42: the duct opens into the descending duodenum). Moved 2026-11-27.
+  [0.025, -0.021, -0.0263],
 ];
 
 /** The accessory duct (of Santorini): leaves the main duct in the head, ends at the minor papilla. */
 export const ACCESSORY_PATH: V3[] = [
   [0.006, -0.0073, -0.0278],
-  [0.017, -0.0075, -0.0255],
-  [0.03, -0.01, -0.0235],
+  // Shortened from [0.03, -0.01, -0.0235] for the same reason as the main duct: the minor papilla is on the duodenal wall, which
+  // now bounds the head 7 mm sooner.
+  [0.0195, -0.0078, -0.0252],
 ];
 
 const VESSEL_X = [0.004, -0.014, -0.032, -0.05, -0.062, -0.07];

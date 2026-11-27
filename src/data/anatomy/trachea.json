@@ -1,6 +1,6 @@
 {
   "atlas": "trachea",
-  "about": "The interior of the trachea: the larynx with its vocal folds and cricoid, the C-shaped rings, the trachealis, the air column, the carina and the two main bronchi. The cartilages are drawn as simple shapes, the larynx is shown without its epiglottis or hyoid, and nothing here models voice, and a cough is shown only as a display index of the engine's cough drive (no airway clearance is simulated); activity is a display index of the engine's breathing signals, of swallowing and of that cough drive.",
+  "about": "The interior of the trachea: the larynx with its vocal folds and cricoid, the C-shaped rings, the trachealis, the air column, the carina and the two main bronchi. The cartilages are drawn as simple shapes, the larynx is drawn with its epiglottis, arytenoid, corniculate and cuneiform cartilages but without the hyoid bone, which belongs to the skull's own atlas and is drawn when the Bones layer is on, and nothing here models voice, and a cough is shown only as a display index of the engine's cough drive (no airway clearance is simulated); activity is a display index of the engine's breathing signals, of swallowing and of that cough drive.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",

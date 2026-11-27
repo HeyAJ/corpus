@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
 import { ellipsoid, halfSpace, intersect, mergeParts, polygonise, tubeAlong, type V3 } from '../sdf';
 import { mulberry32 } from '../noise';
+import { breastDrape } from '../paths';
 
 /**
  * INTERIOR OF THE BREAST, in the register of an anatomy textbook. The shell in models.ts is
@@ -215,7 +216,10 @@ export const parts: PartBuilder = () => {
     lob.push(lobuleParts(s));
   }
 
-  return [
+  // Everything is drawn in the breast's own frame, with its back on a flat plane; the shell is draped
+  // on the chest wall (paths.ts `breastDrape`) and so is every part, by the same shear, so the
+  // interior stays inside the shell and its relation to the wall is the shell's.
+  return draped([
     { id: 'lactiferous_sinuses', geometry: mergeParts(sinuses) },
     { id: 'areolar_glands', geometry: mergeParts(montgomery) },
     { id: 'retromammary_space', geometry: mergeParts(retro) },
@@ -233,5 +237,22 @@ export const parts: PartBuilder = () => {
     { id: 'pectoral_fascia', geometry: mergeParts(fascia) },
     { id: 'lymphatics', geometry: mergeParts(lymph) },
     { id: 'lymph_nodes', geometry: mergeParts(nodes) },
-  ];
+  ]);
 };
+
+/** Apply the chest-wall drape (a z shear by x and y) to every part's vertices. */
+function draped(list: { id: string; geometry: THREE.BufferGeometry }[]): { id: string; geometry: THREE.BufferGeometry }[] {
+  for (const part of list) {
+    const pos = part.geometry.getAttribute('position') as THREE.BufferAttribute;
+    for (let i = 0; i < pos.count; i++) pos.setZ(i, pos.getZ(i) + breastDrape(pos.getX(i), pos.getY(i)));
+    pos.needsUpdate = true;
+    part.geometry.computeBoundingBox();
+    part.geometry.computeBoundingSphere();
+  }
+  return list;
+}
+
+/** A point of the breast frame carried to where the drape puts it (the streams are paths, not meshes). */
+export function drapedPoint(p: V3): V3 {
+  return [p[0], p[1], p[2] + breastDrape(p[0], p[1])];
+}

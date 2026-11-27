@@ -16,6 +16,17 @@ import {
   type V3,
 } from '../sdf';
 import { gravidBody, uterineTubePath } from '../models';
+import {
+  CERVIX_A as PU_CERVIX_A,
+  CERVIX_B as PU_CERVIX_B,
+  CERVIX_RA as PU_CERVIX_RA,
+  CERVIX_RB as PU_CERVIX_RB,
+  NONPREG_CENTRE,
+  NONPREG_RADII,
+  gravidShape,
+  lowerSegment,
+  nonpregIsthmus,
+} from '../models';
 
 /**
  * THE INSIDE OF THE UTERUS, THE UTERINE TUBES, AND IN PREGNANCY THE PLACENTA AND SAC.
@@ -78,12 +89,12 @@ import { gravidBody, uterineTubePath } from '../models';
  * generator and golden-ratio sequences, no Math.random).
  */
 
-const NONPREG_CENTRE: V3 = [0, 0.052, 0.02];
-const NONPREG_RADII: V3 = [0.0235, 0.03, 0.0165];
-const CERVIX_A: V3 = [0, 0, 0];
-const CERVIX_B: V3 = [0, 0.024, 0.006];
-const CERVIX_RA = 0.0115;
-const CERVIX_RB = 0.0125;
+// The non-pregnant body, the cervix and its lean are defined once in ../pelvicUterus.ts and shared
+// with the shell (models.ts): the cervix leans back behind the bladder and the body rests on it.
+const CERVIX_A: V3 = PU_CERVIX_A;
+const CERVIX_B: V3 = PU_CERVIX_B;
+const CERVIX_RA = PU_CERVIX_RA;
+const CERVIX_RB = PU_CERVIX_RB;
 /** Height of the internal os above the external os, metres. */
 const OS_Y = 0.0285;
 
@@ -144,7 +155,10 @@ export function amnioticSacRadii(weeks: number): V3 {
 /** The shell's own field (negative inside), the same expression models.ts polygonises. */
 export function shellField(g: UterusGeo): Sdf {
   const cervix = capsule(CERVIX_A, CERVIX_B, CERVIX_RA, CERVIX_RB);
-  return smoothUnion(g.gravid ? 0.014 : 0.012, cervix, ellipsoid(g.centre, g.radii));
+  // The lower segment (gravid) or isthmus (non-pregnant) joins the leaning cervix to a body that
+  // now sits above the bladder or the pubis; the same pieces models.ts polygonises.
+  const link = g.gravid ? lowerSegment(gravidShape(g.weeks)) : nonpregIsthmus();
+  return smoothUnion(g.gravid ? 0.014 : 0.012, cervix, ...link.map((f) => capsule(f.a, f.b, f.ra, f.rb)), ellipsoid(g.centre, g.radii));
 }
 
 /** The shell's field pulled `d` metres inwards. */
@@ -153,18 +167,17 @@ function inward(f: Sdf, d: number): Sdf {
 }
 
 /** The cervical canal's centreline, external os to internal os; its axis leans forward with height. */
-const CANAL: V3[] = [
-  [0, -0.0098, -0.0025],
-  [0, 0.004, 0.001],
-  [0, 0.0165, 0.0041],
-  [0, OS_Y, 0.0072],
-];
+/** z of the canal's axis at height y: it follows the cervix capsule's own axis (leaning BACK as it rises). */
+const canalZ = (y: number): number => CERVIX_A[2] + ((CERVIX_B[2] - CERVIX_A[2]) * y) / CERVIX_B[1];
+const CANAL: V3[] = [-0.0098, 0.004, 0.0165, OS_Y].map((y) => [0, y, canalZ(y)] as V3);
 
 function cavityField(g: UterusGeo): Sdf {
   const body = ellipsoid(g.centre, g.cavR);
   if (!g.gravid) {
     // The cavity narrows to the internal os through a short neck.
-    return smoothUnion(0.004, body, capsule([0, OS_Y - 0.002, 0.0068], [0, OS_Y + 0.007, 0.0115], 0.0022, 0.0055));
+    // The neck now runs up behind the bladder to the body that rests on it.
+    const ist = nonpregIsthmus()[1];
+    return smoothUnion(0.004, body, capsule([0, OS_Y - 0.002, canalZ(OS_Y - 0.002)], [0, ist.b[1], ist.b[2]], 0.0022, 0.0055));
   }
   return body;
 }
@@ -172,7 +185,7 @@ function cavityField(g: UterusGeo): Sdf {
 function boxOf(g: UterusGeo, yMin = -0.014): { min: V3; max: V3 } {
   const [cx, cy, cz] = g.centre;
   const [rx, ry, rz] = g.radii;
-  return { min: [cx - rx - 0.004, yMin, Math.min(-0.014, cz - rz - 0.004)], max: [cx + rx + 0.004, cy + ry + 0.004, cz + rz + 0.004] };
+  return { min: [cx - rx - 0.004, yMin, Math.min(CERVIX_B[2] - CERVIX_RB - 0.004, cz - rz - 0.004)], max: [cx + rx + 0.004, cy + ry + 0.004, cz + rz + 0.004] };
 }
 
 /** Where the posterior cavity wall is, at a given x and y. */
@@ -630,7 +643,7 @@ export const parts: PartBuilder = (params) => {
   // UTERINE CAVITY: a faint closed surface at the boundary of the lumen.
   out.push({
     id: 'uterine_cavity',
-    geometry: polygonise(cavity, [cx - g.cavR[0] - 0.003, OS_Y - 0.006, cz - g.cavR[2] - 0.003], [cx + g.cavR[0] + 0.003, cy + g.cavR[1] + 0.003, cz + g.cavR[2] + 0.003], { cell: g.cell }),
+    geometry: polygonise(cavity, [cx - g.cavR[0] - 0.003, OS_Y - 0.006, Math.min(cz - g.cavR[2] - 0.003, CERVIX_B[2] - 0.012)], [cx + g.cavR[0] + 0.003, cy + g.cavR[1] + 0.003, cz + g.cavR[2] + 0.003], { cell: g.cell }),
   });
 
   // FUNDUS, BODY, ISTHMUS: three zones on the inner layer of the wall, split by height.
@@ -642,7 +655,7 @@ export const parts: PartBuilder = (params) => {
   const fundusY = cy + 0.4 * g.cavR[1];
   const isthmusTop = OS_Y + 0.008;
   const zoneBox = (y0: number, y1: number): { min: V3; max: V3 } => ({
-    min: [cx - g.cavR[0] - layerT - 0.002, y0, cz - g.cavR[2] - layerT - 0.002],
+    min: [cx - g.cavR[0] - layerT - 0.002, y0, Math.min(cz - g.cavR[2] - layerT - 0.002, CERVIX_B[2] - 0.012)],
     max: [cx + g.cavR[0] + layerT + 0.002, y1, cz + g.cavR[2] + layerT + 0.002],
   });
   const yTop = cy + g.cavR[1] + layerT + 0.002;
@@ -665,8 +678,8 @@ export const parts: PartBuilder = (params) => {
     id: 'cervix',
     geometry: polygonise(
       intersect(subtract(inward(cervixCap, 0.0016), canal), halfSpace([0, OS_Y - 0.0015, 0], [0, -1, 0])),
-      [-0.014, -0.014, -0.012],
-      [0.014, OS_Y, 0.02],
+      [-0.014, -0.014, CERVIX_B[2] - CERVIX_RB - 0.002],
+      [0.014, OS_Y, CERVIX_A[2] + CERVIX_RA + 0.004],
       { cell: 0.0017 },
     ),
   });

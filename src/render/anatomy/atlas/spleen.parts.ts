@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
-import { ellipsoid, mergeParts, polygonise, smoothSubtract, sphere, tubeAlong, type Sdf, type V3 } from '../sdf';
+import { mergeParts, polygonise, tubeAlong, type Sdf, type V3 } from '../sdf';
 import { fbm, mulberry32 } from '../noise';
+import { spleenPressedField } from '../models';
 import { add, beads as beadsOf, cord, perpendicular, ribbon, sample, unit } from './gland_shared';
 
 /**
@@ -51,11 +52,9 @@ const HILUM_X = 0.0065;
 const HILUM_Z = 0.011;
 
 export function shellField(): Sdf {
-  let f: Sdf = ellipsoid([0, 0, 0], [0.027, 0.05, 0.021]);
-  f = smoothSubtract(0.012, f, ellipsoid([0.03, 0, 0.012], [0.02, 0.04, 0.016]));
-  f = smoothSubtract(0.003, f, sphere([-0.004, 0.03, 0.022], 0.006));
-  f = smoothSubtract(0.003, f, sphere([-0.006, 0.012, 0.024], 0.005));
-  return f;
+  // The shell's field with the gastric and renal impressions pressed in (models.ts
+  // `spleenPressedField`), so the pulp and the capsule follow the surface they lie under.
+  return spleenPressedField();
 }
 
 function inward(f: Sdf, d: number): Sdf {

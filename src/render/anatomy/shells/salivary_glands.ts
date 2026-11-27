@@ -98,7 +98,15 @@ export function parotidField(side: number, grow = 0): Sdf {
  * .parts.ts, SUBMANDIBULAR_DUCT) leaves the front pole of the gland and was moved with it.
  */
 export const SUBMANDIBULAR = { c: [0.021, -0.0325, -0.022] as V3, r: [0.0065, 0.0062, 0.0125] as V3, tilt: 0.309 };
-export const SUBLINGUAL = { c: [0.0058, -0.0215, 0.025] as V3, r: [0.0042, 0.0036, 0.0105] as V3 };
+/*
+ * THE SUBLINGUAL GLAND WAS IN THE MOUTH (gx2). Its top stood 3.6 mm above the mouth shell's floor
+ * (scene y 0.368), so it was drawn inside the oral cavity (auditor aur). Gray's 42nd: it lies in
+ * the sublingual fossa of the mandible and on the mylohyoid, UNDER the mucous membrane of the
+ * floor of the mouth, so its top is the floor and the gland is below it. It is lowered 3 mm and
+ * moved 1.7 mm out from the midline (still medial to the mandible's inner surface, 12 mm out at
+ * this z) to clear the floor; the offsets are drawing choices measured against the mouth shell.
+ */
+export const SUBLINGUAL = { c: [0.0075, -0.0245, 0.025] as V3, r: [0.0042, 0.0036, 0.0105] as V3 };
 
 /**
  * A field turned about the vertical axis through `c` by `tilt` radians in the side's own

@@ -30,6 +30,7 @@ import {
   SPINAL_CORD_PATH,
   TRACHEA_CENTRELINE,
   heartCavity,
+  breastDrape,
   bronchusCorridor,
   lungHilum,
 } from './paths';
@@ -662,6 +663,9 @@ export function liverCutters(): Sdf[] {
     seenFrom('liver', 'stomach', stomachField()),
     seenFrom('liver', 'kidney_r', kidneyField(1)),
     seenFrom('liver', 'adrenal_r', union(adrenalField(1), behind)),
+    // The gallbladder lies in its fossa on the visceral surface, in contact and not inside: the audit found its
+    // fundus and body 3.3 mm inside the liver (the liver's own fossa sphere is smaller than the sac).
+    seenFrom('liver', 'gallbladder', gallbladderField()),
   ];
 }
 
@@ -680,8 +684,8 @@ function liver(): THREE.BufferGeometry {
 
 /* ------------------------------------------------------------ gallbladder */
 
-function gallbladder(): THREE.BufferGeometry {
-  const field = smoothUnion(
+export function gallbladderField(): Sdf {
+  return smoothUnion(
     0.003,
     chain(
       [
@@ -693,7 +697,10 @@ function gallbladder(): THREE.BufferGeometry {
     ),
     capsule([-0.01, 0.016, -0.006], [-0.02, 0.026, -0.012], 0.0028, 0.0022), // cystic duct
   );
-  return polygonise(field, [-0.026, -0.04, -0.018], [0.022, 0.032, 0.028], { cell: 0.002 });
+}
+
+function gallbladder(): THREE.BufferGeometry {
+  return polygonise(gallbladderField(), [-0.026, -0.04, -0.018], [0.022, 0.032, 0.028], { cell: 0.002 });
 }
 
 /* ---------------------------------------------------------------- stomach */
@@ -760,13 +767,18 @@ export function pancreasCutters(): Sdf[] {
   // Gray's: the head lies in the concavity of the C of the duodenum, in contact with its
   // inner wall; the audit found the two 8 to 9 mm inside each other.
   const forward = organDef('pancreas').layoutOffset[2];
-  const duodenum = chain(local(giSegment('duodenum'), [0, 0, forward]), 0.0122 * 1.035 + 0.001);
+  const duodenum = chain(local(giSegment('duodenum'), [0, 0, forward]), 0.0122 * 1.035 + 0.002);
   return [
     seenFrom('pancreas', 'stomach', stomachField()),
     seenFrom('pancreas', 'kidney_l', kidneyField(-1)),
     seenFrom('pancreas', 'spleen', spleenField()),
     duodenum,
   ];
+}
+
+/** The pancreas's field without its lobulation, with the contacts pressed in; the atlas draws its parts inside it. */
+export function pancreasField(): Sdf {
+  return pressedBy(pancreasGlandField(), pancreasCutters());
 }
 
 function pancreas(): THREE.BufferGeometry {
@@ -800,8 +812,13 @@ export function spleenCutters(): Sdf[] {
   return [seenFrom('spleen', 'stomach', stomachField()), seenFrom('spleen', 'kidney_l', kidneyField(-1))];
 }
 
+/** The spleen's shell field with its two impressions, which the atlas repeats for its inner layers. */
+export function spleenPressedField(): Sdf {
+  return pressedBy(spleenField(), spleenCutters());
+}
+
 function spleen(): THREE.BufferGeometry {
-  return polygonise(pressedBy(spleenField(), spleenCutters()), [-0.03, -0.054, -0.025], [0.03, 0.054, 0.025], { cell: 0.0028 });
+  return polygonise(spleenPressedField(), [-0.03, -0.054, -0.025], [0.03, 0.054, 0.025], { cell: 0.0028 });
 }
 
 /* --------------------------------------------------------------- adrenals */
@@ -818,19 +835,8 @@ export function adrenalField(side: -1 | 1): Sdf {
       );
 }
 
-/**
- * WHAT PRESSES INTO AN ADRENAL (gx3, 2026-11-27): the kidney's upper pole. Gray's says each
- * gland caps its kidney's upper pole and the kidney is not a part of it; the audit found the
- * right gland 4.6 mm and the left 3.5 mm inside it. The liver is cut from the liver's side
- * (see `liverCutters`), so the right adrenal is the one that keeps its shape.
- */
-export function adrenalCutters(side: -1 | 1): Sdf[] {
-  const id = side < 0 ? 'adrenal_l' : 'adrenal_r';
-  return [seenFrom(id, side < 0 ? 'kidney_l' : 'kidney_r', kidneyField(side))];
-}
-
 function adrenal(side: -1 | 1): THREE.BufferGeometry {
-  return polygonise(pressedBy(adrenalField(side), adrenalCutters(side)), [-0.02, -0.014, -0.009], [0.02, 0.018, 0.009], { cell: 0.0013 });
+  return polygonise(adrenalField(side), [-0.02, -0.014, -0.009], [0.02, 0.018, 0.009], { cell: 0.0013 });
 }
 
 /* ---------------------------------------------------------------- kidneys */
@@ -1039,6 +1045,70 @@ export function uterineTubePath(s: number): [number, number, number][] {
 }
 
 /**
+ * WHERE THE UTERUS MAY BE, WEEK BY WEEK: pure geometry, no three.js.
+ *
+ * Authored in the uterus's own frame (origin at the external os, +y up, +z forward). Shared by
+ * the shell (models.ts), the atlas (atlas/uterus.parts.ts) and the displacement of the organs
+ * around it (pregnancyDisplacement.ts), so the three can never disagree about where the uterus
+ * is.
+ *
+ * WHAT WENT WRONG. The uterus was a pear (non-pregnant) or an ellipsoid whose bottom pole was
+ * fixed at 2 cm above the os (pregnant), and nothing else in the body knew about it. Measured on
+ * the model's own meshes by the 2026-11 audit: the non-pregnant uterus reached 29 mm into the
+ * bladder; the gravid one reached 36 to 40 mm into the pubic bones and 31 to 35 mm into the
+ * muscles that hang from them, 28 mm into the bladder, and (see pregnancyDisplacement.ts) tens of
+ * millimetres into every organ above it. The cause of the first two is geometric, not
+ * anatomical: the model's bladder top is 6.6 cm above the external os and its cervix capsule
+ * leans FORWARD, into the bladder's back wall, whereas Gray's puts the cervix BEHIND the bladder
+ * (directed backward into the vagina) and the body of the uterus ON the bladder's upper surface.
+ *
+ * THE BONES AND THE BLADDER CANNOT MOVE (other organs and the pelvic-floor muscles are authored
+ * against them). So the uterus is made to fit them, and the numbers below are MEASURED ON THIS
+ * MODEL'S OWN MESHES (the probe is described in the 2026-11-27 DOCS NOTE), not anatomical
+ * measurements and not invented ones:
+ *  - `BLADDER_TOP_Y` 0.066: the highest vertex of the bladder shell (its apex toward the navel),
+ *    uterus frame.
+ *  - `PUBIC_TOP_Y` 0.09: the top of the pubic bones and of the muscles hung from them, 0.085,
+ *    plus 5 mm.
+ *  - `PUBIC_REAR_Z` 0.045: the rear surface of those bones and of the levator ani at the height
+ *    of the symphysis, less 6 mm, so the pregnant uterus stays behind them while it is still
+ *    in the true pelvis.
+ *  - `CERVIX_BACK_SHIFT` 0.0065 and `NECK_RADIUS` 0.0085: the room for the cervix and the lower
+ *    segment at the bladder's height is only 15 mm deep (the bladder's back wall is at world z
+ *    -0.0187 and the coccyx's front at -0.034 at y -0.22), so the neck is a 17 mm tube centred 6.5
+ *    mm behind the model's old cervix axis; wider, it meets one or the other. The cervix is drawn
+ *    narrower than a real one (about 25 mm) for exactly that reason, and the limitation says so.
+ * `MARGIN_M` (0.002) and every smoothing radius are DISPLAY choices.
+ *
+ * ANATOMY THIS ENCODES (Gray's, GRAYS42): the uterus is anteverted and anteflexed, so that its
+ * body rests on the superior surface of the bladder; the cervix projects backward and downward
+ * into the vagina. In pregnancy the uterus rises out of the true pelvis between the 12th and the
+ * 16th week (Williams Obstetrics 25e, ch. 4 and 9: the fundus is at the pubic symphysis at about 12
+ * weeks and at the umbilicus at about 20), which is where `RISE_FROM_WEEK` and `RISE_TO_WEEK`
+ * put the lift; the lift itself is a drawing rule, not a measurement.
+ */
+/* ----------------------------------------- WHERE THE UTERUS MAY BE
+ * It lives in this file, not its own, because tsconfig.node.json lists the files the production
+ * build may reach and `placeholder.ts` reaches this one. */
+
+export const BLADDER_TOP_Y = 0.066;
+export const PUBIC_TOP_Y = 0.09;
+export const PUBIC_REAR_Z = 0.045;
+export const CERVIX_BACK_SHIFT = 0.0045;
+/** Clearance kept between the uterus and the structure it rests on or lies behind, metres. A DISPLAY choice. */
+export const MARGIN_M = 0.002;
+/** Week by which the fundus has left the true pelvis, and the week the lift starts. */
+export const RISE_FROM_WEEK = 12;
+export const RISE_TO_WEEK = 16;
+/** The most the body may be moved back to stay behind the pubis while still in the pelvis, metres. A DISPLAY choice: beyond it the uterus would meet the sacrum. */
+export const MAX_BACK_SLIDE_M = 0.02;
+
+function pelvicSmooth(t: number): number {
+  const c = Math.max(0, Math.min(1, t));
+  return c * c * (3 - 2 * c);
+}
+
+/**
  * Height of the uterine fundus above the external os, metres, by gestational week.
  *
  * Landmarks from standard obstetric teaching (Cunningham et al., Williams Obstetrics
@@ -1046,7 +1116,7 @@ export function uterineTubePath(s: number): [number, number, number][] {
  * umbilicus at about 20; between 20 and 34 weeks the symphysis-fundal height in
  * centimetres tracks the gestational age in weeks; near term the presenting part
  * engages and the fundus drops a little. This is a drawing rule for the size of the
- * shape, not a quantity the simulation reads.
+ * shape, not a quantity the simulation reads. 
  */
 export function fundalHeight(weeks: number): number {
   const w = Math.max(0, Math.min(42, weeks));
@@ -1069,22 +1139,121 @@ export function fundalHeight(weeks: number): number {
   return stops[stops.length - 1][1];
 }
 
-/** Centre and semi-axes of the gravid uterine body for a gestational age. Shared with the fetus. */
-export function gravidBody(weeks: number): { centre: V3; radii: V3 } {
+/**
+ * The non-pregnant body: an ellipsoid resting ON the bladder's upper surface. It was centred at
+ * y 0.052 with a 30 mm vertical semi-axis (bottom at 0.022, 4 cm inside the bladder); it is now
+ * a squatter ellipsoid whose bottom is `MARGIN_M` above the bladder's top. Its width and its
+ * depth are unchanged, its height is not: the model's bladder is high, and keeping the old
+ * 30 mm height would have put the fundus at 0.118. The semi-axes are a drawing choice.
+ */
+export const NONPREG_RADII: V3 = [0.0235, 0.022, 0.0165];
+export const NONPREG_CENTRE: V3 = [0, BLADDER_TOP_Y + MARGIN_M + NONPREG_RADII[1], 0.022];
+
+export interface GravidBody {
+  centre: V3;
+  radii: V3;
+  /** Height of the lowest point of the body ellipsoid above the os. */
+  bottom: number;
+}
+
+/**
+ * Centre and semi-axes of the gravid uterine body for a gestational age. Shared with the fetus
+ * and with the glass outline (which draws the belly round exactly this ellipsoid).
+ *
+ * The top (fundus) is the cited height, as before. What changed is the bottom: the old
+ * ellipsoid ran down to 2 cm above the os at every week, through the pubic bones and the
+ * bladder. Now the bottom rises from 2 cm (weeks 12 and under: the uterus is a pelvic organ)
+ * to `PUBIC_TOP_Y` (16 weeks and over: it has left the pelvis), the centre and height follow,
+ * and the width is unchanged. While it is still low it is slid back until its front is behind
+ * the pubis (`PUBIC_REAR_Z`), by no more than `MAX_BACK_SLIDE_M`. Between the two the lower
+ * segment is the funnel returned by `lowerSegment`.
+ */
+export function gravidShape(weeks: number): GravidBody {
   const h = fundalHeight(weeks);
-  const ry = (h - 0.02) / 2;
-  // It rises out of the pelvis and comes forward against the abdominal wall as it grows.
-  return { centre: [0, 0.02 + ry, 0.02 + 0.2 * h], radii: [0.31 * h, ry, 0.23 * h] };
+  const rx = 0.31 * h;
+  const rz = 0.23 * h;
+  const cz0 = 0.02 + 0.2 * h;
+  const bottom = 0.02 + (PUBIC_TOP_Y - 0.02) * pelvicSmooth((weeks - RISE_FROM_WEEK) / (RISE_TO_WEEK - RISE_FROM_WEEK));
+  const ry = (h - bottom) / 2;
+  const cy = (h + bottom) / 2;
+  // Smallest slide back that puts the front of every slice that is still below the pubic top
+  // behind the pubis. The scan is 2 mm steps over the low part of the ellipsoid only.
+  let slide = 0;
+  if (bottom < PUBIC_TOP_Y - MARGIN_M) {
+    for (; slide < MAX_BACK_SLIDE_M; slide += 0.001) {
+      let front = -Infinity;
+      for (let y = bottom; y <= PUBIC_TOP_Y; y += 0.002) {
+        const q = 1 - ((y - cy) / ry) ** 2;
+        if (q > 0) front = Math.max(front, cz0 - slide + rz * Math.sqrt(q));
+      }
+      if (front <= PUBIC_REAR_Z) break;
+    }
+  }
+  return { centre: [0, cy, cz0 - slide], radii: [rx, ry, rz], bottom };
+}
+
+/** Centre and semi-axes of the gravid uterine body for a week: the ellipsoid of `gravidShape`. Shared with the fetus fit, the atlas and the glass outline. */
+export function gravidBody(weeks: number): { centre: V3; radii: V3 } {
+  const { centre, radii } = gravidShape(weeks);
+  return { centre, radii };
+}
+
+/** The tilted cervix: external os to internal os, a capsule leaning BACK as it rises. */
+export const CERVIX_A: V3 = [0, 0, -0.008];
+export const CERVIX_B: V3 = [0, 0.024, -0.008 - CERVIX_BACK_SHIFT];
+export const CERVIX_RA = 0.0095;
+export const CERVIX_RB = 0.0075;
+/** Radius of the lower segment while it passes behind the bladder, metres. See above. */
+export const NECK_RADIUS = 0.0075;
+
+export interface Funnel {
+  a: V3;
+  b: V3;
+  ra: number;
+  rb: number;
+}
+
+/**
+ * The lower uterine segment joining the cervix to the body, as capsules: a straight tube that
+ * stays behind the bladder's back wall up to the bladder's top, then a cone that opens into the
+ * body ellipsoid. Empty where the body itself reaches the cervix (a pelvic uterus, bottom still
+ * at 2 cm).
+ */
+export function lowerSegment(body: { centre: V3; radii: V3; bottom: number }): Funnel[] {
+  if (body.bottom < 0.04) return [];
+  const z = CERVIX_B[2];
+  const top = Math.min(body.bottom + 0.014, body.centre[1]);
+  return [
+    { a: [0, CERVIX_B[1] - 0.004, z], b: [0, BLADDER_TOP_Y, z], ra: NECK_RADIUS, rb: NECK_RADIUS },
+    { a: [0, BLADDER_TOP_Y, z], b: [0, top, Math.min(body.centre[2], z + 0.5 * (body.centre[2] - z))], ra: NECK_RADIUS, rb: Math.min(0.5 * body.radii[0], 0.03) },
+  ];
+}
+
+/**
+ * The non-pregnant isthmus: the same tube behind the bladder, then a cone into the underside of
+ * the body that rests on it. Longer than it was: the body moved up 4 cm to clear the bladder.
+ */
+export function nonpregIsthmus(): Funnel[] {
+  const z = CERVIX_B[2];
+  return [
+    { a: [0, CERVIX_B[1] - 0.004, z], b: [0, BLADDER_TOP_Y, z], ra: NECK_RADIUS, rb: NECK_RADIUS },
+    { a: [0, BLADDER_TOP_Y, z], b: [0, NONPREG_CENTRE[1] - 0.006, NONPREG_CENTRE[2] - 0.012], ra: NECK_RADIUS, rb: 0.0155 },
+  ];
 }
 
 function uterus(params: ModelParams): THREE.BufferGeometry {
   const weeks = params.gestationWeeks ?? 0;
-  const cervix = capsule([0, 0, 0], [0, 0.024, 0.006], 0.0115, 0.0125);
+  // The cervix leans BACK as it rises (Gray's: it projects backward into the vagina), which is
+  // what takes its front edge out of the bladder's back wall; see pelvicUterus.ts.
+  const cervix = capsule(CERVIX_A, CERVIX_B, CERVIX_RA, CERVIX_RB);
 
   if (weeks < 6) {
-    // The non-pregnant uterus: a pear tipped forward over the bladder (anteverted).
-    const field = smoothUnion(0.012, cervix, ellipsoid([0, 0.052, 0.02], [0.0235, 0.03, 0.0165]));
-    const body = polygonise(field, [-0.028, -0.014, -0.014], [0.028, 0.086, 0.04], { cell: 0.0022 });
+    // The non-pregnant uterus: a body resting on the bladder's upper surface, on a cervix that
+    // runs up behind the bladder, joined by the isthmus.
+    const bodyCentre = NONPREG_CENTRE;
+    const isthmus = nonpregIsthmus().map((f) => capsule(f.a, f.b, f.ra, f.rb));
+    const field = smoothUnion(0.012, cervix, ...isthmus, ellipsoid(bodyCentre, NONPREG_RADII));
+    const body = polygonise(field, [-0.028, -0.014, -0.03], [0.028, bodyCentre[1] + NONPREG_RADII[1] + 0.004, 0.04], { cell: 0.0022 });
     const tubes = [1, -1].map((s) =>
       // The tube widens from the isthmus at the uterus to the ampulla, where
       // fertilisation happens, and ends in the fimbriae that sweep the ovary.
@@ -1093,16 +1262,22 @@ function uterus(params: ModelParams): THREE.BufferGeometry {
     return merge([body, ...tubes]);
   }
 
-  const { centre, radii } = gravidBody(weeks);
-  const wall = smoothUnion(0.014, cervix, ellipsoid(centre, radii));
+  const shape = gravidShape(weeks);
+  const { centre, radii } = shape;
+  const funnel = lowerSegment(shape);
+  const wall = smoothUnion(
+    0.014,
+    cervix,
+    ...funnel.map((f) => capsule(f.a, f.b, f.ra, f.rb)),
+    ellipsoid(centre, radii),
+  );
   const cell = Math.max(0.0024, radii[1] / 26);
   // The lower z bound was `centre[2] - radii[2] - 0.004`, which for a body that has come
-  // forward (centre z = 0.02 + 0.2h) is above the cervix's back wall (z = -0.0125 at the
-  // external os) and sliced the cervix off flat. The atlas builder's `boxOf` already
-  // takes the lower of -0.014 and that bound; this box now does the same.
+  // forward (centre z = 0.02 + 0.2h) is above the cervix's back wall and sliced the cervix
+  // off flat. The box now also reaches the tilted cervix, which lies further back.
   const body = polygonise(
     wall,
-    [-radii[0] - 0.004, -0.014, Math.min(-0.014, centre[2] - radii[2] - 0.004)],
+    [-radii[0] - 0.004, -0.014, Math.min(CERVIX_B[2] - CERVIX_RB - 0.004, centre[2] - radii[2] - 0.004)],
     [radii[0] + 0.004, centre[1] + radii[1] + 0.004, centre[2] + radii[2] + 0.004],
     { cell },
   );
@@ -1174,7 +1349,16 @@ function breasts(): THREE.BufferGeometry {
     f = smoothUnion(0.003, f, sphere([s * 0.074, -0.012, 0.024], 0.005));
     parts.push(polygonise(f, [s * 0.072 - 0.054, -0.06, -0.034], [s * 0.072 + 0.054, 0.052, 0.032], { cell: 0.0045 }));
   }
-  return merge(parts);
+  // DRAPED ON THE CHEST WALL (paths.ts `breastDrape`): the flat back plane was 25 mm inside the rib
+  // cage and the chest-wall muscles (and the breast 14 mm inside each lung). Gray's: the breast rests on
+  // the pectoral fascia over pectoralis major, in front of the muscle and the ribs.
+  const g = merge(parts);
+  const pos = g.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) pos.setZ(i, pos.getZ(i) + breastDrape(pos.getX(i), pos.getY(i)));
+  pos.needsUpdate = true;
+  g.computeBoundingBox();
+  g.computeBoundingSphere();
+  return g;
 }
 
 /* ------------------------------------------------------------------ fetus */

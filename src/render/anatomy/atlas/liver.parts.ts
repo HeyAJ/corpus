@@ -8,7 +8,6 @@ import {
   mergeParts,
   offset,
   polygonise,
-  smoothSubtract,
   smoothUnion,
   sphere,
   subtract,
@@ -16,6 +15,7 @@ import {
 } from '../sdf';
 import type { Sdf, V3 } from '../sdf';
 import { mulberry32 } from '../noise';
+import { liverField } from '../models';
 
 /**
  * INTERIOR PARTS OF THE LIVER.
@@ -52,16 +52,12 @@ import { mulberry32 } from '../noise';
  * .cache/probes/abdo_parts.ts reports any part that has ended up outside the real mesh.
  */
 export function liverShellField(): Sdf {
-  let f = smoothUnion(
-    0.03,
-    ellipsoid([0.03, 0.0, -0.005], [0.062, 0.062, 0.058]),
-    ellipsoid([-0.055, 0.016, 0.012], [0.05, 0.03, 0.03]),
-  );
-  f = smoothSubtract(0.02, f, halfSpace([0.0, -0.022, 0], [-0.5, -1, -0.35]));
-  f = smoothSubtract(0.006, f, sphere([0.02, -0.046, 0.026], 0.014));
-  f = smoothSubtract(0.004, f, capsule([-0.02, 0.052, 0.046], [-0.022, -0.03, 0.04], 0.004));
-  f = smoothSubtract(0.006, f, capsule([-0.012, 0.062, -0.046], [-0.012, -0.03, -0.05], 0.012));
-  return f;
+  // The shell's field AND its contacts: the stomach's gastric impression, the right kidney's
+  // renal impression and the pit and channel for the right adrenal (models.ts `liverCutters`).
+  // Before 2026-11-27 this repeated the free ellipsoid pair by hand; the shell then lost its
+  // left lobe's tip to the stomach and the lobes and vessels drawn here would have stood out
+  // of it, so the replica now comes from the one place the shell does.
+  return liverField();
 }
 
 /** Depth of the lobes' surfaces below the shell's, metres: a display choice. */

@@ -61,7 +61,7 @@ function maleOrganSd(): Sdf {
 }
 
 /** Clear space kept between the floor's muscles and the penis or prostate, metres: a display choice. */
-const MALE_ORGAN_GAP = 0.003;
+const MALE_ORGAN_GAP = 0.002;
 export const GROUP_Y = -0.045;
 const local = (p: V3): V3 => [p[0], p[1] - ORIGIN[1], p[2]];
 
@@ -73,6 +73,8 @@ const HIATUS: [number, number] = [0.022, 0.03];
 const SPHINCTER_RING_R = 0.0135;
 const SPHINCTER_RING_Y = -0.2385;
 const SPHINCTER_RING_Z = 0.007;
+/** Radius of the sphincter ring's own tube, metres: the value it was drawn with before; a drawing choice. */
+const RING_TUBE_R = 0.0022;
 /** Gap between the medial edge of each perineal membrane wing and the midline, metres. A drawing choice (see above). */
 const MEMBRANE_GAP = 0.04;
 
@@ -174,17 +176,26 @@ export function pelvicFloorLeaves(): Record<string, THREE.BufferGeometry[]> {
   // where the two ellipsoids meet (body y -0.2385, scene -0.2835) and wide enough to go AROUND the prostate's apex and the bulb's
   // neck instead of through them: SPHINCTER_RING_R 13.5 mm. A drawing choice, and an enlarged one: the real sphincter is a
   // sleeve closely applied to the urethra. Changed 2026-11-27 (agent gx3); the male pelvic floor's earlier byte-identity is gone.
-  const ring: V3[] = Array.from({ length: 13 }, (_, i): V3 => {
-    const a = (2 * Math.PI * i) / 12;
-    return [SPHINCTER_RING_R * Math.cos(a), SPHINCTER_RING_Y, SPHINCTER_RING_Z + SPHINCTER_RING_R * Math.sin(a)];
+  // A CLOSED curve of 24 points, each pushed outward (in the ring's plane) until the whole tube clears the penis and the prostate by
+  // `clear`. Two earlier versions failed and are why this is done on the centreline and not on the finished mesh. (1) A 13-point open
+  // curve left the ends of the tube as an open seam, so any inside test read the mesh as open. (2) Closing it and then pressing the
+  // mesh's vertices out of the two organs with `declip` squashed and folded the tube where the bulb's ridge met it, and the folded
+  // mesh made points 3.5 mm from its axis read as inside a tube of radius 2.2 mm. Moving the centreline keeps the tube a clean torus.
+  const male = maleOrganSd();
+  const clear = RING_TUBE_R + MALE_ORGAN_GAP;
+  const ring: V3[] = Array.from({ length: 24 }, (_, i): V3 => {
+    const a = (2 * Math.PI * i) / 24;
+    const at = (r: number): V3 => [r * Math.cos(a), SPHINCTER_RING_Y, SPHINCTER_RING_Z + r * Math.sin(a)];
+    let r = SPHINCTER_RING_R;
+    while (male(...at(r)) < clear && r < 0.06) r += 0.0004;
+    return at(r);
   });
-  const sph = toLocal(tubeAlong(ring, () => 0.0022, { tubular: 18, radial: 6, closed: false }));
+  const sph = toLocal(tubeAlong(ring, () => RING_TUBE_R, { tubular: 96, radial: 6, closed: true }));
   out.external_urethral_sphincter = [sph];
   // Every vertex clear of the pelvic bones (see `declip`), the field read in the hip bone's body frame (this organ's frame is 0.2 higher).
   for (const gs of Object.values(out)) for (const g of gs) declip(g, hipThighBoneSd(), 0.0002, ORIGIN[1]);
   // Then out of the penis and the prostate. Only the leaves the MALE body draws: the female shell borrows the coccygeus and the
   // tendinous arch from here and nothing else, and those lie nowhere near either organ, so a female body is unchanged.
-  const male = maleOrganSd();
   for (const [id, gs] of Object.entries(out)) {
     if (id === 'coccygeus' || id === 'tendinous_arch_of_levator_ani') continue;
     for (const g of gs) declip(g, male, MALE_ORGAN_GAP, ORIGIN[1]);
