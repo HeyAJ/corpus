@@ -529,7 +529,7 @@ export function laneBelly(
   void tm;
   if (o.ends?.bottom) pts[0] = o.ends.bottom;
   if (o.ends?.top) pts[pts.length - 1] = o.ends.top;
-  return belly(pts, w, t, backFacing, Math.max(10, Math.round(ys.length * 1.1)), 7);
+  return belly(pts, w, t, backFacing, Math.max(10, Math.round(ys.length * 0.75)), 7);
 }
 
 
@@ -589,17 +589,17 @@ export function backMuscleLeaves(): Record<string, THREE.BufferGeometry[]> {
   out.trapezius_descending = fan(
     [M(eop), sp('C2'), sp('C4'), sp('C6'), sp('C7')],
     [0.6, 0.68, 0.76, 0.86, 0.96].map((t) => A(clavPost(t))),
-    0.0035, { above: erectorTop, lift: liftOverScapula, steps: 10 },
+    0.0035, { above: erectorTop, lift: liftOverScapula, steps: 8 },
   );
   out.trapezius_transverse = fan(
     [sp('C7'), sp('T1'), sp('T2'), sp('T3')],
     [A([0.1455, 0.2765, -0.0225]), A(scapSpine(0.126)), A(scapSpine(0.1)), A(scapSpine(0.076))],
-    0.0035, { above: erectorTop, lift: liftOverScapula, steps: 10 },
+    0.0035, { above: erectorTop, lift: liftOverScapula, steps: 8 },
   );
   out.trapezius_ascending = fan(
     ['T4', 'T6', 'T8', 'T10', 'T12'].map((n) => sp(n)),
     [0.068, 0.063, 0.059, 0.056, 0.053].map((x) => A(scapSpine(x))),
-    0.0035, { above: erectorTop, lift: liftOverScapula, steps: 12 },
+    0.0035, { above: erectorTop, lift: liftOverScapula, steps: 9 },
   );
 
   /* ---- latissimus dorsi: the broad sheet of the lower back and the flat tendon to the humerus */
@@ -608,7 +608,7 @@ export function backMuscleLeaves(): Record<string, THREE.BufferGeometry[]> {
   const latOrigins: Anchor[] = [sp('T7'), sp('T9'), sp('T11'), sp('L2'), sp('L4'), M(sacralCrest(-0.12)), A(iliacCrest(0.045)), A(iliacCrest(0.085))];
   const latInserts = latOrigins.map((_, i) => A(apexSpread[Math.min(4, Math.floor((i * 5) / latOrigins.length))]));
   out.latissimus_dorsi = [
-    ...fan(latOrigins, latInserts, 0.0035, { above: erectorTop, lift: () => 0.0025, steps: 12 }),
+    ...fan(latOrigins, latInserts, 0.0035, { above: erectorTop, lift: () => 0.0025, steps: 9 }),
     ...sides((s) => [
       belly(
         ([apex, [0.1515, 0.214, -0.024], [0.155, 0.222, 0.0035], [0.1585, 0.2255, 0.0112], sulcus(0.226)] as V3[]).map((p) => onSide(p, s)),

@@ -70,17 +70,6 @@
       ]
     },
     {
-      "id": "back_muscles",
-      "triangles": 11272,
-      "budget": 10000,
-      "boundingRadius_m": 0.29804,
-      "worldCentre_m": [
-        0,
-        0.1341,
-        -0.0469
-      ]
-    },
-    {
       "id": "upper_limb_bones",
       "triangles": 10712,
       "budget": 12000,
@@ -89,6 +78,17 @@
         -0.0001,
         0.2109,
         -0.0283
+      ]
+    },
+    {
+      "id": "back_muscles",
+      "triangles": 9752,
+      "budget": 10000,
+      "boundingRadius_m": 0.29792,
+      "worldCentre_m": [
+        0,
+        0.1341,
+        -0.0479
       ]
     },
     {
