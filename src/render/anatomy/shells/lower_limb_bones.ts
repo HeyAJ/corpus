@@ -146,10 +146,32 @@ export function wingSurface(s: number, y: number): number {
   return WING_BOW * Math.sin(Math.PI * Math.max(0, Math.min(1, s / 0.144))) * top + WING_LOW * low;
 }
 
+/**
+ * How far the POSTERIOR end of the plate is carried back, metres (a negative z offset), and the
+ * span of s over which that fades out. WHY IT EXISTS (lv2, 2026-11). The sacrum's auricular surface
+ * lies where the sacral axis puts it (the cord/column centreline, z -0.0713 at the alae) and the
+ * ilium's lay 7.7 mm in front of it (-0.0636): the plate was authored from the acetabulum and the
+ * iliac spines, with nothing tying its back end to the sacrum, so the two faces of the sacroiliac
+ * joint overlapped for only a part of their length. The sacrum cannot move (the promontory has to
+ * meet L5, and the alae follow the column), so the ilium's back end does: a pure translation in z
+ * for s below WING_BACK_S0, fading to nothing by WING_BACK_S1, so the anterior superior and inferior
+ * spines, the crest, the fossa and the acetabular junction keep their places and only the plate
+ * between them and the sacrum bends backwards. A pure z translation (no change in x) is chosen
+ * because the two faces already agreed in x to within a millimetre (0.0393 against 0.0385); only z
+ * differed. 7.7 mm is the measured offset of the two patch centres, not a figure from the
+ * literature; Gray's says only that the ilium and sacrum meet at the auricular surfaces.
+ */
+const WING_BACK_Z = -0.0077;
+const WING_BACK_S0 = 0.03;
+const WING_BACK_S1 = 0.09;
+function wingBack(s: number): number {
+  return WING_BACK_Z * (1 - smooth(WING_BACK_S0, WING_BACK_S1, s));
+}
+
 /** The body-coordinate point on the plate's mid-surface at (s, y), pushed off it by `off` along the outward normal. */
 export function wingPoint(s: number, y: number, off = 0): V3 {
   const d = wingSurface(s, y) + off;
-  return [WING_O[0] + s * WING_S[0] + d * WING_N[0], y, WING_O[2] + s * WING_S[1] + d * WING_N[1]];
+  return [WING_O[0] + s * WING_S[0] + d * WING_N[0], y, WING_O[2] + s * WING_S[1] + d * WING_N[1] + wingBack(s)];
 }
 
 /** The plate within an outline, optionally thinner and shifted off the mid-surface. */
@@ -157,8 +179,15 @@ export function wing(outline: readonly (readonly [number, number])[] = WING_OUTL
   const sd = polySd(outline);
   return (x, y, z) => {
     const dx = x - WING_O[0];
-    const dz = z - WING_O[2];
-    const s = dx * WING_S[0] + dz * WING_S[1];
+    // Undo the posterior translation of wingPoint. It depends on s and s depends on z, so the
+    // inverse is found by fixed-point iteration (the slope of wingBack is 0.13, so three passes
+    // leave well under a micrometre).
+    let dz = z - WING_O[2];
+    let s = dx * WING_S[0] + dz * WING_S[1];
+    for (let k = 0; k < 3; k++) {
+      dz = z - WING_O[2] - wingBack(s);
+      s = dx * WING_S[0] + dz * WING_S[1];
+    }
     const dn = dx * WING_N[0] + dz * WING_N[1];
     return Math.max(Math.abs(dn - wingSurface(s, y) - shift) * 0.9 - thick / 2, sd(s, y));
   };

@@ -140,6 +140,13 @@ function ring(y: number, a: number): [number, number] {
   return [A * Math.sin(a), -c * depth];
 }
 
+/**
+ * The cage's cross-section, exported for the muscle shells that wrap it (chest wall, abdominal
+ * wall, back): one rule for where the outside of the trunk lies, so a muscle stub is placed
+ * against the ribs it covers and not against a second, drifting copy of their numbers.
+ */
+export const cageRing = ring;
+
 /** Control points of the right-hand rib n (1..12), body coordinates, head to front end. */
 export function ribPointsBody(n: number): V3[] {
   const r = RIBS[n - 1];

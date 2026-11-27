@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { ORGAN_DEFS, organPosition, warpPoint } from '../../src/render/anatomy/layout';
 import { buildModel } from '../../src/render/anatomy/models';
 import { buildCentrelines } from '../../src/render/vascular/centrelines';
-import { organSamples } from '../../src/render/body/organSamples';
+import { MUSCLE_SKIN_M, organSamples } from '../../src/render/body/organSamples';
 import { outlineModel, SAMPLE_STRIDE, type OutlineBody } from '../../src/render/body/outlineModel';
 import { buildOutline, OUTLINE_MAX_TRIANGLES } from '../../src/render/body/outlineMesh';
 import type { OrganDef } from '../../src/data/types';
@@ -46,7 +46,7 @@ function shell(def: OrganDef, weeks: number): THREE.BufferGeometry {
 
 function organsOf(body: OutlineBody): OrganDef[] {
   return ORGAN_DEFS.filter((d) => {
-    // The same rule as OrganSet.wants: a layer organ (the bones) is not part of the default body
+    // The same rule as OrganSet.wants: a layer organ (the bones, the muscles) is not part of the default body
     // and so is not in the figure's fit.
     if (d.layer) return false;
     if (d.sex && d.sex !== body.sex) return false;
@@ -120,6 +120,35 @@ describe('glass body outline', () => {
       }
     });
   }
+
+  it('leaves every layer organ out of the fit, the muscles as well as the bones', () => {
+    // The outline is built in the worker from the default organs and must not wait for, or change
+    // with, a lazy build, so no layer organ may be among the organs it is fitted to.
+    const male: OutlineBody = { sex: 'male', weeks: 0 };
+    const fitted = new Set(organsOf(male).map((d) => d.id));
+    const layered = ORGAN_DEFS.filter((d) => d.layer);
+    expect(layered.filter((d) => d.layer === 'muscles').map((d) => d.id).sort()).toEqual([
+      'abdominal_wall_muscles', 'back_muscles', 'chest_wall_muscles', 'head_neck_muscles',
+      'hip_thigh_muscles', 'pelvic_floor_muscles', 'shoulder_arm_muscles',
+    ]);
+    for (const d of layered) expect(fitted.has(d.id), d.id).toBe(false);
+  });
+
+  it('the skin covers the muscles: every vertex of all seven muscle shells is inside the glass by the skin margin', { timeout: 120000 }, () => {
+    // The glass is the skin, and skin covers the muscles whether or not the Muscles layer is shown. The
+    // muscles are layer organs, built lazily and left out of the fit, so the figure meets them through the
+    // body-wall landmark samples in organSamples.ts. This replaced a regression bound of 8 mm that had
+    // been a confession (the iliotibial tract stood 13.3 mm outside the glass); it is now a containment
+    // claim, in the three bodies the layer can be shown on, and the worst margin of each is the message.
+    for (const body of [BODIES[0], BODIES[1], BODIES[3]]) {
+      const model = outlineModel(samplesOf(body.body), body.body);
+      for (const def of ORGAN_DEFS.filter((d) => d.layer === 'muscles')) {
+        let worst = -Infinity;
+        for (const v of worldVertices(def, shell(def, 0))) worst = Math.max(worst, model.field(v.x, v.y, v.z));
+        expect(worst, `${body.name}: ${def.id} worst vertex relative to the glass (m, negative is inside)`).toBeLessThanOrEqual(-MUSCLE_SKIN_M);
+      }
+    }
+  });
 
   it('at week 40 the figure encloses the whole gravid uterus', { timeout: 60000 }, () => {
     const body: OutlineBody = { sex: 'female', weeks: 40 };

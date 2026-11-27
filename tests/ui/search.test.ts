@@ -47,6 +47,13 @@ describe('search catalogue and ranking', () => {
     }
   });
 
+  it('finds the seven muscle organs by name (layer organs are built on demand when selected)', () => {
+    for (const [query, organId] of [['head and neck muscles', 'head_neck_muscles'], ['chest wall', 'chest_wall_muscles'], ['abdominal wall', 'abdominal_wall_muscles'], ['back muscles', 'back_muscles'], ['shoulder and upper arm', 'shoulder_arm_muscles'], ['hip and thigh muscles', 'hip_thigh_muscles'], ['pelvic floor', 'pelvic_floor_muscles']] as const) {
+      expect(search(male, query).some((e) => e.kind === 'organ' && e.organId === organId), query).toBe(true);
+    }
+    expect(search(male, 'trapezius').some((e) => e.organId === 'back_muscles' && e.partId === 'trapezius')).toBe(true);
+  });
+
   it('never returns more than the limit and nothing for a blank query', () => {
     expect(search(male, 'e').length).toBeLessThanOrEqual(MAX_RESULTS);
     expect(search(male, '   ')).toEqual([]);

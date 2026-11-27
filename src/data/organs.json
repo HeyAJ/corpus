@@ -729,6 +729,118 @@
       "position": [0, -0.2, 0],
       "layoutOffset": [0, 0, 0],
       "volume_mL": null
+    },
+    {
+      "id": "head_neck_muscles",
+      "displayName": "Head and Neck Muscles",
+      "system": "muscular",
+      "group": "cranial",
+      "layer": "muscles",
+      "panel": "muscular",
+      "selectedColor": "#B8554C",
+      "placeholder": {
+        "kind": "model",
+        "model": "head_neck_muscles"
+      },
+      "position": [0, 0.42, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "chest_wall_muscles",
+      "displayName": "Chest Wall Muscles",
+      "system": "muscular",
+      "group": "thoracic",
+      "layer": "muscles",
+      "panel": "muscular",
+      "selectedColor": "#C0605A",
+      "placeholder": {
+        "kind": "model",
+        "model": "chest_wall_muscles"
+      },
+      "position": [0, 0.2, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "abdominal_wall_muscles",
+      "displayName": "Abdominal Wall Muscles",
+      "system": "muscular",
+      "group": "abdominal",
+      "layer": "muscles",
+      "panel": "muscular",
+      "selectedColor": "#B35A50",
+      "placeholder": {
+        "kind": "model",
+        "model": "abdominal_wall_muscles"
+      },
+      "position": [0, -0.017, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "back_muscles",
+      "displayName": "Back Muscles",
+      "system": "muscular",
+      "group": "axial",
+      "layer": "muscles",
+      "panel": "muscular",
+      "selectedColor": "#A94B45",
+      "placeholder": {
+        "kind": "model",
+        "model": "back_muscles"
+      },
+      "position": [0, 0, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "shoulder_arm_muscles",
+      "displayName": "Shoulder and Upper Arm Muscles",
+      "system": "muscular",
+      "group": "thoracic",
+      "layer": "muscles",
+      "panel": "muscular",
+      "selectedColor": "#BC5C52",
+      "placeholder": {
+        "kind": "model",
+        "model": "shoulder_arm_muscles"
+      },
+      "position": [0, 0.2, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "hip_thigh_muscles",
+      "displayName": "Hip and Thigh Muscles",
+      "system": "muscular",
+      "group": "pelvic",
+      "layer": "muscles",
+      "panel": "muscular",
+      "selectedColor": "#B0534A",
+      "placeholder": {
+        "kind": "model",
+        "model": "hip_thigh_muscles"
+      },
+      "position": [0, -0.2, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
+    },
+    {
+      "id": "pelvic_floor_muscles",
+      "displayName": "Pelvic Floor Muscles",
+      "system": "muscular",
+      "group": "pelvic",
+      "layer": "muscles",
+      "panel": "muscular",
+      "selectedColor": "#C26A60",
+      "placeholder": {
+        "kind": "model",
+        "model": "pelvic_floor_muscles"
+      },
+      "position": [0, -0.2, 0],
+      "layoutOffset": [0, 0, 0],
+      "volume_mL": null
     }
   ],
   "giCentrelines": [

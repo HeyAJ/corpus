@@ -1,0 +1,615 @@
+{
+  "atlas": "back_muscles",
+  "about": "The muscles of the back, in the layers Gray's describes: the trapezius and latissimus dorsi on the surface, the rhomboids, levator scapulae and the two serrati posteriores under them, the splenius muscles of the neck, the erector spinae in the groove beside the spine, the short deep muscles between the vertebrae, the four suboccipital muscles at the top of the neck, and the thoracolumbar fascia. Each muscle runs from its origin to its insertion on the spine, ribs, shoulder blade, collarbone, upper arm bone, pelvis and skull of this body's own skeleton, and the muscles lie in layers over one another. The drives are the whole-body ones the engine has: muscle tone, paralysis, seizure and shivering, and exertion for the erector spinae that holds the body upright. Posture, spinal movement and force are not simulated. Outlines, thicknesses and widths are drawing choices, not measurements, and the fibres of the sheets are not drawn.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "trapezius",
+      "label": "Trapezius",
+      "summary": "The large flat muscle of the back of the neck and shoulders, whose two halves together make a diamond.",
+      "function": "It raises, draws back and lowers the shoulder blade and turns it so that the arm can be lifted overhead. The upper fibres also help to extend and turn the head.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trapezius_descending",
+      "label": "Trapezius, descending (upper) part",
+      "parent": "trapezius",
+      "summary": "The upper fibres, from the skull and the nuchal ligament down and outward to the outer part of the collarbone.",
+      "function": "They raise the point of the shoulder, as in a shrug.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trapezius_transverse",
+      "label": "Trapezius, transverse (middle) part",
+      "parent": "trapezius",
+      "summary": "The middle fibres, running sideways from the lowest neck and upper chest spines to the acromion and the spine of the shoulder blade.",
+      "function": "They draw the shoulder blade back towards the spine.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "trapezius_ascending",
+      "label": "Trapezius, ascending (lower) part",
+      "parent": "trapezius",
+      "summary": "The lower fibres, running up from the thoracic spines to the root of the spine of the shoulder blade.",
+      "function": "They draw the shoulder blade down and, with the upper part, turn it so that the arm can rise.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "latissimus_dorsi",
+      "label": "Latissimus dorsi",
+      "summary": "The broad sheet of the lower back that narrows to a flat tendon on the front of the upper arm bone.",
+      "function": "It draws the raised arm down and back and turns it inward, as in pulling the body up on a bar or paddling. It holds the arm to the trunk.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rhomboid_muscles",
+      "label": "Rhomboid muscles",
+      "summary": "Two flat muscles between the spine and the inner border of the shoulder blade, under the trapezius.",
+      "function": "They draw the shoulder blade towards the spine and hold it against the chest wall.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rhomboid_major",
+      "label": "Rhomboid major",
+      "parent": "rhomboid_muscles",
+      "summary": "The larger, lower of the two, from the spines of the upper thoracic vertebrae to the inner border of the shoulder blade below its spine.",
+      "function": "It draws the shoulder blade towards the spine and lifts it slightly.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rhomboid_minor",
+      "label": "Rhomboid minor",
+      "parent": "rhomboid_muscles",
+      "summary": "The smaller, upper one, from the lowest neck spines to the inner border of the shoulder blade at the root of its spine.",
+      "function": "It works with the major to draw the shoulder blade towards the spine.",
+      "color": "#b05049",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "levator_scapulae",
+      "label": "Levator scapulae",
+      "summary": "A strap from the transverse processes of the upper neck vertebrae to the top corner of the shoulder blade.",
+      "function": "It lifts the shoulder blade and tilts it; with the shoulder held, it bends the neck to its own side.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serratus_posterior_superior",
+      "label": "Serratus posterior superior",
+      "summary": "A thin sheet from the spines of the lowest neck and upper chest vertebrae to the second to fifth ribs.",
+      "function": "It is described as lifting the upper ribs; its part in breathing is small.",
+      "color": "#a9544c",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serratus_posterior_inferior",
+      "label": "Serratus posterior inferior",
+      "summary": "A thin sheet from the lowest chest and upper lumbar spines to the lowest four ribs.",
+      "function": "It draws the lower ribs down and back, and so steadies them against the pull of the diaphragm.",
+      "color": "#a9544c",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "splenius_capitis",
+      "label": "Splenius capitis",
+      "summary": "The upper splenius: a broad, flat muscle of the back of the neck, under the trapezius, reaching the skull behind the ear.",
+      "function": "Together the two extend the head and neck; one alone turns the head to its own side and bends it that way.",
+      "color": "#bc5c52",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "splenius_cervicis",
+      "label": "Splenius cervicis",
+      "summary": "The lower splenius: from the spines of the upper thoracic vertebrae to the transverse processes of the first few neck vertebrae.",
+      "function": "Together the two extend the neck; one alone turns the neck to its own side and bends it that way.",
+      "color": "#b8564e",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "erector_spinae",
+      "label": "Erector spinae",
+      "summary": "The long column of muscle that lies in the groove beside the spine, from the pelvis to the skull.",
+      "function": "It straightens the spine and holds the trunk upright; on one side it bends the trunk sideways, and it lets the trunk be lowered under control when bending forward.",
+      "color": "#b35a50",
+      "rest": 0.3,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "iliocostalis",
+      "label": "Iliocostalis",
+      "parent": "erector_spinae",
+      "summary": "The outer column, from the pelvis up the angles of the ribs to the neck.",
+      "function": "It extends and bends the spine and holds the ribs steady.",
+      "color": "#b35a50",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "longissimus",
+      "label": "Longissimus",
+      "parent": "erector_spinae",
+      "summary": "The middle and longest column, from the lower back to the skull behind the ear.",
+      "function": "It extends and bends the spine and, in the neck, turns and extends the head.",
+      "color": "#bb6156",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "spinalis",
+      "label": "Spinalis",
+      "parent": "erector_spinae",
+      "summary": "The inner column, lying against the spinous processes.",
+      "function": "It extends the spine.",
+      "color": "#a9544c",
+      "rest": 0.3,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deep_back_muscles",
+      "label": "Deep back muscles",
+      "summary": "The short muscles between the vertebrae, deep to the erector spinae.",
+      "function": "They extend and rotate the spine and steady each vertebra on its neighbours.",
+      "color": "#9a4a44",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "transversospinales",
+      "label": "Transversospinales",
+      "parent": "deep_back_muscles",
+      "summary": "The group of muscles that run slantwise from the transverse processes up to the spinous processes.",
+      "function": "They extend the spine and, on one side, turn it to the opposite side.",
+      "color": "#9a4a44",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "semispinalis",
+      "label": "Semispinalis",
+      "parent": "transversospinales",
+      "summary": "The most superficial and longest of the group, reaching from the chest up to the skull.",
+      "function": "It extends the head and spine; on one side it turns them to the opposite side.",
+      "color": "#a24f48",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "multifidus",
+      "label": "Multifidus",
+      "parent": "transversospinales",
+      "summary": "Short slanting bundles against the laminae, from the sacrum to the second neck vertebra, thickest in the lower back.",
+      "function": "It steadies the vertebrae as the spine moves and helps to extend and rotate it.",
+      "color": "#8f453f",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rotatores",
+      "label": "Rotatores",
+      "parent": "transversospinales",
+      "summary": "The shortest and deepest slips, each from a transverse process to the vertebra above.",
+      "function": "They rotate the vertebrae slightly and steady them.",
+      "color": "#86403b",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "interspinales",
+      "label": "Interspinales",
+      "parent": "deep_back_muscles",
+      "summary": "Short paired slips between the spinous processes of neighbouring vertebrae, in the neck and the lower back.",
+      "function": "They help to extend the spine.",
+      "color": "#a85650",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "intertransversarii",
+      "label": "Intertransversarii",
+      "parent": "deep_back_muscles",
+      "summary": "Small slips between the transverse processes of neighbouring vertebrae, in the neck and the lower back.",
+      "function": "They bend the spine to their own side and steady it.",
+      "color": "#a85650",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "suboccipital_muscles",
+      "label": "Suboccipital muscles",
+      "summary": "Four small muscles at the top of the neck, between the atlas, the axis and the skull.",
+      "function": "They extend the head and turn it, and make fine adjustments of its position on the top two vertebrae.",
+      "color": "#9a4a44",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.2,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rectus_capitis_posterior_major",
+      "label": "Rectus capitis posterior major",
+      "parent": "suboccipital_muscles",
+      "summary": "From the spinous process of the axis to the skull, below the inferior nuchal line.",
+      "function": "It extends the head and turns it to its own side.",
+      "color": "#9a4a44",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rectus_capitis_posterior_minor",
+      "label": "Rectus capitis posterior minor",
+      "parent": "suboccipital_muscles",
+      "summary": "From the posterior tubercle of the atlas to the skull, close to the midline.",
+      "function": "It extends the head.",
+      "color": "#a24f48",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "obliquus_capitis_superior",
+      "label": "Obliquus capitis superior",
+      "parent": "suboccipital_muscles",
+      "summary": "From the transverse process of the atlas up to the skull, lateral to the rectus capitis posterior major.",
+      "function": "It extends the head and bends it to its own side.",
+      "color": "#9a4a44",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "obliquus_capitis_inferior",
+      "label": "Obliquus capitis inferior",
+      "parent": "suboccipital_muscles",
+      "summary": "From the spinous process of the axis to the transverse process of the atlas.",
+      "function": "It turns the atlas, and with it the head, to its own side.",
+      "color": "#a24f48",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thoracolumbar_fascia",
+      "label": "Thoracolumbar fascia",
+      "summary": "The strong sheet of connective tissue that covers the deep muscles of the back, thickest in the lower back.",
+      "function": "It binds the muscles of the back to the spine and the pelvis and gives the latissimus dorsi and other muscles a firm anchor on the spinous processes and the iliac crest.",
+      "color": "#d8c3a5",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    }
+  ]
+}

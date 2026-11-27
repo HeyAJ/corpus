@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useRef } from 'react';
 import { useStore } from '../store';
 import type { LayerName } from '../shareLink';
-import { ActivityGlyph, BloodDrop, BoneGlyph, HormoneGlyph, LayersGlyph, NerveGlyph } from './layerGlyphs';
+import { ActivityGlyph, BloodDrop, BoneGlyph, HormoneGlyph, LayersGlyph, MuscleGlyph, NerveGlyph } from './layerGlyphs';
 import styles from './layers.module.css';
 
 /**
@@ -20,7 +20,7 @@ import styles from './layers.module.css';
  *
  * THE ROWS keep each old switch's accessible name and `aria-pressed` ("Show blood vessels" /
  * "Hide blood vessels", and so on), so a visitor's habits and the tests' locators carry over.
- * Order: Bones, Vessels, Nerves, Hormones, Activity. Each row is a 44 px-high switch with a
+ * Order: Bones, Muscles, Vessels, Nerves, Hormones, Activity. Each row is a 44 px-high switch with a
  * one-line plain description.
  */
 
@@ -61,6 +61,8 @@ export function LayersControl() {
   const setOpen = useStore((s) => s.setLayersOpen);
   const bones = useStore((s) => s.bonesVisible);
   const toggleBones = useStore((s) => s.toggleBones);
+  const muscles = useStore((s) => s.musclesVisible);
+  const toggleMuscles = useStore((s) => s.toggleMuscles);
   const vesselsUser = useStore((s) => s.vascularVisible);
   const toggleVessels = useStore((s) => s.toggleVascular);
   // The Viewer forces the vessels on while the heart is open (Viewer.applyVascularVisibility), so
@@ -90,6 +92,16 @@ export function LayersControl() {
       ariaLabel: bones ? 'Hide bones' : 'Show bones',
       title: bones ? 'Hide bones' : 'Show bones',
       glyph: <BoneGlyph on={bones} />,
+    },
+    {
+      id: 'muscles',
+      label: 'Muscles',
+      blurb: 'Muscle groups, over the organs',
+      on: muscles,
+      toggle: toggleMuscles,
+      ariaLabel: muscles ? 'Hide muscles' : 'Show muscles',
+      title: muscles ? 'Hide muscles' : 'Show muscles',
+      glyph: <MuscleGlyph on={muscles} />,
     },
     {
       id: 'vessels',

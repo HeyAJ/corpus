@@ -1372,3 +1372,116 @@ wall. Its duct ends opposite the upper second molar crown, and the facial nerve 
 skull). Shrinking the inner ear to fit (the vestibular envelope was reduced only where the
 landmarks called for it). Leaving the overlap as a limitation (the cause was a placement error,
 not a modelling limit).
+
+## ADR-053 — The leftovers of the head and spine are resolved by Gray's landmarks
+
+After ADR-050 to ADR-052 the measurements still showed overlaps that the texts do not allow: the
+brain shell 5.8 mm inside each eyeball, the conus tapering from inside T12 (Gray's: the L1/L2
+disc), the sacroiliac surfaces 7.7 mm apart, the sacrum and coccyx 23 mm apart, the dural sac
+ending at S1, and the submandibular and sublingual glands and their ganglion cord inside the
+mandible by 1.6 to 3.15 mm.
+
+**The decision.** Each was moved to where Gray's puts it, not hidden. The orbital surface of the
+frontal lobe rests on the orbital plate, so the brain is carved over each orbit: the skull's orbit
+cone grown by `ORBIT_ROOF_GROW` 0.0100 m (a drawing choice, made of the cone skin, the cranial-floor
+margin and the bone) is smooth-subtracted from the cerebrum (`orbitalRoofCutter`, `models.ts`, with
+copies in `brain.parts.ts`), and the skull's hand-held `FLOOR_MM` table was regenerated from the new
+shell. The conus moved to y 0.013, the filum runs to the coccyx, the dural sac ends at S2, the
+coccyx takes the sacrum's shift (`SACRAL_SHIFT`, gap 23 mm to 0.63 mm), the ilium is carried back by
+`WING_BACK_Z`, and the lower salivary glands were refitted into their fossae. Afterwards the eye
+parts lie 7.04 mm clear of the brain shell, and the sacroiliac centres agree to 0.2 mm.
+
+**What it costs.** The skull's orbit cone is much taller than the globe, so the carve raises the
+brain's underside about 20 mm over each orbit: a smooth lift, not a gouge, but larger than life.
+The same hand-kept coupling (the carve in two files, `FLOOR_MM`, `CONUS_TIP_Y`) is a trap, recorded
+in CLAUDE.md. The parotid still overlaps the ramus by 0.29 mm.
+
+**Rejected.** Moving the eyes (the eyes were not wrong: the skull's orbits and the optic nerves are
+placed around them, so moving them would shift those to relieve one overlap, and Gray's has the
+brain resting on the orbital roof, not the globe beneath the brain). Accepting the overlaps (a
+brain inside an eye reads as a bug, and the limitations file is for what cannot be drawn, not what
+was not corrected). Shrinking the orbit cone to the globe (the skull's orbit would no longer match
+the orbit the rest of the skull is built around).
+
+## ADR-054 — The Muscles layer: regional groups attached to this skeleton, driven through muscle tone
+
+The skeleton (ADR-050) made a muscle layer possible and showed what it must not be: a set of
+free-floating slabs. Seven scaffold stubs existed (each under 1,500 triangles); a visitor who
+switches Muscles on expects to see where each muscle runs and what it does when a drug acts.
+
+**The decision.** Muscles are a second layer, `'muscles'`, under the contract of ADR-048 (drawn while
+the layer is on or the organ is selected, built lazily, cached), with its own look (`MUSCLE_TINT`
+0xb5524a, `MUSCLE_DENSITY` 0.5, `MUSCLE_ACTIVITY_COLOUR_MIX` 0.55, display constants) and its own
+budget, `LAYER_BUDGET.muscles` 64,000 (the sum of the per-organ figures; measured 48,696). The Layers
+control gains a Muscles row between Bones and Vessels, the store a `musclesVisible` flag and the
+share link the name `muscles`. They are seven REGIONAL organs, not one (the same reasoning as the
+skeleton: each wants its own framing, tree and triangle entry): head and neck, chest wall,
+abdominal wall, back, shoulder and arm, hip and thigh, pelvic floor, 228 parts in all. Each muscle is
+routed from its origin to its insertion on THIS model's bones, with landmarks snapped to the
+nearest bone surface and every vertex pressed out of bone, so the muscles agree with the skeleton
+the visitor can switch on beside them. **Drives go through muscle tone, not through a new path.**
+`neuro.muscleTone` already reached `mind.ts`, the lungs (flaccid paralysis stops ventilation, rigidity
+stiffens the chest wall) and shivering, and rocuronium, succinylcholine, neostigmine and dantrolene
+already write it; the anatomy deriver turns it into `rigidity` and `paralysis`. So the layer needed
+no engine change, and a neuromuscular blocker shows on the muscles by the same bus as everything
+else (rule 2). (A claim that the blockers act only through tidal volume was made earlier in the
+round and was wrong; propofol's separate `neuromuscularBlock` path is the one that pushes tidal
+volume.) The macroscopic muscles change colour and glow and never move; the display motions are the
+intercostals with the breath and the hyoid group with the swallow.
+
+**What went wrong on the way.** The first pass left the iliacus 17.3 mm into the large intestine and
+the psoas major 7.4 mm into the pancreas, and the vertex-level bone clearance hid large sheet
+triangles whose centroids dip into bone (up to 5.9 mm). Shaping by Gray's descriptions brought the
+iliacus to 12.2 mm and the psoas major to 1.5 mm; the iliacus remainder is a conflict between the
+stylised colon and the pelvis that no muscle can fix (section 21).
+
+**Rejected.** One muscle organ (about 230 parts could be neither picked nor budgeted). Moving the
+organs to give the muscles room (the iliacus conflict is the colon lying on the iliac bone, and
+moving the colon would reopen every neighbour measured in the last two rounds). A per-muscle
+force, fatigue or metabolism model (no sourced magnitudes in this project; stated in section 21).
+Giving each blocker its own muscle path (the one tone signal already carries them all).
+
+## ADR-055 — The glass always encloses the muscles
+
+With the Muscles layer on, the hip and thigh muscles stood 13.3 mm outside the glass body, the back
+7.5 mm, the abdominal wall 5.5 mm and the chest wall 4.8 mm: an écorché figure wearing a skin too
+small for it. The old regression bound (8 mm) had been written to tolerate overshoot, and it failed.
+
+**The decision.** The glass encloses the muscles whether or not the layer is on. Muscle organs stay
+out of the outline fit, because the outline is built in a worker at boot and no muscle mesh exists
+then; instead `organSamples.ts` carries a 21-row table, `BODY_WALL_MUSCLE_ROWS`, derived in prose
+from the outermost muscle vertex per 24 mm height band and side (pectoral region, costal margin,
+rectus, back, the hip edge and the neck at the head margin), mirrored across the midline and inset
+by the margin minus 1 mm, with `MUSCLE_SKIN_M` 0.001 m as the display skin thickness. The thighs
+follow the hip width through the existing outline rule, and `outlineModel.ts` is unchanged. The
+test is a containment test in three bodies (male, female, 28 weeks): each muscle organ's worst
+vertex is at least 1 mm inside the glass (worst margins from -1.4 mm to -12.0 mm). The default
+silhouette is slightly fuller; it was looked at and reads as a human torso, not a bloated one.
+
+**Rejected.** Growing the glass only while the layer is on (the silhouette would change under the
+visitor's hand, and the glass would have to be rebuilt in the worker on each toggle). Tolerating
+overshoot, with a larger bound (it hides exactly the regression the test exists to catch).
+Fitting the outline to lazily built muscle meshes (the reason layer organs are excluded in
+ADR-048).
+
+## ADR-056 — The sarcomere slides: filaments keep their length
+
+The first sarcomere animation, in the magnified biceps, SCALED the thin filaments as the muscle
+became active. That is the opposite of the sliding-filament account in Guyton and Hall: the
+filaments do not change length, they slide past each other, and a diagram that shows them
+shortening teaches the wrong mechanism in an organ whose purpose is to teach the right one.
+
+**The decision.** The animation is per vertex (`slideY` in the detail file). The Z discs approach
+the M line; the thin filaments, with troponin and tropomyosin, translate rigidly with their Z disc;
+the thick filaments and the A band stay fixed; and the I band, the H zone and titin change length
+because the filaments slide and not because anything was scaled. `SHORTEN` 0.18 is the display
+constant for Z-disc travel. Measured from rest to full activity on the schematic (mm): A band
+6.0000 to 6.0000, thick filament 6.0000 to 6.0000, thin filament 4.0000 to 4.0000, I band (half)
+2.20 to 1.26, H zone 2.40 to 0.53, titin 2.23 to 1.29. The junction's vesicle shuttle follows the
+same muscle-activity signal, and its summary states mechanisms only, with no dosing. Exertion
+reached only 0.27 activity in the render, so the visible shift between rest and exercise is subtle.
+
+**Rejected.** Keeping the scaling and calling it a diagram (a learner cannot tell it from the
+mechanism). Freezing the sarcomere (the point of the junction and sarcomere pair is that a
+blocker and a contraction change what is drawn). Exaggerating `SHORTEN` to make exercise visible
+(the figure would no longer resemble the measured proportions of the bands).

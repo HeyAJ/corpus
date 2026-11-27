@@ -6,13 +6,13 @@ const FULL: ShareState = {
   weeks: 28,
   organ: 'uterus',
   part: 'placenta',
-  layers: ['bones', 'vessels', 'nerves', 'hormones', 'activity'],
+  layers: ['bones', 'muscles', 'vessels', 'nerves', 'hormones', 'activity'],
   cut: { axis: 'front', depth: 0.5 },
 };
 
 describe('share link build and parse', () => {
   it('builds the documented format', () => {
-    expect(buildShareHash(FULL)).toBe('#v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=bones,vessels,nerves,hormones,activity&cut=front:0.5');
+    expect(buildShareHash(FULL)).toBe('#v=1&sex=female&weeks=28&organ=uterus&part=placenta&layers=bones,muscles,vessels,nerves,hormones,activity&cut=front:0.5');
   });
 
   it('round-trips a full state', () => {
@@ -29,6 +29,16 @@ describe('share link build and parse', () => {
     expect(buildShareHash({ layers: ['bones'] })).toBe('#v=1&layers=bones');
     // A skeleton organ is a catalogue organ (it is built on demand), so a link may open it.
     expect(parseShareHash('#v=1&organ=thoracic_cage')).toEqual({ organ: 'thoracic_cage' });
+  });
+
+  it('restores the muscles layer from layers=muscles, in layer order, and opens a muscle organ with its layer off', () => {
+    expect(parseShareHash('#v=1&layers=muscles')).toEqual({ layers: ['muscles'] });
+    expect(buildShareHash({ layers: ['muscles'] })).toBe('#v=1&layers=muscles');
+    // Bones come before muscles in the written link whatever order the caller gave them.
+    expect(buildShareHash({ layers: ['muscles', 'bones'] })).toBe('#v=1&layers=bones,muscles');
+    expect(parseShareHash('#v=1&layers=muscles,bones')).toEqual({ layers: ['bones', 'muscles'] });
+    // A muscle organ is a catalogue organ (built on demand), so a link may open it.
+    expect(parseShareHash('#v=1&organ=back_muscles')).toEqual({ organ: 'back_muscles' });
   });
 
   it('leaves weeks out of a male body and an empty layer list out of the hash', () => {
@@ -61,7 +71,7 @@ const CASES: [string, string, ShareState][] = [
   ['cut with a bad axis and depth', '#v=1&organ=heart&cut=sideways:2', { organ: 'heart' }],
   ['cut depth over one', '#v=1&organ=heart&cut=front:1.5', { organ: 'heart' }],
   ['cut depth not a number', '#v=1&organ=heart&cut=front:abc', { organ: 'heart' }],
-  ['layers with one bad name (muscles is not a layer yet)', '#v=1&organ=heart&layers=vessels,muscles', { organ: 'heart' }],
+  ['layers with one bad name (lymph is not a layer yet)', '#v=1&organ=heart&layers=vessels,lymph', { organ: 'heart' }],
   ['empty layers', '#v=1&organ=heart&layers=', { organ: 'heart' }],
   ['a 10 kB value', '#v=1&organ=heart&part=' + 'a'.repeat(10000), {}],
   ['a 65 character value', '#v=1&sex=male&organ=' + 'a'.repeat(65), { sex: 'male' }],

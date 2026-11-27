@@ -74,6 +74,26 @@ export function BoneGlyph({ on }: { on: boolean }) {
   );
 }
 
+/** A muscle: a spindle belly with a tendon at each end, drawn as one outline. */
+export function MuscleGlyph({ on }: { on: boolean }) {
+  // A deep red so the outline reads on the pale chip and is not mistaken for the blood drop's
+  // brighter red (a display choice).
+  const c = '#9a3b34';
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M3.2 12h3.1c1.5-3.6 4-5 7-5 2.2 0 3.7 1.1 3.7 5s-1.5 5-3.7 5c-3 0-5.5-1.4-7-5M17 12h3.8"
+        fill={on ? c : 'none'}
+        fillOpacity={on ? 0.22 : 0}
+        stroke={c}
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 /** Stacked sheets: what the Layers chip shows. */
 export function LayersGlyph() {
   return (

@@ -4,7 +4,7 @@ import { ellipsoid, halfSpace, intersect, mergeParts, polygonise, smoothUnion, t
 import { mulberry32 } from '../noise';
 import { bead, beads, cord, fibonacciSphere } from './gland_shared';
 import { blob } from './gi_shared';
-import { PAROTID, parotidField } from '../shells/salivary_glands';
+import { PAROTID, parotidField, SUBLINGUAL, SUBMANDIBULAR, tiltedAboutY } from '../shells/salivary_glands';
 
 /**
  * THE INSIDE OF THE SALIVARY GLANDS.
@@ -49,8 +49,15 @@ const merge = (g: THREE.BufferGeometry[]): THREE.BufferGeometry => mergeParts(g)
  * 2.2 mm from the vestibule tube's surface; this is closer to both.
  */
 export const PAROTID_DUCT: V3[] = [[0.0625, 0.0055, -0.025], [0.0615, 0.002, -0.01], [0.059, -0.0025, 0.006], [0.048, -0.0055, 0.0185], fromMouth(0.0226, 0.0019, 0.0008)];
-/** The submandibular duct of the right side. Ends on the sublingual caruncle. */
-export const SUBMANDIBULAR_DUCT: V3[] = [[0.03, -0.0285, 0.014], [0.019, -0.024, 0.0225], [0.009, -0.02, 0.029], fromMouth(0.002, -0.008, 0.01)];
+/**
+ * The submandibular duct of the right side. Ends on the sublingual caruncle. WHAT WENT WRONG: it
+ * started 30 mm from the midline and ran through the body of the mandible (3.75 mm deep at its
+ * worst) because the gland it leaves stood where the bone is (see SUBMANDIBULAR in
+ * shells/salivary_glands.ts). It now leaves the deep part of the gland, runs forward above the
+ * mylohyoid under the sublingual gland and along its medial face, and ends on the caruncle
+ * exactly where it did before (the mouth atlas's frame point, so the two atlases still agree).
+ */
+export const SUBMANDIBULAR_DUCT: V3[] = [[0.0135, -0.031, -0.006], [0.009, -0.0285, 0.01], [0.0008, -0.0235, 0.0215], fromMouth(0.002, -0.008, 0.01)];
 /** Where the magnified acinus sits, and its duct (used by the detail module for the droplets). */
 const AC: V3 = [0, 0.01, 0.004];
 const ac = (x: number, y: number, z: number): V3 => [AC[0] + x, AC[1] + y, AC[2] + z];
@@ -65,16 +72,20 @@ function lobulated(c: V3, r: V3, n: number, bump: number, k: number): Sdf {
   }
   return smoothUnion(k, ...fields);
 }
-const SUBMAND_C = (s: number): V3 => [s * 0.034, -0.03, 0.01];
-const SUBMAND_R: V3 = [0.0105, 0.0068, 0.014];
-const SUBLING_C = (s: number): V3 => [s * 0.012, -0.0215, 0.025];
-const SUBLING_R: V3 = [0.005, 0.0038, 0.0105];
+// Centres and radii live in the shell (shells/salivary_glands.ts, which says why they moved in
+// from x 34 mm and 12 mm to lie against the inner surface of the mandible's body).
+const SUBMAND_C = (s: number): V3 => [s * SUBMANDIBULAR.c[0], SUBMANDIBULAR.c[1], SUBMANDIBULAR.c[2]];
+const SUBMAND_R: V3 = SUBMANDIBULAR.r;
+const SUBLING_C = (s: number): V3 => [s * SUBLINGUAL.c[0], SUBLINGUAL.c[1], SUBLINGUAL.c[2]];
+const SUBLING_R: V3 = SUBLINGUAL.r;
 
 function bothSides(make: (s: number) => THREE.BufferGeometry): THREE.BufferGeometry {
   return merge([make(1), make(-1)]);
 }
-function gland(c: V3, r: V3, n: number, bump: number, cell: number): THREE.BufferGeometry {
-  const f = lobulated(c, r, n, bump, 0.0022);
+function gland(c: V3, r: V3, n: number, bump: number, cell: number, tilt = 0, side = 1): THREE.BufferGeometry {
+  // A turned gland is built in a frame centred on itself and turned by `tiltedAboutY`, so the
+  // lobules turn with it; the box is the sphere that holds the gland whatever its turn.
+  const f = tilt === 0 ? lobulated(c, r, n, bump, 0.0022) : tiltedAboutY(lobulated([0, 0, 0], r, n, bump, 0.0022), c, tilt, side);
   const pad = Math.max(r[0], r[1], r[2]) + bump + 0.002;
   return polygonise(f, [c[0] - pad, c[1] - pad, c[2] - pad], [c[0] + pad, c[1] + pad, c[2] + pad], { cell, maxCells: 60000 });
 }
@@ -187,10 +198,17 @@ function ganglion(which: 'otic' | 'submandibular'): THREE.BufferGeometry {
       parts.push(cord([[0.0465, 0.03, -0.0105], [0.0485, 0.0255, -0.024], [0.0495, 0.02, -0.0395]].map((p) => R(p, s)), 0.00028, 6, 4));
       parts.push(cord([[0.044, 0.04, -0.012], [0.0455, 0.035, -0.0112], [0.0465, 0.03, -0.0105]].map((p) => R(p, s)), 0.00026, 6, 4));
     } else {
-      parts.push(bead(R([0.0265, -0.0235, 0.018], s), 0.001, 8, 6));
-      parts.push(cord([[0.0265, -0.0235, 0.018], [0.028, -0.0245, 0.0155], [0.0295, -0.0255, 0.0135]].map((p) => R(p, s)), 0.00028, 6, 4));
-      parts.push(cord([[0.0265, -0.0235, 0.018], [0.021, -0.022, 0.0215], [0.0155, -0.0205, 0.0245]].map((p) => R(p, s)), 0.00028, 6, 4));
-      parts.push(cord([[0.03, -0.012, 0.02], [0.028, -0.018, 0.019], [0.0265, -0.0235, 0.018]].map((p) => R(p, s)), 0.00026, 6, 4));
+      // WHAT WENT WRONG: the ganglion hung 26 mm out from the midline with its cords 1.6 mm
+      // inside the mandible, because the gland it hangs over stood there. It now hangs from the
+      // lingual nerve just above the deep part of the (moved) gland, as Gray's has it, and sends
+      // fibres into the gland and forward to the sublingual gland. The lingual nerve itself is
+      // not drawn here; the cord from above is its branch.
+      // It sits in front of the hyoid's greater horn, which the first re-seating forgot (the
+      // cords ran 2.3 mm into the horn); the cord into the gland therefore runs back and down.
+      parts.push(bead(R([0.0125, -0.0265, 0.006], s), 0.001, 8, 6));
+      parts.push(cord([[0.0125, -0.0265, 0.006], [0.0128, -0.0305, -0.002], [0.0123, -0.0315, -0.003]].map((p) => R(p, s)), 0.00028, 6, 4));
+      parts.push(cord([[0.0125, -0.0265, 0.006], [0.0095, -0.0235, 0.011], [0.007, -0.0218, 0.0165]].map((p) => R(p, s)), 0.00028, 6, 4));
+      parts.push(cord([[0.0155, -0.014, 0.0], [0.0145, -0.021, 0.004], [0.0125, -0.0265, 0.006]].map((p) => R(p, s)), 0.00026, 6, 4));
     }
   }
   return merge(parts);
@@ -237,7 +255,7 @@ export const parts: PartBuilder = () => {
   add('parotid_superficial_part', bothSides((s) => parotidHalf(s, true)));
   add('parotid_deep_part', bothSides((s) => parotidHalf(s, false)));
   add('parotid_duct', merge([1, -1].map((s) => duct(PAROTID_DUCT, s, 0.0006))));
-  add('submandibular_glands', bothSides((s) => gland(SUBMAND_C(s), SUBMAND_R, 7, 0.0028, 0.0014)));
+  add('submandibular_glands', bothSides((s) => gland(SUBMAND_C(s), SUBMAND_R, 7, 0.0028, 0.0014, SUBMANDIBULAR.tilt, s)));
   add('submandibular_duct', merge([1, -1].map((s) => duct(SUBMANDIBULAR_DUCT, s, 0.0006))));
   add('sublingual_glands', bothSides((s) => gland(SUBLING_C(s), SUBLING_R, 6, 0.0018, 0.0011)));
   add('sublingual_ducts', sublingualDucts());

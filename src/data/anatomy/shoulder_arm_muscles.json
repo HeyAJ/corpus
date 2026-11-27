@@ -1,0 +1,1188 @@
+{
+  "atlas": "shoulder_arm_muscles",
+  "about": "The muscles of the shoulder and the upper arm, drawn against the clavicle, the shoulder blade and the humerus of the shoulder and arm bone atlas: the deltoid over the shoulder, the four muscles of the rotator cuff, the teres major, the coracobrachialis, the biceps and brachialis in front of the arm and the triceps behind it, each from its origin to its insertion as Gray's gives them. The radius and ulna are not in this skeleton, so the biceps, brachialis and triceps end in a short tendon at the elbow. Inside the biceps are magnified schematics of muscle tissue and of the neuromuscular junction, drawn far larger than life. The drives are the whole-body ones the engine has: muscle tone (raised in rigidity, lost in paralysis, which is how a neuromuscular blocker acts), exertion, shivering and a seizure. Arm movement, the forearm and force are not simulated.",
+  "sources": {
+    "GH14": {
+      "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
+      "url": "https://www.elsevier.com/books/guyton-and-hall-textbook-of-medical-physiology/hall/978-0-323-59712-8"
+    },
+    "GRAYS42": {
+      "label": "Standring S (ed). Gray's Anatomy: The Anatomical Basis of Clinical Practice, 42nd ed. Elsevier, 2020.",
+      "url": "https://www.elsevier.com/books/grays-anatomy/standring/978-0-7020-7705-0"
+    }
+  },
+  "parts": [
+    {
+      "id": "deltoid",
+      "label": "Deltoid",
+      "summary": "The rounded muscle that caps the shoulder",
+      "function": "The deltoid covers the shoulder joint and runs from the clavicle, the acromion and the spine of the scapula to the deltoid tuberosity of the humerus. It lifts the arm away from the side, and its front and back parts also swing it forward and back.",
+      "color": "#bc5c52",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deltoid_anterior",
+      "parent": "deltoid",
+      "label": "Anterior (Clavicular) Part",
+      "summary": "The front part of the deltoid, from the clavicle",
+      "function": "The anterior part arises from the lateral part of the clavicle and helps to flex and turn the arm inward.",
+      "color": "#c4685e",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deltoid_middle",
+      "parent": "deltoid",
+      "label": "Middle (Acromial) Part",
+      "summary": "The middle part of the deltoid, from the acromion",
+      "function": "The middle part arises from the acromion and is the main part that lifts the arm out to the side.",
+      "color": "#b85a50",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deltoid_posterior",
+      "parent": "deltoid",
+      "label": "Posterior (Spinal) Part",
+      "summary": "The back part of the deltoid, from the spine of the scapula",
+      "function": "The posterior part arises from the spine of the scapula and helps to extend and turn the arm outward.",
+      "color": "#ad5249",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rotator_cuff",
+      "label": "Rotator Cuff",
+      "summary": "Supraspinatus, infraspinatus, teres minor and subscapularis, with their tendons round the humeral head",
+      "function": "These four muscles run from the shoulder blade to the head of the humerus, and their tendons blend with the capsule of the shoulder joint. Together they hold the head of the humerus in its shallow socket while the arm moves. The thin cap drawn here is the place where the four tendons blend into the capsule.",
+      "color": "#a94b45",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "supraspinatus",
+      "parent": "rotator_cuff",
+      "label": "Supraspinatus",
+      "summary": "The muscle in the fossa above the spine of the scapula",
+      "function": "The supraspinatus arises from the supraspinous fossa and runs under the acromion to the superior facet of the greater tubercle. It starts the arm lifting away from the side and holds the humeral head in the socket.",
+      "color": "#a94b45",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "infraspinatus",
+      "parent": "rotator_cuff",
+      "label": "Infraspinatus",
+      "summary": "The muscle in the fossa below the spine of the scapula",
+      "function": "The infraspinatus arises from the infraspinous fossa and runs to the middle facet of the greater tubercle. It turns the arm outward and holds the humeral head in the socket.",
+      "color": "#b3544d",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "teres_minor",
+      "parent": "rotator_cuff",
+      "label": "Teres Minor",
+      "summary": "The small round muscle on the lateral border of the scapula",
+      "function": "The teres minor arises from the dorsal surface of the lateral border of the scapula and runs to the inferior facet of the greater tubercle. It turns the arm outward and holds the humeral head in the socket.",
+      "color": "#9f4a44",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "subscapularis",
+      "parent": "rotator_cuff",
+      "label": "Subscapularis",
+      "summary": "The broad muscle on the front of the shoulder blade",
+      "function": "The subscapularis fills the subscapular fossa on the front of the scapula and runs in front of the shoulder joint to the lesser tubercle. It turns the arm inward and holds the humeral head in the socket.",
+      "color": "#c06a60",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.25,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "teres_major",
+      "label": "Teres Major",
+      "summary": "The thick round muscle from the lower shoulder blade to the humerus",
+      "function": "The teres major arises from the dorsal surface of the inferior angle of the scapula and passes behind and then in front of the humerus to the medial lip of the intertubercular sulcus. It draws the raised arm down and turns it inward.",
+      "color": "#b3584e",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "coracobrachialis",
+      "label": "Coracobrachialis",
+      "summary": "The slender muscle from the coracoid process to the middle of the humerus",
+      "function": "The coracobrachialis arises from the tip of the coracoid process, together with the short head of the biceps, and runs to the middle of the medial surface of the humeral shaft. It draws the arm forward and toward the body.",
+      "color": "#c46860",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "biceps_brachii",
+      "label": "Biceps Brachii",
+      "summary": "The two-headed muscle on the front of the upper arm",
+      "function": "The biceps arises by two heads from the scapula and runs down the front of the arm in front of the brachialis. At the elbow its tendon goes on to the radius, which this skeleton does not draw, so the muscle is shown ending in a short tendon. It bends the elbow and turns the forearm so that the palm faces up.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "biceps_long_head",
+      "parent": "biceps_brachii",
+      "label": "Long Head",
+      "summary": "The head that arises inside the shoulder joint",
+      "function": "The long head arises from the supraglenoid tubercle of the scapula, and its tendon passes over the humeral head and down the intertubercular sulcus before it joins the belly of the muscle.",
+      "color": "#c8706a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "biceps_long_head_tendon",
+      "parent": "biceps_long_head",
+      "label": "Tendon in the Intertubercular Sulcus",
+      "summary": "The tendon of the long head, held in the groove between the tubercles",
+      "function": "The tendon runs from the supraglenoid tubercle over the humeral head and lies in the intertubercular sulcus between the greater and lesser tubercles. The groove holds it in place as the arm moves.",
+      "color": "#e0d2b4",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "biceps_short_head",
+      "parent": "biceps_brachii",
+      "label": "Short Head",
+      "summary": "The head that arises from the coracoid process",
+      "function": "The short head arises from the tip of the coracoid process, with the coracobrachialis, and joins the long head in the belly of the biceps.",
+      "color": "#b8564f",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "biceps_short_head_tendon",
+      "parent": "biceps_short_head",
+      "label": "Tendon from the Coracoid Process",
+      "summary": "The tendon of the short head, shared at its start with the coracobrachialis",
+      "function": "This tendon runs from the tip of the coracoid process down in front of the shoulder to the belly of the short head.",
+      "color": "#e0d2b4",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "brachialis",
+      "label": "Brachialis",
+      "summary": "The muscle under the biceps on the front of the humerus",
+      "function": "The brachialis arises from the front of the lower half of the humerus and lies directly on the bone beneath the biceps. It goes on to the ulna, which this skeleton does not draw, so it is shown ending in a short tendon at the elbow. It bends the elbow.",
+      "color": "#b3544d",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "triceps_brachii",
+      "label": "Triceps Brachii",
+      "summary": "The three-headed muscle on the back of the upper arm",
+      "function": "The triceps arises by three heads from the scapula and the back of the humerus and runs down the back of the arm. Its tendon goes on to the olecranon of the ulna, which this skeleton does not draw, so the muscle is shown ending in a short tendon behind the elbow. It straightens the elbow.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "triceps_long_head",
+      "parent": "triceps_brachii",
+      "label": "Long Head",
+      "summary": "The head that arises from the scapula below the shoulder socket",
+      "function": "The long head arises from the infraglenoid tubercle of the scapula and runs down the back of the arm. It is the only head that crosses the shoulder joint.",
+      "color": "#bb645a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "triceps_lateral_head",
+      "parent": "triceps_brachii",
+      "label": "Lateral Head",
+      "summary": "The head that arises from the back of the humerus above the radial groove",
+      "function": "The lateral head arises from the back of the humerus above the groove for the radial nerve and lies outside the long head.",
+      "color": "#a9524a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "triceps_medial_head",
+      "parent": "triceps_brachii",
+      "label": "Medial Head",
+      "summary": "The deepest head, on the back of the humerus below the radial groove",
+      "function": "The medial head arises from the back of the humerus below the radial groove and lies directly on the bone, under the other two heads.",
+      "color": "#9c4a43",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "triceps_tendon",
+      "parent": "triceps_brachii",
+      "label": "Common Tendon",
+      "summary": "The tendon the three heads share",
+      "function": "The three heads join one broad tendon that runs to the olecranon of the ulna, so they act together to straighten the elbow.",
+      "color": "#e0d2b4",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscle_fascicle",
+      "label": "Fascicle (enlarged)",
+      "summary": "A bundle of muscle fibres with the connective tissue sleeves round it",
+      "function": "A skeletal muscle is made of fascicles, each a bundle of fibres. Connective tissue sleeves hold the fibres together and carry the vessels and nerves. This is a magnified schematic, drawn far larger than life and placed inside the biceps so that it can be seen; it is not true size or place.",
+      "color": "#c9776a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "epimysium",
+      "parent": "muscle_fascicle",
+      "label": "Epimysium",
+      "summary": "The connective tissue sleeve round the whole muscle",
+      "function": "The epimysium wraps the whole muscle and is continuous with its tendons. It lets the muscle slide against its neighbours.",
+      "color": "#e6c7b8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perimysium",
+      "parent": "muscle_fascicle",
+      "label": "Perimysium",
+      "summary": "The connective tissue sleeve round each fascicle",
+      "function": "The perimysium divides the muscle into fascicles and carries the larger vessels and nerves between them.",
+      "color": "#dcb4a2",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "endomysium",
+      "parent": "muscle_fascicle",
+      "label": "Endomysium",
+      "summary": "The thin connective tissue sleeve round each muscle fibre",
+      "function": "The endomysium lies between neighbouring fibres and carries the fine vessels that feed them.",
+      "color": "#d3a28e",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscle_fibre",
+      "label": "Skeletal Muscle Fibre (enlarged)",
+      "summary": "One long, many-nucleated muscle cell",
+      "function": "A skeletal muscle fibre is a single long cell that is packed with myofibrils, the contractile units, and is run by one motor nerve ending. A signal that spreads over its membrane and into the cell makes the myofibrils shorten. This is a magnified schematic, drawn far larger than life and placed inside the biceps so that it can be seen; it is not true size or place.",
+      "color": "#d28b7d",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sarcolemma",
+      "parent": "muscle_fibre",
+      "label": "Sarcolemma",
+      "summary": "The cell membrane of the muscle fibre",
+      "function": "The sarcolemma carries the electrical signal along the fibre and down into it through the transverse tubules.",
+      "color": "#ebd3c8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "t_tubules",
+      "parent": "muscle_fibre",
+      "label": "Transverse (T) Tubules",
+      "summary": "Tubes that carry the surface signal into the fibre",
+      "function": "The transverse tubules are inward folds of the sarcolemma that pass between the myofibrils. They carry the signal deep into the fibre so that every myofibril is reached together.",
+      "color": "#8f6f9c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "sarcoplasmic_reticulum",
+      "parent": "muscle_fibre",
+      "label": "Sarcoplasmic Reticulum",
+      "summary": "The store of calcium that wraps each myofibril",
+      "function": "The sarcoplasmic reticulum is a membrane network round the myofibrils that stores calcium and releases it when the signal arrives, then takes it back so the fibre relaxes.",
+      "color": "#c9b25a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "terminal_cisternae",
+      "parent": "sarcoplasmic_reticulum",
+      "label": "Terminal Cisternae",
+      "summary": "The swollen ends of the sarcoplasmic reticulum beside the T tubules",
+      "function": "The terminal cisternae lie on each side of a transverse tubule and release the stored calcium when the signal reaches them.",
+      "color": "#d9c46e",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "peripheral_nuclei",
+      "parent": "muscle_fibre",
+      "label": "Peripheral Nuclei",
+      "summary": "The many nuclei lying just under the sarcolemma",
+      "function": "A muscle fibre has many nuclei, and they lie at its edge under the membrane, out of the way of the myofibrils.",
+      "color": "#5a5f8f",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mitochondria",
+      "parent": "muscle_fibre",
+      "label": "Mitochondria",
+      "summary": "The cell's power plants, packed between the myofibrils",
+      "function": "Mitochondria between the myofibrils make most of the energy that the contracting fibre uses.",
+      "color": "#c9803c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "myofibrils",
+      "parent": "muscle_fibre",
+      "label": "Myofibrils",
+      "summary": "The long contractile threads that fill the fibre",
+      "function": "Each myofibril is a chain of sarcomeres end to end. The shortening of all the sarcomeres in a chain is what shortens the fibre.",
+      "color": "#e0a79c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "satellite_cell",
+      "parent": "muscle_fibre",
+      "label": "Satellite Cell",
+      "summary": "A small stem cell lying against the fibre under its basement membrane",
+      "function": "A satellite cell is a resting cell beside a fibre that can divide and add to the fibre when the muscle is damaged or grows.",
+      "color": "#6aa38f",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sarcomere",
+      "label": "Sarcomere (enlarged)",
+      "summary": "The repeating unit of contraction between two Z discs",
+      "function": "A sarcomere is the stretch of a myofibril between two Z discs. Thin filaments run in from each Z disc and thick filaments lie between them. When the filaments slide past each other the sarcomere shortens. This is a magnified schematic, drawn far larger than life and placed inside the biceps so that it can be seen; it is not true size or place.",
+      "color": "#d9a0a0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "z_discs",
+      "parent": "sarcomere",
+      "label": "Z Discs",
+      "summary": "The plates that mark the ends of the sarcomere",
+      "function": "The Z discs anchor the thin filaments and mark the two ends of the sarcomere. They are drawn closer together as the sarcomere shortens.",
+      "color": "#6f5b73",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "i_band",
+      "parent": "sarcomere",
+      "label": "I Band",
+      "summary": "The light band that holds thin filaments only",
+      "function": "The I band is the part of the sarcomere where there are only thin filaments. It is a half band on each side of a Z disc and narrows as the sarcomere shortens.",
+      "color": "#f0dcd0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "a_band",
+      "parent": "sarcomere",
+      "label": "A Band",
+      "summary": "The dark band as long as the thick filaments",
+      "function": "The A band is the whole length of the thick filaments, including where the thin filaments overlap them. Its length does not change as the sarcomere shortens.",
+      "color": "#a86a6a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "h_zone",
+      "parent": "a_band",
+      "label": "H Zone",
+      "summary": "The middle of the A band where thick filaments lie alone",
+      "function": "The H zone is the centre of the A band that the thin filaments do not reach at rest. It closes up as they slide in.",
+      "color": "#c78d86",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "m_line",
+      "parent": "a_band",
+      "label": "M Line",
+      "summary": "The line across the middle that holds the thick filaments in register",
+      "function": "The M line lies at the centre of the H zone and links the thick filaments side to side.",
+      "color": "#5d4a5e",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thin_filaments",
+      "parent": "sarcomere",
+      "label": "Thin Filaments (actin)",
+      "summary": "The actin filaments that run in from each Z disc",
+      "function": "The thin filaments are made mainly of actin and are fixed to the Z disc. They slide in between the thick filaments when the fibre contracts.",
+      "color": "#7fa6c9",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "troponin",
+      "parent": "thin_filaments",
+      "label": "Troponin",
+      "summary": "The calcium-binding complex on the thin filament",
+      "function": "Troponin sits on the thin filament at regular intervals. When it binds calcium it changes shape and so lets the myosin heads reach the actin.",
+      "color": "#3f6f9c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "tropomyosin",
+      "parent": "thin_filaments",
+      "label": "Tropomyosin",
+      "summary": "The strand that lies along the thin filament",
+      "function": "Tropomyosin lies along the groove of the thin filament and covers the sites where myosin heads would bind, until calcium binds troponin.",
+      "color": "#9cc0e0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "thick_filaments",
+      "parent": "sarcomere",
+      "label": "Thick Filaments (myosin)",
+      "summary": "The myosin filaments in the centre of the sarcomere",
+      "function": "The thick filaments are bundles of myosin. They lie in the A band and hold the heads that reach out to the thin filaments.",
+      "color": "#c9824c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "myosin_heads",
+      "parent": "thick_filaments",
+      "label": "Myosin Heads",
+      "summary": "The heads that reach from the thick filament to the actin",
+      "function": "The myosin heads bind to actin, bend, and release again, over and over, which pulls the thin filaments toward the centre. They draw on the cell's energy store to do it.",
+      "color": "#e0a060",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "titin",
+      "parent": "sarcomere",
+      "label": "Titin",
+      "summary": "The elastic protein that links each Z disc to the thick filament",
+      "function": "Titin is a long elastic protein that holds the thick filaments centred between the Z discs and returns the sarcomere to its length after it is stretched.",
+      "color": "#8f9c4f",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "neuromuscular_junction",
+      "label": "Neuromuscular Junction (enlarged)",
+      "summary": "Where a motor nerve ending meets a muscle fibre",
+      "function": "The motor nerve ending releases acetylcholine into a narrow cleft, and the acetylcholine opens channels in the muscle fibre's end plate, which starts the contraction. Each fibre is run by one such junction. At this junction a competitive nicotinic blocker holds the receptor without opening it, so the end plate is not depolarised; a depolarising blocker acts like acetylcholine but is not removed as quickly, so the end plate stays depolarised and cannot answer the next signal; and an acetylcholinesterase inhibitor lets acetylcholine linger in the cleft. This describes how they act and is not advice. This is a magnified schematic, drawn far larger than life and placed inside the biceps so that it can be seen; it is not true size or place.",
+      "color": "#8fb0a0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.45,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "motor_axon_terminal",
+      "parent": "neuromuscular_junction",
+      "label": "Motor Axon Terminal",
+      "summary": "The swollen end of the motor nerve fibre",
+      "function": "The terminal holds the vesicles of acetylcholine and releases them into the cleft when the nerve signal arrives.",
+      "color": "#e0c46a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "synaptic_vesicles",
+      "parent": "motor_axon_terminal",
+      "label": "Synaptic Vesicles (acetylcholine)",
+      "summary": "Small packets of acetylcholine in the terminal",
+      "function": "Each vesicle holds acetylcholine. When the signal arrives vesicles empty into the cleft, and they are drawn moving to the cleft face in step with the activity of the muscle.",
+      "color": "#f2e08a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "synaptic_cleft",
+      "parent": "neuromuscular_junction",
+      "label": "Synaptic Cleft",
+      "summary": "The narrow gap between the nerve ending and the muscle fibre",
+      "function": "Acetylcholine crosses the synaptic cleft in a very short time and is then broken down.",
+      "color": "#cfe3df",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "acetylcholinesterase",
+      "parent": "synaptic_cleft",
+      "label": "Acetylcholinesterase",
+      "summary": "The enzyme in the cleft that breaks acetylcholine down",
+      "function": "Acetylcholinesterase lies in the cleft and splits acetylcholine, so that each signal is brief and the end plate can answer the next one.",
+      "color": "#d9703c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GH14"
+    },
+    {
+      "id": "motor_end_plate",
+      "parent": "neuromuscular_junction",
+      "label": "Motor End Plate",
+      "summary": "The part of the muscle fibre membrane under the nerve ending",
+      "function": "The motor end plate is the specialised patch of the sarcolemma under the nerve terminal. It is folded and is the part that responds to acetylcholine.",
+      "color": "#d28b7d",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.45,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "junctional_folds",
+      "parent": "motor_end_plate",
+      "label": "Junctional Folds",
+      "summary": "The deep folds of the end plate under the terminal",
+      "function": "The junctional folds greatly increase the area of membrane that faces the cleft and carry the receptors on their crests.",
+      "color": "#b86a6a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "nicotinic_receptors",
+      "parent": "motor_end_plate",
+      "label": "Nicotinic Acetylcholine Receptors",
+      "summary": "The acetylcholine-gated channels of the end plate",
+      "function": "When two acetylcholine molecules bind a receptor its channel opens and positive ions flow into the fibre, which depolarises the end plate. Blocking or occupying these receptors is how neuromuscular blocking drugs act.",
+      "color": "#4f7fb0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.45,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "terminal_schwann_cell",
+      "parent": "neuromuscular_junction",
+      "label": "Terminal Schwann Cell",
+      "summary": "The cell that caps the nerve terminal",
+      "function": "A terminal Schwann cell covers the nerve ending on the side away from the muscle and helps keep the junction in place.",
+      "color": "#8fa0d0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "muscle_spindle",
+      "label": "Muscle Spindle (enlarged)",
+      "summary": "A stretch sensor lying among the muscle fibres",
+      "function": "A muscle spindle is a small capsule of thin, specialised muscle fibres with sensory nerve endings wound round them. It reports how long the muscle is and how fast the length is changing. This is a magnified schematic, drawn far larger than life and placed inside the biceps so that it can be seen; it is not true size or place.",
+      "color": "#d9c46e",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. A drug that blocks the neuromuscular junction reaches this muscle through that same fall in tone. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    },
+    {
+      "id": "golgi_tendon_organ",
+      "label": "Golgi Tendon Organ (enlarged)",
+      "summary": "A tension sensor at the junction of muscle and tendon",
+      "function": "A Golgi tendon organ is a sensory nerve ending woven among the tendon strands where muscle joins tendon. It reports the tension the muscle is pulling with. This is a magnified schematic, drawn far larger than life and placed inside the biceps so that it can be seen; it is not true size or place.",
+      "color": "#9fc9c0",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.25,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A generalised seizure drives the skeletal muscles into strong, repeated contraction, so a muscle of this group contracts with it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GH14"
+    }
+  ]
+}

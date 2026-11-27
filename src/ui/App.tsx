@@ -92,6 +92,7 @@ function applyShareLink(): () => void {
         hormonesVisible: parsed.layers.includes('hormones'),
         activityVisible: parsed.layers.includes('activity'),
         bonesVisible: parsed.layers.includes('bones'),
+        musclesVisible: parsed.layers.includes('muscles'),
       });
     }
     if (parsed.organ) {
@@ -156,6 +157,7 @@ export function App() {
   const hormonesVisible = useStore((s) => s.hormonesVisible);
   const activityVisible = useStore((s) => s.activityVisible);
   const bonesVisible = useStore((s) => s.bonesVisible);
+  const musclesVisible = useStore((s) => s.musclesVisible);
   const layersOpen = useStore((s) => s.layersOpen);
   const pushLog = useStore((s) => s.pushLog);
   // Why the 3D view is not showing, if it is not: it could not start, or it lost its context.
@@ -469,6 +471,9 @@ export function App() {
   useEffect(() => {
     viewerRef.current?.setLayerVisible('bones', bonesVisible);
   }, [bonesVisible]);
+  useEffect(() => {
+    viewerRef.current?.setLayerVisible('muscles', musclesVisible);
+  }, [musclesVisible]);
 
   /* ---------------------------------------------------------------- input */
 

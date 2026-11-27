@@ -139,6 +139,7 @@ function currentShareHash(): string {
   const repro = s.snapshot?.reproductive;
   const layersOn: Record<LayerName, boolean> = {
     bones: s.bonesVisible,
+    muscles: s.musclesVisible,
     vessels: s.vascularVisible,
     nerves: s.nervesVisible,
     hormones: s.hormonesVisible,

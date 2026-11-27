@@ -29,7 +29,10 @@ export type OrganId =
   /* head and neck */
   | 'mouth' | 'salivary_glands' | 'pharynx' | 'nasal_cavity' | 'ears'
   /* skeleton (layer organs) */
-  | 'skull' | 'vertebral_column' | 'thoracic_cage' | 'upper_limb_bones' | 'lower_limb_bones';
+  | 'skull' | 'vertebral_column' | 'thoracic_cage' | 'upper_limb_bones' | 'lower_limb_bones'
+  /* muscles (layer organs) */
+  | 'head_neck_muscles' | 'chest_wall_muscles' | 'abdominal_wall_muscles' | 'back_muscles'
+  | 'shoulder_arm_muscles' | 'hip_thigh_muscles' | 'pelvic_floor_muscles';
 
 /**
  * Body regions of the exploded stack. `axial` is for structures that run through more
@@ -41,11 +44,11 @@ export type OrganGroup = 'cranial' | 'thoracic' | 'abdominal' | 'pelvic' | 'axia
 /** Which body system an organ belongs to: drives the layer switches and the grouping in lists. */
 export type BodySystem =
   | 'nervous' | 'cardiovascular' | 'respiratory' | 'digestive'
-  | 'urinary' | 'endocrine' | 'lymphatic' | 'reproductive' | 'skeletal';
+  | 'urinary' | 'endocrine' | 'lymphatic' | 'reproductive' | 'skeletal' | 'muscular';
 
 export type OrganPanel =
   | 'cardiac' | 'neuro' | 'respiratory' | 'renal' | 'gastric' | 'hepatic' | 'gi' | 'bladder'
-  | 'pancreatic' | 'endocrine' | 'reproductive' | 'fetal' | 'ocular' | 'spinal' | 'headneck' | 'skeletal' | 'generic';
+  | 'pancreatic' | 'endocrine' | 'reproductive' | 'fetal' | 'ocular' | 'spinal' | 'headneck' | 'skeletal' | 'muscular' | 'generic';
 
 export interface OrganDef {
   id: OrganId;
@@ -78,11 +81,11 @@ export interface OrganDef {
    * or while it is itself the selected organ; with the layer off, and nothing selected, it
    * costs the load nothing. The reason is the budget: a whole skeleton is far more
    * triangles than the organs combined, and most visitors never turn it on, so it must
-   * not be paid for by everyone at start. `'bones'` is the first layer; `'muscles'` and
-   * `'lymph'` are expected to follow and will be added to this union when they exist.
+   * not be paid for by everyone at start. `'bones'` was the first layer and `'muscles'` the
+   * second; `'lymph'` is expected to follow and will be added to this union when it exists.
    * Until the layer control exists, a layer organ is simply not built (OrganSet.wants).
    */
-  layer?: 'bones';
+  layer?: 'bones' | 'muscles';
   /** Which panel layout the UI shows on selection. */
   panel: OrganPanel;
   /** Saturated colour when selected (spec 6.4, measured in VISUAL_AUDIT 2.1). */

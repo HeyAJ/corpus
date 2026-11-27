@@ -230,7 +230,7 @@ export class Viewer {
   }
 
   /**
-   * Switch a LAYER of optional organs (today `'bones'`) on or off. The first time a layer is on its
+   * Switch a LAYER of optional organs (`'bones'`, `'muscles'`) on or off. The first time a layer is on its
    * organs are built in the geometry worker; afterwards they are only shown and hidden. Never
    * touches the selection: an open organ of the layer stays open, because selection is its own
    * reason to be drawn (see organs/layers.ts).

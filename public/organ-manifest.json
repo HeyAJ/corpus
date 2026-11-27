@@ -1,17 +1,28 @@
 {
   "generatedBy": "tools/placeholder-organs.ts",
   "note": "Bounding spheres and centroids of the authored organ shells, in the BODY frame (+x = the patient's right; the renderer mirrors x). Anything that replaces a shell must match these within a few millimetres, or the camera focus animation and the sim-driven pulse scaling will be framed on the wrong point.",
-  "totalTriangles": 233476,
+  "totalTriangles": 233184,
   "organs": [
     {
       "id": "brain",
-      "triangles": 23792,
+      "triangles": 23740,
       "budget": 26000,
       "boundingRadius_m": 0.09712,
       "worldCentre_m": [
         0.0001,
         0.4609,
         -0.0022
+      ]
+    },
+    {
+      "id": "lower_limb_bones",
+      "triangles": 15032,
+      "budget": 16000,
+      "boundingRadius_m": 0.1762,
+      "worldCentre_m": [
+        0,
+        -0.2147,
+        -0.0091
       ]
     },
     {
@@ -23,17 +34,6 @@
         0,
         -0.2503,
         0.0067
-      ]
-    },
-    {
-      "id": "lower_limb_bones",
-      "triangles": 14720,
-      "budget": 16000,
-      "boundingRadius_m": 0.17647,
-      "worldCentre_m": [
-        0,
-        -0.2147,
-        -0.0053
       ]
     },
     {
@@ -81,6 +81,17 @@
       ]
     },
     {
+      "id": "back_muscles",
+      "triangles": 9752,
+      "budget": 10000,
+      "boundingRadius_m": 0.29792,
+      "worldCentre_m": [
+        0,
+        0.1341,
+        -0.0479
+      ]
+    },
+    {
       "id": "trachea",
       "triangles": 9484,
       "budget": 11000,
@@ -100,6 +111,39 @@
         0.0301,
         0.0443,
         0.0011
+      ]
+    },
+    {
+      "id": "hip_thigh_muscles",
+      "triangles": 8944,
+      "budget": 12000,
+      "boundingRadius_m": 0.17892,
+      "worldCentre_m": [
+        0,
+        -0.2302,
+        -0.0087
+      ]
+    },
+    {
+      "id": "shoulder_arm_muscles",
+      "triangles": 7904,
+      "budget": 10000,
+      "boundingRadius_m": 0.2175,
+      "worldCentre_m": [
+        0,
+        0.2162,
+        -0.037
+      ]
+    },
+    {
+      "id": "chest_wall_muscles",
+      "triangles": 7728,
+      "budget": 8000,
+      "boundingRadius_m": 0.19564,
+      "worldCentre_m": [
+        0,
+        0.172,
+        -0.0029
       ]
     },
     {
@@ -137,7 +181,7 @@
     },
     {
       "id": "skull",
-      "triangles": 7304,
+      "triangles": 7292,
       "budget": 8000,
       "boundingRadius_m": 0.11534,
       "worldCentre_m": [
@@ -150,10 +194,10 @@
       "id": "vertebral_column",
       "triangles": 7244,
       "budget": 8000,
-      "boundingRadius_m": 0.31647,
+      "boundingRadius_m": 0.30652,
       "worldCentre_m": [
         0,
-        0.0749,
+        0.0849,
         -0.059
       ]
     },
@@ -166,6 +210,17 @@
         0,
         -0.2241,
         -0.0051
+      ]
+    },
+    {
+      "id": "head_neck_muscles",
+      "triangles": 7016,
+      "budget": 8000,
+      "boundingRadius_m": 0.17588,
+      "worldCentre_m": [
+        0,
+        0.3823,
+        -0.0056
       ]
     },
     {
@@ -334,6 +389,17 @@
       ]
     },
     {
+      "id": "abdominal_wall_muscles",
+      "triangles": 4144,
+      "budget": 8000,
+      "boundingRadius_m": 0.21708,
+      "worldCentre_m": [
+        0,
+        -0.072,
+        -0.0012
+      ]
+    },
+    {
       "id": "ovaries",
       "triangles": 3676,
       "budget": 8000,
@@ -364,6 +430,17 @@
         0.0001,
         0.2456,
         0.0299
+      ]
+    },
+    {
+      "id": "pelvic_floor_muscles",
+      "triangles": 3208,
+      "budget": 8000,
+      "boundingRadius_m": 0.10308,
+      "worldCentre_m": [
+        0,
+        -0.2566,
+        -0.0052
       ]
     },
     {
@@ -456,13 +533,13 @@
     },
     {
       "id": "salivary_glands",
-      "triangles": 1128,
+      "triangles": 888,
       "budget": 8000,
-      "boundingRadius_m": 0.07697,
+      "boundingRadius_m": 0.07781,
       "worldCentre_m": [
         -0.0001,
-        0.385,
-        0.0135
+        0.382,
+        0.0124
       ]
     }
   ]

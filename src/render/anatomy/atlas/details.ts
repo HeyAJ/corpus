@@ -38,6 +38,13 @@ import { detail as skull } from './skull.detail';
 import { detail as vertebralColumn } from './vertebral_column.detail';
 import { detail as thoracicCage } from './thoracic_cage.detail';
 import { detail as upperLimbBones } from './upper_limb_bones.detail';
+import { detail as headNeckMuscles } from './head_neck_muscles.detail';
+import { detail as chestWallMuscles } from './chest_wall_muscles.detail';
+import { detail as abdominalWallMuscles } from './abdominal_wall_muscles.detail';
+import { detail as backMuscles } from './back_muscles.detail';
+import { detail as shoulderArmMuscles } from './shoulder_arm_muscles.detail';
+import { detail as hipThighMuscles } from './hip_thigh_muscles.detail';
+import { detail as pelvicFloorMuscles } from './pelvic_floor_muscles.detail';
 import { detail as lowerLimbBones } from './lower_limb_bones.detail';
 
 /**
@@ -85,4 +92,11 @@ export const DETAIL_SPECS: Record<string, OrganDetailSpec> = {
   thoracic_cage: thoracicCage,
   upper_limb_bones: upperLimbBones,
   lower_limb_bones: lowerLimbBones,
+  head_neck_muscles: headNeckMuscles,
+  chest_wall_muscles: chestWallMuscles,
+  abdominal_wall_muscles: abdominalWallMuscles,
+  back_muscles: backMuscles,
+  shoulder_arm_muscles: shoulderArmMuscles,
+  hip_thigh_muscles: hipThighMuscles,
+  pelvic_floor_muscles: pelvicFloorMuscles,
 };
