@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useId, useRef } from 'react';
 import { useStore } from '../store';
 import type { LayerName } from '../shareLink';
-import { ActivityGlyph, BloodDrop, BoneGlyph, HormoneGlyph, LayersGlyph, MuscleGlyph, NerveGlyph } from './layerGlyphs';
+
+/** The glass row's id: it is a row of the control but NOT a share-link `layers` name (it has its own `glass` key). */
+type RowId = LayerName | 'glass';
+import { ActivityGlyph, BloodDrop, BoneGlyph, GlassGlyph, HormoneGlyph, LayersGlyph, MuscleGlyph, NerveGlyph } from './layerGlyphs';
 import styles from './layers.module.css';
 
 /**
@@ -20,8 +23,13 @@ import styles from './layers.module.css';
  *
  * THE ROWS keep each old switch's accessible name and `aria-pressed` ("Show blood vessels" /
  * "Hide blood vessels", and so on), so a visitor's habits and the tests' locators carry over.
- * Order: Bones, Muscles, Vessels, Nerves, Hormones, Activity. Each row is a 44 px-high switch with a
+ * Order: Glass body, Bones, Muscles, Vessels, Nerves, Hormones, Activity. Each row is a 44 px-high switch with a
  * one-line plain description.
+ *
+ * THE GLASS BODY ROW comes first and starts ON (it is the see-through skin that has always been
+ * drawn, so the default view is unchanged). The chip's count deliberately EXCLUDES it: the count
+ * says how many layers a visitor has ADDED to the default view, so the default still reads
+ * "Layers" with no badge; a glass switched off is shown by its own row, not by the number.
  */
 
 /** Which panel, sheet or menu is open, as one string: it changes when any of them opens or swaps. */
@@ -45,7 +53,7 @@ function panelKey(s: ReturnType<typeof useStore.getState>): string {
 }
 
 interface RowSpec {
-  id: LayerName;
+  id: RowId;
   label: string;
   /** One line, plain words: kept short enough not to wrap at the 320 px popover width. */
   blurb: string;
@@ -59,6 +67,8 @@ interface RowSpec {
 export function LayersControl() {
   const open = useStore((s) => s.layersOpen);
   const setOpen = useStore((s) => s.setLayersOpen);
+  const glass = useStore((s) => s.glassVisible);
+  const toggleGlass = useStore((s) => s.toggleGlass);
   const bones = useStore((s) => s.bonesVisible);
   const toggleBones = useStore((s) => s.toggleBones);
   const muscles = useStore((s) => s.musclesVisible);
@@ -83,6 +93,16 @@ export function LayersControl() {
   const popId = useId();
 
   const rows: RowSpec[] = [
+    {
+      id: 'glass',
+      label: 'Glass body',
+      blurb: 'See-through skin outline',
+      on: glass,
+      toggle: toggleGlass,
+      ariaLabel: glass ? 'Hide glass body' : 'Show glass body',
+      title: glass ? 'Hide glass body' : 'Show glass body',
+      glyph: <GlassGlyph on={glass} />,
+    },
     {
       id: 'bones',
       label: 'Bones',
@@ -145,7 +165,7 @@ export function LayersControl() {
       glyph: <ActivityGlyph on={activity} />,
     },
   ];
-  const count = rows.filter((r) => r.on).length;
+  const count = rows.filter((r) => r.id !== 'glass' && r.on).length;
 
   /** Close; if focus is inside the popover, hand it back to the chip so it is never lost to <body>. */
   const close = useCallback(() => {

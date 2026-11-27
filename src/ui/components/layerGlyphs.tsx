@@ -94,6 +94,24 @@ export function MuscleGlyph({ on }: { on: boolean }) {
   );
 }
 
+/** A standing figure's outline: the see-through skin the Glass body row switches. */
+export function GlassGlyph({ on }: { on: boolean }) {
+  // A cool grey-blue, the glass's own cast, dark enough to read on the pale chip (a display choice).
+  const c = '#5b7a8c';
+  return (
+    <svg width={S} height={S} viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M12 2.6a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2ZM7 11c0-1.5 1.1-2.4 2.6-2.4h4.8c1.5 0 2.6.9 2.6 2.4v4.2h-1.9V21.4h-3.2v-4.6h-1.8v4.6H8.9v-6.2H7Z"
+        fill={on ? c : 'none'}
+        fillOpacity={on ? 0.22 : 0}
+        stroke={c}
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /** Stacked sheets: what the Layers chip shows. */
 export function LayersGlyph() {
   return (

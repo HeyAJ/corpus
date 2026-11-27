@@ -133,3 +133,29 @@ describe('share links and finer structures', () => {
   });
 });
 
+
+describe('the glass body key', () => {
+  it('is written only when the glass is off, so every link made with it on is unchanged', () => {
+    expect(buildShareHash({ glass: false })).toBe('#v=1&glass=0');
+    expect(buildShareHash({ glass: true })).toBe('#v=1');
+    expect(buildShareHash({})).toBe('#v=1');
+    expect(buildShareHash({ organ: 'heart', layers: ['bones'], glass: false })).toBe('#v=1&organ=heart&layers=bones&glass=0');
+  });
+
+  it('restores glass off from glass=0 and round-trips it', () => {
+    expect(parseShareHash('#v=1&glass=0')).toEqual({ glass: false });
+    expect(parseShareHash(buildShareHash({ organ: 'heart', glass: false }))).toEqual({ organ: 'heart', glass: false });
+  });
+
+  it('an old link without glass says nothing about it, so the glass stays on', () => {
+    expect(parseShareHash('#v=1&organ=heart&layers=bones').glass).toBeUndefined();
+  });
+
+  it('drops every value other than exactly 0 or 1', () => {
+    for (const bad of ['2', 'true', 'false', '00', '01', '-1', '0,1', '']) {
+      expect(parseShareHash(`#v=1&glass=${bad}`).glass).toBeUndefined();
+    }
+    expect(parseShareHash('#v=1&glass=0&glass=1').glass).toBeUndefined();
+    expect(parseShareHash('#v=1&glass=1')).toEqual({ glass: true });
+  });
+});

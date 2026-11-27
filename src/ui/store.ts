@@ -120,6 +120,9 @@ interface UiState {
    * even built (OrganSet builds a layer organ on first need). Selecting a bone organ does NOT change
    * this flag: a selected organ is drawn because it is selected, not because its layer is on.
    */
+  /** The see-through skin outline (BodyOutline). ON at start: it is today's look, not an added layer. */
+  glassVisible: boolean;
+  toggleGlass: () => void;
   bonesVisible: boolean;
   toggleBones: () => void;
   musclesVisible: boolean;
@@ -363,6 +366,8 @@ export const useStore = create<UiState>((set, get) => ({
   setPartLabels: (l) => set({ partLabels: l }),
   reproductionPanelOpen: false,
   toggleReproductionPanel: () => set((s) => openOnly(s, 'reproductionPanelOpen')),
+  glassVisible: true,
+  toggleGlass: () => set((s) => ({ glassVisible: !s.glassVisible })),
   bonesVisible: false,
   toggleBones: () => set((s) => ({ bonesVisible: !s.bonesVisible })),
   musclesVisible: false,

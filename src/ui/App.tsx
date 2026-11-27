@@ -103,6 +103,8 @@ function applyShareLink(): () => void {
       }
       if (parsed.cut) s.setCut(parsed.cut.axis, parsed.cut.depth);
     }
+    // An absent `glass` key leaves the glass as it is (on at start); only an explicit 0 or 1 acts.
+    if (parsed.glass !== undefined) useStore.setState({ glassVisible: parsed.glass });
     s.pushLog(LINK_OPENED_TOAST, 'info');
   };
   const bodyIsReady = () => {
@@ -156,6 +158,7 @@ export function App() {
   const nervesVisible = useStore((s) => s.nervesVisible);
   const hormonesVisible = useStore((s) => s.hormonesVisible);
   const activityVisible = useStore((s) => s.activityVisible);
+  const glassVisible = useStore((s) => s.glassVisible);
   const bonesVisible = useStore((s) => s.bonesVisible);
   const musclesVisible = useStore((s) => s.musclesVisible);
   const layersOpen = useStore((s) => s.layersOpen);
@@ -468,6 +471,9 @@ export function App() {
     viewerRef.current?.setActivityVisible(activityVisible);
   }, [activityVisible]);
   /* ---- the skeleton layer: built on first need, then shown and hidden (Viewer.setLayerVisible) ---- */
+  useEffect(() => {
+    viewerRef.current?.setGlassVisible(glassVisible);
+  }, [glassVisible]);
   useEffect(() => {
     viewerRef.current?.setLayerVisible('bones', bonesVisible);
   }, [bonesVisible]);

@@ -79,6 +79,13 @@
   -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.06);
   animation: popIn 140ms var(--ease-out, ease-out) both;
+  /* SEVEN ROWS (7 x 48 px plus padding, about 360 px) are taller than the free space above the
+     chip on a short phone (360 x 740 with the HUD folded in). The popover therefore scrolls
+     inside its own bounds rather than running off the top: the room below it is the measured
+     bottom bar, the chip and two gaps, and 130 px is kept clear for the HUD (a display choice). */
+  max-height: calc(100dvh - var(--corpus-bar-actual, var(--corpus-bar-h)) - 44px - 16px - 130px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .row {

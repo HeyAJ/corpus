@@ -15,7 +15,7 @@ import { buildCatalogue, partBelongsTo, type BodyKind, type SearchEntry } from '
  * lands in a page which dispatches intents to an engine. The rules:
  *   - `v` must be exactly 1; with no `v`, or another version, NOTHING is applied (a future
  *     format must not be half-understood by this reader);
- *   - only the keys v, sex, weeks, organ, part, layers, cut are read; every other key is
+ *   - only the keys v, sex, weeks, organ, part, layers, cut, glass are read; every other key is
  *     ignored; a key that appears twice is ignored (neither copy can be trusted);
  *   - a value longer than MAX_VALUE_LENGTH is dropped before anything looks at it;
  *   - every value must also match a conservative character class, so even a string that is
@@ -24,7 +24,8 @@ import { buildCatalogue, partBelongsTo, type BodyKind, type SearchEntry } from '
  *     read from reproduction.json, and only for a female body; `organ` must be an organ THIS
  *     body has (the search catalogue is the single definition of that); `part` must be a part
  *     of that organ's atlas; `layers` must be a comma list of the six layer names (bones, muscles, vessels, nerves, hormones, activity) (one bad
- *     name drops the whole key, not just the name); `cut` is an axis and a number in 0..1.
+ *     name drops the whole key, not just the name); `cut` is an axis and a number in 0..1; `glass` is 0 or 1 (the glass body outline; absent
+ *     means on, so every older link keeps it).
  *   - a parsed string is only ever COMPARED against the catalogue and the fixed name lists.
  *     The values that leave this module are members of those lists or numbers this file
  *     built itself, never a substring of the input.
@@ -42,7 +43,7 @@ export type ShareAxis = (typeof CUT_AXES)[number];
 /** The longest value read (a display-free safety limit; no legal value comes near it). */
 export const MAX_VALUE_LENGTH = 64;
 const SAFE_VALUE = /^[a-z0-9_.,:-]+$/;
-const KNOWN_KEYS = ['v', 'sex', 'weeks', 'organ', 'part', 'layers', 'cut'] as const;
+const KNOWN_KEYS = ['v', 'sex', 'weeks', 'organ', 'part', 'layers', 'cut', 'glass'] as const;
 
 /** The view and body a link carries; every field is optional on the way in. */
 export interface ShareState {
@@ -53,6 +54,8 @@ export interface ShareState {
   part?: string;
   layers?: LayerName[];
   cut?: { axis: ShareAxis; depth: number };
+  /** The glass body outline: false only for an explicit `glass=0`; absent means the link says nothing (on). */
+  glass?: boolean;
 }
 
 /** The pregnancy ceiling the engine itself uses (a cited-or-assumed constant of the model). */
@@ -75,6 +78,8 @@ export function buildShareHash(state: ShareState): string {
     parts.push(`layers=${ordered.join(',')}`);
   }
   if (state.organ && state.cut) parts.push(`cut=${state.cut.axis}:${Number(state.cut.depth.toFixed(2))}`);
+  // Written only when the glass is OFF, so every link made while it is on stays as short as before.
+  if (state.glass === false) parts.push('glass=0');
   return '#' + parts.join('&');
 }
 
@@ -164,6 +169,10 @@ export function parseShareHash(
       const depth = m ? Number(m[2]) : NaN;
       if (axis && Number.isFinite(depth) && depth >= 0 && depth <= 1) out.cut = { axis, depth };
     }
+    // Exactly "0" or "1"; anything else (2, true, 01) is dropped and the glass stays on.
+    const glassRaw = get('glass');
+    if (glassRaw === '0') out.glass = false;
+    else if (glassRaw === '1') out.glass = true;
     return out;
   } catch {
     return {};

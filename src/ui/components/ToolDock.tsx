@@ -151,6 +151,7 @@ function currentShareHash(): string {
     organ: s.selectedOrgan ?? undefined,
     part: s.selectedOrgan && s.selectedPart ? s.selectedPart : undefined,
     layers: LAYER_NAMES.filter((n) => layersOn[n]),
+    glass: s.glassVisible,
     cut: s.selectedOrgan && s.cutAxis ? { axis: s.cutAxis, depth: s.cutDepth } : undefined,
   });
 }

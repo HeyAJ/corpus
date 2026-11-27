@@ -822,8 +822,13 @@ export class Viewer {
     this.vascular.setVisible(shown);
   }
 
-  /** Show or hide the glass body outline and its floor shadow. On by default. */
-  setBodyOutlineVisible(on: boolean): void {
+  /**
+   * Show or hide the glass body outline ("Glass body" row of the Layers control). On by default.
+   * Off hides it completely, including the one-third ghost it keeps while an organ is open: the
+   * outline's own fade target is 0 when it is switched off, so it eases out rather than popping.
+   * The glass is never picked, so nothing about picking changes either way.
+   */
+  setGlassVisible(on: boolean): void {
     this.outline.setVisible(on);
   }
 
