@@ -1,6 +1,6 @@
 {
   "atlas": "chest_wall_muscles",
-  "about": "The muscles that lie on the rib cage: the intercostal layer between the ribs, the two pectoral muscles on the front of the chest and the serratus anterior on its side, drawn as thin sheets that follow the cage's own cross-section. The engine has no per-muscle state, so the drives are the whole-body ones: muscle tone, a seizure, exertion, and the rise in ventilation that the intercostals and the accessory muscles of inspiration answer. Force, fatigue and the work of breathing are not simulated. Sheet outlines and thicknesses are drawing choices.",
+  "about": "The muscles of the chest wall: the three intercostal layers, the deep muscles inside and behind the cage, and the pectoral and serratus muscles on its outside, drawn from the model's own ribs, cartilages, sternum, clavicle, scapula and humerus. Skeletal muscle: the drives are muscle tone (rigidity and paralysis), a seizure, shivering, ventilation for the external intercostals and respiratory drive for the muscles of forced breathing. The intercostals rise with the ribs in the breath. Each space is a schematic strip and the direction of the fibres is not drawn; the thickness of each layer is a drawing choice.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -15,27 +15,505 @@
     {
       "id": "intercostal_muscles",
       "label": "Intercostal Muscles",
-      "summary": "The muscles in the spaces between the ribs",
-      "function": "The external intercostals lift the ribs in inspiration and the internal and innermost intercostals draw them down in forced expiration. Together they stiffen the chest wall as it moves.",
+      "summary": "The three layers of muscle between the ribs",
+      "function": "They fill the spaces between neighbouring ribs in three layers and move with the ribs in breathing. Drawn schematically, one strip per space; the direction of the fibres is not drawn.",
       "color": "#c0605a",
-      "rest": 0.3,
+      "rest": 0.25,
       "drives": [
         {
           "signal": "ventilation",
-          "weight": 0.4,
-          "note": "The intercostals move the ribs for breathing, so they work harder as ventilation rises above rest.",
-          "source": "GRAYS42"
+          "weight": 0.25,
+          "note": "Guyton and Hall name this muscle among those that raise the ribs or sternum in a deeper breath, so a rise in minute ventilation engages it. The weight is a display scale.",
+          "source": "GH14"
         },
         {
-          "signal": "paralysis",
-          "weight": -0.4,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "signal": "respDrive",
+          "weight": 0.2,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
           "weight": 0.25,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostals",
+      "parent": "intercostal_muscles",
+      "label": "External Intercostals",
+      "summary": "The outermost layer",
+      "function": "They run from the tubercle of each rib to its costochondral junction and lift the ribs in quiet inspiration.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.4,
+          "note": "Guyton and Hall name this muscle among those that raise the ribs or sternum in a deeper breath, so a rise in minute ventilation engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostals",
+      "parent": "intercostal_muscles",
+      "label": "Internal Intercostals",
+      "summary": "The middle layer",
+      "function": "They run from the angle of each rib forward, between the cartilages of the upper spaces, and draw the ribs down in forced expiration.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "respDrive",
+          "weight": 0.4,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "innermost_intercostals",
+      "parent": "intercostal_muscles",
+      "label": "Innermost Intercostals",
+      "summary": "The deepest, least separable layer",
+      "function": "They lie on the inner surface of the ribs and share the action of the internal layer. Drawn as one sheet, not space by space.",
+      "color": "#a94d46",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_01",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 1",
+      "summary": "The external layer between rib 1 and rib 2",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_02",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 2",
+      "summary": "The external layer between rib 2 and rib 3",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_03",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 3",
+      "summary": "The external layer between rib 3 and rib 4",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_04",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 4",
+      "summary": "The external layer between rib 4 and rib 5",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_05",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 5",
+      "summary": "The external layer between rib 5 and rib 6",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_06",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 6",
+      "summary": "The external layer between rib 6 and rib 7",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_07",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 7",
+      "summary": "The external layer between rib 7 and rib 8",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_08",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 8",
+      "summary": "The external layer between rib 8 and rib 9",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_09",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 9",
+      "summary": "The external layer between rib 9 and rib 10",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_10",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 10",
+      "summary": "The external layer between rib 10 and rib 11",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_intercostal_space_11",
+      "parent": "external_intercostals",
+      "label": "External Intercostal, Space 11",
+      "summary": "The external layer between rib 11 and rib 12",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#c0605a",
+      "rest": 0.25,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_01",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 1",
+      "summary": "The internal layer between rib 1 and rib 2",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_02",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 2",
+      "summary": "The internal layer between rib 2 and rib 3",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_03",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 3",
+      "summary": "The internal layer between rib 3 and rib 4",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_04",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 4",
+      "summary": "The internal layer between rib 4 and rib 5",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_05",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 5",
+      "summary": "The internal layer between rib 5 and rib 6",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_06",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 6",
+      "summary": "The internal layer between rib 6 and rib 7",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_07",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 7",
+      "summary": "The internal layer between rib 7 and rib 8",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_08",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 8",
+      "summary": "The internal layer between rib 8 and rib 9",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_09",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 9",
+      "summary": "The internal layer between rib 9 and rib 10",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_10",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 10",
+      "summary": "The internal layer between rib 10 and rib 11",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "internal_intercostal_space_11",
+      "parent": "internal_intercostals",
+      "label": "Internal Intercostal, Space 11",
+      "summary": "The internal layer between rib 11 and rib 12",
+      "function": "One strip of the schematic series; it spans the space between the two ribs.",
+      "color": "#b5564f",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "subcostales",
+      "label": "Subcostales",
+      "summary": "Thin bands on the inner surface of the lower ribs",
+      "function": "They cross one or two ribs near the angles and act like the internal intercostals. Three bands are drawn.",
+      "color": "#a94d46",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "respDrive",
+          "weight": 0.3,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "transversus_thoracis",
+      "label": "Transversus Thoracis",
+      "summary": "The muscle behind the front of the chest wall",
+      "function": "It arises from the back of the lower sternum and fans out to the inner surfaces of the costal cartilages two to six, and draws them down.",
+      "color": "#a24a43",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "respDrive",
+          "weight": 0.3,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "levatores_costarum",
+      "label": "Levatores Costarum",
+      "summary": "Twelve pairs of small muscles at the back of the ribs",
+      "function": "They run from the transverse processes of the seventh cervical and upper eleven thoracic vertebrae to the rib below and lift the ribs.",
+      "color": "#b85a52",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "ventilation",
+          "weight": 0.2,
+          "note": "Guyton and Hall name this muscle among those that raise the ribs or sternum in a deeper breath, so a rise in minute ventilation engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
@@ -44,56 +522,148 @@
     {
       "id": "pectoralis_major",
       "label": "Pectoralis Major",
-      "summary": "The broad muscle across the front of the upper chest",
-      "function": "The pectoralis major runs from the sternum, the clavicle and the upper ribs to the humerus. It pulls the arm across the body, and it lies under the breast.",
-      "color": "#b8554c",
+      "summary": "The large muscle of the front of the chest",
+      "function": "It runs from the clavicle, sternum and upper cartilages to the humerus and moves the arm. Breast tissue lies over it; the breast organ draws that.",
+      "color": "#c0605a",
       "rest": 0.2,
       "drives": [
         {
           "signal": "exertion",
           "weight": 0.3,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "note": "Exercise engages the muscles that move and steady the trunk and hip, so a rise in exertion engages this muscle. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "rigidity",
           "weight": 0.3,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
       "source": "GRAYS42"
     },
     {
+      "id": "pectoralis_major_clavicular_part",
+      "parent": "pectoralis_major",
+      "label": "Clavicular Part of Pectoralis Major",
+      "summary": "The upper part from the clavicle",
+      "function": "It arises from the medial half of the clavicle.",
+      "color": "#c76a62",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pectoralis_major_sternocostal_part",
+      "parent": "pectoralis_major",
+      "label": "Sternocostal Part of Pectoralis Major",
+      "summary": "The large middle part",
+      "function": "It arises from the front of the sternum and the upper costal cartilages.",
+      "color": "#bf5f57",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pectoralis_major_abdominal_part",
+      "parent": "pectoralis_major",
+      "label": "Abdominal Part of Pectoralis Major",
+      "summary": "The lowest fibres",
+      "function": "They arise from the sheath of the rectus abdominis.",
+      "color": "#b8574f",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "pectoralis_minor",
       "label": "Pectoralis Minor",
-      "summary": "The smaller pectoral muscle, deep to the major",
-      "function": "The pectoralis minor runs from ribs three to five to the coracoid process of the scapula. It draws the shoulder blade forward and down, and can help lift the ribs when the shoulder is fixed.",
-      "color": "#a94b45",
+      "summary": "A smaller muscle deep to the pectoralis major",
+      "function": "It runs from the third to fifth ribs to the coracoid process of the scapula and draws the scapula forward and down.",
+      "color": "#b3524a",
       "rest": 0.2,
       "drives": [
         {
           "signal": "exertion",
-          "weight": 0.2,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "weight": 0.25,
+          "note": "Exercise engages the muscles that move and steady the trunk and hip, so a rise in exertion engages this muscle. The weight is a display scale.",
           "source": "GH14"
         },
         {
-          "signal": "ventilation",
-          "weight": 0.15,
-          "note": "With the scapula fixed, the pectoralis minor can lift the upper ribs as an accessory muscle of inspiration.",
-          "source": "GRAYS42"
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "subclavius",
+      "label": "Subclavius",
+      "summary": "A small muscle under the clavicle",
+      "function": "It runs from the first rib and its cartilage to the underside of the clavicle and steadies the clavicle.",
+      "color": "#aa4d46",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
@@ -102,30 +672,75 @@
     {
       "id": "serratus_anterior",
       "label": "Serratus Anterior",
-      "summary": "The muscle on the side of the chest that holds the shoulder blade to the ribs",
-      "function": "The serratus anterior runs from the upper ribs round to the medial border of the scapula. It holds the shoulder blade against the chest and swings it forward when the arm reaches.",
-      "color": "#c26a60",
+      "summary": "The muscle on the side of the chest under the scapula",
+      "function": "It runs from the upper ribs to the medial border of the scapula and holds the scapula against the chest. In forced breathing it helps to lift the ribs.",
+      "color": "#b85a52",
       "rest": 0.2,
       "drives": [
         {
-          "signal": "exertion",
-          "weight": 0.3,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "signal": "respDrive",
+          "weight": 0.35,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
           "source": "GH14"
         },
         {
-          "signal": "ventilation",
-          "weight": 0.15,
-          "note": "With the scapula fixed, the serratus anterior can lift the ribs as an accessory muscle of inspiration.",
-          "source": "GRAYS42"
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serratus_anterior_superior_part",
+      "parent": "serratus_anterior",
+      "label": "Superior Part of Serratus Anterior",
+      "summary": "The upper part, from the first two ribs",
+      "function": "It runs to the superior angle of the scapula.",
+      "color": "#b85a52",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serratus_anterior_intermediate_part",
+      "parent": "serratus_anterior",
+      "label": "Intermediate Part of Serratus Anterior",
+      "summary": "The middle part",
+      "function": "It fans from the second and third ribs to the medial border of the scapula.",
+      "color": "#b0524a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "serratus_anterior_inferior_part",
+      "parent": "serratus_anterior",
+      "label": "Inferior Part of Serratus Anterior",
+      "summary": "The lower part, from the lower ribs",
+      "function": "It converges on the inferior angle of the scapula.",
+      "color": "#a84c45",
+      "rest": 0.2,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]

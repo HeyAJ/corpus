@@ -1,6 +1,6 @@
 {
   "atlas": "abdominal_wall_muscles",
-  "about": "The four muscles of the front and side of the abdominal wall (the rectus abdominis, the external and internal obliques and the transversus abdominis) and the muscles of its back wall (the psoas, the quadratus lumborum and the iliacus), drawn as sheets on the trunk's cross-section and as three spindles. The drives are the whole-body ones the engine has: muscle tone, exertion, a seizure, and vomiting, in which the textbook says the abdominal muscles contract strongly. Breathing out against resistance, posture and the force of any contraction are not simulated. Outlines and thicknesses are drawing choices.",
+  "about": "The muscles and fibrous layers of the wall of the abdomen and its posterior wall: the rectus and its sheath, the three flat muscles and their aponeuroses, the linea alba, pyramidalis, the inguinal ligament and canal, and psoas, iliacus and quadratus lumborum, drawn on the trunk's own surface and attached to the model's hip bones, ribs, cartilages and lumbar vertebrae. Skeletal muscle: the drives are muscle tone (rigidity and paralysis), a seizure, shivering, vomiting and respiratory drive for the wall muscles of forced expiration, and exertion for the posterior wall. The layers' thicknesses are drawing choices; the cremaster, anal sphincter, perineal muscles and diaphragm belong to other organs. The inguinal canal is schematic and empty.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -15,33 +15,159 @@
     {
       "id": "rectus_abdominis",
       "label": "Rectus Abdominis",
-      "summary": "The paired vertical muscle beside the midline of the abdomen",
-      "function": "The rectus abdominis runs from the costal margin and the xiphoid process to the pubis. It bends the trunk forward and holds the abdominal contents.",
-      "color": "#b8554c",
+      "summary": "The paired straight muscle of the front of the abdomen",
+      "function": "It runs from the costal cartilages and xiphoid process to the pubis inside its sheath. It flexes the trunk and, with the other wall muscles, forces air out and compresses the abdomen.",
+      "color": "#b35a50",
       "rest": 0.2,
       "drives": [
         {
-          "signal": "exertion",
+          "signal": "vomiting",
           "weight": 0.3,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "note": "Vomiting is forced by contraction of the abdominal wall muscles; the engine's vomiting signal is 0 or 1. The weight is a display scale.",
           "source": "GH14"
         },
         {
-          "signal": "vomiting",
-          "weight": 0.4,
-          "note": "Vomiting includes strong contraction of the abdominal wall muscles, which raises the pressure on the stomach.",
+          "signal": "respDrive",
+          "weight": 0.35,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "rigidity",
           "weight": 0.3,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tendinous_intersections",
+      "parent": "rectus_abdominis",
+      "label": "Tendinous Intersections",
+      "summary": "Fibrous bands across the muscle",
+      "function": "They divide the rectus into segments and fix it to the front of its sheath. Gray's: usually three.",
+      "color": "#d8c0b0",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rectus_sheath",
+      "label": "Rectus Sheath",
+      "summary": "The fibrous case round the rectus",
+      "function": "It is formed by the aponeuroses of the three flat muscles. It encloses the rectus and its layers differ above and below the arcuate line.",
+      "color": "#d9bfb0",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rectus_sheath_anterior_layer",
+      "parent": "rectus_sheath",
+      "label": "Anterior Layer of Rectus Sheath",
+      "summary": "The layer in front of the muscle",
+      "function": "It covers the front of the rectus for its whole length.",
+      "color": "#d9bfb0",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rectus_sheath_posterior_layer",
+      "parent": "rectus_sheath",
+      "label": "Posterior Layer of Rectus Sheath",
+      "summary": "The layer behind the muscle",
+      "function": "It lies behind the rectus down to the arcuate line.",
+      "color": "#cdb2a4",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "arcuate_line",
+      "parent": "rectus_sheath",
+      "label": "Arcuate Line",
+      "summary": "The lower edge of the posterior layer",
+      "function": "Below it the aponeuroses pass in front of the rectus, which then lies directly on the transversalis fascia.",
+      "color": "#c0a698",
+      "rest": 0.15,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "linea_alba",
+      "label": "Linea Alba",
+      "summary": "The midline band between the two recti",
+      "function": "Fibres of the three aponeuroses meet here from the xiphoid process to the pubic symphysis.",
+      "color": "#e0ccbf",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
@@ -50,56 +176,114 @@
     {
       "id": "external_oblique",
       "label": "External Oblique",
-      "summary": "The outermost flat muscle of the side of the abdomen",
-      "function": "The external oblique runs from the lower ribs down and forward towards the midline and the iliac crest. It bends and twists the trunk and compresses the abdomen.",
-      "color": "#c0605a",
+      "summary": "The outermost flat muscle of the flank",
+      "function": "It runs from the lower ribs down and forward to the iliac crest, the linea alba and the inguinal ligament. It rotates and flexes the trunk, and compresses the abdomen.",
+      "color": "#b0524a",
       "rest": 0.2,
       "drives": [
         {
-          "signal": "exertion",
-          "weight": 0.25,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "signal": "vomiting",
+          "weight": 0.3,
+          "note": "Vomiting is forced by contraction of the abdominal wall muscles; the engine's vomiting signal is 0 or 1. The weight is a display scale.",
           "source": "GH14"
         },
         {
-          "signal": "vomiting",
-          "weight": 0.4,
-          "note": "Vomiting includes strong contraction of the abdominal wall muscles, which raises the pressure on the stomach.",
+          "signal": "respDrive",
+          "weight": 0.35,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
       "source": "GRAYS42"
     },
     {
+      "id": "external_oblique_muscle",
+      "parent": "external_oblique",
+      "label": "Muscular Part of External Oblique",
+      "summary": "The fleshy part of the flank",
+      "function": "It ends at the lateral border of the rectus, the semilunar line.",
+      "color": "#b0524a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_oblique_aponeurosis",
+      "parent": "external_oblique",
+      "label": "Aponeurosis of External Oblique",
+      "summary": "The broad tendon sheet in front of the rectus",
+      "function": "It carries on to the linea alba and its lower border is rolled under to form the inguinal ligament.",
+      "color": "#d4b8aa",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "internal_oblique",
       "label": "Internal Oblique",
-      "summary": "The middle flat muscle of the side of the abdomen",
-      "function": "The internal oblique lies under the external oblique and its fibres run at right angles to it. It twists and bends the trunk and compresses the abdomen.",
-      "color": "#b35a50",
+      "summary": "The middle flat muscle of the flank",
+      "function": "It runs from the iliac crest and inguinal ligament up and forward to the lower ribs and the rectus sheath, at right angles to the external oblique.",
+      "color": "#a84c45",
       "rest": 0.2,
       "drives": [
         {
-          "signal": "exertion",
-          "weight": 0.25,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "signal": "vomiting",
+          "weight": 0.3,
+          "note": "Vomiting is forced by contraction of the abdominal wall muscles; the engine's vomiting signal is 0 or 1. The weight is a display scale.",
           "source": "GH14"
         },
         {
-          "signal": "vomiting",
-          "weight": 0.4,
-          "note": "Vomiting includes strong contraction of the abdominal wall muscles, which raises the pressure on the stomach.",
+          "signal": "respDrive",
+          "weight": 0.3,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
@@ -108,59 +292,254 @@
     {
       "id": "transversus_abdominis",
       "label": "Transversus Abdominis",
-      "summary": "The innermost flat muscle of the abdominal wall",
-      "function": "The transversus abdominis runs round the abdomen like a belt, deep to the obliques. It compresses the abdominal contents.",
-      "color": "#a94b45",
+      "summary": "The deepest flat muscle",
+      "function": "It runs transversely from the lower costal cartilages, the iliac crest and the inguinal ligament to the linea alba and compresses the abdominal contents.",
+      "color": "#9e463f",
       "rest": 0.2,
       "drives": [
         {
           "signal": "vomiting",
-          "weight": 0.45,
-          "note": "Vomiting includes strong contraction of the abdominal wall muscles, which raises the pressure on the stomach.",
+          "weight": 0.3,
+          "note": "Vomiting is forced by contraction of the abdominal wall muscles; the engine's vomiting signal is 0 or 1. The weight is a display scale.",
           "source": "GH14"
         },
         {
-          "signal": "exertion",
-          "weight": 0.2,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
       "source": "GRAYS42"
     },
     {
-      "id": "posterior_abdominal_wall",
-      "label": "Posterior Abdominal Wall Muscles",
-      "summary": "The psoas major, quadratus lumborum and iliacus",
-      "function": "The psoas major and the iliacus run from the lumbar spine and the iliac fossa to the lesser trochanter of the femur and bend the hip. The quadratus lumborum joins the twelfth rib to the iliac crest and bends the trunk to the side.",
-      "color": "#9a4a44",
-      "rest": 0.25,
+      "id": "pyramidalis",
+      "label": "Pyramidalis",
+      "summary": "A small triangular muscle in front of the lower rectus",
+      "function": "It runs from the pubis to the linea alba and tenses it. It is absent in some people.",
+      "color": "#bd6a60",
+      "rest": 0.15,
       "drives": [
-        {
-          "signal": "exertion",
-          "weight": 0.3,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
-          "source": "GH14"
-        },
         {
           "signal": "rigidity",
           "weight": 0.3,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inguinal_ligament",
+      "label": "Inguinal Ligament",
+      "summary": "The band from the hip bone to the pubis",
+      "function": "It runs from the anterior superior iliac spine to the pubic tubercle and is the rolled lower border of the external oblique aponeurosis.",
+      "color": "#dcc6b6",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inguinal_canal",
+      "label": "Inguinal Canal",
+      "summary": "An oblique channel through the lower wall",
+      "function": "It passes above the inguinal ligament from the deep ring to the superficial ring. Drawn as a schematic glass channel; nothing passes through it here.",
+      "color": "#d5b9a8",
+      "rest": 0.1,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deep_inguinal_ring",
+      "parent": "inguinal_canal",
+      "label": "Deep Inguinal Ring",
+      "summary": "The inner opening of the canal",
+      "function": "It lies in the transversalis fascia about half way along the inguinal ligament.",
+      "color": "#cdb0a0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superficial_inguinal_ring",
+      "parent": "inguinal_canal",
+      "label": "Superficial Inguinal Ring",
+      "summary": "The outer opening of the canal",
+      "function": "It is a gap in the external oblique aponeurosis above the pubic crest.",
+      "color": "#cdb0a0",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "posterior_abdominal_wall",
+      "label": "Posterior Abdominal Wall",
+      "summary": "The muscles beside the lumbar spine",
+      "function": "Psoas, iliacus and quadratus lumborum form the back wall of the abdomen, behind the kidneys.",
+      "color": "#9a4a44",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.3,
+          "note": "Exercise engages the muscles that move and steady the trunk and hip, so a rise in exertion engages this muscle. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "psoas_major",
+      "parent": "posterior_abdominal_wall",
+      "label": "Psoas Major",
+      "summary": "The long muscle beside the lumbar vertebrae",
+      "function": "It runs from the sides of the lumbar bodies over the pelvic brim to the lesser trochanter of the femur and flexes the hip.",
+      "color": "#9a4a44",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "psoas_minor",
+      "parent": "posterior_abdominal_wall",
+      "label": "Psoas Minor",
+      "summary": "A slender muscle in front of the psoas major",
+      "function": "It runs from the upper lumbar bodies to the pubis. It is not always present.",
+      "color": "#a65450",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "iliacus",
+      "parent": "posterior_abdominal_wall",
+      "label": "Iliacus",
+      "summary": "The fan-shaped muscle of the iliac fossa",
+      "function": "It arises from the inner face of the iliac plate and joins the psoas tendon, flexing the hip.",
+      "color": "#a24f48",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "quadratus_lumborum",
+      "parent": "posterior_abdominal_wall",
+      "label": "Quadratus Lumborum",
+      "summary": "The muscle between the twelfth rib and the iliac crest",
+      "function": "It lies behind the kidney and bends the trunk to the side and fixes the last rib.",
+      "color": "#964640",
+      "rest": 0.2,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]

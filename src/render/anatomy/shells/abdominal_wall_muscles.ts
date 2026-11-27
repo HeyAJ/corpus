@@ -342,6 +342,7 @@ const aponeurosisRows = (y0: number): (readonly RowPoint[])[] =>
 
 // EXTERNAL OBLIQUE: from the outer surfaces of the lower eight ribs, down and in; its muscle ends at the semilunar line and its aponeurosis crosses in front of the rectus to the linea alba and down to the inguinal ligament.
 spec.external_oblique_muscle = {
+  parent: 'external_oblique',
   make: (k, s) => [layerSheet(s, 'externalOblique', muscleRows(0.105, 0.0042, A_BACK), 5, 4, k)],
 };
 spec.external_oblique_aponeurosis = {

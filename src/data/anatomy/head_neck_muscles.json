@@ -1,6 +1,6 @@
 {
   "atlas": "head_neck_muscles",
-  "about": "The muscles of the jaw, the hyoid, the front and side of the neck and the front of the cervical spine, drawn as one schematic silhouette per group in the right place against the skull, the hyoid and the cervical column. They are skeletal muscle, so the only drives are the whole-body ones the engine has: muscle tone (rigidity and paralysis), a seizure, swallowing and the rise in ventilation that recruits the neck's accessory breathing muscles. Chewing force, speech, facial expression and neck movement are not simulated, and the muscles of the face are not drawn. The widths of the muscle bellies are drawing choices, not measurements.",
+  "about": "The muscles of the jaw, the hyoid, the front and side of the neck and the front of the cervical spine, drawn from their Gray's attachments on the skull, mandible, hyoid, sternum, clavicle, scapula, cervical vertebrae and first two ribs. They are skeletal muscle, so the drives are the whole-body ones the engine has: muscle tone (rigidity and paralysis, including a neuromuscular blocker), a seizure, shivering, swallowing for the hyoid group, and ventilation and respiratory drive for the accessory breathing muscles of the neck. Chewing force, speech, facial expression and neck movement are not simulated, and the muscles of the face are not drawn. The widths of the muscle bellies are drawing choices, not measurements; the attachments are on the model's own bones.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -15,37 +15,131 @@
     {
       "id": "mastication_muscles",
       "label": "Muscles of Mastication",
-      "summary": "Temporalis and masseter, the jaw closers",
-      "function": "The temporalis fans over the side of the skull and the masseter lies over the ramus of the mandible; both close the jaw. Chewing itself is not simulated.",
+      "summary": "The four paired muscles that move the jaw",
+      "function": "Temporalis, masseter and the medial and lateral pterygoids close, open and slide the jaw. Chewing itself is not simulated.",
       "color": "#b8554c",
-      "rest": 0.25,
+      "rest": 0.2,
       "drives": [
         {
           "signal": "rigidity",
-          "weight": 0.35,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
-          "weight": -0.35,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "seizure",
-          "weight": 0.3,
+          "weight": 0.25,
           "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
       "source": "GRAYS42"
     },
     {
+      "id": "temporalis",
+      "parent": "mastication_muscles",
+      "label": "Temporalis",
+      "summary": "A fan-shaped muscle on the side of the skull",
+      "function": "It arises from the temporal fossa and gathers onto the coronoid process of the mandible. It closes the jaw and pulls it back.",
+      "color": "#bd5d52",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "masseter",
+      "parent": "mastication_muscles",
+      "label": "Masseter",
+      "summary": "The thick muscle over the ramus of the mandible",
+      "function": "It runs from the zygomatic arch to the angle and ramus of the mandible and closes the jaw.",
+      "color": "#b3524a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "masseter_superficial_part",
+      "parent": "masseter",
+      "label": "Superficial Part of Masseter",
+      "summary": "The larger front layer of the masseter",
+      "function": "It arises from the front of the zygomatic arch and passes down and back to the angle of the mandible.",
+      "color": "#b3524a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "masseter_deep_part",
+      "parent": "masseter",
+      "label": "Deep Part of Masseter",
+      "summary": "The smaller back layer of the masseter",
+      "function": "It arises from the back and inner surface of the zygomatic arch and passes down to the upper ramus.",
+      "color": "#a84a42",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_pterygoid",
+      "parent": "mastication_muscles",
+      "label": "Lateral Pterygoid",
+      "summary": "A short muscle deep to the ramus that draws the jaw forward",
+      "function": "It runs from the sphenoid bone back to the neck of the mandible and the joint disc, and it opens the jaw and moves it from side to side.",
+      "color": "#c0625a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_pterygoid_upper_head",
+      "parent": "lateral_pterygoid",
+      "label": "Upper Head of Lateral Pterygoid",
+      "summary": "The head from the infratemporal surface of the sphenoid",
+      "function": "It arises from the greater wing of the sphenoid bone and passes back and out to the neck of the mandible.",
+      "color": "#c0625a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "lateral_pterygoid_lower_head",
+      "parent": "lateral_pterygoid",
+      "label": "Lower Head of Lateral Pterygoid",
+      "summary": "The head from the lateral pterygoid plate",
+      "function": "It arises from the outer surface of the lateral pterygoid plate and passes back and out to the neck of the mandible.",
+      "color": "#b85a52",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "medial_pterygoid",
+      "parent": "mastication_muscles",
+      "label": "Medial Pterygoid",
+      "summary": "A muscle on the inner face of the ramus",
+      "function": "It runs from the pterygoid fossa down and back to the inner surface of the angle of the mandible and helps to close the jaw.",
+      "color": "#bb5b52",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "hyoid_muscles",
       "label": "Hyoid Muscles",
       "summary": "The suprahyoid and infrahyoid muscles around the hyoid bone",
-      "function": "The suprahyoid muscles join the hyoid to the jaw and the infrahyoid muscles join it to the sternum. They lift and steady the hyoid and the larynx, which is part of the swallow.",
+      "function": "The suprahyoid muscles join the hyoid to the jaw and skull and the infrahyoid muscles join it to the sternum, clavicle and scapula. They lift and steady the hyoid and the larynx, which is part of the swallow.",
       "color": "#c26a60",
       "rest": 0.2,
       "drives": [
@@ -56,84 +150,422 @@
           "source": "GRAYS42"
         },
         {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
           "signal": "paralysis",
-          "weight": -0.25,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "digastric",
+      "parent": "hyoid_muscles",
+      "label": "Digastric",
+      "summary": "A two-bellied muscle from the mastoid region to the chin",
+      "function": "Its posterior belly runs from the mastoid notch and its anterior belly to the mandible, joined by an intermediate tendon at the hyoid. It lowers the jaw and raises the hyoid.",
+      "color": "#c76d62",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "digastric_posterior_belly",
+      "parent": "digastric",
+      "label": "Posterior Belly of Digastric",
+      "summary": "The belly from the mastoid notch",
+      "function": "It runs from the mastoid notch of the temporal bone forward and down to the intermediate tendon.",
+      "color": "#c76d62",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "digastric_intermediate_tendon",
+      "parent": "digastric",
+      "label": "Intermediate Tendon of Digastric",
+      "summary": "The tendon joining the two bellies",
+      "function": "It is held to the hyoid bone by a fibrous sling.",
+      "color": "#d8b8a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "digastric_anterior_belly",
+      "parent": "digastric",
+      "label": "Anterior Belly of Digastric",
+      "summary": "The belly to the chin",
+      "function": "It runs from the intermediate tendon forward and up to the digastric fossa of the mandible beside the midline.",
+      "color": "#c26a60",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "stylohyoid",
+      "parent": "hyoid_muscles",
+      "label": "Stylohyoid",
+      "summary": "A slender muscle from the styloid process to the hyoid",
+      "function": "It runs alongside the posterior belly of the digastric and draws the hyoid up and back.",
+      "color": "#c9766a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "mylohyoid",
+      "parent": "hyoid_muscles",
+      "label": "Mylohyoid",
+      "summary": "The muscular floor of the mouth",
+      "function": "A sheet from the mylohyoid line of the mandible to a midline raphe and the hyoid body, it raises the floor of the mouth and the hyoid. The mouth organ draws the tongue above it.",
+      "color": "#d07f72",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "geniohyoid",
+      "parent": "hyoid_muscles",
+      "label": "Geniohyoid",
+      "summary": "A short muscle above the mylohyoid beside the midline",
+      "function": "It runs from the inferior mental spine of the mandible to the body of the hyoid and draws the hyoid forward and up.",
+      "color": "#c4695e",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sternohyoid",
+      "parent": "hyoid_muscles",
+      "label": "Sternohyoid",
+      "summary": "An infrahyoid strap from the sternum to the hyoid",
+      "function": "It runs from the back of the manubrium and the medial clavicle up the front of the neck to the hyoid and pulls the hyoid down.",
+      "color": "#b9564d",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "omohyoid",
+      "parent": "hyoid_muscles",
+      "label": "Omohyoid",
+      "summary": "An infrahyoid muscle with two bellies and a tendon between",
+      "function": "Its inferior belly arises from the upper border of the scapula and, after an intermediate tendon, its superior belly reaches the hyoid. It steadies and lowers the hyoid.",
+      "color": "#b3524a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "omohyoid_inferior_belly",
+      "parent": "omohyoid",
+      "label": "Inferior Belly of Omohyoid",
+      "summary": "The belly from the scapula",
+      "function": "It crosses the lower neck from the superior border of the scapula to the intermediate tendon.",
+      "color": "#b3524a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "omohyoid_intermediate_tendon",
+      "parent": "omohyoid",
+      "label": "Intermediate Tendon of Omohyoid",
+      "summary": "The tendon between the two bellies",
+      "function": "It is bound down to the clavicle by a sheet of deep fascia.",
+      "color": "#d8b8a8",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "omohyoid_superior_belly",
+      "parent": "omohyoid",
+      "label": "Superior Belly of Omohyoid",
+      "summary": "The belly to the hyoid",
+      "function": "It runs up beside the sternohyoid to the lower border of the hyoid.",
+      "color": "#b9564d",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sternothyroid",
+      "parent": "hyoid_muscles",
+      "label": "Sternothyroid",
+      "summary": "A deeper infrahyoid strap to the thyroid cartilage",
+      "function": "It runs from the back of the manubrium to the oblique line of the thyroid cartilage and pulls the larynx down.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "thyrohyoid",
+      "parent": "hyoid_muscles",
+      "label": "Thyrohyoid",
+      "summary": "The short continuation of the sternothyroid",
+      "function": "It runs from the thyroid cartilage up to the hyoid and brings the two closer.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
       "source": "GRAYS42"
     },
     {
       "id": "sternocleidomastoid",
       "label": "Sternocleidomastoid",
-      "summary": "The strap muscle from behind the ear to the sternum and clavicle",
-      "function": "Each sternocleidomastoid runs from the mastoid process to the sternum and the medial clavicle. It turns and tilts the head, and in laboured breathing it helps lift the chest as an accessory muscle of inspiration.",
+      "summary": "The muscle that runs obliquely across the side of the neck",
+      "function": "It runs from the sternum and clavicle to the mastoid process of the skull. It turns and tilts the head, and in forced breathing it helps to lift the sternum.",
       "color": "#a94b45",
       "rest": 0.2,
       "drives": [
         {
           "signal": "ventilation",
-          "weight": 0.3,
-          "note": "The sternocleidomastoid is an accessory muscle of inspiration, recruited when ventilation rises above rest.",
-          "source": "GRAYS42"
+          "weight": 0.2,
+          "note": "Guyton and Hall name this muscle among those that raise the ribs or sternum in a deeper breath, so a rise in minute ventilation engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "respDrive",
+          "weight": 0.35,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
+          "source": "GH14"
         },
         {
           "signal": "rigidity",
           "weight": 0.3,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scm_sternal_head",
+      "parent": "sternocleidomastoid",
+      "label": "Sternal Head of Sternocleidomastoid",
+      "summary": "The rounded tendon from the manubrium",
+      "function": "It arises from the front of the manubrium of the sternum.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scm_clavicular_head",
+      "parent": "sternocleidomastoid",
+      "label": "Clavicular Head of Sternocleidomastoid",
+      "summary": "The broader fleshy part from the clavicle",
+      "function": "It arises from the upper surface of the medial part of the clavicle and joins the sternal head.",
+      "color": "#b0524a",
+      "rest": 0.2,
+      "drives": [],
       "source": "GRAYS42"
     },
     {
       "id": "scalene_muscles",
       "label": "Scalene Muscles",
-      "summary": "Three muscles from the neck to the first two ribs",
-      "function": "The scalenes run from the cervical vertebrae to the first and second ribs and bend the neck. They also lift the upper ribs in inspiration, and work harder as ventilation rises.",
+      "summary": "The three muscles from the neck vertebrae to the first two ribs",
+      "function": "They bend the neck, and in a deeper breath they lift the first two ribs.",
       "color": "#b35a50",
-      "rest": 0.25,
+      "rest": 0.2,
       "drives": [
         {
           "signal": "ventilation",
+          "weight": 0.2,
+          "note": "Guyton and Hall name this muscle among those that raise the ribs or sternum in a deeper breath, so a rise in minute ventilation engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "respDrive",
+          "weight": 0.35,
+          "note": "Guyton and Hall name this muscle among those recruited when breathing is driven harder (accessory inspiration or forced expiration), so a rise in central respiratory drive engages it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
           "weight": 0.3,
-          "note": "The scalenes raise the first and second ribs in inspiration and are recruited as ventilation rises above rest.",
-          "source": "GRAYS42"
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
       "source": "GRAYS42"
     },
     {
+      "id": "scalenus_anterior",
+      "parent": "scalene_muscles",
+      "label": "Anterior Scalene",
+      "summary": "The front scalene",
+      "function": "It runs from the cervical transverse processes to the first rib, in front of the subclavian artery.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scalenus_medius",
+      "parent": "scalene_muscles",
+      "label": "Middle Scalene",
+      "summary": "The middle and largest scalene",
+      "function": "It runs from the cervical transverse processes to the first rib behind the subclavian artery.",
+      "color": "#ab5249",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "scalenus_posterior",
+      "parent": "scalene_muscles",
+      "label": "Posterior Scalene",
+      "summary": "The back scalene",
+      "function": "It runs from the lower cervical transverse processes to the second rib.",
+      "color": "#a34a42",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "prevertebral_muscles",
       "label": "Prevertebral Muscles",
-      "summary": "The deep flexors on the front of the cervical spine",
-      "function": "The longus colli and the longus capitis lie on the front of the cervical vertebrae and flex the neck. They are thin and lie in the narrow space between the spine and the pharynx.",
+      "summary": "The muscles on the front of the cervical spine",
+      "function": "Longus colli and longus capitis flex the neck and head. They lie behind the pharynx.",
       "color": "#9a4a44",
       "rest": 0.2,
       "drives": [
         {
           "signal": "rigidity",
-          "weight": 0.25,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
           "source": "GH14"
         },
         {
           "signal": "paralysis",
           "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "longus_colli",
+      "parent": "prevertebral_muscles",
+      "label": "Longus Colli",
+      "summary": "A muscle on the front of the cervical and upper thoracic vertebrae",
+      "function": "It lies on the front of the vertebral bodies and flexes the neck. Gray's describes three parts; they are drawn as one strap here.",
+      "color": "#9a4a44",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "longus_capitis",
+      "parent": "prevertebral_muscles",
+      "label": "Longus Capitis",
+      "summary": "A muscle from the cervical vertebrae to the base of the skull",
+      "function": "It runs from the anterior tubercles of the cervical transverse processes to the underside of the occipital bone and flexes the head.",
+      "color": "#a24f48",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "platysma",
+      "label": "Platysma",
+      "summary": "A thin sheet in the skin of the neck",
+      "function": "It spreads from the fascia over the upper chest and shoulder up over the clavicle and the neck to the lower border of the mandible. It tenses the skin of the neck.",
+      "color": "#c98a80",
+      "rest": 0.15,
+      "drives": [
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so this muscle tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis, or a neuromuscular blocker) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.25,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.12,
+          "note": "Shivering is rhythmic contraction of skeletal muscle in the cold, so this muscle is engaged by it. The weight is a display scale.",
           "source": "GH14"
         }
       ],

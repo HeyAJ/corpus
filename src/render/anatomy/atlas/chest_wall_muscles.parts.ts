@@ -1,23 +1,17 @@
-import * as THREE from 'three';
 import type { PartBuilder, PartGeometry } from '../parts';
 import { mergeParts } from '../sdf';
 import { chestWallMuscleGroups } from '../shells/chest_wall_muscles';
 
 /**
- * THE INSIDE OF THE CHEST WALL MUSCLES: a FIRST-PASS STUB (the scaffold of the muscles layer).
- *
- * This organ's shell is the union of one schematic silhouette per part (the intercostal layer, the two pectorals and the serratus anterior), so
- * the interior is simply each of those silhouettes drawn separately, in the organ's own frame,
- * under the part id the atlas file (src/data/anatomy/chest_wall_muscles.json) gives it. The shell and the
- * parts therefore share one function (`chestWallMuscleGroups`) and cannot disagree about where a
- * muscle is. A content agent who draws these muscles properly replaces this file and adds the
- * finer structures with the atlas's `parent` field; until then nothing here is anatomy beyond
- * the placement the shell's own header describes.
+ * THE INSIDE OF THE CHEST WALL MUSCLES. Every part, level 1 to 3, comes from the function the
+ * shell comes from (`chestWallMuscleGroups`), so interior and shell cannot disagree about where a
+ * muscle lies. A parent is the union of its children at full radius and each child is drawn slimmer
+ * inside it. Procedural and illustrative: the attachments are on the model's ribs, cartilages,
+ * sternum, clavicle, scapula and humerus; the thickness of a layer is a drawing choice and each
+ * intercostal space is one schematic strip.
  */
 export const parts: PartBuilder = () => {
   const out: PartGeometry[] = [];
-  for (const [id, geometries] of Object.entries(chestWallMuscleGroups() as Record<string, THREE.BufferGeometry[]>)) {
-    out.push({ id, geometry: mergeParts(geometries) });
-  }
+  for (const [id, geometries] of Object.entries(chestWallMuscleGroups())) out.push({ id, geometry: mergeParts(geometries) });
   return out;
 };

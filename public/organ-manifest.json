@@ -246,6 +246,17 @@
       ]
     },
     {
+      "id": "hip_thigh_muscles",
+      "triangles": 6360,
+      "budget": 12000,
+      "boundingRadius_m": 0.17889,
+      "worldCentre_m": [
+        0,
+        -0.2302,
+        -0.0087
+      ]
+    },
+    {
       "id": "penis",
       "triangles": 6356,
       "budget": 8000,
@@ -379,13 +390,13 @@
     },
     {
       "id": "abdominal_wall_muscles",
-      "triangles": 4120,
+      "triangles": 4144,
       "budget": 8000,
-      "boundingRadius_m": 0.20853,
+      "boundingRadius_m": 0.21734,
       "worldCentre_m": [
         0,
-        -0.0723,
-        -0.0006
+        -0.0724,
+        -0.0012
       ]
     },
     {
@@ -507,17 +518,6 @@
         0,
         0.0357,
         -0.006
-      ]
-    },
-    {
-      "id": "hip_thigh_muscles",
-      "triangles": 984,
-      "budget": 12000,
-      "boundingRadius_m": 0.15602,
-      "worldCentre_m": [
-        0,
-        -0.221,
-        -0.0183
       ]
     },
     {

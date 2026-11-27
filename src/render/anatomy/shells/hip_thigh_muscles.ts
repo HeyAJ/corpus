@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { mergeParts, type Sdf, type V3 } from '../sdf';
 import {
-  GREATER, LESSER, INFERIOR_RAMUS, ISCHIAL_RAMUS, PUBIC_BODY, PUBIC_TUBERCLE, SPINE_TIP, SUPERIOR_RAMUS, TUBEROSITY, F as HIP_JOINT,
-  CONDYLE_L, CONDYLE_M, femurField, hipBoneField, shaftAxisAt, shaftRadiusAt, wingPoint,
+  GREATER, LESSER, INFERIOR_RAMUS, ISCHIAL_RAMUS, PUBIC_BODY, SPINE_TIP, SUPERIOR_RAMUS, TUBEROSITY, F as HIP_JOINT,
+  CONDYLE_M, femurField, hipBoneField, shaftAxisAt, shaftRadiusAt, wingPoint,
 } from './lower_limb_bones';
 import { SACRAL_SHIFT, coccyxField, sacrumField } from './vertebral_column';
 import { belly, fusiform, mirrorGeo, sheet } from './back_muscles';
@@ -222,7 +222,7 @@ const pair = (g: THREE.BufferGeometry): THREE.BufferGeometry[] => [g, mirrorGeo(
 /* ------------------------------------------------------------------------------ landmarks */
 
 /** The iliac plate's outer (gluteal) face at wing coordinates (s, y), pushed a little off it. */
-const iliac = (s: number, y: number, off = 0.0005): V3 => wingPoint(s, y, 0.0055 + off);
+export const iliac = (s: number, y: number, off = 0.0005): V3 => wingPoint(s, y, 0.0055 + off);
 /** The right sacrum's posterior surface at height y (sacrum frame) and x, as a point in the hip bone's frame. */
 function sacrumBack(yHip: number, x: number): V3 {
   const f = sacrumField();
@@ -244,49 +244,173 @@ const BELOW_KNEE_Y = -0.318;
 
 /* ------------------------------------------------------------------------------ the muscles */
 
+/** The sacrum's front surface at height y (hip frame) and x: found marching back from in front. */
+function sacrumFront(yHip: number, x: number): V3 {
+  const f = sacrumField();
+  const ys = yHip - SACRUM_IN_HIP;
+  let z = 0.0;
+  while (f(x, ys, z) > 0 && z > -0.14) z -= 0.0004;
+  return [x, yHip, z + 0.0003];
+}
+
+type End = 'hip' | 'femur' | 'sacrum' | 'free';
+const G = (id: string, o: Omit<Spec, 'ends'>, ends: [End, End]): THREE.BufferGeometry[] => pair(bellyOf(id, { ...o, ends }));
+
 /** The pieces of each LEAF muscle, keyed by the leaf's part id in src/data/anatomy/hip_thigh_muscles.json. Built deepest first. */
 export function hipThighLeaves(): Record<string, THREE.BufferGeometry[]> {
   layer = [];
   ATTACHMENTS.length = 0;
   const out: Record<string, THREE.BufferGeometry[]> = {};
-  const y0 = (y: number): number => y;
-  void y0;
-
-  /* ---- the short lateral rotators and their neighbours: the deepest layer behind the hip */
   const grTop = snap([GREATER[0], GREATER[1] + 0.0125, GREATER[2]]);
   const grMedial = snap([GREATER[0] - 0.0095, GREATER[1] + 0.001, GREATER[2] + 0.0005]);
-  out.piriformis = pair(bellyOf('piriformis', {
-    guides: [sacrumBack(-0.112, 0.022).map((v, i) => (i === 2 ? v + 0.012 : v)) as unknown as V3, [0.05, -0.122, -0.058], [0.078, -0.138, -0.046], [0.097, -0.147, -0.03], grTop],
-    w: 0.009, t: 0.0045, a: 0.15, b: 0.2, ends: ['sacrum', 'femur'],
-  }));
-  const spineMid = snap([SPINE_TIP[0], SPINE_TIP[1] - 0.002, SPINE_TIP[2]]);
-  out.superior_gemellus = pair(bellyOf('superior_gemellus', { guides: [spineMid, [0.095, -0.155, -0.035], grMedial], w: 0.0045, t: 0.0028, a: 0.1, b: 0.2, tendon: 0.3, n: 5, ends: ['hip', 'femur'] }));
-  const tubUpper = snap([TUBEROSITY[0] + 0.001, TUBEROSITY[1] + 0.008, TUBEROSITY[2] - 0.003]);
-  out.inferior_gemellus = pair(bellyOf('inferior_gemellus', { guides: [tubUpper, [0.1, -0.178, -0.028], snap([GREATER[0] - 0.0085, GREATER[1] - 0.004, GREATER[2] - 0.002])], w: 0.0045, t: 0.0028, a: 0.1, b: 0.2, tendon: 0.3, n: 5, ends: ['hip', 'femur'] }));
-  out.obturator_internus = pair(bellyOf('obturator_internus', {
-    guides: [[0.049, -0.178, 0.0355], [0.066, -0.183, 0.005], [0.083, -0.19, -0.03], [0.099, -0.176, -0.028], snap([GREATER[0] - 0.0095, GREATER[1] + 0.003, GREATER[2] + 0.001])],
-    w: 0.011, t: 0.0035, a: 0.45, b: 0.18, tendon: 0.2, n: 10, ends: ['hip', 'femur'],
-  }));
-  const quadTub = snap([0.1, -0.1865, -0.02]);
-  out.quadratus_femoris = pair(bellyOf('quadratus_femoris', { guides: [snap([TUBEROSITY[0] + 0.011, TUBEROSITY[1] + 0.004, TUBEROSITY[2] + 0.002]), [0.093, -0.196, -0.026], quadTub], w: 0.0095, t: 0.0035, a: 0.1, b: 0.1, tendon: 0.35, n: 5, ends: ['hip', 'femur'] }));
-  out.obturator_externus = pair(bellyOf('obturator_externus', {
-    guides: [[0.055, -0.178, 0.0445], [0.075, -0.2, 0.012], [0.094, -0.188, -0.012], snap([GREATER[0] - 0.007, GREATER[1] - 0.0045, GREATER[2] + 0.0005])],
-    w: 0.009, t: 0.0035, a: 0.2, b: 0.2, tendon: 0.25, n: 8, ends: ['hip', 'femur'],
-  }));
+  const grLateral = snap([GREATER[0] + 0.0095, GREATER[1] - 0.002, GREATER[2]]);
+  const grAnterior = snap([GREATER[0] + 0.002, GREATER[1] - 0.002, GREATER[2] + 0.0105]);
+  const grLowLat = snap([GREATER[0] + 0.0085, GREATER[1] - 0.009, GREATER[2] + 0.001]);
 
+  /* ---- the short lateral rotators: the deepest layer behind the hip */
+  out.piriformis = G('piriformis', {
+    guides: [snap(sacrumFront(-0.112, 0.022)), [0.05, -0.124, -0.056], [0.078, -0.138, -0.046], [0.097, -0.147, -0.03], grTop],
+    w: 0.009, t: 0.0045, a: 0.15, b: 0.2,
+  }, ['sacrum', 'femur']);
+  const spineMid = snap([SPINE_TIP[0], SPINE_TIP[1] - 0.002, SPINE_TIP[2]]);
+  out.superior_gemellus = G('superior_gemellus', { guides: [spineMid, [0.095, -0.155, -0.035], grMedial], w: 0.0045, t: 0.0028, a: 0.1, b: 0.2, tendon: 0.3, n: 5 }, ['hip', 'femur']);
+  const tubUpper = snap([TUBEROSITY[0] + 0.001, TUBEROSITY[1] + 0.008, TUBEROSITY[2] - 0.003]);
+  out.inferior_gemellus = G('inferior_gemellus', { guides: [tubUpper, [0.1, -0.178, -0.028], snap([GREATER[0] - 0.0085, GREATER[1] - 0.004, GREATER[2] - 0.002])], w: 0.0045, t: 0.0028, a: 0.1, b: 0.2, tendon: 0.3, n: 5 }, ['hip', 'femur']);
+  out.obturator_internus = G('obturator_internus', {
+    guides: [snap([0.045, -0.19, 0.042]), [0.066, -0.183, 0.005], [0.083, -0.19, -0.03], [0.099, -0.176, -0.028], snap([GREATER[0] - 0.0095, GREATER[1] + 0.003, GREATER[2] + 0.001])],
+    w: 0.011, t: 0.0035, a: 0.45, b: 0.18, tendon: 0.2, n: 10,
+  }, ['hip', 'femur']);
+  out.quadratus_femoris = G('quadratus_femoris', { guides: [snap([TUBEROSITY[0] + 0.011, TUBEROSITY[1] + 0.004, TUBEROSITY[2] + 0.002]), [0.093, -0.196, -0.026], snap([0.1, -0.1865, -0.02])], w: 0.0095, t: 0.0035, a: 0.1, b: 0.1, tendon: 0.35, n: 5 }, ['hip', 'femur']);
+  out.obturator_externus = G('obturator_externus', {
+    guides: [snap([0.06, -0.2, 0.04]), [0.075, -0.2, 0.012], [0.094, -0.188, -0.012], snap([GREATER[0] - 0.007, GREATER[1] - 0.0045, GREATER[2] + 0.0005])],
+    w: 0.009, t: 0.0035, a: 0.2, b: 0.2, tendon: 0.25, n: 8,
+  }, ['hip', 'femur']);
+
+  /* ---- the deep thigh: vastus intermedius, the short adductors, the short head of biceps */
+  const patTop: V3 = [PATELLA[0], PATELLA[1] + 0.0102, PATELLA[2] - 0.002];
+  const patLat: V3 = [PATELLA[0] + 0.0085, PATELLA[1] + 0.0045, PATELLA[2] + 0.001];
+  const patMed: V3 = [PATELLA[0] - 0.0085, PATELLA[1] + 0.0045, PATELLA[2] + 0.001];
+  const ys = [-0.205, -0.225, -0.245, -0.265];
+  out.vastus_intermedius = G('vastus_intermedius', {
+    guides: [snap(thigh(-0.205, -15, shaftRadiusAt(-0.205))), ...ys.slice(1).map((y) => thigh(y, -10, onShaft(y, 0, 0.0035))), patTop],
+    w: 0.009, t: 0.0035, a: 0.1, b: 0.2, tendon: 0.2, ends: undefined,
+  } as Omit<Spec, 'ends'>, ['femur', 'free']);
+  out.adductor_brevis = G('adductor_brevis', {
+    guides: [snap([INFERIOR_RAMUS[3][0] + 0.004, INFERIOR_RAMUS[3][1] + 0.002, INFERIOR_RAMUS[3][2] - 0.001]), [0.06, -0.19, 0.03], thigh(-0.205, 120, onShaft(-0.205, 0, 0.004)), snap(thigh(-0.222, 140, shaftRadiusAt(-0.222)))],
+    w: 0.011, t: 0.004, a: 0.15, b: 0.15, n: 6,
+  }, ['hip', 'femur']);
+  out.pectineus = G('pectineus', {
+    guides: [snap([SUPERIOR_RAMUS[3][0], SUPERIOR_RAMUS[3][1] + 0.002, SUPERIOR_RAMUS[3][2]]), [0.07, -0.17, 0.03], snap(thigh(-0.2, 115, shaftRadiusAt(-0.2)))],
+    w: 0.0095, t: 0.0035, a: 0.1, b: 0.15, tendon: 0.3, n: 5,
+  }, ['hip', 'femur']);
+  out.biceps_femoris_short_head = G('biceps_femoris_short_head', {
+    guides: [snap(thigh(-0.235, 215, shaftRadiusAt(-0.235))), thigh(-0.26, 225, onShaft(-0.26, 0, 0.003)), thigh(-0.29, 225, onShaft(-0.29, 0, 0.003)), [0.092, BELOW_KNEE_Y, -0.024]],
+    w: 0.007, t: 0.003, a: 0.1, b: 0.25, tendon: 0.2, n: 6,
+  }, ['femur', 'free']);
+
+  /* ---- the vasti and the medial thigh */
+  out.vastus_lateralis = G('vastus_lateralis', {
+    guides: [grLowLat, thigh(-0.2, -80, onShaft(-0.2, 0, 0.0045)), thigh(-0.235, -80, onShaft(-0.235, 0, 0.0045)), thigh(-0.265, -70, onShaft(-0.265, 0, 0.004)), patLat],
+    w: 0.011, t: 0.0045, a: 0.08, b: 0.22, tendon: 0.2, n: 9,
+  }, ['femur', 'free']);
+  out.vastus_medialis = G('vastus_medialis', {
+    guides: [snap([LESSER[0] - 0.001, LESSER[1] + 0.009, LESSER[2] + 0.0055]), thigh(-0.215, 75, onShaft(-0.215, 0, 0.005)), thigh(-0.245, 80, onShaft(-0.245, 0, 0.005)), thigh(-0.27, 70, onShaft(-0.27, 0, 0.005)), patMed],
+    w: 0.011, t: 0.005, a: 0.08, b: 0.2, tendon: 0.2, n: 9,
+  }, ['femur', 'free']);
+  out.adductor_longus = G('adductor_longus', {
+    guides: [snap([PUBIC_BODY[0] + 0.004, PUBIC_BODY[1] + 0.004, PUBIC_BODY[2] - 0.002]), [0.05, -0.18, 0.045], thigh(-0.215, 110, 0.03), snap(thigh(-0.258, 140, shaftRadiusAt(-0.258)))],
+    w: 0.0115, t: 0.0055, a: 0.12, b: 0.15, tendon: 0.2, n: 8,
+  }, ['hip', 'femur']);
+  // Adductor magnus: a fan from the ischiopubic ramus and the tuberosity to the whole linea aspera and the adductor tubercle.
+  const rami: V3[] = [snap([INFERIOR_RAMUS[1][0], INFERIOR_RAMUS[1][1] + 0.001, INFERIOR_RAMUS[1][2]]), snap([ISCHIAL_RAMUS[2][0], ISCHIAL_RAMUS[2][1] + 0.001, ISCHIAL_RAMUS[2][2]]), snap([ISCHIAL_RAMUS[1][0], ISCHIAL_RAMUS[1][1] + 0.001, ISCHIAL_RAMUS[1][2]]), snap([TUBEROSITY[0] - 0.004, TUBEROSITY[1] - 0.004, TUBEROSITY[2] + 0.004])];
+  const tubercle = snap([CONDYLE_M[0] - 0.0055, CONDYLE_M[1] + 0.0055, CONDYLE_M[2] + 0.0005]);
+  const lineaAt = (y: number): V3 => snap(thigh(y, 150, shaftRadiusAt(y)));
+  out.adductor_magnus = pair(sheetOf('adductor_magnus', rami, [lineaAt(-0.21), lineaAt(-0.235), lineaAt(-0.265), tubercle], 0.006, ['hip', 'femur'], () => [], 6));
+
+  /* ---- the hamstrings behind */
+  const tubLow = snap([TUBEROSITY[0] - 0.005, TUBEROSITY[1] - 0.012, TUBEROSITY[2] - 0.002]);
+  const tubLat = snap([TUBEROSITY[0] + 0.006, TUBEROSITY[1] - 0.004, TUBEROSITY[2] - 0.009]);
+  out.semimembranosus = G('semimembranosus', {
+    guides: [tubLat, thigh(-0.235, 150, onShaft(-0.235, 0, 0.0045)), thigh(-0.27, 130, onShaft(-0.27, 0, 0.0045)), [0.07, BELOW_KNEE_Y, -0.017]],
+    w: 0.011, t: 0.0045, a: 0.2, b: 0.2, tendon: 0.18, n: 8,
+  }, ['hip', 'free']);
+  out.semitendinosus = G('semitendinosus', {
+    guides: [tubLow, thigh(-0.235, 165, 0.0215), thigh(-0.27, 140, 0.0215), [0.066, BELOW_KNEE_Y, -0.02]],
+    w: 0.0085, t: 0.003, a: 0.25, b: 0.3, tendon: 0.18, n: 8,
+  }, ['hip', 'free']);
+  out.biceps_femoris_long_head = G('biceps_femoris_long_head', {
+    guides: [tubLow, thigh(-0.235, 195, 0.0215), thigh(-0.27, 215, 0.021), [0.092, BELOW_KNEE_Y, -0.024]],
+    w: 0.0095, t: 0.0035, a: 0.2, b: 0.25, tendon: 0.18, n: 8,
+  }, ['hip', 'free']);
+
+  /* ---- the superficial layer */
+  const gracilisTop = snap([INFERIOR_RAMUS[3][0] + 0.0035, INFERIOR_RAMUS[3][1] + 0.004, INFERIOR_RAMUS[3][2] + 0.0015]);
+  out.gracilis = G('gracilis', {
+    guides: [gracilisTop, [0.04, -0.215, 0.04], thigh(-0.25, 105, 0.034), thigh(-0.29, 100, 0.03), [0.064, BELOW_KNEE_Y, -0.015]],
+    w: 0.007, t: 0.0022, a: 0.1, b: 0.3, tendon: 0.2, n: 10,
+  }, ['hip', 'free']);
+  const asis = iliac(0.14, -0.058, 0.0);
+  out.sartorius = G('sartorius', {
+    guides: [asis, [0.1, -0.125, 0.044], thigh(-0.21, 25, 0.027), thigh(-0.25, 65, 0.026), thigh(-0.29, 95, 0.026), [0.066, BELOW_KNEE_Y, -0.012]],
+    w: 0.007, t: 0.0025, a: 0.08, b: 0.15, tendon: 0.15, n: 12,
+  }, ['hip', 'free']);
+  out.rectus_femoris = G('rectus_femoris', {
+    guides: [iliac(0.1435, -0.088, 0.0), [0.104, -0.13, 0.034], thigh(-0.2, 0, 0.02), thigh(-0.24, 0, 0.0205), thigh(-0.27, 0, 0.021), [PATELLA[0], PATELLA[1] + 0.0105, PATELLA[2] + 0.0015]],
+    w: 0.0105, t: 0.0035, a: 0.1, b: 0.22, tendon: 0.2, n: 10,
+  }, ['hip', 'free']);
+  out.iliopsoas_tendon = G('iliopsoas_tendon', {
+    guides: [[0.084, -0.085, 0.042], [0.09, -0.13, 0.027], [0.093, -0.17, 0.01], snap([LESSER[0] - 0.005, LESSER[1] + 0.001, LESSER[2] + 0.003])],
+    w: 0.0065, t: 0.0025, a: 0.0, b: 0.0, tendon: 1, n: 6,
+  }, ['free', 'femur']);
+  // Gluteal region: the three gluteal muscles are sheets; the tensor of the fascia lata a short belly.
+  const ptsGMin = [iliac(0.07, -0.085), iliac(0.09, -0.1), iliac(0.105, -0.075)];
+  out.gluteus_minimus = pair(sheetOf('gluteus_minimus', ptsGMin.map((p) => snap(p)), [grAnterior, grAnterior, grAnterior].map((p, i) => [p[0], p[1] + 0.002 * i, p[2]] as V3), 0.0035, ['hip', 'femur'], () => [], 5));
+  const ptsGMed = [iliac(0.05, -0.06), iliac(0.085, -0.05), iliac(0.11, -0.055)];
+  out.gluteus_medius = pair(sheetOf('gluteus_medius', ptsGMed.map((p) => snap(p)), [grTop, grLateral, grLowLat].map((p) => p), 0.0045, ['hip', 'femur'], () => [], 6));
+  const gmaxO: V3[] = [snap(iliac(0.03, -0.06)), snap(iliac(0.045, -0.075)), snap(sacrumBack(-0.105, 0.012)), snap(sacrumBack(-0.13, 0.008)), snap(coccyxBack(-0.155, 0.002))];
+  const gmaxI: V3[] = [[0.1235, -0.168, -0.02], [0.1225, -0.185, -0.022], snap(thigh(-0.2, 232, shaftRadiusAt(-0.2))), snap(thigh(-0.205, 215, shaftRadiusAt(-0.205))), snap(thigh(-0.21, 205, shaftRadiusAt(-0.21)))];
+  out.gluteus_maximus = pair(sheetOf('gluteus_maximus', gmaxO, gmaxI, 0.007, ['sacrum', 'femur'], () => [], 8));
+  out.tensor_fasciae_latae = G('tensor_fasciae_latae', {
+    guides: [iliac(0.141, -0.068, 0.0), [0.119, -0.12, 0.034], [0.122, -0.158, 0.015]],
+    w: 0.0085, t: 0.0035, a: 0.1, b: 0.3, tendon: 0.2, n: 6,
+  }, ['hip', 'free']);
+  out.iliotibial_tract = G('iliotibial_tract', {
+    guides: [[0.122, -0.158, 0.015], thigh(-0.2, -75, 0.024), thigh(-0.245, -82, 0.022), thigh(-0.285, -88, 0.0215), [0.0955, BELOW_KNEE_Y, -0.017]],
+    w: 0.0085, t: 0.0014, a: 0.0, b: 0.0, tendon: 1, n: 10,
+  }, ['free', 'free']);
+  // The femoral triangle: a thin glass wedge on the front of the upper thigh, bounded by the inguinal ligament above, the sartorius outside and the adductor longus inside.
+  const ftApex: V3 = [0.077, -0.235, 0.02];
+  out.femoral_triangle = pair(sheet([[[0.103, -0.1, 0.05], ftApex].map((p) => p as V3), [[0.032, -0.155, 0.064], [ftApex[0] + 0.006, ftApex[1], ftApex[2]] as V3]], 1, 0.004, HIP_JOINT as V3).translate(0, -ORIGIN[1], 0));
   return out;
 }
 
 /** The hierarchy (child to parent), as src/data/anatomy/hip_thigh_muscles.json declares it. */
-export const HIP_PARENT: Readonly<Record<string, string>> = {};
+export const HIP_PARENT: Readonly<Record<string, string>> = {
+  gluteus_maximus: 'gluteal_muscles', gluteus_medius: 'gluteal_muscles', gluteus_minimus: 'gluteal_muscles', tensor_fasciae_latae: 'gluteal_muscles',
+  piriformis: 'short_rotators', obturator_internus: 'short_rotators', superior_gemellus: 'short_rotators', inferior_gemellus: 'short_rotators', quadratus_femoris: 'short_rotators', obturator_externus: 'short_rotators',
+  rectus_femoris: 'quadriceps_femoris', vastus_lateralis: 'quadriceps_femoris', vastus_medialis: 'quadriceps_femoris', vastus_intermedius: 'quadriceps_femoris',
+  pectineus: 'adductor_muscles', adductor_longus: 'adductor_muscles', adductor_brevis: 'adductor_muscles', adductor_magnus: 'adductor_muscles', gracilis: 'adductor_muscles',
+  biceps_femoris: 'hamstring_muscles', semitendinosus: 'hamstring_muscles', semimembranosus: 'hamstring_muscles',
+  biceps_femoris_long_head: 'biceps_femoris', biceps_femoris_short_head: 'biceps_femoris',
+};
 
+/** Every part's geometry; a parent is the union of its children (the same geometry, so a parent shown alone is the whole muscle). */
 export function hipThighMuscleMap(): Record<string, THREE.BufferGeometry[]> {
-  return hipThighLeaves();
+  const out = hipThighLeaves();
+  const add = (id: string): void => {
+    out[id] = Object.entries(HIP_PARENT).filter(([, p]) => p === id).flatMap(([c]) => out[c]);
+  };
+  for (const id of ['biceps_femoris', 'gluteal_muscles', 'short_rotators', 'quadriceps_femoris', 'adductor_muscles']) add(id);
+  add('hamstring_muscles');
+  return out;
 }
+/** The level-1 parts with their children merged: what the shell is made of. */
 export function hipThighMuscleGroups(): Record<string, THREE.BufferGeometry[]> {
-  return hipThighMuscleMap();
+  const all = hipThighMuscleMap();
+  const top = ['gluteal_muscles', 'short_rotators', 'quadriceps_femoris', 'adductor_muscles', 'hamstring_muscles', 'iliotibial_tract', 'iliopsoas_tendon', 'sartorius', 'femoral_triangle'];
+  return Object.fromEntries(top.map((id) => [id, all[id]]));
 }
 export function hipThighMuscles(): THREE.BufferGeometry {
   return mergeParts(Object.values(hipThighMuscleGroups()).flat());
 }
-void [CONDYLE_L, CONDYLE_M, INFERIOR_RAMUS, ISCHIAL_RAMUS, PUBIC_BODY, PUBIC_TUBERCLE, SUPERIOR_RAMUS, LESSER, PATELLA, BELOW_KNEE_Y, iliac, coccyxBack, thigh, onShaft, toLocal, sheetOf, resample];
+void [toLocal, iliac];
