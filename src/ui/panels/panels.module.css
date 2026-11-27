@@ -112,6 +112,16 @@
   }
 }
 
+/* On a tablet or a landscape phone that move puts the tags under the speed pill (the pill
+   reaches right past the card's left edge in this range; see --card-top in tokens.css), and
+   at 844 x 390 with an alarm up "Hypovolemia" printed through the pill's 30x button. The tags
+   start below the pill there, as they do on a phone. */
+@media (min-width: 721px) and (max-width: 1100px) {
+  :global([data-sheet='open']) .conditions {
+    top: var(--sheet-top-clear);
+  }
+}
+
 /* --- GI transit list ---------------------------------------------------- */
 
 .transitList {

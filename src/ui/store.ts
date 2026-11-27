@@ -15,10 +15,17 @@ import type { SimSnapshot, SimIntent, Route } from '../bridge/types';
  * the whole snapshot at 60 fps (the ECG strip) read it imperatively instead.
  */
 
-export type ToolMode = 'none' | 'body' | 'procedure' | 'drugs' | 'defib' | 'circulation';
+/**
+ * The tools that open a card of their own. There used to be a sixth, 'circulation': nothing ever
+ * set it (no dock entry, no menu row, no intent) and nothing rendered it; the only places that
+ * knew the word were this type and a sheet-open test in App.tsx, so it was a mode with no door.
+ * The circulation is shown by the Vessels layer and the blood-contents panel instead, so the
+ * dead mode was removed rather than given a card that would duplicate them.
+ */
+export type ToolMode = 'none' | 'body' | 'procedure' | 'drugs' | 'defib';
 /** Which side of the open organ a section removes; mirrors the viewer's SliceAxis. */
 export type CutAxis = 'front' | 'side' | 'top';
-export type DrawerTab = 'drugs' | 'food' | 'biologics';
+export type DrawerTab = 'drugs' | 'food';
 
 export type EventKind = 'drug' | 'food' | 'procedure' | 'state';
 
@@ -115,14 +122,16 @@ interface UiState {
   /** Reproduction: sex, the menstrual cycle, pregnancy and the sexual response. */
   reproductionPanelOpen: boolean;
   toggleReproductionPanel: () => void;
+  /** The see-through skin outline (BodyOutline). ON at start: it is today's look, not an added layer. */
+  glassVisible: boolean;
+  toggleGlass: () => void;
   /**
    * The skeleton layer ("Bones" in the Layers control). Off at start; while off no bone geometry is
    * even built (OrganSet builds a layer organ on first need). Selecting a bone organ does NOT change
    * this flag: a selected organ is drawn because it is selected, not because its layer is on.
+   * (The glass-outline comment used to be wedged between this paragraph and `bonesVisible`, so
+   * the Bones text read as the description of the glass field; they are in order again.)
    */
-  /** The see-through skin outline (BodyOutline). ON at start: it is today's look, not an added layer. */
-  glassVisible: boolean;
-  toggleGlass: () => void;
   bonesVisible: boolean;
   toggleBones: () => void;
   musclesVisible: boolean;

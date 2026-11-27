@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { giCentrelines, groupOffset } from './OrganSet';
+import { warpOffsetY } from '../anatomy/layout';
 import type { SimSnapshot } from '../../bridge/types';
 
 /**
@@ -24,6 +25,15 @@ import type { SimSnapshot } from '../../bridge/types';
  * "air in" of the airway cue. It shares this file because the swallowed path is exactly
  * the curve the food bolus already travels; only the reason for the parcel differs.
  */
+
+/**
+ * The segments of the large bowel. The large-intestine organ belongs to the AXIAL group and is drawn
+ * through the axial warp (`warpGeometry`), which drops the pelvis a further 20 mm below the abdominal
+ * group's rigid offset, whereas this bolus group carries only the abdominal offset. Left alone, the parcel
+ * ran the sigmoid colon up to 18 mm above the bowel it was meant to be inside once the colon was drawn
+ * down into the pelvis, so these segments are carried through the same warp as the shell.
+ */
+const COLON_SEGMENTS = new Set(['caecum', 'colon_ascending', 'colon_transverse', 'colon_descending', 'colon_sigmoid', 'rectum']);
 
 const MAX_BOLUSES = 16;
 /** How many tinted parcels trace the oral drug path at once. A couple reads as flow. */
@@ -50,10 +60,12 @@ export class GiBolus {
     this.root.renderOrder = 32;
 
     for (const line of giCentrelines()) {
+      // Colon points are authored unwarped; the group offset below already supplies the abdominal part of the warp.
+      const lift = COLON_SEGMENTS.has(line.segment) ? (y: number): number => warpOffsetY(y) - offset[1] : (): number => 0;
       this.curves.set(
         line.segment,
         new THREE.CatmullRomCurve3(
-          line.points.map((p) => new THREE.Vector3(...p)),
+          line.points.map((p) => new THREE.Vector3(p[0], p[1] + lift(p[1]), p[2])),
           false,
           'catmullrom',
           0.35,

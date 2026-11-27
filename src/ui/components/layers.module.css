@@ -214,3 +214,18 @@
 :global([data-menu='open']) .layers {
   display: none;
 }
+
+/*
+ * SHORT LANDSCAPE (a phone on its side, 844 x 390): THE CHIP STANDS BESIDE THE MENU CHIP. Above the
+ * bar there is no free corner on so short a screen: the HUD's detail rows (CO, SV, EDV, CVP, CPP)
+ * reach down to about 250 px and the chip, translucent by design, was painted over them so that
+ * "CVP" and "43" printed through the word "Layers" (the checker's TEXTHIT, 844 x 390 with touch).
+ * In the dock's own row, to the right of the 46 px menu chip and its 10 px gap, the corner is free
+ * at every height. --corpus-dock-bottom is measured in App.tsx. A layout choice, not a measured value.
+ */
+@media (max-height: 560px) and (min-width: 721px) {
+  .layers {
+    left: calc(var(--inset-hud) + 46px + 10px);
+    bottom: var(--corpus-dock-bottom, 8px);
+  }
+}

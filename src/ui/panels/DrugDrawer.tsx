@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import foodsFile from '../../data/foods.json';
-import type { Drug } from '../../data/pharma-types';
+import notModelledFile from '../../data/notModelled.json';
+import receptorsFile from '../../data/receptors.json';
+import type { Drug, ReceptorsFile } from '../../data/pharma-types';
 import { useDrugData } from '../drugData';
 import type { Route, SimIntent } from '../../bridge/types';
 import { useStore, type DrawerTab } from '../store';
@@ -295,7 +297,16 @@ export function DrugDrawer() {
         <>
           <header className={styles.header}>
             <div className={styles.segmented} role="tablist" aria-label="What to give">
-              {(['drugs', 'food', 'biologics'] as DrawerTab[]).map((t) => (
+              {/*
+                There is no Biologics segment, on purpose. It used to be a third tab whose only
+                content was "Nothing here yet": a biologic needs the same standard of evidence as
+                everything else in this drawer (a published affinity or a labelled
+                pharmacokinetic parameter) and the ingestion pipeline has not been pointed at a
+                source that provides them, so the tab could only ever show an apology. A tab that
+                always says nothing is clutter on a phone, where the segmented control is
+                narrow. Add it back (DrawerTab in store.ts, this list and a panel) when the first
+                sourced biologic exists; until then the sheet reads Drugs | Food. */}
+              {(['drugs', 'food'] as DrawerTab[]).map((t) => (
                 <button
                   key={t}
                   role="tab"
@@ -303,7 +314,7 @@ export function DrugDrawer() {
                   className={`${styles.segment} ${tab === t ? styles.segmentOn : ''}`}
                   onClick={() => setDrawer(true, t)}
                 >
-                  {t === 'drugs' ? 'Drugs' : t === 'food' ? 'Food' : 'Biologics'}
+                  {t === 'drugs' ? 'Drugs' : 'Food'}
                 </button>
               ))}
             </div>
@@ -331,16 +342,6 @@ export function DrugDrawer() {
             )
           )}
           {tab === 'food' && <FoodList />}
-          {tab === 'biologics' && (
-            <div className={styles.scroll}>
-              <p className={styles.emptyNote}>
-                Nothing here yet. A biologic needs the same standard of evidence as everything else in
-                this drawer — a published affinity or a labelled pharmacokinetic parameter — and the
-                ingestion pipeline has not been pointed at a source that provides them. Rather than
-                show plausible numbers, this tab shows none.
-              </p>
-            </div>
-          )}
         </>
       )}
     </div>
@@ -735,12 +736,44 @@ function DosePane({
   );
 }
 
+/**
+ * THE EFFECTS THIS MODEL DOES NOT SIMULATE. src/data/notModelled.json lists the effect-bus
+ * targets that no system in the engine reads (`label` and `reason` for each, written by the
+ * model's authors). A drug whose pharmacology writes to one of them looks, on its page, as if the
+ * model knew what it does: atorvastatin and allopurinol have only such effects, so the page used
+ * to promise a statin that changes nothing and not say why. Each such effect is therefore stated,
+ * once per target, from the drug's receptor effects (receptors.json, through the receptors the drug
+ * binds) and from its `directEffects`. Nothing is computed here: a target is shown only if the
+ * file lists it, and the words are the file's.
+ *
+ * receptors.json is imported, not fetched: the Receptors panel already bundles it, so reading it
+ * here adds nothing to the entry script (the drug database, 1.2 MB, is the file that must be
+ * fetched; see drugData.ts).
+ */
+const NOT_MODELLED = (notModelledFile as { targets: Record<string, { label: string; reason: string }> }).targets;
+const RECEPTOR_EFFECT_TARGETS = new Map(
+  (receptorsFile as unknown as ReceptorsFile).receptors.map((r) => [r.id, r.effects.map((e) => e.target)] as const),
+);
+
+function notModelledLines(drug: Drug): { label: string; reason: string }[] {
+  const targets = new Set<string>();
+  for (const t of drug.targets) for (const target of RECEPTOR_EFFECT_TARGETS.get(t.receptorId) ?? []) targets.add(target);
+  for (const e of drug.directEffects) targets.add(e.target);
+  return [...targets].filter((t) => t in NOT_MODELLED).map((t) => NOT_MODELLED[t]);
+}
+
 function DrugAbout({ drug }: { drug: Drug }) {
+  const notModelled = notModelledLines(drug);
   return (
     <>
       <h3 className={styles.groupHeader}>About</h3>
       <div className={styles.card}>
         <p className={styles.notes}>{drug.notes}</p>
+        {notModelled.map((n) => (
+          <p key={n.label} className={styles.notes}>
+            Not simulated in this model: {n.label}. {n.reason}
+          </p>
+        ))}
       </div>
 
       {drug.targets.length > 0 && (

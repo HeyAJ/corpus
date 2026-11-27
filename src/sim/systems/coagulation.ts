@@ -30,7 +30,28 @@ import { effect } from '../core/effects';
 export function stepCoagulation(s: SimState, dt: number): void {
   const c = s.coagulation;
 
-  c.factorActivity = Math.max(0.05, Math.min(2, 1 + effect(s, 'blood.coagulation')));
+  // THE SIGN OF `blood.coagulation` MEANS TWO DIFFERENT THINGS, and reading it as one
+  // was a bug. A negative value is the anticoagulant direction (heparin, enoxaparin,
+  // warfarin, apixaban, alteplase): fewer working clotting factors, so the factor
+  // activity falls and the INR and aPTT lengthen. A positive value is the
+  // ANTIFIBRINOLYTIC direction, written only by tranexamic acid: it stops plasmin
+  // dissolving a clot that has already formed. It makes no new factor and shortens
+  // neither PT nor aPTT, yet the old single line turned its +0.4 into a factor activity
+  // of 1.4, so a gram of tranexamic acid read INR 0.60 and aPTT 18.1 s against a
+  // normal 1.00 and 30.0 s. The positive part therefore no longer touches the screen; it
+  // becomes `clotStability` below and acts only where a formed clot matters, the
+  // bleed-stopping ceiling.
+  //
+  // KNOWN LIMITATION, stated rather than hidden: the two signs are summed on the bus
+  // before they get here, so heparin given together with tranexamic acid nets to a
+  // smaller negative number and reads a shorter aPTT than heparin alone. A separate
+  // fibrinolysis target would fix that, but it means changing the generated drug data
+  // through the ingest pipeline, which could not be reproduced byte for byte in this
+  // environment (see the 2026 round notes), so the fix lives here and the cost is recorded
+  // in MODEL_LIMITATIONS.
+  const coag = effect(s, 'blood.coagulation');
+  c.factorActivity = Math.max(0.05, Math.min(2, 1 + Math.min(0, coag)));
+  const clotStability = 1 + Math.max(0, coag);
   c.plateletFunction = Math.max(0.05, Math.min(2, 1 + effect(s, 'blood.plateletAggregation')));
 
   // Platelets turn over on their eight-to-ten-day lifespan (GH14); a destructive process
@@ -46,7 +67,7 @@ export function stepCoagulation(s: SimState, dt: number): void {
   }
   const countFactor = Math.min(1, c.platelets / 100);
   const vesselFactor = 1 / (1 + rate / P('coag.largeBleedRate_mL_per_min'));
-  const ceiling = Math.max(0, Math.min(0.98, c.factorActivity * c.plateletFunction * countFactor * vesselFactor));
+  const ceiling = Math.max(0, Math.min(0.98, c.factorActivity * c.plateletFunction * clotStability * countFactor * vesselFactor));
   const tau_s = P('coag.bleedingTime_min') * 60;
   c.haemostasis += (ceiling - c.haemostasis) * (1 - Math.exp(-dt / tau_s));
 }

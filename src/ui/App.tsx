@@ -10,7 +10,7 @@ import { ToolDock, LegendStack } from './components/ToolDock';
 import { LayersControl } from './components/LayersControl';
 import { CoachMark } from './components/CoachMark';
 import { ResetViewButton } from './components/ResetViewButton';
-import { buildCatalogue } from './search';
+import { buildCatalogue, organsOf } from './search';
 import { parseShareHash, LINK_OPENED_TOAST, type ShareState } from './shareLink';
 import { DrugDrawer } from './panels/DrugDrawer';
 import { ReceptorPanel } from './panels/ReceptorPanel';
@@ -191,7 +191,7 @@ export function App() {
   );
   // The HUD folds to its first line while ANY floating sheet is showing (phones only, in
   // CSS). anyPanelOpen above covers the menu panels, Structures and the body tool; the
-  // drug drawer is its own flag and the procedure / defib / circulation tools are the
+  // drug drawer is its own flag and the procedure and defib tools are the
   // remaining modes. Derived from the same store flags those components render from, so
   // the fold and the sheet can never disagree.
   const sheetOpen = useStore(
@@ -200,7 +200,6 @@ export function App() {
       s.tool === 'body' ||
       s.tool === 'procedure' ||
       s.tool === 'defib' ||
-      s.tool === 'circulation' ||
       s.statusPanelOpen ||
       s.impactPanelOpen ||
       s.physiologyPanelOpen ||
@@ -231,13 +230,27 @@ export function App() {
     const bar = bottomBarRef.current;
     if (!bar) return;
     const root = document.documentElement;
-    const publish = () => root.style.setProperty('--corpus-bar-actual', `${Math.ceil(bar.getBoundingClientRect().height)}px`);
+    const publish = () => {
+      root.style.setProperty('--corpus-bar-actual', `${Math.ceil(bar.getBoundingClientRect().height)}px`);
+      // Also where the dock's own row sits, as a distance up from the bottom of the screen, so a
+      // control can stand in that row beside the dock chips (the Layers chip does on a short
+      // landscape screen, layers.module.css). The bar's height is not enough for that: the timeline
+      // pill and the warning above and below the dock change with the page's state.
+      const dock = bar.querySelector('[data-dock]');
+      if (dock) {
+        const gap = window.innerHeight - dock.getBoundingClientRect().bottom;
+        root.style.setProperty('--corpus-dock-bottom', `${Math.max(0, Math.round(gap))}px`);
+      }
+    };
     publish();
     const observer = new ResizeObserver(publish);
     observer.observe(bar);
+    window.addEventListener('resize', publish);
     return () => {
       observer.disconnect();
+      window.removeEventListener('resize', publish);
       root.style.removeProperty('--corpus-bar-actual');
+      root.style.removeProperty('--corpus-dock-bottom');
     };
   }, []);
 
@@ -387,6 +400,27 @@ export function App() {
   useEffect(() => {
     viewerRef.current?.select(selectedOrgan);
   }, [selectedOrgan]);
+
+  /* ---- a selection must belong to the body that is on screen ----
+   * Switching sex (or ending a pregnancy) makes the viewer drop an organ this body no longer has
+   * and clear its own selection, but the store kept the old id: the prostate stayed "selected" in
+   * a female body, with its panel open, its part labels listed and its id in the share link
+   * (found by the functional audit). The store is the one source the panel, the labels and the
+   * link read, so it is corrected here, where the body is known. The two pelvic-floor organs are
+   * one structure drawn for each sex, so that selection moves to the counterpart this body has
+   * (the panel stays open on the matching organ); anything else is cleared, which also closes the
+   * Structures panel and the part picked inside it (store.setSelected(null)). */
+  const bodySex = useStore((s) => s.snapshot?.reproductive?.sex);
+  const bodyPregnant = useStore((s) => s.snapshot?.reproductive?.pregnancy?.pregnant);
+  useEffect(() => {
+    if (!selectedOrgan || bodySex === undefined) return;
+    const present = organsOf({ sex: bodySex, pregnant: bodyPregnant ?? false });
+    if (present.some((o) => o.id === selectedOrgan)) return;
+    const pelvic = bodySex === 'female' ? 'pelvic_floor_muscles_female' : 'pelvic_floor_muscles';
+    const counterpart =
+      selectedOrgan.startsWith('pelvic_floor_muscles') && present.some((o) => o.id === pelvic) ? pelvic : null;
+    useStore.getState().setSelected((counterpart as OrganId | null) ?? null);
+  }, [selectedOrgan, bodySex, bodyPregnant]);
 
   /* ---- the pointer cursor over an organ (mouse only: the viewer never reports hover for touch) ----
    * The viewer already shows the hovered organ's name as its big label; a second tag near the

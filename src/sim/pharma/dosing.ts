@@ -240,28 +240,56 @@ function applyPayload(s: SimState, drug: Drug, dose_mg: number): void {
   // amount and the payload describes what one unit of it delivers.
   const scale = dose_mg;
 
-  if (p.volume_mL) addVolume(s.cardio, p.volume_mL * scale);
-
   const plasmaVolume_L = (s.cardio.bloodVolume * (1 - s.chem.hct)) / 1000;
   const ecfVolume_L = s.body.mass_kg * 0.2;
 
-  if (p.na_mEq) s.chem.na += (p.na_mEq * scale) / ecfVolume_L;
-  if (p.k_mEq) s.chem.k += (p.k_mEq * scale) / ecfVolume_L;
-  if (p.cl_mEq) s.chem.cl += (p.cl_mEq * scale) / ecfVolume_L;
+  // WATER AND SOLUTE ARRIVE TOGETHER. This block used to add the sodium and chloride of
+  // an infusate as if they were dissolved in nothing: a litre of normal saline put
+  // 154 mEq/L x 1 L over the 14 L extracellular pool onto the serum as a bare +11 mEq/L
+  // of sodium, while its water was tagged isotonic (cardio.addVolume) and so dilutes
+  // nothing. Serum sodium went 142.0 -> 157.3 mEq/L and osmolality 294 -> 325 in an hour
+  // from one litre of the fluid whose whole point is that it is isotonic. Mass balance
+  // says the concentration moves only by the DIFFERENCE between infusate and plasma:
+  // mixing V litres of infusate at concentration C_in into a pool of E litres at c gives
+  // c' = (c E + C_in V) / (E + V) (the Adrogue-Madias infusate relation, N Engl J Med
+  // 2000;342:1581, with this model's own extracellular pool as E rather than total body
+  // water). So each serum species takes the solute in and is diluted by the water in.
+  // The water is still tagged isotonic, because the dilution is applied here by name and
+  // `rebalanceElectrolytes` must not apply it a second time.
+  const V_L = (p.volume_mL ?? 0) * scale / 1000;
+  const E_L = ecfVolume_L;
+  const mix = V_L > 0 ? E_L / (E_L + V_L) : 1;
+  if (p.volume_mL) addVolume(s.cardio, p.volume_mL * scale);
+
+  // Each species: c' = (c E + m) / (E + V), written as dilution of what was there plus
+  // the solute that came in over the enlarged pool.
+  const mixIn = (c: number, mass: number | undefined): number =>
+    (c * E_L + (mass ?? 0) * scale) / (E_L + V_L);
+  if (p.na_mEq || V_L > 0) s.chem.na = mixIn(s.chem.na, p.na_mEq);
+  if (p.k_mEq || V_L > 0) s.chem.k = mixIn(s.chem.k, p.k_mEq);
+  if (p.cl_mEq || V_L > 0) s.chem.cl = mixIn(s.chem.cl, p.cl_mEq);
+  // Calcium has always been placed over three plasma volumes (an ionised-calcium
+  // apparent volume, the same one renal.ts uses). Water dilutes it by the same mixing
+  // fraction; no calcium payload also carries volume today, so this is for consistency.
   if (p.ca_mmol) s.chem.ca += (p.ca_mmol * scale) / Math.max(1, plasmaVolume_L * 3);
+  if (V_L > 0) s.chem.ca *= mix;
 
   // Dextrose lands in the glucose distribution volume the Bergman model uses, as a
   // concentration rise in mg/dL: grams x 1000 mg/g over the distribution volume in dL.
   // That is why 25 g of 50% dextrose lifts a hypoglycaemic adult by roughly 40 mg/dL,
-  // and why the insulin response then follows on its own.
+  // and why the insulin response then follows on its own. The solute enters ONCE, here;
+  // the metabolic model then clears it with insulin, and the water it came in stays as
+  // the free water the sodium dilution above already accounted for.
   if (p.glucose_g) s.metabolic.G += (p.glucose_g * scale * 1000) / P('metabolic.glucoseDistributionVolume_dL');
 
   // Sodium bicarbonate raises the metabolic bicarbonate pool (and the sodium that came
   // with it). The acid-base system turns that into a pH change through Henderson-
   // Hasselbalch, and the chemoreflex answers - which is why a bolus given to a patient
   // who cannot increase their ventilation can paradoxically worsen the intracellular
-  // acidosis, a lesson the coupled model can show.
-  if (p.hco3_mEq) addBicarbonate(s, p.hco3_mEq * scale);
+  // acidosis, a lesson the coupled model can show. The bicarbonate pool is mixed like
+  // the other serum species: diluted by the infusate's water, then topped up.
+  if (V_L > 0) s.acidBase.metabolicHco3 = Math.max(2, s.acidBase.metabolicHco3 * mix);
+  if (p.hco3_mEq) addBicarbonate(s, p.hco3_mEq * scale * mix);
 
   // Iron replaces a deficit over WEEKS - it is incorporated into new red cells on the
   // marrow's timescale, not the session's - so there is deliberately no acute effect to

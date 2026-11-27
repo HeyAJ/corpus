@@ -22,6 +22,17 @@
  *
  * Run it with:  npx vite-node tests/sim/inert-sweep.ts
  *
+ * TWO CHECKS, AND WHY THE SECOND EXISTS. The sweep first asks whether every drug's first
+ * preset was ACCEPTED at all, because the engine silently refuses any dose that is not a
+ * declared preset and a refused dose looks exactly like a broken drug (CLAUDE.md lists it
+ * among the traps that have fooled several people). Only then does it ask whether the
+ * accepted dose moved a PHYSIOLOGICAL readout. The "moved" ranking used to take the maximum
+ * over every signal the file samples, which let a gut-timing artefact (glucose absorption
+ * from the shared meal, 100 % different the moment any drug nudged gastric emptying) count
+ * as a drug that "moved" something, and so hid drugs that move nothing a body would show.
+ * The ranking is now restricted to PHYSIOLOGICAL below; the other signals are still
+ * sampled, because they are what you want when you go looking for why.
+ *
  * It lives under tests/ rather than tools/ because tools/ is a separate TypeScript
  * project that deliberately sees only the DATA types from src, not the simulation
  * itself. Widening it so a script could import the Engine would blur a layer boundary
@@ -98,14 +109,28 @@ function vitals(s: SimSnapshot): Record<string, number> {
     insulin: s.metabolic.insulin_uU_per_mL,
     sedation: s.neuro.sedationLevel,
     cbf: s.neuro.cerebralBloodFlow_mL_per_min,
+    inr: s.coagulation.inr,
+    aptt: s.coagulation.aptt_s,
+    osmolality: s.fluids.osmolality_mOsm_per_kg,
   };
 }
 
-function runOne(intents: { at: number; intent: unknown }[]): Record<string, number>[] {
+interface Run {
+  samples: Record<string, number>[];
+  /** The named drug entered the body at some point: a pharmacokinetic record with a plasma
+   *  concentration, a pending payload (fluids and electrolytes never reach a plasma level in
+   *  the same way) or a cumulative dose. False means the engine refused the dose. */
+  entered: boolean;
+  /** Text of any refusal notice raised during the run. */
+  refusal: string | null;
+}
+
+function runOne(intents: { at: number; intent: unknown }[], drugId?: string): Run {
   const engine = new Engine(0x5eed);
   const steps = Math.round(MINUTES * 60 / DT);
   const sampleStride = Math.round(10 / DT);
   const out: Record<string, number>[] = [];
+  let entered = false;
   const pending = [...intents];
   let cursor = 0;
   for (let i = 0; i < steps; i++) {
@@ -117,9 +142,14 @@ function runOne(intents: { at: number; intent: unknown }[]): Record<string, numb
     }
     engine.tick(DT);
     engine.pending.length = 0;
+    if (drugId && !entered) {
+      const st = engine.state.drugs.find((d) => d.drugId === drugId);
+      if (st && (st.cp > 0 || st.payloadPending > 0 || st.payloadRate > 0 || st.cumulativeDose > 0)) entered = true;
+    }
     if (i % sampleStride === 0) out.push(vitals(engine.snapshot()));
   }
-  return out;
+  const refusal = engine.snapshot().notices.find((n) => /refus|declin|not a declared|cannot/i.test(n.text))?.text ?? null;
+  return { samples: out, entered, refusal };
 }
 
 /**
@@ -136,6 +166,19 @@ function runOne(intents: { at: number; intent: unknown }[]): Record<string, numb
 const NOT_A_DRUG_EFFECT = new Set(['gastricVolume']);
 
 /**
+ * The readouts a body would actually show: vitals, clotting times, the main electrolytes,
+ * glucose, osmolality and pH. The "moved" verdict is decided on these ONLY. Gut-timing
+ * signals (gastric volume and pH, glucose absorption), insulin and the sedation index are
+ * sampled but not ranked: glucose absorption from the shared test meal swings by 100 %
+ * whenever a drug shifts gastric emptying by a hair, which is a timing artefact and not a
+ * physiological effect. The membership is a measuring choice, not a physiological claim.
+ */
+const PHYSIOLOGICAL = new Set([
+  'hr', 'map', 'sbp', 'co', 'rr', 'spo2', 'paco2', 'vt', 'temp', 'glucose', 'consciousness',
+  'urine', 'na', 'k', 'ca', 'cl', 'hco3', 'ph', 'lactate', 'cbf', 'inr', 'aptt', 'osmolality',
+]);
+
+/**
  * Largest fractional excursion of any signal, drug run against control run.
  *
  * The denominator is max(|control|, |test|) rather than |control|, which bounds the
@@ -149,7 +192,7 @@ function biggestDivergence(
   test: Record<string, number>[],
 ): { signal: string; fraction: number } {
   let best = { signal: 'none', fraction: 0 };
-  const keys = Object.keys(control[0]).filter((k) => !NOT_A_DRUG_EFFECT.has(k));
+  const keys = Object.keys(control[0]).filter((k) => PHYSIOLOGICAL.has(k) && !NOT_A_DRUG_EFFECT.has(k));
   for (const k of keys) {
     for (let i = 0; i < Math.min(control.length, test.length); i++) {
       const c = control[i][k];
@@ -185,10 +228,11 @@ function main(): void {
   const only = new Set(process.argv.slice(2).filter((a) => !a.startsWith('-')));
   const subject = only.size > 0 ? DRUGS.filter((d) => only.has(d.id)) : DRUGS;
   process.stdout.write(`Inert-drug sweep: ${subject.length} drugs, ${MINUTES} simulated minutes each.\n\n`);
-  const control = runOne([IV_ACCESS, MEAL]);
+  const control = runOne([IV_ACCESS, MEAL]).samples;
 
   const inert: string[] = [];
   const noPreset: string[] = [];
+  const refused: string[] = [];
   let moved = 0;
 
   for (const d of subject) {
@@ -197,7 +241,7 @@ function main(): void {
       noPreset.push(d.id);
       continue;
     }
-    const samples = runOne([
+    const run = runOne([
       IV_ACCESS,
       MEAL,
       {
@@ -211,7 +255,14 @@ function main(): void {
           label: preset.label,
         },
       },
-    ]);
+    ], d.id);
+    const samples = run.samples;
+    if (!run.entered) {
+      // Not measured further: a drug that never entered the body says nothing about its
+      // pharmacology, and reporting it as "inert" would send the reader to the wrong place.
+      refused.push(`${d.id.padEnd(22)} ${preset.label} ${preset.route}${run.refusal ? ` - ${run.refusal}` : ''}`);
+      continue;
+    }
     const best = biggestDivergence(control, samples);
     if (best.fraction < THRESHOLD) {
       inert.push(`${d.id.padEnd(22)} ${preset.label} ${preset.route} - largest change ${(best.fraction * 100).toFixed(3)}% (${best.signal})`);
@@ -223,16 +274,23 @@ function main(): void {
     }
   }
 
-  process.stdout.write(`\n${moved}/${subject.length} drugs moved a vital sign by more than ${THRESHOLD * 100}%.\n`);
+  process.stdout.write(`\n${moved}/${subject.length} drugs moved a physiological readout by more than ${THRESHOLD * 100}%.\n`);
+
+  if (refused.length > 0) {
+    process.stdout.write(`\nDOSE NEVER ENTERED THE BODY (refused, or no pharmacokinetic record) - fix the preset before reading anything else:\n`);
+    for (const line of refused) process.stdout.write(`  ${line}\n`);
+  } else {
+    process.stdout.write('\nEvery first preset was accepted.\n');
+  }
 
   if (noPreset.length > 0) {
     process.stdout.write(`\nNo declared preset (cannot be given at all): ${noPreset.join(', ')}\n`);
   }
   if (inert.length > 0) {
-    process.stdout.write(`\nMOVED NOTHING - each of these needs an explanation:\n`);
+    process.stdout.write(`\nMOVED NO PHYSIOLOGICAL READOUT - each of these needs an explanation:\n`);
     for (const line of inert) process.stdout.write(`  ${line}\n`);
   } else {
-    process.stdout.write('\nEvery drug with a preset moved something.\n');
+    process.stdout.write('\nEvery accepted drug moved a physiological readout.\n');
   }
 }
 

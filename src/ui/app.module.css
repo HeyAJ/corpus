@@ -284,7 +284,21 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  padding: 2px 8px;
+  /* A BACKING, because this is the one line that must always be legible and it lies directly
+     over the 3D scene: with an organ open close up, vessels and organ shells ran straight
+     through the words (the heart-with-glass-off capture in the FU1 audit). The pill is the
+     panels' own surface (--sheet-bg, 94 % opaque, so even a black vessel behind it leaves
+     the 7.5:1 of --ink-mid above 6:1), it shrinks to the text (align-self) so it covers no
+     more of the stage than the words, and it takes no pointer events (see below) so it cannot
+     cover a control. A display choice, not a measured value. */
+  align-self: center;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 3px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--sheet-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   /* Was 10 px (9 px on a phone) in --ink-faint, about 2:1: the one line the project
      requires to be permanently visible was the least legible text on the screen. Now the
      11 px floor in --ink-mid (7.5:1 on the light surfaces). */

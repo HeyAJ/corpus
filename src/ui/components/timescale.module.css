@@ -8,7 +8,14 @@
   gap: 4px;
   padding: 4px 6px;
   border-radius: var(--radius-pill);
-  background: var(--chip-bg);
+  /* The panels' own surface, not the 5 % tint of the dock chips. The pill sits over the top of
+     the stage, where with an organ open the organ's shell, a vessel or the glass body outline
+     can pass behind it, and the clock and the three inactive speeds (--ink-dim) lost contrast
+     against whatever was there (the FU1 audit measured it on the 900 x 700 open-organ capture).
+     At 94 % opacity the text keeps at least 5:1 over any scene colour. A display choice. */
+  background: var(--sheet-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 15;
 }
 
@@ -31,6 +38,21 @@
 .active {
   background: rgba(0, 0, 0, 0.12);
   color: var(--ink);
+}
+
+/*
+ * TOUCH WIDTH. The global touch rule (responsive.css) gives every button a 44 px minimum
+ * height but no width, so the 1x, 5x and 30x buttons measured 34 x 44 and 42 x 44 at 844 x 390
+ * on a touch screen: a sliver one thumb-width narrower than the contract. The text keeps its
+ * size; the button simply refuses to be narrower than a finger. The pill grows by about 30 px,
+ * which the centred pill has room for at every width above the phone breakpoint. 44 px is the
+ * project's touch-target floor (CLAUDE.md, readability contract), not a measured value.
+ */
+@media (pointer: coarse) {
+  .button,
+  .active {
+    min-width: 44px;
+  }
 }
 
 /* The single tap-to-cycle chip; only shown on a phone. */
@@ -64,7 +86,10 @@
     padding: 4px 12px;
     border: none;
     border-radius: var(--radius-pill);
-    background: var(--chip-bg);
+    /* Same backing as the wide pill, for the same reason. */
+    background: var(--sheet-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     font-size: var(--text-md);
     color: var(--ink);
     cursor: pointer;

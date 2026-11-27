@@ -472,7 +472,7 @@ export function ToolDock() {
   const anyPanel = items.some((i) => i.active && i.key !== 'sound');
 
   return (
-    <nav className={styles.dock} aria-label="Tools">
+    <nav className={styles.dock} aria-label="Tools" data-dock>
       <div className={styles.cluster}>
         <DockButton label="Panels" active={menuOpen || anyPanel} onClick={() => setMenuOpen(!menuOpen)}>
           <Menu />

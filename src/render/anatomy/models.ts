@@ -640,63 +640,10 @@ function intestineSmall(): THREE.BufferGeometry {
 }
 
 /**
- * The four segments of the large bowel whose centrelines are drawn HERE and not read from
- * organs.json, body coordinates (unexploded, before the axial warp). The authored
- * organs.json lines put the caecum and the lower ascending colon straight through the plate of
- * the right ilium and the descending colon and the start of the sigmoid through the left one
- * (the first measurement found the shell 5.5 mm inside the hip bone and the iliacus 12.2 mm
- * inside the bowel), because the iliac fossa is a bowed plate that curves medially below the
- * level of the crest and the authored points were written without the bone to hand. The
- * transverse colon and the rectum are untouched and still come from organs.json, and the
- * first point of the caecum and the last of the sigmoid are the same points, so the joints
- * with the ileum side, the transverse colon and the rectum do not move.
+ * The appendix, body coordinates, off the lower pole of the caecum. It hangs from the caecum's first
+ * authored point in organs.json (giCentrelines 'caecum'), 0.3 mm in x short of it and 12 mm behind it in z, so
+ * its base lies inside the caecal wall; when the caecum is moved this path has to move with it.
  */
-export const COLON_CENTRELINES: Record<string, [number, number, number][]> = {
-  caecum: [
-    [0.0499, -0.0848, 0.0387],
-    [0.0501, -0.0657, 0.0361],
-    [0.0585, -0.0444, 0.0363],
-  ],
-  colon_ascending: [
-    [0.0585, -0.0444, 0.0363],
-    [0.0718, -0.0299, 0.0041],
-    [0.08, -0.016, -0.012],
-  ],
-  colon_descending: [
-    [-0.082, -0.0, -0.01],
-    [-0.0685, -0.0658, -0.0262],
-    [-0.0742, -0.0691, -0.0165],
-  ],
-  colon_sigmoid: [
-    [-0.0742, -0.0691, -0.0165],
-    [-0.0825, -0.0755, 0.033],
-    [-0.0456, -0.1095, 0.0419],
-    [-0.0313, -0.1234, 0.0496],
-    [-0.02, -0.1465, 0.028],
-    [-0.005, -0.14, 0],
-    [0, -0.158, -0.02],
-  ],
-};
-
-/** One large-bowel segment's centreline: ours where we drew it, else the authored one. */
-export function colonSegment(segment: string): [number, number, number][] {
-  return COLON_CENTRELINES[segment] ?? giSegment(segment);
-}
-
-/** Several large-bowel segments joined end to end, the shared joint written once (as `giPath` does). */
-export function colonPath(segments: readonly string[]): [number, number, number][] {
-  const out: [number, number, number][] = [];
-  for (const s of segments) {
-    const pts = colonSegment(s);
-    for (let i = 0; i < pts.length; i++) {
-      if (i === 0 && out.length > 0) continue;
-      out.push(pts[i]);
-    }
-  }
-  return out;
-}
-
-/** The appendix, body coordinates, off the base of the caecum. */
 export const APPENDIX_PATH: [number, number, number][] = [
   [0.0469, -0.0848, 0.0267],
   [0.0389, -0.0988, 0.0187],
@@ -705,7 +652,7 @@ export const APPENDIX_PATH: [number, number, number][] = [
 
 function intestineLarge(): THREE.BufferGeometry {
   const segments = ['caecum', 'colon_ascending', 'colon_transverse', 'colon_descending', 'colon_sigmoid', 'rectum'];
-  const path = colonPath(segments);
+  const path = giPath(segments);
 
   // Calibre at each authored point: widest at the caecum, narrowing round the frame,
   // widening again at the rectal ampulla and closing at the anal canal.
@@ -719,7 +666,7 @@ function intestineLarge(): THREE.BufferGeometry {
     rectum: 0.018,
   };
   for (const s of segments) {
-    const n = colonSegment(s).length;
+    const n = giSegment(s).length;
     for (let i = calibreAt.length === 0 ? 0 : 1; i < n; i++) calibreAt.push(table[s]);
   }
   calibreAt[calibreAt.length - 1] = 0.008; // anal canal

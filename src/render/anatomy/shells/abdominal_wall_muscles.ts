@@ -439,7 +439,7 @@ spec.psoas_minor = {
 /**
  * The iliacus sheet's thickness, a display choice (no thickness is cited here): 3.0 mm, up from 1.8 mm, so the muscle
  * reads as a muscle lining the fossa and not as a film. It is bounded above by the room the bowel leaves: the colon
- * (COLON_CENTRELINES in models.ts) is held at least 4.3 mm from the hip bone on the left and more on the right, and
+ * (the colon, caecum to sigmoid, in organs.json giCentrelines) is held at least 4.3 mm from the hip bone on the left and more on the right, and
  * the sheet stands 0.6 mm off the bone, so 3.0 mm leaves the colon at least 0.7 mm clear of the muscle. The first
  * version of this sheet was thin because the stylised colon lay in the bone and no thickness could have cleared it.
  */

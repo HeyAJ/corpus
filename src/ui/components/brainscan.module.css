@@ -174,7 +174,16 @@
      change line to 10 px, all under the 11 px floor. They now keep --text-xs everywhere;
      the card grows by a few pixels instead of the text shrinking. */
 
-  /* 44 px touch target on the pin without growing the card: extend the hit area. */
+}
+
+/*
+ * The pin is a 28 px disc inside a card that has no room to grow, so its 44 px touch area is an
+ * invisible ::after reaching 8 px past each edge. It used to be inside the phone media query
+ * only, so on a landscape phone or a tablet (a touch screen wider than 720 px) the global
+ * 44 px minimum height applied but the width stayed 28 px: it measured 28 x 44 at 844 x 390.
+ * Keyed on the input, not the width, like the global touch rule in responsive.css.
+ */
+@media (pointer: coarse), (max-width: 720px) {
   .pin {
     position: relative;
   }
