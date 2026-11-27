@@ -1,6 +1,6 @@
 {
   "atlas": "hip_thigh_muscles",
-  "about": "The muscles of the hip and the thigh: the gluteal muscles behind the hip, the short rotators deep to them, the quadriceps in front of the femur, the adductors on its inner side and the hamstrings behind it, drawn against the hip bone and the femur of the hip and thigh bone atlas. The thigh muscles are the largest muscle mass in the body, so they carry the strongest exertion drive. The drives are the whole-body ones the engine has: muscle tone, exertion, shivering and a seizure. Gait, force and the lower leg are not simulated. The figure's leg ends at the knee and the glass thigh is slim, so the muscle bellies are slim too.",
+  "about": "The muscles of the buttock and the thigh, drawn from their origins to their insertions on this body's own hip bone, sacrum and thigh bone: the gluteal muscles in three layers, the short lateral rotators deep to them, the iliotibial tract and the sartorius, the four heads of the quadriceps in front, the adductors on the inner side, the three hamstrings behind, and the femoral triangle. Muscles are drawn deepest first, so a superficial muscle lies on the one beneath it. The skeleton ends at the knee, so the muscles that would reach the shin (the sartorius, gracilis, hamstrings and iliotibial tract) stop in a short tendon just below it, and the muscle bellies of the iliopsoas belong to the abdominal wall. The drives are the whole-body ones the engine has: exertion, muscle tone, paralysis, seizure and shivering. Force, movement of the hip and knee and gait are not simulated. Outlines, thicknesses and widths are drawing choices, not measurements.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -14,9 +14,9 @@
   "parts": [
     {
       "id": "gluteal_muscles",
-      "label": "Gluteal Muscles",
-      "summary": "Gluteus maximus, medius and minimus",
-      "function": "The gluteus maximus covers the back of the hip and straightens it; the medius and minimus lie on the outer side of the ilium and move the thigh away from the midline and steady the pelvis.",
+      "label": "Gluteal muscles",
+      "summary": "The muscles of the buttock, in three layers, from the pelvis to the upper thigh bone.",
+      "function": "They extend, steady and turn the hip, and hold the pelvis level when one foot is off the ground.",
       "color": "#b8554c",
       "rest": 0.2,
       "drives": [
@@ -28,7 +28,7 @@
         },
         {
           "signal": "shivering",
-          "weight": 0.25,
+          "weight": 0.3,
           "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
           "source": "GH14"
         },
@@ -43,45 +43,76 @@
           "weight": -0.35,
           "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
           "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gluteus_maximus",
+      "label": "Gluteus maximus",
+      "parent": "gluteal_muscles",
+      "summary": "The large superficial muscle of the buttock, from the back of the pelvis and sacrum to the upper thigh bone and the iliotibial tract.",
+      "function": "It extends the thigh at the hip, as in rising from a chair or climbing, and helps to turn it outward.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gluteus_medius",
+      "label": "Gluteus medius",
+      "parent": "gluteal_muscles",
+      "summary": "A fan-shaped muscle on the outer surface of the ilium, under the gluteus maximus, ending on the greater trochanter.",
+      "function": "It draws the thigh outward and steadies the pelvis on the standing leg.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gluteus_minimus",
+      "label": "Gluteus minimus",
+      "parent": "gluteal_muscles",
+      "summary": "The smallest and deepest gluteal muscle, from the ilium under the gluteus medius to the front of the greater trochanter.",
+      "function": "It draws the thigh outward and turns it inward, and steadies the pelvis with the gluteus medius.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "tensor_fasciae_latae",
+      "label": "Tensor fasciae latae",
+      "parent": "gluteal_muscles",
+      "summary": "A short muscle at the front of the hip, from the front of the iliac crest into the iliotibial tract.",
+      "function": "It tightens the iliotibial tract, steadies the knee and helps to bend and turn the thigh inward.",
+      "color": "#bc5c52",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "iliotibial_tract",
+      "label": "Iliotibial tract",
+      "summary": "The thick band of the deep fascia on the outer side of the thigh, receiving the tensor fasciae latae and part of the gluteus maximus.",
+      "function": "It braces the outer side of the hip and knee. Below the model's skeleton it would end on the outer side of the shin bone, so it stops just below the knee here.",
+      "color": "#d8c3a5",
+      "rest": 0.2,
+      "drives": [],
       "source": "GRAYS42"
     },
     {
       "id": "short_rotators",
-      "label": "Short Rotators of the Hip",
-      "summary": "The piriformis and the small muscles deep to the gluteus maximus",
-      "function": "The piriformis and the other short muscles run from the sacrum and the pelvis to the greater trochanter and turn the thigh outwards, holding the head of the femur in its socket.",
+      "label": "Short lateral rotators",
+      "summary": "The group of small muscles deep to the gluteus maximus that run from the pelvis to the upper thigh bone.",
+      "function": "They turn the thigh outward and hold the head of the thigh bone in its socket.",
       "color": "#a94b45",
-      "rest": 0.25,
-      "drives": [
-        {
-          "signal": "exertion",
-          "weight": 0.25,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
-          "source": "GH14"
-        },
-        {
-          "signal": "rigidity",
-          "weight": 0.3,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
-          "source": "GH14"
-        },
-        {
-          "signal": "paralysis",
-          "weight": -0.35,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
-          "source": "GH14"
-        }
-      ],
-      "source": "GRAYS42"
-    },
-    {
-      "id": "quadriceps_femoris",
-      "label": "Quadriceps Femoris",
-      "summary": "The large muscle on the front of the thigh",
-      "function": "The four heads of the quadriceps run from the hip bone and the femur to the patella and straighten the knee.",
-      "color": "#c0605a",
       "rest": 0.2,
       "drives": [
         {
@@ -107,50 +138,97 @@
           "weight": -0.35,
           "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
           "source": "GH14"
-        }
-      ],
-      "source": "GRAYS42"
-    },
-    {
-      "id": "adductor_muscles",
-      "label": "Adductor Muscles",
-      "summary": "The muscle group on the inner side of the thigh",
-      "function": "The adductors run from the pubis and the ischium to the femur and draw the thigh towards the midline.",
-      "color": "#b35a50",
-      "rest": 0.2,
-      "drives": [
-        {
-          "signal": "exertion",
-          "weight": 0.35,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
-          "source": "GH14"
         },
         {
-          "signal": "shivering",
-          "weight": 0.25,
-          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
-          "source": "GH14"
-        },
-        {
-          "signal": "rigidity",
+          "signal": "seizure",
           "weight": 0.3,
-          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
-          "source": "GH14"
-        },
-        {
-          "signal": "paralysis",
-          "weight": -0.35,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
           "source": "GH14"
         }
       ],
       "source": "GRAYS42"
     },
     {
-      "id": "hamstring_muscles",
-      "label": "Hamstrings",
-      "summary": "The muscles on the back of the thigh",
-      "function": "The hamstrings run from the ischial tuberosity to the bones of the lower leg, bend the knee and straighten the hip.",
+      "id": "piriformis",
+      "label": "Piriformis",
+      "parent": "short_rotators",
+      "summary": "A pear-shaped muscle from the front of the sacrum, through the greater sciatic foramen, to the top of the greater trochanter.",
+      "function": "It turns the thigh outward and, with the hip bent, draws it away from the midline.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "obturator_internus",
+      "label": "Obturator internus",
+      "parent": "short_rotators",
+      "summary": "A fan from the inner surface of the membrane that closes the obturator foramen, turning round the ischium to the greater trochanter.",
+      "function": "It turns the thigh outward. Its pelvic part lines the side wall of the pelvis, next to the levator ani.",
+      "color": "#b05049",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superior_gemellus",
+      "label": "Superior gemellus",
+      "parent": "short_rotators",
+      "summary": "A small muscle from the ischial spine along the upper edge of the obturator internus tendon.",
+      "function": "It turns the thigh outward with the obturator internus.",
+      "color": "#9a4a44",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "inferior_gemellus",
+      "label": "Inferior gemellus",
+      "parent": "short_rotators",
+      "summary": "A small muscle from the ischial tuberosity along the lower edge of the obturator internus tendon.",
+      "function": "It turns the thigh outward with the obturator internus.",
+      "color": "#9a4a44",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "quadratus_femoris",
+      "label": "Quadratus femoris",
+      "parent": "short_rotators",
+      "summary": "A flat, square muscle from the ischial tuberosity to the back of the upper thigh bone between the trochanters.",
+      "function": "It turns the thigh outward and steadies the hip.",
+      "color": "#a24f48",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "obturator_externus",
+      "label": "Obturator externus",
+      "parent": "short_rotators",
+      "summary": "A fan from the outer surface of the obturator membrane, passing under the neck of the thigh bone to the trochanteric fossa.",
+      "function": "It turns the thigh outward and steadies the head of the thigh bone.",
+      "color": "#8f453f",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "iliopsoas_tendon",
+      "label": "Iliopsoas tendon",
+      "summary": "The common tendon of the psoas major and the iliacus, passing in front of the hip joint to the lesser trochanter.",
+      "function": "It bends the thigh at the hip and is the strongest hip flexor. The muscle bellies lie in the abdominal wall organ and are not drawn here.",
+      "color": "#d8c3a5",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "sartorius",
+      "label": "Sartorius",
+      "summary": "The long strap-like muscle that runs obliquely down the front of the thigh from the front of the iliac crest to the inner side of the upper shin.",
+      "function": "It bends and turns the thigh outward at the hip and bends the knee. Below the model's skeleton it would end on the shin bone, so it stops just below the knee here.",
       "color": "#bc5c52",
       "rest": 0.2,
       "drives": [
@@ -177,8 +255,301 @@
           "weight": -0.35,
           "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
           "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "quadriceps_femoris",
+      "label": "Quadriceps femoris",
+      "summary": "The large muscle of the front of the thigh, made of four heads that share one tendon to the kneecap.",
+      "function": "It straightens the knee, and the rectus femoris part also bends the hip.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.45,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.3,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "rectus_femoris",
+      "label": "Rectus femoris",
+      "parent": "quadriceps_femoris",
+      "summary": "The head that runs straight down the front of the thigh from the anterior inferior iliac spine.",
+      "function": "It straightens the knee and bends the hip.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vastus_lateralis",
+      "label": "Vastus lateralis",
+      "parent": "quadriceps_femoris",
+      "summary": "The largest head, on the outer side of the thigh, from the greater trochanter and the linea aspera.",
+      "function": "It straightens the knee.",
+      "color": "#b8554c",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vastus_medialis",
+      "label": "Vastus medialis",
+      "parent": "quadriceps_femoris",
+      "summary": "The head on the inner side of the thigh, from the intertrochanteric line and the linea aspera.",
+      "function": "It straightens the knee and helps to keep the kneecap in its groove.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "vastus_intermedius",
+      "label": "Vastus intermedius",
+      "parent": "quadriceps_femoris",
+      "summary": "The deep head, lying on the front and sides of the thigh bone under the rectus femoris.",
+      "function": "It straightens the knee.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "adductor_muscles",
+      "label": "Adductor muscles",
+      "summary": "The muscles of the inner thigh, from the pubis and ischium to the back of the thigh bone.",
+      "function": "They draw the thigh towards the midline and help to steady the pelvis.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.45,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.3,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pectineus",
+      "label": "Pectineus",
+      "parent": "adductor_muscles",
+      "summary": "A flat muscle from the pectineal line of the pubis to the back of the upper thigh bone, in the floor of the femoral triangle.",
+      "function": "It bends the thigh and draws it towards the midline.",
+      "color": "#b35a50",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "adductor_longus",
+      "label": "Adductor longus",
+      "parent": "adductor_muscles",
+      "summary": "A triangular muscle from the front of the pubis to the middle of the back of the thigh bone.",
+      "function": "It draws the thigh towards the midline; its edge forms the inner boundary of the femoral triangle.",
+      "color": "#bb6156",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "adductor_brevis",
+      "label": "Adductor brevis",
+      "parent": "adductor_muscles",
+      "summary": "A muscle from the pubic body and inferior ramus to the upper part of the back of the thigh bone, deep to the pectineus and adductor longus.",
+      "function": "It draws the thigh towards the midline.",
+      "color": "#a85650",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "adductor_magnus",
+      "label": "Adductor magnus",
+      "parent": "adductor_muscles",
+      "summary": "The largest adductor, a fan from the ischiopubic ramus and the ischial tuberosity to the whole linea aspera and the adductor tubercle.",
+      "function": "It draws the thigh towards the midline; its hamstring part also extends the hip.",
+      "color": "#a24f48",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "gracilis",
+      "label": "Gracilis",
+      "parent": "adductor_muscles",
+      "summary": "The long slender superficial muscle of the inner thigh, from the pubis to the inner side of the upper shin.",
+      "function": "It draws the thigh towards the midline and bends the knee. Below the model's skeleton it would end on the shin bone, so it stops just below the knee here.",
+      "color": "#c26a60",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "hamstring_muscles",
+      "label": "Hamstring muscles",
+      "summary": "The three muscles of the back of the thigh, from the ischial tuberosity to the bones of the leg.",
+      "function": "They extend the hip and bend the knee.",
+      "color": "#bc5c52",
+      "rest": 0.2,
+      "drives": [
+        {
+          "signal": "exertion",
+          "weight": 0.45,
+          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "source": "GH14"
+        },
+        {
+          "signal": "shivering",
+          "weight": 0.3,
+          "note": "Shivering is rhythmic contraction of skeletal muscle that makes heat; the textbook describes it as a whole-body muscle response, so this muscle rises with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "rigidity",
+          "weight": 0.3,
+          "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "paralysis",
+          "weight": -0.35,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
+          "source": "GH14"
+        },
+        {
+          "signal": "seizure",
+          "weight": 0.3,
+          "note": "A seizure is a brief, intense motor discharge, which the engine reports as 0 or 1; skeletal muscle contracts in it. The weight is a display scale.",
+          "source": "GH14"
+        }
+      ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "biceps_femoris",
+      "label": "Biceps femoris",
+      "parent": "hamstring_muscles",
+      "summary": "The outer hamstring, with a long head from the ischial tuberosity and a short head from the thigh bone.",
+      "function": "It bends the knee and turns the leg outward; the long head also extends the hip.",
+      "color": "#bc5c52",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "biceps_femoris_long_head",
+      "label": "Biceps femoris, long head",
+      "parent": "biceps_femoris",
+      "summary": "The head that arises from the ischial tuberosity, with the semitendinosus.",
+      "function": "It extends the hip and bends the knee.",
+      "color": "#bc5c52",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "biceps_femoris_short_head",
+      "label": "Biceps femoris, short head",
+      "parent": "biceps_femoris",
+      "summary": "The head that arises from the lower half of the linea aspera and joins the long head.",
+      "function": "It bends the knee; it does not cross the hip.",
+      "color": "#a85650",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "semitendinosus",
+      "label": "Semitendinosus",
+      "parent": "hamstring_muscles",
+      "summary": "The superficial inner hamstring, with a long tendon that gives it its name.",
+      "function": "It extends the hip, bends the knee and turns the leg inward. Below the model's skeleton it would end on the shin bone, so it stops just below the knee here.",
+      "color": "#c0605a",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "semimembranosus",
+      "label": "Semimembranosus",
+      "parent": "hamstring_muscles",
+      "summary": "The deep inner hamstring, with a flat membranous tendon of origin.",
+      "function": "It extends the hip, bends the knee and turns the leg inward. Below the model's skeleton it would end on the shin bone, so it stops just below the knee here.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "femoral_triangle",
+      "label": "Femoral triangle",
+      "summary": "The triangular hollow at the front of the upper thigh, bounded by the inguinal ligament above, the sartorius outside and the adductor longus inside.",
+      "function": "It is a space, not a muscle: the main artery, vein and nerve of the leg pass through it. They are not drawn here.",
+      "color": "#e8d8c0",
+      "rest": 0.2,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]
