@@ -166,7 +166,7 @@ function clearRows(rows: readonly (readonly V3[])[], r: number): V3[][] {
 
 /** A tube of the chest wall, routed round the bones. */
 function chestBelly(pts: readonly V3[], rMax: number, k: number, o: Parameters<typeof belly>[3] = {}): BG {
-  return belly(routed(localBones, pts, rMax * k + 0.0003, 4), rMax, k, o);
+  return belly(routed(localBones, pts, rMax * k + 0.0008, 6), rMax, k, o);
 }
 
 /* ------------------------------------------------------------------ the intercostal strips */
@@ -199,7 +199,7 @@ function intercostalStrip(n: number, layer: Layer, side: number, k: number): BG 
     }),
   );
   const y = (a[0][1] + b[0][1]) / 2;
-  return ruled(clearRows(rows, 0.0006), cfg.thick, Math.max(4, Math.ceil(a.length / 2)), 1, L(onSide([0, y, 0], side)), k);
+  return ruled(clearRows(rows, 0.0012), cfg.thick, Math.max(4, Math.ceil(a.length / 2)), 1, L(onSide([0, y, 0], side)), k);
 }
 
 const spec: Record<string, MuscleSpec> = {};
@@ -294,7 +294,7 @@ function fan(origin: readonly V3[], insertion: readonly V3[], lift: number, thic
       const y = p[1] + (insertion[i][1] - p[1]) * f + ORIGIN[1];
       return onSide(L(front ? chestFront(y, x, lift) : cagePoint(y, Math.PI / 2 + 0.2 + 0.4 * f, lift)), side);
     });
-  return ruled(clearRows([A, mid(0.33), mid(0.67), B], 0.0006), thick, Math.max(3, origin.length * 2), 6, onSide([0, (A[0][1] + B[0][1]) / 2, 0], side), k);
+  return ruled(clearRows([A, mid(0.33), mid(0.67), B], 0.0012), thick, Math.max(3, origin.length * 2), 6, onSide([0, (A[0][1] + B[0][1]) / 2, 0], side), k);
 }
 
 spec.pectoralis_major_clavicular_part = {
@@ -336,7 +336,7 @@ spec.pectoralis_minor = {
   make: (k, s) => {
     const A = [3, 4, 5].map((n) => seatBody(ribField(n, 1), outward(ribPointsBody(n)[10], 0.003), 0.0036));
     const B = [0.2625, 0.261, 0.2595].map((y, i) => seatBody(coracoidField(), [0.1415 + 0.0006 * i, y, 0.011 + 0.003 * i], 0.0026));
-    return [fan(A, B, 0.0036, 0.0028, s, k, false)];
+    return [fan(A, B, 0.0046, 0.0026, s, k, false)];
   },
 };
 
@@ -384,7 +384,7 @@ function serratusPart(ribs: number[], ys: number[], k: number, s: number): BG {
   const B = ys.map((y) => scapulaBorder(y, 1, 0.0026));
   // Three middle rows walk the sheet round the cage (side, back-side, back) so its chord cannot cut in towards the ribs.
   const mid = (alpha: number): V3[] => A.map((a, i): V3 => L(cagePoint((a[1] + B[i][1]) / 2 + ORIGIN[1], alpha, 0.0058)));
-  return ruled(clearRows([A, mid(1.2), mid(0.95), mid(0.7), B].map((r) => r.map((p) => onSide(p, s))), 0.0006), 0.0026, Math.max(3, ribs.length * 2), 8, onSide([0, (A[0][1] + B[0][1]) / 2, 0], s), k);
+  return ruled(clearRows([A, mid(1.2), mid(0.95), mid(0.7), B].map((r) => r.map((p) => onSide(p, s))), 0.0014), 0.0026, Math.max(3, ribs.length * 2), 8, onSide([0, (A[0][1] + B[0][1]) / 2, 0], s), k);
 }
 spec.serratus_anterior_superior_part = { parent: 'serratus_anterior', make: (k, s) => [serratusPart([1, 2], [0.2585, 0.255], k, s)] };
 spec.serratus_anterior_intermediate_part = { parent: 'serratus_anterior', make: (k, s) => [serratusPart([2, 3], [0.238, 0.215], k, s)] };

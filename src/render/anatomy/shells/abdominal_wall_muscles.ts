@@ -206,7 +206,7 @@ function clearRows(rows: readonly (readonly V3[])[], r: number): V3[][] {
 
 /** A tube of the wall, routed round the bones. */
 function wallBelly(pts: readonly V3[], rMax: number, k: number, o: Parameters<typeof belly>[3] = {}): BG {
-  return belly(routed(bones, pts, rMax * k + 0.0003, 6), rMax, k, o);
+  return belly(routed(bones, pts, rMax * k + 0.0008, 8), rMax, k, o);
 }
 
 /* ------------------------------------------------------------------ slabs on the wall */
@@ -228,7 +228,7 @@ function layerSheet(side: number, name: LayerName, rows: readonly (readonly RowP
   );
   const first = pts[0][0];
   const mid = (first[1] + pts[0][pts[0].length - 1][1]) / 2;
-  return ruled(clearRows(pts, 0.0005), L.t + extra, nu, nv, onSide([0, mid, 0], side), k);
+  return ruled(clearRows(pts, 0.0012), L.t + extra, nu, nv, onSide([0, mid, 0], side), k);
 }
 
 const range = (a: number, b: number, n: number): number[] => Array.from({ length: n }, (_, i) => a + ((b - a) * i) / (n - 1));
@@ -379,7 +379,7 @@ spec.inguinal_ligament = {
     const a = asis();
     const b = pubicTubercle();
     const m: V3 = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, Math.min(trunkRing(-0.11, Math.PI - 0.5)[1], (a[2] + b[2]) / 2 + 0.002)];
-    return [tendon(routed(bones, [a, m, b].map((p) => onSide(p, s)), 0.0023, 9), 0.0021, k, 16)];
+    return [tendon(routed(bones, [a, m, b].map((p) => onSide(p, s)), 0.0042, 12), 0.0021, k, 16)];
   },
 };
 
@@ -431,8 +431,8 @@ spec.psoas_minor = {
   make: (k, s) => {
     // Gray's: psoas minor lies on the front of the psoas major; it is drawn level with it, not in front, because the pancreas occupies the space in front of the upper lumbar column in this model.
     const a = lumbarSide('t12', s, -0.003);
-    const sup = SUPERIOR_RAMUS[2];
-    const b = P([sup[0] - 0.002, sup[1] + 0.0075, sup[2] + 0.0005]);
+    const iliopubic = SUPERIOR_RAMUS[1]; // the iliopubic eminence, lateral on the superior ramus, where Gray's has the minor end; the bowel hangs into the pelvis medial to it
+    const b = P([iliopubic[0], iliopubic[1] + 0.0075, iliopubic[2] - 0.004]);
     return [wallBelly([a, lumbarSide('l3', s, -0.001), onSide(b, s)], 0.0022, k, { ends: 0.3, shape: 0.5, tubular: 12, radial: 5 })];
   },
 };
@@ -440,15 +440,13 @@ spec.psoas_minor = {
 spec.iliacus = {
   parent: 'posterior_abdominal_wall',
   make: (k, s) => {
-    const ys = [-0.04, -0.062, -0.085];
-    const rows = [0.09, 0.07, 0.05].map((sv) => ys.map((y): V3 => onSide(P(wingPoint(sv, y, -0.0062)), s)));
+    // Rows follow the plate itself (one row per height, each across three positions along the fossa), so the fan hugs the bowed bone instead of cutting a chord across it.
+    const ys = [-0.04, -0.056, -0.072, -0.088, -0.104];
     const target = onSide(lesserTrochanter(), s);
-    const A = [rows[0][0], rows[1][0], rows[2][0]];
-    const B = [rows[0][2], rows[1][2], rows[2][2]];
-    const M: V3[] = A.map((a, i): V3 => [(a[0] + B[i][0]) / 2 * 0.98, (a[1] + B[i][1]) / 2, (a[2] + B[i][2]) / 2]);
+    const rowsY = ys.map((y) => [0.09, 0.07, 0.05].map((sv): V3 => onSide(P(wingPoint(sv, y, -0.0062)), s)));
     const T: V3[] = [0, 1, 2].map((i): V3 => [target[0] + (i - 1) * 0.0015, target[1] + 0.0015, target[2] + (i - 1) * 0.0025]);
     // Gray's: the iliacus is a flat fan that lines the iliac fossa; the caecum and the sigmoid colon rest on it, so it must lie between bone and bowel. Its inner face is the fossa (0.7 mm clear of the bone) and it is thin, standing medially from the bone: `away` is a point beyond the plate's outer face so the thickness is on the bowel side.
-    return [ruled(clearRows([A, M, B, T], 0.0006), 0.0018, 3, 6, onSide(P(wingPoint(0.07, -0.07, 0.05)), s), k)];
+    return [ruled(clearRows([...rowsY, T], 0.0006), 0.0018, 3, 6, onSide(P(wingPoint(0.07, -0.07, 0.05)), s), k)];
   },
 };
 // QUADRATUS LUMBORUM: from the iliac crest (and the iliolumbar ligament) up to the lower border of the twelfth rib and the tips of the transverse processes of the upper four lumbar vertebrae, behind the kidney. Its path is carried back past the kidney's posterior face (scene z -0.071 at its back wall) so it lies behind the organ and not through it.

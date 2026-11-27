@@ -321,7 +321,7 @@ export function hipThighLeaves(): Record<string, THREE.BufferGeometry[]> {
     w: 0.011, t: 0.005, a: 0.08, b: 0.2, tendon: 0.2, n: 9,
   }, ['femur', 'free']);
   out.adductor_longus = G('adductor_longus', {
-    guides: [snap([PUBIC_BODY[0] + 0.004, PUBIC_BODY[1] + 0.004, PUBIC_BODY[2] - 0.002]), [0.05, -0.18, 0.045], thigh(-0.215, 110, 0.03), snap(thigh(-0.258, 140, shaftRadiusAt(-0.258)))],
+    guides: [snap([PUBIC_BODY[0] + 0.004, PUBIC_BODY[1] + 0.004, PUBIC_BODY[2] - 0.002]), [0.058, -0.18, 0.043], thigh(-0.215, 112, 0.036), snap(thigh(-0.258, 140, shaftRadiusAt(-0.258)))],
     w: 0.0115, t: 0.0055, a: 0.12, b: 0.15, tendon: 0.2, n: 8,
   }, ['hip', 'femur']);
   // Adductor magnus: a fan from the ischiopubic ramus and the tuberosity to the whole linea aspera and the adductor tubercle.

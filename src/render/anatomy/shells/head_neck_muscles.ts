@@ -422,7 +422,7 @@ export function routed(f: Sdf, pts: readonly V3[], r: number, sub = 3): V3[] {
 
 /** A belly of the neck or head, routed round the bones. `side` mirrors the right-hand waypoints. */
 function neckBelly(pts: readonly V3[], rMax: number, k: number, o: Parameters<typeof belly>[3] = {}): BG {
-  return belly(routed(neckBones(), pts, rMax * k + 0.0003, 4), rMax, k, o);
+  return belly(routed(neckBones(), pts, rMax * k + 0.0009, 6), rMax, k, o);
 }
 
 /* ============================================================================ the muscles */
@@ -613,14 +613,14 @@ spec.sternothyroid = {
   parent: 'hyoid_muscles',
   make: (k, s) => {
     const a = onManubrium([0.0075, 0.2655, 0.0475], 0.0022);
-    return [neckBelly([a, F.warp([0.0115, 0.3155, 0.0185]), F.warp([0.0128, 0.3555, 0.0105])].map((p) => onSide(p, s)), 0.003, k, { ends: 0.4, shape: 0.4 })];
+    return [neckBelly([a, F.warp([0.0115, 0.3155, 0.0185]), F.warp([0.0185, 0.3535, 0.0045])].map((p) => onSide(p, s)), 0.003, k, { ends: 0.4, shape: 0.4 })];
   },
 };
 // THYROHYOID: the short continuation of the sternothyroid from the oblique line of the thyroid
 // cartilage up to the lower border of the greater horn and body of the hyoid.
 spec.thyrohyoid = {
   parent: 'hyoid_muscles',
-  make: (k, s) => [neckBelly([F.warp([0.0128, 0.3555, 0.0105]), onHyoid([0.0132, -0.1195, 0.0185], 0.0016), onHyoid([0.0125, -0.1195, 0.0198], 0.0017)].map((p) => onSide(p, s)), 0.0027, k, { ends: 0.5, shape: 0.5, tubular: 6 })],
+  make: (k, s) => [neckBelly([F.warp([0.0185, 0.3535, 0.0045]), onHyoid([0.0132, -0.1195, 0.0185], 0.0016), onHyoid([0.0125, -0.1195, 0.0198], 0.0017)].map((p) => onSide(p, s)), 0.0027, k, { ends: 0.5, shape: 0.5, tubular: 6 })],
 };
 
 // OMOHYOID: two bellies and an intermediate tendon that is tied down to the clavicle by fascia. The
