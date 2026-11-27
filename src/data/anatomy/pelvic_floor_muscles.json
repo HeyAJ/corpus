@@ -1,6 +1,6 @@
 {
   "atlas": "pelvic_floor_muscles",
-  "about": "The muscles that close the bottom of the pelvis: the levator ani, the coccygeus, and the muscles of the perineum that the other atlases do not draw (the ischiocavernosus and the transverse perineal). The levator ani is drawn as a bowl hung from the pubis, the ischial spine and the coccyx with a central opening. The model's pelvic organs hang lower than its pelvic bones, so the bowl is hung deeper than the bone rim alone would give; the shell's header says so. The drives are the whole-body ones the engine has: muscle tone, exertion and a seizure. Continence, the pelvic floor's support of the organs and the muscles' force are not simulated.",
+  "about": "The muscles that close the bottom of the pelvis: the levator ani (its puborectalis, pubococcygeus and iliococcygeus parts), the coccygeus, the tendinous arch they arise from, and the perineal muscles that no other atlas draws: the perineal membrane, the deep and superficial transverse perineal muscles and the external urethral sphincter. The levator ani is drawn as a bowl hung from the pubis, the tendinous arch and the coccyx with an open middle for the urethra, vagina and rectum. It is one geometry for a male and a female body. The external anal sphincter, the bulbospongiosus and ischiocavernosus and the perineal body belong to the large intestine, penis and vagina atlases. The model's pelvic organs hang lower than its pelvic bones, so the floor hangs lower than its bony rim. The drives are the whole-body ones the engine has: muscle tone, paralysis, a seizure, and orgasm for the perineal muscles. Continence, bladder and bowel control and the effort of the pelvic floor are not simulated. Outlines and thicknesses are drawing choices.",
   "sources": {
     "GH14": {
       "label": "Hall JE, Hall ME. Guyton and Hall Textbook of Medical Physiology, 14th ed. Elsevier, 2021.",
@@ -14,18 +14,12 @@
   "parts": [
     {
       "id": "levator_ani",
-      "label": "Levator Ani",
-      "summary": "The muscular bowl that supports the pelvic organs",
-      "function": "The levator ani runs from the pubis and the pelvic wall to the coccyx and the midline behind. It holds the bladder, the rectum and the uterus or prostate up, and it has openings for the urethra and the anal canal.",
+      "label": "Levator ani",
+      "summary": "The broad funnel-shaped sheet of muscle that forms most of the pelvic floor, hung from the pubis, the side wall of the pelvis and the coccyx.",
+      "function": "It supports the pelvic organs, helps to keep the bladder and rectum closed and is the muscle that a person tightens to hold urine or faeces in.",
       "color": "#c26a60",
       "rest": 0.35,
       "drives": [
-        {
-          "signal": "paralysis",
-          "weight": -0.3,
-          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
-          "source": "GH14"
-        },
         {
           "signal": "rigidity",
           "weight": 0.25,
@@ -33,9 +27,9 @@
           "source": "GH14"
         },
         {
-          "signal": "exertion",
-          "weight": 0.15,
-          "note": "Exertion is the fraction of aerobic capacity in use; the textbook says working skeletal muscle takes most of the extra blood flow and oxygen of exercise, so a muscle used in effort rises with it. The weight is a display scale and not a muscle force.",
+          "signal": "paralysis",
+          "weight": -0.3,
+          "note": "Lost skeletal muscle tone (paralysis) lowers the tone of the muscles of the body, so this muscle goes slack. The weight is a display scale.",
           "source": "GH14"
         },
         {
@@ -48,10 +42,43 @@
       "source": "GRAYS42"
     },
     {
+      "id": "puborectalis",
+      "label": "Puborectalis",
+      "parent": "levator_ani",
+      "summary": "The innermost part of the levator ani, a sling from the pubic body round behind the junction of the rectum and anal canal.",
+      "function": "It holds the rectum bent forward and so helps to keep the bowel closed.",
+      "color": "#c26a60",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "pubococcygeus",
+      "label": "Pubococcygeus",
+      "parent": "levator_ani",
+      "summary": "The front part of the levator ani proper, from the back of the pubis towards the coccyx and the midline behind the anorectum.",
+      "function": "It lifts and supports the pelvic floor.",
+      "color": "#b35a50",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "iliococcygeus",
+      "label": "Iliococcygeus",
+      "parent": "levator_ani",
+      "summary": "The back part of the levator ani, from the tendinous arch over the obturator internus to the coccyx.",
+      "function": "It lifts and supports the pelvic floor.",
+      "color": "#a85650",
+      "rest": 0.35,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "coccygeus",
       "label": "Coccygeus",
-      "summary": "The small muscle from the ischial spine to the coccyx",
-      "function": "The coccygeus lies in the same plane as the levator ani, behind it. It helps close the back of the pelvic outlet and supports the coccyx.",
+      "summary": "A small triangular muscle from the ischial spine to the side of the coccyx and the lower sacrum, behind the levator ani.",
+      "function": "It completes the back of the pelvic floor and draws the coccyx forward.",
       "color": "#b35a50",
       "rest": 0.25,
       "drives": [
@@ -71,10 +98,20 @@
       "source": "GRAYS42"
     },
     {
+      "id": "tendinous_arch_of_levator_ani",
+      "label": "Tendinous arch of the levator ani",
+      "summary": "The thickened band of the fascia of the obturator internus, running from the pubic body to the ischial spine, from which part of the levator ani arises.",
+      "function": "It gives the levator ani a firm line of attachment across the side wall of the pelvis.",
+      "color": "#d8c3a5",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
       "id": "perineal_muscles",
-      "label": "Perineal Muscles",
-      "summary": "The muscles of the perineum below the pelvic floor",
-      "function": "The ischiocavernosus runs along the pubic and ischial rami and the transverse perineal muscle crosses between the ischial tuberosities. They steady the perineal body below the levator ani.",
+      "label": "Perineal muscles",
+      "summary": "The muscles of the urogenital triangle that this model draws, in the deep and superficial pouches under the pelvic floor.",
+      "function": "They support the base of the pelvis and close the urethra; the perineal muscles contract during orgasm. The bulbospongiosus and ischiocavernosus are drawn in the penis atlas, the external anal sphincter in the large intestine atlas and the perineal body in the vagina atlas.",
       "color": "#a94b45",
       "rest": 0.2,
       "drives": [
@@ -89,8 +126,58 @@
           "weight": 0.2,
           "note": "Raised skeletal muscle tone (rigidity) is a rise in the tone of the muscles of the body, so a muscle of this group tightens with it. The weight is a display scale.",
           "source": "GH14"
+        },
+        {
+          "signal": "orgasm",
+          "weight": 0.4,
+          "note": "The perineal muscles contract during orgasm.",
+          "source": "GH14"
         }
       ],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "perineal_membrane",
+      "label": "Perineal membrane",
+      "parent": "perineal_muscles",
+      "summary": "The tough triangular sheet of fascia that spans the pubic arch below the pelvic floor, with the urethra (and, in a woman, the vagina) passing through it.",
+      "function": "It anchors the muscles and the root of the genitals to the pubic arch. In this model the pelvic organs hang lower than the bones, so the membrane is drawn as two wings that leave the midline open.",
+      "color": "#d8c3a5",
+      "rest": 0.1,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "deep_transverse_perineal",
+      "label": "Deep transverse perineal muscle",
+      "parent": "perineal_muscles",
+      "summary": "A thin band in the deep perineal pouch, running across from the ischiopubic ramus on each side towards the midline.",
+      "function": "It supports the base of the pelvis and steadies the perineal body.",
+      "color": "#a94b45",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "superficial_transverse_perineal",
+      "label": "Superficial transverse perineal muscle",
+      "parent": "perineal_muscles",
+      "summary": "A narrow slip in the superficial pouch, from the ischial tuberosity along the back of the perineal membrane to the perineal body.",
+      "function": "It helps to fix the perineal body.",
+      "color": "#b05049",
+      "rest": 0.2,
+      "drives": [],
+      "source": "GRAYS42"
+    },
+    {
+      "id": "external_urethral_sphincter",
+      "label": "External urethral sphincter",
+      "parent": "perineal_muscles",
+      "summary": "The ring of skeletal muscle that surrounds the urethra in the deep perineal pouch, below the bladder neck.",
+      "function": "It closes the urethra at will and so holds urine in. It is drawn at the position of the male membranous urethra; a woman's urethra lies further forward, so in a female body the one ring does not surround it.",
+      "color": "#9a4a44",
+      "rest": 0.3,
+      "drives": [],
       "source": "GRAYS42"
     }
   ]

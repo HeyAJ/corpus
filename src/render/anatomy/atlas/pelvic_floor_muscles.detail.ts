@@ -1,9 +1,17 @@
 import type { OrganDetailSpec } from '../detail/types';
 
 /**
- * No streams and no motion: this is a first-pass stub of the muscles layer, and the engine has no
- * per-muscle state (only whole-body muscle tone, exertion, shivering and a seizure, which the atlas
- * file turns into each part's activity glow through the default detail). A content agent who draws
- * the pelvic floor muscles properly says here what is different about them.
+ * NO MOTION: the pelvic floor muscles change colour and glow, and nothing here moves them.
+ *
+ * The engine has no per-muscle state: whole-body muscle tone (rigidity; paralysis, which is how a neuromuscular blocker reaches
+ * a muscle), a seizure, and, for the perineal muscles, the orgasm signal (Guyton and Hall describe the perineal muscles
+ * contracting in orgasm). Nothing says how far the floor is lifted or whether the urethra is closed, so the muscles do not lift or
+ * tighten. The two fasciae (the perineal membrane and the tendinous arch) are drawn as panes, a display opacity, so the muscles under them show.
  */
-export const detail: OrganDetailSpec = {};
+const FASCIA_OPACITY = 0.45;
+
+export const detail: OrganDetailSpec = {
+  animate: (ctx) => {
+    for (const id of ['perineal_membrane', 'tendinous_arch_of_levator_ani']) ctx.part(id)?.setOpacity(FASCIA_OPACITY);
+  },
+};

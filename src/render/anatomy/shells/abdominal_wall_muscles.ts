@@ -417,21 +417,23 @@ const lesserTrochanter = (): V3 => P([LESSER[0] - 0.003, LESSER[1] + 0.0015, LES
 spec.psoas_major = {
   parent: 'posterior_abdominal_wall',
   make: (k, s) => {
-    const top = lumbarSide('t12', s);
-    const mid = lumbarSide('l3', s);
+    // Gray's: psoas major arises thin from the sides of T12 and L1 and thickens downward to its widest in the lower lumbar region, so the belly's thickest point is carried towards the pelvis (skew) and its top starts slim, and its upper origin is kept on the side of the body behind the plane of the pancreas, which lies in front of the upper lumbar column (dz).
+    const top = lumbarSide('t12', s, -0.007);
+    const mid = lumbarSide('l3', s, -0.004);
     const low = lumbarSide('l5', s);
     const brim = P(wingPoint(0.012, -0.093, -0.0088));
-    return [wallBelly([top, mid, low, onSide(brim, s), onSide(lesserTrochanter(), s)], 0.0085, k, { ends: 0.35, shape: 0.5, tubular: 16, radial: 7 })];
+    return [wallBelly([top, mid, low, onSide(brim, s), onSide(lesserTrochanter(), s)], 0.0085, k, { ends: 0.2, skew: 0.75, shape: 0.5, tubular: 16, radial: 7 })];
   },
 };
 // PSOAS MINOR: a slender muscle in front of the psoas major, from the sides of T12 and L1 to the pectineal line and iliopubic eminence (not always present).
 spec.psoas_minor = {
   parent: 'posterior_abdominal_wall',
   make: (k, s) => {
-    const a = lumbarSide('t12', s, 0.004);
+    // Gray's: psoas minor lies on the front of the psoas major; it is drawn level with it, not in front, because the pancreas occupies the space in front of the upper lumbar column in this model.
+    const a = lumbarSide('t12', s, -0.003);
     const sup = SUPERIOR_RAMUS[2];
     const b = P([sup[0] - 0.002, sup[1] + 0.0075, sup[2] + 0.0005]);
-    return [wallBelly([a, lumbarSide('l3', s, 0.006), onSide(b, s)], 0.0027, k, { ends: 0.3, shape: 0.5, tubular: 12, radial: 5 })];
+    return [wallBelly([a, lumbarSide('l3', s, -0.001), onSide(b, s)], 0.0022, k, { ends: 0.3, shape: 0.5, tubular: 12, radial: 5 })];
   },
 };
 // ILIACUS: from the iliac fossa (the smooth inner face of the plate) to the tendon of the psoas major and the lesser trochanter.
@@ -439,13 +441,14 @@ spec.iliacus = {
   parent: 'posterior_abdominal_wall',
   make: (k, s) => {
     const ys = [-0.04, -0.062, -0.085];
-    const rows = [0.09, 0.07, 0.05].map((sv) => ys.map((y): V3 => onSide(P(wingPoint(sv, y, -0.0076)), s)));
+    const rows = [0.09, 0.07, 0.05].map((sv) => ys.map((y): V3 => onSide(P(wingPoint(sv, y, -0.0062)), s)));
     const target = onSide(lesserTrochanter(), s);
     const A = [rows[0][0], rows[1][0], rows[2][0]];
     const B = [rows[0][2], rows[1][2], rows[2][2]];
     const M: V3[] = A.map((a, i): V3 => [(a[0] + B[i][0]) / 2 * 0.98, (a[1] + B[i][1]) / 2, (a[2] + B[i][2]) / 2]);
     const T: V3[] = [0, 1, 2].map((i): V3 => [target[0] + (i - 1) * 0.0015, target[1] + 0.0015, target[2] + (i - 1) * 0.0025]);
-    return [ruled(clearRows([A, M, B, T], 0.0006), 0.0034, 3, 6, onSide(S([0, -0.1, 0.0]), s), k)];
+    // Gray's: the iliacus is a flat fan that lines the iliac fossa; the caecum and the sigmoid colon rest on it, so it must lie between bone and bowel. Its inner face is the fossa (0.7 mm clear of the bone) and it is thin, standing medially from the bone: `away` is a point beyond the plate's outer face so the thickness is on the bowel side.
+    return [ruled(clearRows([A, M, B, T], 0.0006), 0.0018, 3, 6, onSide(P(wingPoint(0.07, -0.07, 0.05)), s), k)];
   },
 };
 // QUADRATUS LUMBORUM: from the iliac crest (and the iliolumbar ligament) up to the lower border of the twelfth rib and the tips of the transverse processes of the upper four lumbar vertebrae, behind the kidney. Its path is carried back past the kidney's posterior face (scene z -0.071 at its back wall) so it lies behind the organ and not through it.

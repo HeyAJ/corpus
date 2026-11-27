@@ -1,23 +1,18 @@
-import * as THREE from 'three';
 import type { PartBuilder, PartGeometry } from '../parts';
 import { mergeParts } from '../sdf';
-import { pelvicFloorMuscleGroups } from '../shells/pelvic_floor_muscles';
+import { pelvicFloorMuscleMap } from '../shells/pelvic_floor_muscles';
 
 /**
- * THE INSIDE OF THE PELVIC FLOOR MUSCLES: a FIRST-PASS STUB (the scaffold of the muscles layer).
- *
- * This organ's shell is the union of one schematic silhouette per part (the levator ani, the coccygeus and the perineal muscles), so
- * the interior is simply each of those silhouettes drawn separately, in the organ's own frame,
- * under the part id the atlas file (src/data/anatomy/pelvic_floor_muscles.json) gives it. The shell and the
- * parts therefore share one function (`pelvicFloorMuscleGroups`) and cannot disagree about where a
- * muscle is. A content agent who draws these muscles properly replaces this file and adds the
- * finer structures with the atlas's `parent` field; until then nothing here is anatomy beyond
- * the placement the shell's own header describes.
+ * THE INSIDE OF THE PELVIC FLOOR MUSCLES: every muscle of src/data/anatomy/pelvic_floor_muscles.json, from the same map the
+ * shell is made from. The levator ani is drawn twice on purpose: as the whole bowl, which the opened organ shows, and as its
+ * three parts (puborectalis, pubococcygeus, iliococcygeus), which the reveal rule shows when the levator is selected or the
+ * camera comes close; the parent drops to glass while they show. The perineal muscles group works the same way. The shapes are
+ * drawn on one surface and are the same for a male and a female body; no fibres are drawn.
  */
 export const parts: PartBuilder = () => {
   const out: PartGeometry[] = [];
-  for (const [id, geometries] of Object.entries(pelvicFloorMuscleGroups() as Record<string, THREE.BufferGeometry[]>)) {
-    out.push({ id, geometry: mergeParts(geometries) });
+  for (const [id, geometries] of Object.entries(pelvicFloorMuscleMap())) {
+    out.push({ id, geometry: mergeParts(geometries.map((g) => g.clone())) });
   }
   return out;
 };

@@ -443,6 +443,32 @@ export function mirrorGeo(g: THREE.BufferGeometry): THREE.BufferGeometry {
   return m;
 }
 
+/**
+ * LAST STEP FOR A MUSCLE'S SURFACE: move every vertex that lies inside a bone out along the bone field's gradient until it is
+ * `margin` clear. The courses are cleared at their control points, but a tube or a sheet between two of them can still cut a corner
+ * of a bone; this is what makes "no muscle passes through a bone" true of the mesh and not only of its guides. `yShift` is added to the
+ * vertex's y before the field is read (a muscle authored in an organ frame that is offset from the field's frame).
+ */
+export function declip(g: THREE.BufferGeometry, sd: Sdf, margin = 0.0002, yShift = 0): THREE.BufferGeometry {
+  const p = g.getAttribute('position');
+  const e = 0.0005;
+  for (let i = 0; i < p.count; i++) {
+    let x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    for (let k = 0; k < 4; k++) {
+      const d = sd(x, y + yShift, z) - margin;
+      if (d >= 0) break;
+      const gx = sd(x + e, y + yShift, z) - sd(x - e, y + yShift, z);
+      const gy = sd(x, y + yShift + e, z) - sd(x, y + yShift - e, z);
+      const gz = sd(x, y + yShift, z + e) - sd(x, y + yShift, z - e);
+      const n = Math.hypot(gx, gy, gz) || 1;
+      x -= (gx / n) * d; y -= (gy / n) * d; z -= (gz / n) * d;
+    }
+    p.setXYZ(i, x, y, z);
+  }
+  g.computeVertexNormals();
+  return g;
+}
+
 /** Wind the triangles so the signed volume is positive (outward faces). */
 export function orient(g: THREE.BufferGeometry): void {
   const p = g.getAttribute('position');
@@ -691,6 +717,9 @@ export function backMuscleLeaves(): Record<string, THREE.BufferGeometry[]> {
   const fasciaRows = [spinous('T10'), spinous('T12'), spinous('L2'), spinous('L4'), sacralCrest(-0.125)];
   out.thoracolumbar_fascia = fan(fasciaRows.map((p) => M(p)), fasciaRows.map((p) => raphe(p[1])), 0.0013, { above: erectorTop, steps: 6 });
 
+  // Every vertex clear of the bones (see `declip`); the girdle is included because a superficial muscle must clear the scapula too.
+  const bonesAll = trunkBoneSd(true);
+  for (const gs of Object.values(out)) for (const g of gs) declip(g, bonesAll);
   return out;
 }
 

@@ -482,18 +482,19 @@ spec.temporalis = {
 spec.masseter_superficial_part = {
   parent: 'masseter',
   make: (k, s) => {
-    const a = onSkull([0.0615, -0.0495, 0.034], 0.0034);
-    const b = onJaw([0.0575, -0.1085, -0.0185], 0.0028);
-    const m: V3 = [0.0665, -0.078, 0.008];
+    // Gray's: the superficial part of the parotid gland lies over the posterior masseter, so the masseter is drawn forward of the parotid (its angle end is brought forward along the lower border).
+    const a = onSkull([0.0615, -0.0495, 0.038], 0.0034);
+    const b = onJaw([0.0575, -0.1085, -0.0125], 0.0028);
+    const m: V3 = [0.0655, -0.078, 0.0125];
     return [neckBelly([a, m, b].map((p) => onSide(p, s)), 0.0058, k, { shape: 0.45 })];
   },
 };
 spec.masseter_deep_part = {
   parent: 'masseter',
   make: (k, s) => {
-    const a = onSkull([0.0625, -0.0495, -0.004], 0.0032);
-    const b = onJaw([0.0585, -0.082, -0.001], 0.0028);
-    const m: V3 = [0.064, -0.066, -0.0015];
+    const a = onSkull([0.0625, -0.0495, 0.006], 0.0032);
+    const b = onJaw([0.0585, -0.082, 0.004], 0.0028);
+    const m: V3 = [0.064, -0.066, 0.0045];
     return [neckBelly([a, m, b].map((p) => onSide(p, s)), 0.0048, k, { shape: 0.5 })];
   },
 };

@@ -5,7 +5,7 @@ import {
   CONDYLE_M, femurField, hipBoneField, shaftAxisAt, shaftRadiusAt, wingPoint,
 } from './lower_limb_bones';
 import { SACRAL_SHIFT, coccyxField, sacrumField } from './vertebral_column';
-import { belly, fusiform, mirrorGeo, sheet } from './back_muscles';
+import { belly, declip, fusiform, mirrorGeo, sheet } from './back_muscles';
 
 /**
  * HIP AND THIGH MUSCLES, SHELL: THE MUSCLES OF THE GLUTEAL REGION AND THE THIGH AT TEXTBOOK DEPTH.
@@ -181,28 +181,30 @@ interface Spec {
  * elliptical tube, and then recorded as an obstacle for the muscles that lie over it.
  */
 function bellyOf(id: string, s: Spec): THREE.BufferGeometry {
-  const n = s.n ?? 9;
+  const n = Math.max(s.n ?? 9, 12);
   const prof = (u: number): number => fusiform(u, s.a ?? 0.12, s.b ?? 0.12, s.tendon ?? 0.22);
   const half = (u: number): number => s.t * prof(u);
   let pts = resample(s.guides, n);
   for (let pass = 0; pass < 2; pass++) {
     const sm = pts.map((p, i) => (i === 0 || i === n ? p : ([(pts[i - 1][0] + 2 * p[0] + pts[i + 1][0]) / 4, (pts[i - 1][1] + 2 * p[1] + pts[i + 1][1]) / 4, (pts[i - 1][2] + 2 * p[2] + pts[i + 1][2]) / 4] as V3)));
-    pts = sm.map((p, i) => (i === 0 || i === n ? p : clear(p, half(i / n) + 0.0004)));
+    pts = sm.map((p, i) => (i === 0 || i === n ? p : clear(p, half(i / n) + 0.0008)));
   }
-  pts = pts.map((p, i) => (i === 0 || i === n ? p : clear(p, half(i / n) + 0.0004)));
+  pts = pts.map((p, i) => (i === 0 || i === n ? p : clear(p, half(i / n) + 0.0008)));
   for (let i = 0; i < n; i++) layer.push({ a: pts[i], b: pts[i + 1], r: Math.max(0.0012, half((i + 0.5) / n)) });
   ATTACHMENTS.push({ muscle: id, end: 'origin', p: pts[0], on: s.ends?.[0] ?? 'hip' });
   ATTACHMENTS.push({ muscle: id, end: 'insertion', p: pts[n], on: s.ends?.[1] ?? 'femur' });
   const g = belly(pts, (u) => s.w * prof(u), half, outward, Math.max(8, n + 1), 6);
+  declip(g, hipThighBoneSd(), 0.0002);
   g.translate(0, -ORIGIN[1], 0);
   return g;
 }
 
 /** A SHEET over rails (a fan of courses): each rail from an origin to an insertion, interior points pushed clear; `thick` proud of the rails. */
-function sheetOf(id: string, origins: V3[], inserts: V3[], thick: number, ends: ['hip' | 'femur' | 'sacrum' | 'free', 'hip' | 'femur' | 'sacrum' | 'free'], via: (i: number) => V3[] = () => [], n = 7): THREE.BufferGeometry {
+function sheetOf(id: string, origins: V3[], inserts: V3[], thick: number, ends: ['hip' | 'femur' | 'sacrum' | 'free', 'hip' | 'femur' | 'sacrum' | 'free'], via: (i: number) => V3[] = () => [], nIn = 7, inside: V3 = HIP_JOINT as V3): THREE.BufferGeometry {
+  const n = Math.max(nIn, 12);
   const rails = origins.map((o, i) => {
     const pts = resample([o, ...via(i), inserts[i]], n);
-    return pts.map((p, k) => (k === 0 || k === n ? p : clear(p, 0.0005)));
+    return pts.map((p, k) => (k === 0 || k === n ? p : clear(p, 0.0009)));
   });
   rails.forEach((r, i) => {
     for (let k = 0; k < n; k++) layer.push({ a: r[k], b: r[k + 1], r: thick * 0.5 });
@@ -212,7 +214,8 @@ function sheetOf(id: string, origins: V3[], inserts: V3[], thick: number, ends: 
     }
   });
   // The sheet is mirrored by `pair`, so it is built on the right (side +1) and moved to the organ's frame here.
-  const g = sheet(rails, 1, thick, HIP_JOINT as V3);
+  const g = sheet(rails, 1, thick, inside);
+  declip(g, hipThighBoneSd(), 0.0002);
   g.translate(0, -ORIGIN[1], 0);
   return g;
 }
@@ -224,14 +227,14 @@ const pair = (g: THREE.BufferGeometry): THREE.BufferGeometry[] => [g, mirrorGeo(
 /** The iliac plate's outer (gluteal) face at wing coordinates (s, y), pushed a little off it. */
 export const iliac = (s: number, y: number, off = 0.0005): V3 => wingPoint(s, y, 0.0055 + off);
 /** The right sacrum's posterior surface at height y (sacrum frame) and x, as a point in the hip bone's frame. */
-function sacrumBack(yHip: number, x: number): V3 {
+export function sacrumBack(yHip: number, x: number): V3 {
   const f = sacrumField();
   const ys = yHip - SACRUM_IN_HIP;
   let z = -0.14;
   while (f(x, ys, z) > 0 && z < 0) z += 0.0004;
   return [x, yHip, z - 0.0003];
 }
-function coccyxBack(yHip: number, x = 0.0): V3 {
+export function coccyxBack(yHip: number, x = 0.0): V3 {
   const f = coccyxField();
   const ys = yHip - SACRUM_IN_HIP;
   let z = -0.1;
@@ -310,8 +313,8 @@ export function hipThighLeaves(): Record<string, THREE.BufferGeometry[]> {
 
   /* ---- the vasti and the medial thigh */
   out.vastus_lateralis = G('vastus_lateralis', {
-    guides: [grLowLat, thigh(-0.2, -80, onShaft(-0.2, 0, 0.0045)), thigh(-0.235, -80, onShaft(-0.235, 0, 0.0045)), thigh(-0.265, -70, onShaft(-0.265, 0, 0.004)), patLat],
-    w: 0.011, t: 0.0045, a: 0.08, b: 0.22, tendon: 0.2, n: 9,
+    guides: [grLowLat, thigh(-0.2, -80, onShaft(-0.2, 0, 0.0035)), thigh(-0.235, -80, onShaft(-0.235, 0, 0.0035)), thigh(-0.265, -70, onShaft(-0.265, 0, 0.0035)), patLat],
+    w: 0.01, t: 0.0035, a: 0.08, b: 0.22, tendon: 0.2, n: 9,
   }, ['femur', 'free']);
   out.vastus_medialis = G('vastus_medialis', {
     guides: [snap([LESSER[0] - 0.001, LESSER[1] + 0.009, LESSER[2] + 0.0055]), thigh(-0.215, 75, onShaft(-0.215, 0, 0.005)), thigh(-0.245, 80, onShaft(-0.245, 0, 0.005)), thigh(-0.27, 70, onShaft(-0.27, 0, 0.005)), patMed],
@@ -325,7 +328,7 @@ export function hipThighLeaves(): Record<string, THREE.BufferGeometry[]> {
   const rami: V3[] = [snap([INFERIOR_RAMUS[1][0], INFERIOR_RAMUS[1][1] + 0.001, INFERIOR_RAMUS[1][2]]), snap([ISCHIAL_RAMUS[2][0], ISCHIAL_RAMUS[2][1] + 0.001, ISCHIAL_RAMUS[2][2]]), snap([ISCHIAL_RAMUS[1][0], ISCHIAL_RAMUS[1][1] + 0.001, ISCHIAL_RAMUS[1][2]]), snap([TUBEROSITY[0] - 0.004, TUBEROSITY[1] - 0.004, TUBEROSITY[2] + 0.004])];
   const tubercle = snap([CONDYLE_M[0] - 0.0055, CONDYLE_M[1] + 0.0055, CONDYLE_M[2] + 0.0005]);
   const lineaAt = (y: number): V3 => snap(thigh(y, 150, shaftRadiusAt(y)));
-  out.adductor_magnus = pair(sheetOf('adductor_magnus', rami, [lineaAt(-0.21), lineaAt(-0.235), lineaAt(-0.265), tubercle], 0.006, ['hip', 'femur'], () => [], 6));
+  out.adductor_magnus = pair(sheetOf('adductor_magnus', rami, [lineaAt(-0.21), lineaAt(-0.235), lineaAt(-0.265), tubercle], 0.006, ['hip', 'femur'], () => [], 6, [0.125, -0.22, -0.004]));
 
   /* ---- the hamstrings behind */
   const tubLow = snap([TUBEROSITY[0] - 0.005, TUBEROSITY[1] - 0.012, TUBEROSITY[2] - 0.002]);
@@ -339,7 +342,7 @@ export function hipThighLeaves(): Record<string, THREE.BufferGeometry[]> {
     w: 0.0085, t: 0.003, a: 0.25, b: 0.3, tendon: 0.18, n: 8,
   }, ['hip', 'free']);
   out.biceps_femoris_long_head = G('biceps_femoris_long_head', {
-    guides: [tubLow, thigh(-0.235, 195, 0.0215), thigh(-0.27, 215, 0.021), [0.092, BELOW_KNEE_Y, -0.024]],
+    guides: [tubLow, thigh(-0.235, 190, 0.0205), thigh(-0.27, 200, 0.02), [0.092, BELOW_KNEE_Y, -0.024]],
     w: 0.0095, t: 0.0035, a: 0.2, b: 0.25, tendon: 0.18, n: 8,
   }, ['hip', 'free']);
 
@@ -368,8 +371,8 @@ export function hipThighLeaves(): Record<string, THREE.BufferGeometry[]> {
   const ptsGMed = [iliac(0.05, -0.06), iliac(0.085, -0.05), iliac(0.11, -0.055)];
   out.gluteus_medius = pair(sheetOf('gluteus_medius', ptsGMed.map((p) => snap(p)), [grTop, grLateral, grLowLat].map((p) => p), 0.0045, ['hip', 'femur'], () => [], 6));
   const gmaxO: V3[] = [snap(iliac(0.03, -0.06)), snap(iliac(0.045, -0.075)), snap(sacrumBack(-0.105, 0.012)), snap(sacrumBack(-0.13, 0.008)), snap(coccyxBack(-0.155, 0.002))];
-  const gmaxI: V3[] = [[0.1235, -0.168, -0.02], [0.1225, -0.185, -0.022], snap(thigh(-0.2, 232, shaftRadiusAt(-0.2))), snap(thigh(-0.205, 215, shaftRadiusAt(-0.205))), snap(thigh(-0.21, 205, shaftRadiusAt(-0.21)))];
-  out.gluteus_maximus = pair(sheetOf('gluteus_maximus', gmaxO, gmaxI, 0.007, ['sacrum', 'femur'], () => [], 8));
+  const gmaxI: V3[] = [snap([GREATER[0] + 0.004, GREATER[1] - 0.006, GREATER[2] - 0.0105]), snap(thigh(-0.19, 238, shaftRadiusAt(-0.19))), snap(thigh(-0.2, 232, shaftRadiusAt(-0.2))), snap(thigh(-0.205, 215, shaftRadiusAt(-0.205))), snap(thigh(-0.21, 205, shaftRadiusAt(-0.21)))];
+  out.gluteus_maximus = pair(sheetOf('gluteus_maximus', gmaxO, gmaxI, 0.007, ['sacrum', 'femur'], () => [], 8, [0.04, -0.13, 0.0]));
   out.tensor_fasciae_latae = G('tensor_fasciae_latae', {
     guides: [iliac(0.141, -0.068, 0.0), [0.119, -0.12, 0.034], [0.122, -0.158, 0.015]],
     w: 0.0085, t: 0.0035, a: 0.1, b: 0.3, tendon: 0.2, n: 6,
