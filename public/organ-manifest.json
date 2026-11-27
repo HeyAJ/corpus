@@ -172,11 +172,11 @@
       "id": "intestine_large",
       "triangles": 7480,
       "budget": 9000,
-      "boundingRadius_m": 0.16344,
+      "boundingRadius_m": 0.16263,
       "worldCentre_m": [
-        0.0007,
-        -0.1436,
-        0.0109
+        0.0009,
+        -0.1435,
+        0.0087
       ]
     },
     {
