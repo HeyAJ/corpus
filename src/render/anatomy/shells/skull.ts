@@ -292,6 +292,24 @@ export function maxillarySinus(): Sdf {
   return mirroredX(ellipsoid([0.028, -0.08, 0.048], [0.0105, 0.0105, 0.0135]));
 }
 
+/**
+ * THE ORAL CAVITY AS THE MOUTH SHELL DRAWS IT (gx2), skull-local frame: an ellipsoid whose upper
+ * surface lies on the roof of the mouth shell. The roof was measured, not guessed: scanning the
+ * mouth organ's shell for its highest interior point on a 5 mm grid of x (0 to 0.025) and z
+ * (0.015 to 0.07) gives scene y 0.3919 at (x 0, z 0.04), 0.3898 at x 0.015, 0.3877 at x 0.02,
+ * 0.3841 at x 0.025, 0.3892 at z 0.025 and 0.3874 at z 0.07 on the midline. The best ellipsoid
+ * through those 36 heights (random search, rms 0.67 mm, worst 1.78 mm) is centred at scene
+ * (0, 0.3771, 0.0445) with radii (0.0282, 0.0146, 0.0331); the centre is then raised 0.8 mm so
+ * that the fit's own error leaves the bone on the roof and not under it. The numbers are the
+ * fit, a display choice with no anatomical measurement behind them. Gray's 42nd: the hard
+ * palate is the roof of the mouth and the floor of the nose, so the bone belongs above this
+ * surface, never below it. The mouth shell's top and the nasal cavity shell's floor cross each
+ * other (0.3919 against 0.3922 at the centre of the palate: no room for a plate between them at
+ * all), which is a conflict BETWEEN those two organs that the skull cannot solve; the palate is
+ * simply thin or absent where they meet and present where they part (front, back and sides).
+ */
+const ORAL_CAVITY_PROXY: Sdf = ellipsoid([0, 0.3779 - 0.48, 0.0445], [0.0282, 0.0146, 0.0331]);
+
 /** Everything that is bone, other than the mandible and the hyoid, before it is hollowed. */
 export function outerEnvelope(): Sdf {
   const cavity = cranialCavity();
@@ -323,12 +341,39 @@ export function outerEnvelope(): Sdf {
     mirroredX(ellipsoid([0.0105, -0.0845, -0.0245], [0.009, 0.0065, 0.0125])), // occipital condyle
     ellipsoid([0, -0.058, -0.01], [0.017, 0.019, 0.04]), // the clivus and the basilar part
   );
-  return smoothUnion(0.003, wall, face);
+  // The oral cavity is not bone. The face's palate, alveolar arch and cheek ellipsoids were drawn
+  // at heights fitted to the teeth, and reached down into the mouth shell's roof by up to 6.8 mm
+  // (auditor aur: skull in mouth). The bone is therefore cut by a proxy of the oral cavity.
+  return subtract(smoothUnion(0.003, wall, face), ORAL_CAVITY_PROXY);
 }
 
-/** The foramen magnum: a vertical hole through the skull base along the cord's centreline. */
-function foramenMagnumHole(): Sdf {
+/**
+ * The foramen magnum: a vertical hole through the skull base along the cord's centreline.
+ *
+ * TWO DEPTHS, AND WHY (gx2). The hollow BONE needs the hole to run up to the cranial cavity, and
+ * it does: the capsule below reaches local y -0.0475, and above that the cavity's own funnel
+ * takes over, so the brainstem passes through an open hole into the cranial cavity (the probe in
+ * the atlas notes finds no brain vertex inside the bone). The SHELL is a solid silhouette with no
+ * cavity, so the same hole in it is a BLIND pit, and a blind pit has a roof. Gray's 42nd: the
+ * medulla oblongata passes through the foramen magnum, so the brain shell's brainstem fills that
+ * pit; the old roof (scene y 0.4325) and walls lay inside the brainstem and the pons, 9.6 mm
+ * deep, and measured as "skull 9.6 mm into the brain" (auditor aur, 40 vertices, all of them
+ * the pit's roof and wall, none of them the vault or the cranial floor: the floor table was
+ * not at fault). A roof cannot be put anywhere the brainstem is not, so in the SHELL the pit
+ * stops at `SHELL_PIT_TOP_Y`, 1.5 mm under the lowest brain vertex (scene y 0.3871), where the
+ * brain is not yet present. The shell then shows a pit of about 3 cm under the base of the skull
+ * rather than a hole through to the cavity, which a silhouette that is solid by design cannot
+ * show anyway. The brain is not moved.
+ */
+const SHELL_PIT_TOP_Y = 0.3856 - 0.48;
+/** Where the shell's orbit cones stop at the back, skull-local z. A drawing choice (the cone's own tip is at z 0.018 to 0.024). */
+const SHELL_ORBIT_BACK_Z = 0.0255;
+function foramenMagnumHole(shellOnly = false): Sdf {
   const [x, y, z] = SKULL_LANDMARKS.foramenMagnum;
+  if (shellOnly) {
+    const r = 0.0125;
+    return capsule([x, SHELL_PIT_TOP_Y - r, z], [x, y - 0.03, z], r);
+  }
   return capsule([x, y + 0.04, z], [x, y - 0.03, z], 0.0125);
 }
 
@@ -410,7 +455,14 @@ export const SKULL_BOUNDS: { min: V3; max: V3 } = { min: [-0.086, -0.13, -0.1], 
  */
 export function skull(): THREE.BufferGeometry {
   const env = outerEnvelope();
-  const cuts = union(orbitCavity(), nasalPassage(), foramenMagnumHole(), meatusHole());
+  // The orbit's cone ends at the optic canal, whose tip (scene y 0.452, z 0.018 to 0.024) is
+  // where the brain shell's optic stalks leave it, and the cone's last 5 mm in this SOLID silhouette is a
+  // blind point with its roof 1.3 mm inside the brain (gx2). The cone is therefore cut off at
+  // `SHELL_ORBIT_BACK_Z` in the shell only. `orbitCavity()` itself is NOT changed: the brain's
+  // orbital carve (`orbitalRoofCutter`, models.ts) is that cone grown by 10 mm, so editing it
+  // would move the brain, and the hollow bone needs the full canal.
+  const orbitFront = intersect(orbitCavity(), (_x, _y, z) => SHELL_ORBIT_BACK_Z - z);
+  const cuts = union(orbitFront, nasalPassage(), foramenMagnumHole(true), meatusHole());
   const solid: Sdf = (x, y, z) => {
     const e = env(x, y, z);
     return e > 0.002 ? e : Math.max(e, -cuts(x, y, z));

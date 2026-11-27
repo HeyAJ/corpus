@@ -78,7 +78,26 @@ export function parotidField(side: number, grow = 0): Sdf {
  * slope between z 0 and z 40). Sizes and centres are drawing choices fitted to the bone, the
  * hyoid's greater horn and the mouth atlas, not measurements.
  */
-export const SUBMANDIBULAR = { c: [0.0115, -0.038, -0.016] as V3, r: [0.0075, 0.0062, 0.0125] as V3, tilt: 0.309 };
+/*
+ * THE SUBMANDIBULAR GLAND WAS IN THE LARYNX (gx2). It stood at scene (0.0115, 0.352, 0.004), 12 mm
+ * under the hyoid (scene y 0.3645) and 11.5 mm from the midline, with its medial third inside the
+ * trachea organ's larynx, which at that height (y 0.350 to 0.378) is 25 to 30 mm wide and reaches
+ * z 0.017 (auditor aur: salivary glands 7.4 mm into the trachea). Gray's 42nd: the gland lies in
+ * the digastric triangle, its superficial part below the lower border of the body of the
+ * mandible and on the outer surface of the mylohyoid, its deep part above the muscle's posterior
+ * border and on the hyoglossus, which is to say LATERAL to the hyoid and the thyroid cartilage and
+ * level with the hyoid, not under it. It is now centred 21 mm from the midline at scene y 0.3575 and
+ * 6 mm further back (scene z -0.002; the strap muscles' upper ends and the thyroid cartilage's
+ * lamina, which the sternothyroid reaches at z 0.0105, are in front of it),
+ * so that it is lateral to the larynx (half-width 14 mm at that height), above the thyroid lobe's
+ * upper pole (scene y 0.3519), and still below the mandibular body's lower border (scene y
+ * 0.357 at the arch's x of 14 to 28 mm there) and the mouth's floor (0.368). Its half-width in x is
+ * 6.5 mm so that its lateral end stops at the mandible's inner surface (27.7 mm at z 0): the room
+ * between the larynx and the bone is only 13 mm, a limit of the narrow drawn arch. Every number is
+ * a drawing choice fitted to those neighbours, not a measurement. The duct (atlas/salivary_glands
+ * .parts.ts, SUBMANDIBULAR_DUCT) leaves the front pole of the gland and was moved with it.
+ */
+export const SUBMANDIBULAR = { c: [0.021, -0.0325, -0.022] as V3, r: [0.0065, 0.0062, 0.0125] as V3, tilt: 0.309 };
 export const SUBLINGUAL = { c: [0.0058, -0.0215, 0.025] as V3, r: [0.0042, 0.0036, 0.0105] as V3 };
 
 /**

@@ -4,6 +4,7 @@ import {
   tubeAlong, type Sdf, type V3,
 } from '../sdf';
 import { fbm, mulberry32 } from '../noise';
+import { bronchusCorridor, heartCavity, lungHilum } from '../paths';
 import type { PartGeometry } from '../parts';
 import type { SimSnapshot } from '../../../bridge/types';
 import type { DetailContext, FlowSpec, OrganDetailSpec } from '../detail/types';
@@ -44,8 +45,7 @@ export const LUNG_BOX_MAX: V3 = [0.066, 0.12, 0.072];
 
 /** Where the bronchus and the vessels enter, in the lung's own frame. */
 export function hilum(side: -1 | 1): V3 {
-  const med = side < 0 ? 1 : -1;
-  return [med * 0.047, 0.012, -0.004];
+  return lungHilum(side);
 }
 
 /** The lung as one mass, with no fissures: the shell recipe of models.ts without its cuts. */
@@ -59,10 +59,11 @@ export function lungBaseField(side: -1 | 1): Sdf {
   );
   f = smoothSubtract(0.014, f, halfSpace([med * 0.042, 0, 0], [med, 0, 0]));
   f = smoothSubtract(0.012, f, ellipsoid([med * 0.03, -0.165, 0.0], [0.11, 0.07, 0.1]));
-  f = left
-    ? smoothSubtract(0.012, f, ellipsoid([med * 0.062, -0.04, 0.03], [0.04, 0.055, 0.046]))
-    : smoothSubtract(0.012, f, ellipsoid([med * 0.066, -0.035, 0.022], [0.034, 0.045, 0.04]));
-  return smoothSubtract(0.006, f, sphere([med * 0.047, 0.012, -0.004], 0.014));
+  // The cardiac impression is the heart itself, grown by the pleural gap (paths.ts `heartCavity`).
+  f = smoothSubtract(0.006, f, heartCavity(left ? 'lung_l' : 'lung_r'));
+  // The main bronchus lies in the mediastinum, in a groove on the lung's medial face (paths.ts).
+  f = smoothSubtract(0.004, f, bronchusCorridor(left ? 'lung_l' : 'lung_r'));
+  return smoothSubtract(0.006, f, sphere(lungHilum(side), 0.014));
 }
 
 /* The oblique fissure plane passes through (0, 0.012, 0) with normal (0, 1, 0.9). */
@@ -503,17 +504,21 @@ function skin(side: -1 | 1, grow: number, cell: number): THREE.BufferGeometry {
 }
 
 function ligamentSheet(side: -1 | 1): THREE.BufferGeometry {
+  // Hangs from the root, 8 mm lateral of the hilum's centre (it was a fixed x = 39 mm, which for
+  // the left lung is now the middle of the heart, since the hilum moved: paths.ts `lungHilum`).
   const med = side < 0 ? 1 : -1;
-  const x = med * 0.039;
+  const hc = hilum(side);
+  const x = hc[0] - med * 0.008;
+  const zc = hc[2];
   const P: number[] = [];
   const I: number[] = [];
   const rows = 6;
   // A fold narrowing downward: the double sheet of pleura hanging from the root.
   for (let i = 0; i <= rows; i++) {
     const t = i / rows;
-    const y = -0.002 - 0.07 * t;
+    const y = hc[1] - 0.003 - 0.07 * t;
     const w = 0.006 * (1 - t) + 0.0005;
-    P.push(x, y, -0.004 - w, x, y, -0.004 + w);
+    P.push(x, y, zc - w, x, y, zc + w);
   }
   for (let i = 0; i < rows; i++) { const a = i * 2; I.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
   const g = new THREE.BufferGeometry();
@@ -536,14 +541,16 @@ export function buildLungChildren(side: -1 | 1): PartGeometry[] {
 
   /* --- surfaces, tiled from one coarse copy of the outer surface --- */
   const surf = skin(side, -0.0008, 0.0085);
+  const cavity = heartCavity(left ? 'lung_l' : 'lung_r');
   // Order matters: the first test a triangle passes names it. The cardiac impression is tested before the mediastinal face.
   const classify = (x: number, y: number, z: number): string => {
     if (y > 0.088) return 'apex';
     if (y < -0.092) return 'diaphragmatic_surface';
-    if (left) {
-      const dx = (x - med * 0.062) / 0.052, dy = (y + 0.04) / 0.067, dz = (z - 0.03) / 0.058;
-      if (dx * dx + dy * dy + dz * dz < 1 && z > 0.0) return 'cardiac_notch';
-    }
+    // The cardiac impression is the surface the heart's cut left on the lung (a 3 mm band round
+    // the cut); on the left it is the cardiac notch and impression together. The hilum pit is
+    // part of the mediastinal face, so it is tested first.
+    if (Math.hypot(x - hc[0], y - hc[1], z - hc[2]) < 0.022) return 'mediastinal_surface';
+    if (left && cavity(x, y, z) < 0.003) return 'cardiac_notch';
     if (med * x > 0.028) return 'mediastinal_surface';
     return 'costal_surface';
   };

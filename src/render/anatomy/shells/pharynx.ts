@@ -35,9 +35,24 @@ import { bodyFrontAt } from './vertebral_column';
  * cannot drift apart.
  */
 
-/** Body-frame heights of the shell's two ends. */
+/**
+ * Body-frame heights of the shell's two ends.
+ *
+ * THE TOP WAS 0.4 AND IS NOW LOWER (gx2). Body y 0.4 is scene y 0.4506 after the cranial warp,
+ * and the ring there is inside the brain shell: the roof of the tube lay 6.3 mm up in the brain's
+ * underside (auditor aur, scene y 0.433, x 0, z -0.001; the brain's lowest surface above the
+ * pharynx is scene y about 0.4235 at z 0 and the pituitary fossa is at y 0.454, z 0.0095). Gray's
+ * 42nd: the roof of the nasopharynx is the under-surface of the body of the sphenoid and the
+ * basilar part of the occipital bone, a bony floor of the cranial cavity that lies BELOW the brain
+ * and its stalk, so the tube must end under it. The top is the highest body height whose ring,
+ * once warped, has no vertex in the brain shell (measured, see `PROFILE_TOP`'s note). The tube
+ * keeps its radius profile (`PROFILE_TOP`) so that everything that reads a ring below this
+ * height (the mouth's doorway at 0.385, the atlas) is unchanged.
+ */
 export const BODY_Y0 = 0.35;
-export const BODY_Y1 = 0.4;
+export const BODY_Y1 = 0.394;
+/** The height the radius profile was authored over (0.37 to here). Not the tube's top: see BODY_Y1. */
+const PROFILE_TOP = 0.4;
 /** The old centreline, kept for the part of the tube that must still meet the oesophagus. */
 const OLD: readonly (readonly [number, number, number])[] = [
   [0.002, 0.35, -0.02],
@@ -106,7 +121,7 @@ export interface Ring {
 export function ringAt(y: number): Ring {
   // The radius profile keeps its original reference (0.37 to 0.4): the tube now starts 12 mm lower,
   // and re-basing u would have narrowed the doorway the mouth reads at y 0.385.
-  const u = Math.max(0, Math.min(1, (y - 0.37) / (BODY_Y1 - 0.37)));
+  const u = Math.max(0, Math.min(1, (y - 0.37) / (PROFILE_TOP - 0.37)));
   // The old circle: its radius profile is the shell's original one.
   const r0 = 0.0075 + 0.0045 * Math.sin(Math.min(1, u * 1.6) * Math.PI * 0.5);
   const cx = lerp(0.002, 0, u);

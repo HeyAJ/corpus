@@ -1,5 +1,6 @@
 import type { OrganDetailSpec } from '../detail/types';
 import { BRONCHUS_LEFT_END, BRONCHUS_RIGHT_END, CARINA } from '../models';
+import { TRACHEA_CENTRELINE } from '../paths';
 import type { V3 } from '../sdf';
 import { breathTracker } from './lungShared';
 
@@ -21,12 +22,8 @@ import { breathTracker } from './lungShared';
 const LARYNX_REST = 0.15;
 const LARYNX_SWALLOW_WEIGHT = 0.5;
 
-const TRUNK: V3[] = [
-  [0, 0.352, 0],
-  [0, 0.32, 0.002],
-  [0, 0.285, 0.004],
-  [CARINA[0], CARINA[1], CARINA[2]],
-];
+/** The same centreline the shell and the parts follow (paths.ts), so the air stream stays inside the airway. */
+const TRUNK: readonly V3[] = TRACHEA_CENTRELINE;
 
 function toBronchus(end: V3): V3[] {
   return [...TRUNK, [(CARINA[0] + end[0]) / 2, (CARINA[1] + end[1]) / 2, (CARINA[2] + end[2]) / 2], end];

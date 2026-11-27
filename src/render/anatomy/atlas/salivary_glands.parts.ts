@@ -57,7 +57,7 @@ export const PAROTID_DUCT: V3[] = [[0.0625, 0.0055, -0.025], [0.0615, 0.002, -0.
  * mylohyoid under the sublingual gland and along its medial face, and ends on the caruncle
  * exactly where it did before (the mouth atlas's frame point, so the two atlases still agree).
  */
-export const SUBMANDIBULAR_DUCT: V3[] = [[0.0135, -0.031, -0.006], [0.009, -0.0285, 0.01], [0.0008, -0.0235, 0.0215], fromMouth(0.002, -0.008, 0.01)];
+export const SUBMANDIBULAR_DUCT: V3[] = [[0.023, -0.0255, -0.009], [0.009, -0.0285, 0.01], [0.0008, -0.0235, 0.0215], fromMouth(0.002, -0.008, 0.01)];
 /** Where the magnified acinus sits, and its duct (used by the detail module for the droplets). */
 const AC: V3 = [0, 0.01, 0.004];
 const ac = (x: number, y: number, z: number): V3 => [AC[0] + x, AC[1] + y, AC[2] + z];

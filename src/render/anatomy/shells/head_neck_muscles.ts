@@ -609,18 +609,33 @@ spec.sternohyoid = {
     return [neckBelly([a, F.warp([0.0105, 0.318, 0.0255]), onHyoid([0.0085, -0.1195, 0.0236], 0.0016)].map((p) => onSide(p, s)), 0.0032, k, { ends: 0.4, shape: 0.4 })];
   },
 };
+/*
+ * THE STERNOTHYROID WENT THROUGH THE THYROID GLAND (gx2). Its upper end was drawn at body
+ * (0.0185, 0.3535, 0.0045), which is 6 mm BEHIND the front of the thyroid lobe at that
+ * height (the lobe's front is at z 0.0075 to 0.0100 for x 0.012 to 0.020, y 0.33 to 0.346, and the
+ * lobe reaches y 0.3519), so the belly crossed the lobe and was measured 2.4 mm inside it
+ * (auditor aur). Gray's 42nd: the sternothyroid lies behind the sternohyoid and IN FRONT of the
+ * thyroid gland, covering the front of each lobe, and ends on the oblique line of the thyroid
+ * cartilage's lamina. The muscle therefore passes in front of the lobe (a waypoint at z 0.0125
+ * for the lobe's front of 0.0100 plus the belly's 3 mm radius, less 0.5 mm of the shell's
+ * fade) and its upper end is at the cartilage's lamina above the lobe's pole (y 0.3535 is
+ * above the 0.3519 top) at the lamina's outer face, z 0.0105. All three are drawing choices fitted
+ * to the neighbours' shells. The thyrohyoid starts at the same point, so it is shared.
+ */
+const STERNOTHYROID_MID: V3 = [0.0155, 0.336, 0.0135];
+const THYROID_OBLIQUE_LINE: V3 = [0.0175, 0.3545, 0.0105];
 spec.sternothyroid = {
   parent: 'hyoid_muscles',
   make: (k, s) => {
     const a = onManubrium([0.0075, 0.2655, 0.0475], 0.0022);
-    return [neckBelly([a, F.warp([0.0115, 0.3155, 0.0185]), F.warp([0.0185, 0.3535, 0.0045])].map((p) => onSide(p, s)), 0.003, k, { ends: 0.4, shape: 0.4 })];
+    return [neckBelly([a, F.warp([0.0115, 0.3155, 0.0185]), F.warp(STERNOTHYROID_MID), F.warp(THYROID_OBLIQUE_LINE)].map((p) => onSide(p, s)), 0.003, k, { ends: 0.4, shape: 0.4 })];
   },
 };
 // THYROHYOID: the short continuation of the sternothyroid from the oblique line of the thyroid
 // cartilage up to the lower border of the greater horn and body of the hyoid.
 spec.thyrohyoid = {
   parent: 'hyoid_muscles',
-  make: (k, s) => [neckBelly([F.warp([0.0185, 0.3535, 0.0045]), onHyoid([0.0132, -0.1195, 0.0185], 0.0016), onHyoid([0.0125, -0.1195, 0.0198], 0.0017)].map((p) => onSide(p, s)), 0.0027, k, { ends: 0.5, shape: 0.5, tubular: 6 })],
+  make: (k, s) => [neckBelly([F.warp(THYROID_OBLIQUE_LINE), onHyoid([0.0132, -0.1195, 0.0185], 0.0016), onHyoid([0.0125, -0.1195, 0.0198], 0.0017)].map((p) => onSide(p, s)), 0.0027, k, { ends: 0.5, shape: 0.5, tubular: 6 })],
 };
 
 // OMOHYOID: two bellies and an intermediate tendon that is tied down to the clavicle by fascia. The

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
 import { blob, thin } from './lungShared';
 import { BRONCHUS_LEFT_END, BRONCHUS_RIGHT_END, CARINA } from '../models';
+import { TRACHEA_CENTRELINE } from '../paths';
 import {
   ellipsoid, halfSpace, intersect, mergeParts, polygonise, shell, tubeAlong, union, torus, type Sdf, type V3,
 } from '../sdf';
@@ -23,13 +24,13 @@ import {
  * tubes and the trachealis is a ribbon laid out directly, a few hundred triangles each.
  */
 
-/** The shell's centreline (body coordinates), top to bottom. */
-const SPINE: V3[] = [
-  [0, 0.352, 0],
-  [0, 0.32, 0.002],
-  [0, 0.285, 0.004],
-  [CARINA[0], CARINA[1], CARINA[2]],
-];
+/**
+ * The shell's centreline (body coordinates), top to bottom: the one list in paths.ts that the shell
+ * (models.ts `trachea()`) sweeps its chain along. It is no longer four points copied here, because
+ * the lower trachea now inclines back behind the aortic root (paths.ts `TRACHEA_CENTRELINE`) and a copy
+ * would have drifted from the shell the first time either changed.
+ */
+const SPINE: readonly V3[] = TRACHEA_CENTRELINE;
 
 /** Depth (z) of the centreline at height y, by straight interpolation between the control points. */
 export function tracheaCentreZ(y: number): number {
@@ -125,7 +126,7 @@ function trachealis(): THREE.BufferGeometry {
 
 function lumen(): THREE.BufferGeometry {
   return tubeAlong(
-    [[0, 0.355, 0.0], ...SPINE.slice(1, 3), [CARINA[0], CARINA[1] + 0.003, CARINA[2]]],
+    [[0, 0.355, 0.0], ...SPINE.slice(1, -1), [CARINA[0], CARINA[1] + 0.003, CARINA[2]]],
     () => 0.0074,
     { tubular: 30, radial: 10 },
   );

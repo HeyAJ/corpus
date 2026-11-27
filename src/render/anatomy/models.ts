@@ -8,6 +8,7 @@ import {
   halfSpace,
   intersect,
   mergeParts,
+  offset,
   polygonise,
   slab,
   smoothSubtract,
@@ -20,8 +21,19 @@ import {
   type V3,
 } from './sdf';
 import { fbm, ridged } from './noise';
-import { SPINAL_CORD_PATH } from './paths';
-import { giPath, giSegment, organDef, warpGeometry } from './layout';
+import {
+  BRONCHUS_LEFT_END as BRONCHUS_LEFT_END_PATH,
+  BRONCHUS_RIGHT_END as BRONCHUS_RIGHT_END_PATH,
+  CARINA as CARINA_PATH,
+  OESOPHAGUS_FLATTEN,
+  OESOPHAGUS_PATH,
+  SPINAL_CORD_PATH,
+  TRACHEA_CENTRELINE,
+  heartCavity,
+  bronchusCorridor,
+  lungHilum,
+} from './paths';
+import { giPath, giSegment, organDef, organPosition, warpGeometry } from './layout';
 import { mouth } from './shells/mouth';
 import { salivaryGlands } from './shells/salivary_glands';
 import { pharynx } from './shells/pharynx';
@@ -88,6 +100,61 @@ function local(points: readonly V3[], origin: V3): [number, number, number][] {
 }
 
 const merge = mergeParts;
+
+/* ------------------------------------------------- neighbours, seen from here */
+
+/**
+ * ONE ORGAN'S FIELD AS ANOTHER ORGAN SEES IT (gx3, 2026-11-27).
+ *
+ * Every organ is authored in its own frame, so two neighbours cannot be compared directly.
+ * This carries a point from `owner`'s frame to the world (its rotation, then its position as
+ * the exploded stack places it) and from there into `other`'s frame, and asks `field`, which
+ * is written in that frame. The result is `other`'s shape in `owner`'s coordinates, which is
+ * what a CONTACT needs: Gray's draws the liver with a gastric impression where the stomach
+ * lies against it, the spleen with gastric and renal impressions, and the adrenal with a
+ * suprarenal pit in the liver, and each of those is exactly "this organ, minus its
+ * neighbour". The audit of 2026-11-27 had found the liver 29 mm inside the stomach, the right
+ * adrenal 12 mm inside the liver and the spleen 9 mm inside the stomach, because each shell
+ * was authored alone. Rotation uses the same Euler order (XYZ) the renderer applies to the
+ * mesh, so what is cut here is what is drawn there. It reads organ placement only; no body
+ * or pregnancy state enters it, which is right for these organs (none moves with either).
+ */
+function seenFrom(owner: string, other: string, field: Sdf): Sdf {
+  const frame = (id: string): THREE.Matrix4 => {
+    const def = organDef(id);
+    const q = new THREE.Quaternion();
+    if (def.rotation) q.setFromEuler(new THREE.Euler(def.rotation[0], def.rotation[1], def.rotation[2], 'XYZ'));
+    return new THREE.Matrix4().compose(organPosition(def), q, new THREE.Vector3(1, 1, 1));
+  };
+  const m = frame(other).invert().multiply(frame(owner));
+  const e = m.elements;
+  return (x, y, z) =>
+    field(
+      e[0] * x + e[4] * y + e[8] * z + e[12],
+      e[1] * x + e[5] * y + e[9] * z + e[13],
+      e[2] * x + e[6] * y + e[10] * z + e[14],
+    );
+}
+
+/**
+ * The clear space left between two organs that touch, metres. Organs in life are separated by
+ * serosa and a film of fluid, and the marching-cubes mesh of each differs from its field by a
+ * fraction of a millimetre, so the cut is made this much deeper than the contact. A display
+ * choice, not an anatomical measurement.
+ */
+const CONTACT_GAP = 0.0008;
+
+/** The edge of a contact cut is rounded over about this much, metres: a display choice. */
+const CONTACT_ROUND = 0.004;
+
+/** `own` with each neighbour in `cutters` pressed out of it, leaving CONTACT_GAP between them. */
+function pressedBy(own: Sdf, cutters: Sdf[]): Sdf {
+  // The polynomial smooth subtraction gives material back near the crease (by k / 4 at most),
+  // so the cutter is grown by that much as well; without it a vertex at the crease still
+  // lies a quarter of CONTACT_ROUND inside the neighbour.
+  const grow = CONTACT_GAP + CONTACT_ROUND * 0.25;
+  return smoothSubtract(CONTACT_ROUND, own, offset(union(...cutters), grow));
+}
 
 /* ------------------------------------------------------------------ brain */
 
@@ -325,12 +392,14 @@ function lung(side: -1 | 1): THREE.BufferGeometry {
   f = smoothSubtract(0.014, f, halfSpace([med * 0.042, 0, 0], [med, 0, 0]));
   // Base: hollowed by the dome of the diaphragm.
   f = smoothSubtract(0.012, f, ellipsoid([med * 0.03, -0.165, 0.0], [0.11, 0.07, 0.1]));
-  // Cardiac impression - deep on the left, where it becomes the notch.
-  f = left
-    ? smoothSubtract(0.012, f, ellipsoid([med * 0.062, -0.04, 0.03], [0.04, 0.055, 0.046]))
-    : smoothSubtract(0.012, f, ellipsoid([med * 0.066, -0.035, 0.022], [0.034, 0.045, 0.04]));
+  // Cardiac impression: the heart itself, grown by the pericardial and pleural gap, subtracted from
+  // the lung (Gray's: deep on the left, where it becomes the cardiac notch, shallower on the right).
+  // THE OLD ONE WAS A FREE ELLIPSOID, and the heart sat 33 mm inside the left lung; see paths.ts.
+  f = smoothSubtract(0.006, f, heartCavity(left ? 'lung_l' : 'lung_r'));
+  // The main bronchus lies in the mediastinum, in a groove on the lung's medial face (paths.ts).
+  f = smoothSubtract(0.004, f, bronchusCorridor(left ? 'lung_l' : 'lung_r'));
   // Hilum: where the bronchus and the vessels enter.
-  f = smoothSubtract(0.006, f, sphere([med * 0.047, 0.012, -0.004], 0.014));
+  f = smoothSubtract(0.006, f, sphere(lungHilum(side), 0.014));
 
   // Oblique fissure: high at the back, low at the front.
   const obliquePoint: V3 = [0, 0.012, 0];
@@ -349,21 +418,17 @@ function lung(side: -1 | 1): THREE.BufferGeometry {
 
 /* ---------------------------------------------------------------- trachea */
 
-/** Carina and the ends of the two main bronchi, body coordinates. Shared with the airway detail. */
-export const CARINA: V3 = [0, 0.254, 0.004];
-export const BRONCHUS_RIGHT_END: V3 = [0.03, 0.228, -0.002];
-export const BRONCHUS_LEFT_END: V3 = [-0.03, 0.222, -0.002];
+/**
+ * Carina and the ends of the two main bronchi, body coordinates. Shared with the airway detail.
+ * They live in paths.ts now (the trachea was brought back behind the aortic root, see there) and
+ * are re-exported here so the atlas files keep importing them from this module.
+ */
+export const CARINA: V3 = CARINA_PATH;
+export const BRONCHUS_RIGHT_END: V3 = BRONCHUS_RIGHT_END_PATH;
+export const BRONCHUS_LEFT_END: V3 = BRONCHUS_LEFT_END_PATH;
 
 function trachea(): THREE.BufferGeometry {
-  const trunk = chain(
-    [
-      [0, 0.352, 0],
-      [0, 0.32, 0.002],
-      [0, 0.285, 0.004],
-      [CARINA[0], CARINA[1], CARINA[2]],
-    ],
-    0.0098,
-  );
+  const trunk = chain(TRACHEA_CENTRELINE, 0.0098);
   // Sixteen to twenty C-shaped cartilage rings: ridges on the front and sides only,
   // because the back wall is muscle (it is what lets a swallowed bolus bulge forward).
   const ringed = displaced(trunk, (_x, y, z) => {
@@ -382,7 +447,10 @@ function trachea(): THREE.BufferGeometry {
     capsule(CARINA, BRONCHUS_RIGHT_END, 0.0078, 0.0068),
     capsule(CARINA, BRONCHUS_LEFT_END, 0.0068, 0.006),
   );
-  return polygonise(field, [-0.04, 0.212, -0.014], [0.04, 0.38, 0.022], { cell: 0.002 });
+  // The box follows the airway: it reaches back to z -0.04 (the lower trachea now inclines behind the
+  // aortic root, paths.ts), down to y 0.196 and out to x -0.08 (the left main bronchus now ends at the
+  // left hilum). The old box stopped at z -0.014 and would have clipped the trachea open.
+  return polygonise(field, [-0.08, 0.196, -0.04], [0.045, 0.38, 0.022], { cell: 0.002 });
 }
 
 /* -------------------------------------------------------------- diaphragm */
@@ -460,6 +528,75 @@ function diaphragm(): THREE.BufferGeometry {
 
 /* ------------------------------------------------------------- oesophagus */
 
+/**
+ * The oesophagus's path, as `tubeAlong` sweeps it: the authored points and nothing else. The
+ * thoracic part is `OESOPHAGUS_PATH` in paths.ts (moved back behind the heart, see there); it
+ * replaces the organs.json centreline, which still feeds GiBolus.ts.
+ */
+export const OESOPHAGUS_POINTS: readonly V3[] = OESOPHAGUS_PATH;
+
+/**
+ * Flatten the thoracic oesophagus front to back about its own centreline, in place.
+ *
+ * `OESOPHAGUS_FLATTEN` gives a front-to-back scale by height (1 where there is room). Every vertex
+ * is moved toward the centreline's z at its own height by that scale, and away from its x by
+ * `1 + 0.5 (1 - scale)`. The centre is the Catmull-Rom curve `tubeAlong` uses (sampled densely and
+ * read by height, since the oesophagus never turns back upward), not the straight lines between
+ * nodes, so a vertex's offset is measured from the true axis. The atlas applies the same function
+ * to every part (atlas/oesophagus.parts.ts), so the layers stay inside the flattened wall.
+ */
+const flattenCentre = (() => {
+  let samples: { y: number; x: number; z: number }[] | null = null;
+  return (y: number): { x: number; z: number } => {
+    if (samples === null) {
+      const curve = new THREE.CatmullRomCurve3(OESOPHAGUS_POINTS.map((p) => new THREE.Vector3(p[0], p[1], p[2])), false, 'catmullrom', 0.5);
+      samples = curve.getSpacedPoints(400).map((p) => ({ y: p.y, x: p.x, z: p.z }));
+    }
+    // samples run top to bottom (y falls); find the bracketing pair by bisection.
+    let lo = 0;
+    let hi = samples.length - 1;
+    if (y >= samples[0].y) return samples[0];
+    if (y <= samples[hi].y) return samples[hi];
+    while (hi - lo > 1) {
+      const m = (lo + hi) >> 1;
+      if (samples[m].y >= y) lo = m;
+      else hi = m;
+    }
+    const f = (samples[lo].y - y) / (samples[lo].y - samples[hi].y || 1);
+    return { x: samples[lo].x + (samples[hi].x - samples[lo].x) * f, z: samples[lo].z + (samples[hi].z - samples[lo].z) * f };
+  };
+})();
+
+function flattenScale(y: number): number {
+  const t = OESOPHAGUS_FLATTEN;
+  if (y >= t[0][0]) return t[0][1];
+  for (let i = 0; i < t.length - 1; i++) {
+    if (y <= t[i][0] && y >= t[i + 1][0]) {
+      const f = (t[i][0] - y) / (t[i][0] - t[i + 1][0]);
+      // Smoothstep, so the squeeze eases in and out instead of creasing at each node.
+      const e = f * f * (3 - 2 * f);
+      return t[i][1] + (t[i + 1][1] - t[i][1]) * e;
+    }
+  }
+  return t[t.length - 1][1];
+}
+
+export function flattenOesophagus(geometry: THREE.BufferGeometry): THREE.BufferGeometry {
+  const pos = geometry.getAttribute('position') as THREE.BufferAttribute;
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i);
+    const sz = flattenScale(y);
+    if (sz === 1) continue;
+    const c = flattenCentre(y);
+    const sx = 1 + 0.5 * (1 - sz);
+    pos.setX(i, c.x + (pos.getX(i) - c.x) * sx);
+    pos.setZ(i, c.z + (pos.getZ(i) - c.z) * sz);
+  }
+  pos.needsUpdate = true;
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
 function oesophagus(): THREE.BufferGeometry {
   // THE TOP WAS AN EXTRA POINT, [0.002, 0.37, -0.014], AND IS GONE. It had two faults. It tipped
   // the top 6 mm of the tube forward until its front wall lay 3 mm inside the trachea's back wall
@@ -468,14 +605,18 @@ function oesophagus(): THREE.BufferGeometry {
   // bodies, now back at their real depth (paths.ts), leave no room: the tube starts at the data's
   // own first point (y 0.352, z -0.02) and the pharynx, which has a front-to-back span that can
   // follow the bone, takes over above it (shells/pharynx.ts).
-  const points: [number, number, number][] = [...giSegment('oesophagus')];
+  //
+  // THE THORACIC PART WAS MOVED BACK AND FLATTENED (gx1, 2026-11-27): it lay 8 mm inside the heart's
+  // back. The new points and the reasons are in paths.ts `OESOPHAGUS_PATH`; the flattening is
+  // `flattenOesophagus` above.
+  const points: [number, number, number][] = OESOPHAGUS_POINTS.map((p) => [p[0], p[1], p[2]]);
   const g = tubeAlong(
     points,
     // Narrowed at each end by its sphincters; the lower one is what reflux gets past.
     (t) => 0.0086 * (1 - 0.28 * Math.exp(-Math.pow((t - 0.97) / 0.035, 2)) - 0.2 * Math.exp(-Math.pow(t / 0.04, 2))),
     { tubular: 90, radial: 12 },
   );
-  return warpGeometry(g);
+  return warpGeometry(flattenOesophagus(g));
 }
 
 /* ------------------------------------------------------------------ liver */
@@ -485,7 +626,7 @@ function oesophagus(): THREE.BufferGeometry {
  * sloping visceral surface, the notch of the falciform ligament on the front and the
  * groove the inferior vena cava runs in at the back.
  */
-function liver(): THREE.BufferGeometry {
+function liverBaseField(): Sdf {
   let f = smoothUnion(
     0.03,
     ellipsoid([0.03, 0.0, -0.005], [0.062, 0.062, 0.058]),
@@ -499,7 +640,41 @@ function liver(): THREE.BufferGeometry {
   f = smoothSubtract(0.004, f, capsule([-0.02, 0.052, 0.046], [-0.022, -0.03, 0.04], 0.004));
   // Groove for the inferior vena cava.
   f = smoothSubtract(0.006, f, capsule([-0.012, 0.062, -0.046], [-0.012, -0.03, -0.05], 0.012));
-  const field = displacedNear(f, (x, y, z) => 0.0012 * fbm(x, y, z, 55, 2), 0.011);
+  return f;
+}
+
+/**
+ * WHAT PRESSES INTO THE LIVER, in the liver's frame (gx3, 2026-11-27). The liver was authored
+ * as a free ellipsoid pair and the stomach, right kidney and right adrenal as free shapes, so
+ * the audit found the left lobe 29 mm inside the stomach, the right adrenal 12 mm inside the
+ * liver and the right kidney 5.6 mm inside it. Gray's gives each of these a surface on the
+ * liver: the gastric impression on the visceral surface of the left lobe, the renal
+ * impression on the right lobe behind, and the suprarenal impression beside the groove of
+ * the inferior vena cava. The right adrenal is NOT surrounded by liver: it lies behind it,
+ * in contact with the bare area, so the cutter for it is the gland plus a channel running
+ * straight back (-z) from its centre, which opens the pit to the posterior surface instead of
+ * leaving a closed cavity inside the organ. The channel radius is the gland's own half height
+ * rounded up (a display choice).
+ */
+export function liverCutters(): Sdf[] {
+  const behind = capsule([0, 0, 0], [0, 0, -0.08], 0.012);
+  return [
+    seenFrom('liver', 'stomach', stomachField()),
+    seenFrom('liver', 'kidney_r', kidneyField(1)),
+    seenFrom('liver', 'adrenal_r', union(adrenalField(1), behind)),
+  ];
+}
+
+/** The liver's shell field without its fine texture, with the contacts pressed in. */
+export function liverField(): Sdf {
+  return pressedBy(liverBaseField(), liverCutters());
+}
+
+function liver(): THREE.BufferGeometry {
+  const textured = displacedNear(liverBaseField(), (x, y, z) => 0.0012 * fbm(x, y, z, 55, 2), 0.011);
+  // The contacts are cut AFTER the texture so the surface the neighbour touches is the
+  // neighbour's own shape and not that shape plus 1.2 mm of noise.
+  const field = pressedBy(textured, liverCutters());
   return polygonise(field, [-0.112, -0.07, -0.068], [0.098, 0.068, 0.062], { cell: 0.004 });
 }
 
@@ -528,16 +703,19 @@ function gallbladder(): THREE.BufferGeometry {
  * swallowed is always drawn inside it: cardia, a fundus that domes above the cardia,
  * body, antrum and a narrow pylorus that ends to the RIGHT of the midline.
  */
-function stomach(): THREE.BufferGeometry {
+export function stomachField(): Sdf {
   const origin = organDef('stomach').position;
   const line = local(giSegment('stomach'), origin);
   const fundus = local([[-0.052, 0.094, 0.002]], origin)[0];
-  const field = smoothUnion(
+  return smoothUnion(
     0.012,
     chain(line, [0.011, 0.022, 0.031, 0.032, 0.028, 0.02, 0.009]),
     sphere(fundus, 0.027),
   );
-  return polygonise(field, [-0.066, -0.066, -0.04], [0.068, 0.07, 0.044], { cell: 0.0036 });
+}
+
+function stomach(): THREE.BufferGeometry {
+  return polygonise(stomachField(), [-0.066, -0.066, -0.04], [0.068, 0.07, 0.056], { cell: 0.0036 });
 }
 
 /* --------------------------------------------------------------- pancreas */
@@ -551,55 +729,124 @@ export const PANCREAS_PATH: [number, number, number][] = [
   [0.022, -0.02, -0.024],
 ];
 
-function pancreas(): THREE.BufferGeometry {
-  const gland = smoothUnion(
+/** The pancreas as a plain field, before its lobulation: the chain of the gland and the uncinate hook. */
+export function pancreasGlandField(): Sdf {
+  return smoothUnion(
     0.006,
     chain(PANCREAS_PATH, [0.008, 0.011, 0.0125, 0.0115, 0.019]),
     ellipsoid([0.01, -0.036, -0.027], [0.012, 0.009, 0.008]), // uncinate process
   );
-  // Lobulated: the pancreas has no capsule to smooth it over.
-  const field = displacedNear(gland, (x, y, z) => 0.0016 * fbm(x, y, z, 180, 2), 0.008);
-  return polygonise(field, [-0.088, -0.05, -0.05], [0.046, 0.04, -0.004], { cell: 0.0026 });
+}
+
+/**
+ * WHAT PRESSES INTO THE PANCREAS (gx3, 2026-11-27). Gray's: the body and tail lie in front of
+ * the left kidney and adrenal and the neck in front of the portal vein, the aorta and the
+ * vertebral bodies, with the stomach in FRONT of the gland across the lesser sac, and the tail
+ * ends at the splenic hilum. The audit found the gland 11 mm inside the left kidney and the
+ * vertebral column 10 mm inside it. Most of that was a depth problem: the gland sat at the
+ * same z as the front of the lumbar bodies and the kidney (about -29 mm), with the stomach's
+ * back wall pressed on it from the front. The whole organ now sits 12 mm further forward (its
+ * `layoutOffset` in organs.json) and the stomach 12 mm forward over the body, so the gland has
+ * a slot between them; what is left of the contact is pressed in here. The vertebral column
+ * is not a field this file can read, and no longer touches the gland.
+ */
+export function pancreasCutters(): Sdf[] {
+  // The duodenum is part of the small-bowel tube, which has no field of its own, so it is
+  // rebuilt here as a chain along its authored centreline at the tube's own calibre (the
+  // first term of `intestineSmall`, 0.0122 m, with the 3.5 % ripple added) plus 1 mm for the
+  // gap between the spline the shell follows and the straight chords this chain follows. The
+  // gut centrelines are in unexploded body coordinates and the pancreas frame is the same
+  // frame moved 12 mm forward (its layoutOffset), so the path is shifted back by that much.
+  // Gray's: the head lies in the concavity of the C of the duodenum, in contact with its
+  // inner wall; the audit found the two 8 to 9 mm inside each other.
+  const forward = organDef('pancreas').layoutOffset[2];
+  const duodenum = chain(local(giSegment('duodenum'), [0, 0, forward]), 0.0122 * 1.035 + 0.001);
+  return [
+    seenFrom('pancreas', 'stomach', stomachField()),
+    seenFrom('pancreas', 'kidney_l', kidneyField(-1)),
+    seenFrom('pancreas', 'spleen', spleenField()),
+    duodenum,
+  ];
+}
+
+function pancreas(): THREE.BufferGeometry {
+  // Lobulated: the pancreas has no capsule to smooth it over. The contacts are cut after the
+  // lobulation so the neighbour's surface is the neighbour's own.
+  const lobulated = displacedNear(pancreasGlandField(), (x, y, z) => 0.0016 * fbm(x, y, z, 180, 2), 0.008);
+  const field = pressedBy(lobulated, pancreasCutters());
+  return polygonise(field, [-0.088, -0.05, -0.05], [0.046, 0.04, 0.02], { cell: 0.0026 });
 }
 
 /* ----------------------------------------------------------------- spleen */
 
-function spleen(): THREE.BufferGeometry {
+export function spleenField(): Sdf {
   let f: Sdf = ellipsoid([0, 0, 0], [0.027, 0.05, 0.021]);
   // Visceral surface and hilum, facing forward and toward the midline.
   f = smoothSubtract(0.012, f, ellipsoid([0.03, 0, 0.012], [0.02, 0.04, 0.016]));
   // The notches on its superior border - the feature a palpating hand looks for.
   f = smoothSubtract(0.003, f, sphere([-0.004, 0.03, 0.022], 0.006));
   f = smoothSubtract(0.003, f, sphere([-0.006, 0.012, 0.024], 0.005));
-  return polygonise(f, [-0.03, -0.054, -0.025], [0.03, 0.054, 0.025], { cell: 0.0028 });
+  return f;
+}
+
+/**
+ * WHAT PRESSES INTO THE SPLEEN (gx3, 2026-11-27): Gray's gives the spleen a gastric
+ * impression (the stomach's fundus and upper body against its visceral surface) and a renal
+ * impression (the upper pole of the left kidney against its lower part). The audit found it 9 mm
+ * inside the stomach and 5 mm inside the left kidney. The tail of the pancreas, which reaches
+ * the hilum, is cut from the pancreas side instead.
+ */
+export function spleenCutters(): Sdf[] {
+  return [seenFrom('spleen', 'stomach', stomachField()), seenFrom('spleen', 'kidney_l', kidneyField(-1))];
+}
+
+function spleen(): THREE.BufferGeometry {
+  return polygonise(pressedBy(spleenField(), spleenCutters()), [-0.03, -0.054, -0.025], [0.03, 0.054, 0.025], { cell: 0.0028 });
 }
 
 /* --------------------------------------------------------------- adrenals */
 
-function adrenal(side: -1 | 1): THREE.BufferGeometry {
+export function adrenalField(side: -1 | 1): Sdf {
   // The left gland is a crescent draped over the kidney's upper pole; the right is a
   // pyramid tucked behind the vena cava. They really are different shapes.
-  const field =
-    side < 0
-      ? smoothSubtract(0.003, ellipsoid([0, 0, 0], [0.017, 0.011, 0.006]), sphere([0.004, -0.016, 0], 0.013))
-      : smoothUnion(
-          0.004,
-          ellipsoid([0, -0.002, 0], [0.014, 0.009, 0.006]),
-          capsule([0, 0, 0], [0.002, 0.013, 0], 0.006, 0.002),
-        );
-  return polygonise(field, [-0.02, -0.014, -0.009], [0.02, 0.018, 0.009], { cell: 0.0013 });
+  return side < 0
+    ? smoothSubtract(0.003, ellipsoid([0, 0, 0], [0.017, 0.011, 0.006]), sphere([0.004, -0.016, 0], 0.013))
+    : smoothUnion(
+        0.004,
+        ellipsoid([0, -0.002, 0], [0.014, 0.009, 0.006]),
+        capsule([0, 0, 0], [0.002, 0.013, 0], 0.006, 0.002),
+      );
+}
+
+/**
+ * WHAT PRESSES INTO AN ADRENAL (gx3, 2026-11-27): the kidney's upper pole. Gray's says each
+ * gland caps its kidney's upper pole and the kidney is not a part of it; the audit found the
+ * right gland 4.6 mm and the left 3.5 mm inside it. The liver is cut from the liver's side
+ * (see `liverCutters`), so the right adrenal is the one that keeps its shape.
+ */
+export function adrenalCutters(side: -1 | 1): Sdf[] {
+  const id = side < 0 ? 'adrenal_l' : 'adrenal_r';
+  return [seenFrom(id, side < 0 ? 'kidney_l' : 'kidney_r', kidneyField(side))];
+}
+
+function adrenal(side: -1 | 1): THREE.BufferGeometry {
+  return polygonise(pressedBy(adrenalField(side), adrenalCutters(side)), [-0.02, -0.014, -0.009], [0.02, 0.018, 0.009], { cell: 0.0013 });
 }
 
 /* ---------------------------------------------------------------- kidneys */
 
-function kidney(side: -1 | 1): THREE.BufferGeometry {
+export function kidneyField(side: -1 | 1): Sdf {
   const med = side < 0 ? 1 : -1;
   let f: Sdf = ellipsoid([0, 0, 0], [0.0285, 0.055, 0.021]);
   // The hilum: the notch that makes it a bean, where artery, vein and ureter attach.
   f = smoothSubtract(0.01, f, ellipsoid([med * 0.036, 0, 0.004], [0.018, 0.022, 0.02]));
   // The renal pelvis emerging from it and turning down into the ureter.
   f = smoothUnion(0.004, f, capsule([med * 0.014, 0, 0.002], [med * 0.03, -0.014, 0.004], 0.0065, 0.004));
-  return polygonise(f, [-0.034, -0.058, -0.024], [0.034, 0.058, 0.024], { cell: 0.0028 });
+  return f;
+}
+
+function kidney(side: -1 | 1): THREE.BufferGeometry {
+  return polygonise(kidneyField(side), [-0.034, -0.058, -0.024], [0.034, 0.058, 0.024], { cell: 0.0028 });
 }
 
 /** The two ureters, body coordinates: renal pelvis to the trigone of the bladder. */

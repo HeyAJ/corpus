@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { PartBuilder } from '../parts';
-import { giSegment, warpGeometry } from '../layout';
+import { warpGeometry } from '../layout';
+import { OESOPHAGUS_POINTS, flattenOesophagus } from '../models';
 import { mulberry32 } from '../noise';
 import { mergeParts, tubeAlong } from '../sdf';
 import type { V3 } from '../sdf';
@@ -64,7 +65,9 @@ export const ABDOMINAL_START = 0.94;
 
 /** The same points the shell is swept along: a short run up to the pharynx, then the gut centreline. */
 export function oesophagusPoints(): V3[] {
-  return [[0.002, 0.37, -0.014], ...giSegment('oesophagus')];
+  // The thoracic centreline is the one in paths.ts (moved back behind the heart, gx1 2026-11-27), not the
+  // organs.json one; the shell sweeps the same points, so shell and parts cannot disagree.
+  return [[0.002, 0.37, -0.014], ...OESOPHAGUS_POINTS.map((p): V3 => [p[0], p[1], p[2]])];
 }
 
 /** The shell's radius at arc fraction t. Copied from models.ts `oesophagus()`; see header. */
@@ -307,7 +310,9 @@ export const parts: PartBuilder = () => {
   }
   const zLine = tubeAlong(zig, () => 0.00032, { tubular: teeth * 6, radial: 3, closed: true, tension: 0.2 });
 
-  const w = (g: THREE.BufferGeometry): THREE.BufferGeometry => warpGeometry(g);
+  // Every part is flattened exactly as the shell is (models.ts `flattenOesophagus`), BEFORE the warp, so the
+  // layers stay inside a wall that is squeezed to about half its depth behind the left atrium.
+  const w = (g: THREE.BufferGeometry): THREE.BufferGeometry => warpGeometry(flattenOesophagus(g));
   return [
     { id: 'upper_sphincter', geometry: w(upper) },
     { id: 'cervical_segment', geometry: w(cervical) },
