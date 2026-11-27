@@ -98,6 +98,10 @@ const BODY_WALL_MUSCLE_ROWS: readonly WallRow[] = [
   [0.044, 0.168, -0.127, 'z', -1, 'trunk'],
   [0.016, 0.192, -0.127, 'z', -1, 'trunk'],
   [0.048, 0.216, -0.122, 'z', -1, 'trunk'],
+  // The gluteal back of the pelvis. Added when the large intestine was moved off the iliac bones: the old
+  // descending colon and sigmoid had been holding the male glass out here, and once they moved the back
+  // muscles stood 0.24 mm inside it against the 1 mm the containment test needs.
+  [0.083, -0.15, -0.082, 'z', -1, 'trunk'],
   // The iliotibial tract and the gluteal region at the hip: the widest vertex of the thigh shell.
   [0.127, -0.216, 0.0, 'x', 1, 'trunk'],
   [0.125, -0.240, -0.005, 'x', 1, 'trunk'],
