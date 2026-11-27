@@ -66,6 +66,14 @@ export function stepFluids(s: SimState, dt: number): void {
 
   f.interstitial -= shift;
   s.cardio.veins.V += shift;
+  // The fluid that crosses the capillary wall is plasma ultrafiltrate: it takes its
+  // sodium, potassium and chloride with it. Left untagged, `rebalanceElectrolytes` read
+  // the return of an infused litre to the interstitium as plasma WATER being lost and
+  // concentrated the serum sodium by about 4 mEq/L on top of the infusion itself (a litre
+  // of normal saline read 146.8 instead of the ~142.8 mass balance gives). It is tagged
+  // so the electrolytes ignore it while the haematocrit and albumin, which the fluid does
+  // not carry, still dilute by it (haemodilution after a bleed is preserved).
+  s.cardio.solutedShift_mL += shift;
 
   // --- capillary leak ------------------------------------------------------
   //
@@ -83,6 +91,8 @@ export function stepFluids(s: SimState, dt: number): void {
     s.cardio.veins.V -= moved;
     f.interstitial += moved;
     s.cardio.targetBloodVolume = Math.max(500, s.cardio.targetBloodVolume - moved);
+    // Leaked plasma carries its electrolytes (same reasoning as the refill above).
+    s.cardio.solutedShift_mL -= moved;
   }
 
   // --- non-urine fluid losses: diarrhoea and sweat -------------------------

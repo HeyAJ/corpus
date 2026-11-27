@@ -305,15 +305,21 @@ export function rebalanceElectrolytes(s: SimState, previousVolume: number): void
   // solutes with it and must not concentrate anything. Only the free-water part does.
   const isotonic = s.cardio.isotonicDelta_mL;
   s.cardio.isotonicDelta_mL = 0;
+  const solutedShift = s.cardio.solutedShift_mL;
+  s.cardio.solutedShift_mL = 0;
   const effectiveNow = now - isotonic;
-  if (previousVolume <= 0 || effectiveNow <= 0) return;
+  // Electrolytes ignore the ultrafiltrate shifts as well; red cells and albumin do not.
+  const electrolyteNow = effectiveNow - solutedShift;
+  if (previousVolume <= 0 || effectiveNow <= 0 || electrolyteNow <= 0) return;
   const ratio = previousVolume / effectiveNow;
-  if (!Number.isFinite(ratio) || Math.abs(ratio - 1) < 1e-9) return;
+  const eRatio = previousVolume / electrolyteNow;
+  if (!Number.isFinite(ratio) || !Number.isFinite(eRatio)) return;
+  if (Math.abs(ratio - 1) < 1e-9 && Math.abs(eRatio - 1) < 1e-9) return;
   // Only the intravascular share dilutes immediately; the ECF equilibrates over
   // minutes, so the effective ratio is damped. Hct and albumin are intravascular, so
   // they take the full ratio - which is why transcapillary refill after a bleed lowers
   // them (haemodilution) while the bleed itself, being isotonic, does not.
-  const damped = 1 + (ratio - 1) * 0.35;
+  const damped = 1 + (eRatio - 1) * 0.35;
   s.chem.na *= damped;
   s.chem.k *= damped;
   s.chem.cl *= damped;

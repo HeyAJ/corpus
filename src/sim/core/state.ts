@@ -95,6 +95,15 @@ export interface CardioState {
   targetBloodVolume: number;
   /** Isotonic volume moved this tick (blood, saline); excluded from electrolyte concentration. */
   isotonicDelta_mL: number;
+  /**
+   * Plasma ultrafiltrate moved between the vessels and the interstitium this tick
+   * (transcapillary refill and capillary leak), mL, signed as the change in blood volume.
+   * It carries the serum electrolytes with it, so it must not concentrate them, but unlike
+   * whole blood it carries no red cells and no albumin, so it DOES dilute or concentrate
+   * the haematocrit and albumin. That asymmetry is why it is a second tally and not part of
+   * `isotonicDelta_mL`.
+   */
+  solutedShift_mL: number;
 
   /** CPR compression impulse, decays over ~1.2 s (spec 9). */
   cprImpulse: number;
@@ -770,6 +779,7 @@ export function createInitialState(seed: number): SimState {
     bloodVolume: bv,
     targetBloodVolume: bv,
     isotonicDelta_mL: 0,
+    solutedShift_mL: 0,
 
     cprImpulse: 0,
     fibAmplitude: 0,
